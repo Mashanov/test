@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Кристальный Мэтч</title>
+<script src="https://vk.com/js/api/xd_connection.js?2"></script>
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
+html,body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-family:'Segoe UI',Arial,sans-serif; touch-action:none; }
+#game-container { position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg,#0a0a2a 0%,#1a0a3a 50%,#0a1a3a 100%); }
+.screen { position:absolute; top:0; left:0; width:100%; height:100%; display:none; flex-direction:column; align-items:center; justify-content:center; z-index:10; }
+.screen.active { display:flex; }
+
+/* Animations */
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes scaleIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes floatUp { 0%{transform:translateY(0)} 50%{transform:translateY(-10px)} 100%{transform:translateY(0)} }
+@keyframes glow { 0%{filter:drop-shadow(0 0 5px rgba(100,200,255,.8))} 50%{filter:drop-shadow(0 0 20px rgba(100,200,255,1))} 100%{filter:drop-shadow(0 0 5px rgba(100,200,255,.8))} }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes popIn { 0%{transform:scale(0) rotate(-180deg);opacity:0} 70%{transform:scale(1.2) rotate(10deg)} 100%{transform:scale(1) rotate(0);opacity:1} }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+@keyframes sparkleAnim { 0%{transform:scale(0) rotate(0);opacity:1} 100%{transform:scale(2) rotate(180deg);opacity:0} }
+@keyframes slideDown { from{transform:translateY(-50px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes coinFly { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{transform:translate(0,-20px) scale(1);opacity:1} 100%{transform:translate(150px,-100px) scale(.5);opacity:0} }
+
+.btn { cursor:pointer; border:none; border-radius:14px; padding:14px 28px; font-size:18px; font-weight:bold; color:#fff; transition:transform .15s,box-shadow .15s; position:relative; overflow:hidden; }
+.btn:active { transform:scale(0.95); }
+.btn-primary { background:linear-gradient(135deg,#667eea,#764ba2); box-shadow:0 4px 15px rgba(102,126,234,.5); }
+.btn-success { background:linear-gradient(135deg,#11998e,#38ef7d); box-shadow:0 4px 15px rgba(56,239,125,.4); }
+.btn-danger { background:linear-gradient(135deg,#e74c3c,#c0392b); box-shadow:0 4px 15px rgba(231,76,60,.4); }
+.btn-warning { background:linear-gradient(135deg,#f7971e,#ffd200); box-shadow:0 4px 15px rgba(255,210,0,.4); }
+.btn-secondary { background:linear-gradient(135deg,#2c3e50,#3498db); box-shadow:0 4px 15px rgba(52,152,219,.3); }
+.btn::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent); animation:shimmer 3s infinite; }
+
+.title-text { font-size:42px; font-weight:900; color:transparent; background:linear-gradient(135deg,#667eea,#f093fb,#4facfe); -webkit-background-clip:text; background-clip:text; text-shadow:none; animation:glow 2s infinite; text-align:center; margin-bottom:30px; }
+
+.panel { background:rgba(20,20,50,.85); border:2px solid rgba(100,150,255,.3); border-radius:20px; padding:20px; backdrop-filter:blur(10px); box-shadow:0 8px 32px rgba(0,0,0,.4); }
+
+/* Lobby */
+#lobby-screen { animation:fadeIn .5s; }
+.lobby-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; max-width:420px; width:90%; }
+.lobby-btn { display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 10px; border-radius:16px; cursor:pointer; transition:transform .2s; background:rgba(30,30,70,.7); border:1px solid rgba(100,150,255,.2); }
+.lobby-btn:active { transform:scale(.93); }
+.lobby-btn svg { width:48px; height:48px; }
+.lobby-btn span { font-size:14px; font-weight:bold; color:#aaddff; }
+.top-bar { position:absolute; top:10px; left:10px; right:10px; display:flex; justify-content:space-between; align-items:center; z-index:20; }
+.coin-display { display:flex; align-items:center; gap:8px; background:rgba(20,20,50,.8); padding:8px 16px; border-radius:20px; border:1px solid rgba(255,215,0,.3); }
+.coin-display span { color:#ffd700; font-weight:bold; font-size:16px; }
+
+/* Level Select */
+.level-grid-container { max-width:500px; width:95%; max-height:70vh; overflow-y:auto; padding:10px; }
+.level-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+.level-card { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:12px; cursor:pointer; transition:transform .15s; font-weight:bold; }
+.level-card.unlocked { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; box-shadow:0 2px 10px rgba(102,126,234,.3); }
+.level-card.locked { background:rgba(40,40,60,.6); color:#555; cursor:not-allowed; }
+.level-card.current { background:linear-gradient(135deg,#38ef7d,#11998e); animation:pulse 1.5s infinite; }
+.level-card:active { transform:scale(.9); }
+
+/* Game board */
+#game-screen { flex-direction:column; }
+#game-canvas { border-radius:12px; box-shadow:0 0 40px rgba(100,150,255,.3); }
+.game-top-bar { width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+.game-info-box { background:rgba(20,20,50,.8); padding:8px 16px; border-radius:12px; text-align:center; min-width:80px; }
+.game-info-box .label { font-size:11px; color:#8899bb; text-transform:uppercase; }
+.game-info-box .value { font-size:20px; font-weight:bold; color:#fff; }
+.btn-back { background:rgba(40,40,70,.8); border:1px solid rgba(100,150,255,.3); border-radius:10px; padding:8px 14px; color:#fff; cursor:pointer; font-size:14px; }
+.power-up-bar { display:flex; gap:8px; margin-top:10px; }
+.power-up-slot { width:52px; height:52px; border-radius:12px; background:rgba(30,30,70,.7); border:2px solid rgba(100,150,255,.3); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; position:relative; transition:transform .15s; }
+.power-up-slot:active { transform:scale(.9); }
+.power-up-slot svg { width:30px; height:30px; }
+.power-up-count { position:absolute; bottom:-4px; right:-4px; background:#e74c3c; color:#fff; font-size:10px; font-weight:bold; border-radius:10px; padding:1px 5px; }
+
+/* Overlay */
+.overlay-bg { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; z-index:50; animation:fadeIn .3s; }
+.overlay-content { animation:scaleIn .3s; text-align:center; max-width:90%; }
+.star-rating { display:flex; gap:10px; justify-content:center; margin:20px 0; }
+.star { width:50px; height:50px; animation:popIn .5s; }
+.star.filled { filter:drop-shadow(0 0 10px gold); }
+
+/* Settings */
+.settings-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(100,150,255,.15); width:100%; }
+.settings-row:last-child { border:none; }
+.settings-label { color:#aaddff; font-size:16px; font-weight:bold; }
+.toggle-switch { width:54px; height:30px; background:rgba(60,60,80,.5); border-radius:15px; cursor:pointer; position:relative; transition:background .3s; }
+.toggle-switch.on { background:linear-gradient(135deg,#38ef7d,#11998e); }
+.toggle-switch .knob { position:absolute; top:3px; left:3px; width:24px; height:24px; background:#fff; border-radius:50%; transition:left .3s; }
+.toggle-switch.on .knob { left:27px; }
+.lang-btn { padding:8px 20px; border-radius:10px; cursor:pointer; font-weight:bold; border:2px solid transparent; background:rgba(40,40,70,.7); color:#aaddff; transition:all .2s; }
+.lang-btn.active { border-color:#38ef7d; color:#38ef7d; }
+.promo-input { width:100%; padding:12px; border-radius:10px; background:rgba(20,20,50,.8); border:1px solid rgba(100,150,255,.3); color:#fff; font-size:16px; margin:10px 0; }
+
+/* Quests */
+.quest-card { background:rgba(30,30,70,.6); border:1px solid rgba(100,150,255,.2); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.quest-info { flex:1; }
+.quest-title { color:#fff; font-weight:bold; font-size:15px; }
+.quest-progress { color:#8899bb; font-size:13px; margin-top:4px; }
+.quest-reward { display:flex; align-items:center; gap:4px; color:#ffd700; font-weight:bold; }
+.quest-claim-btn { background:linear-gradient(135deg,#38ef7d,#11998e); color:#fff; border:none; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:13px; }
+.quest-claim-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Shop */
+.shop-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; max-width:460px; width:95%; }
+.shop-card { background:rgba(30,30,70,.7); border:1px solid rgba(100,150,255,.2); border-radius:14px; padding:14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; }
+.shop-card svg { width:40px; height:40px; }
+.shop-card .name { color:#aaddff; font-weight:bold; font-size:14px; }
+.shop-card .desc { color:#8899bb; font-size:11px; }
+.shop-card .owned { color:#ffd700; font-size:13px; font-weight:bold; }
+.shop-card .price { display:flex; align-items:center; gap:4px; color:#ffd700; font-weight:bold; font-size:16px; }
+.buy-btn { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none; padding:8px 20px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:14px; width:100%; }
+.buy-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Daily reward */
+.daily-grid { display:flex; flex-direction:column; gap:10px; max-width:400px; width:90%; }
+.daily-row { display:flex; align-items:center; justify-content:space-between; padding:14px; border-radius:12px; background:rgba(30,30,70,.5); border:1px solid rgba(100,150,255,.15); }
+.daily-row.claimed { opacity:.4; }
+.daily-row.available { border-color:#38ef7d; animation:pulse 2s infinite; }
+
+/* AFK room */
+.afk-info { text-align:center; margin:20px 0; }
+.afk-coin { width:80px; height:80px; margin:0 auto 16px; animation:floatUp 2s infinite; }
+
+/* Banner */
+#banner-container { position:fixed; bottom:0; left:0; width:100%; height:65px; z-index:100; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,.3); }
+
+/* Tutorial overlay */
+.tut-highlight { position:absolute; border:3px solid #ffd700; border-radius:12px; pointer-events:none; z-index:40; animation:pulse 1s infinite; }
+.tut-text { position:absolute; background:rgba(0,0,0,.85); color:#fff; padding:14px 20px; border-radius:14px; font-size:15px; z-index:41; max-width:280px; text-align:center; }
+
+/* Toast */
+.toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(30,30,70,.95); color:#fff; padding:14px 28px; border-radius:14px; z-index:200; animation:slideDown .3s; border:1px solid rgba(100,150,255,.3); font-weight:bold; }
+</style>
+</head>
+<body>
+<div id="game-container">
+<!-- Screens will be managed by JS -->
+</div>
+<div id="banner-container"></div>
+
+<script>
+// ==================== VK BRIDGE ====================
+let vkAvailable = false;
+try {
+  if (typeof vkBridge !== 'undefined') {
+    vkBridge.send("VKWebAppInit").then(r => { vkAvailable = true; }).catch(e => { vkAvailable = false; });
+  }
+} catch(e) { vkAvailable = false; }
+
+// ==================== TRANSLATIONS ====================
+const I18N = {
+  ru: {
+    title:"Кристальный Мэтч", play:"Играть", settings:"Настройки", quests:"Задания", afk:"АФК Комната",
+    daily:"Ежедневная награда", shop:"Магазин", back:"Назад", level:"Уровень", score:"Очки", moves:"Ходы",
+    target:"Цель", win:"Победа!", lose:"Поражение", retry:"Заново", next:"Далее", menu:"Меню",
+    music:"Музыка", language:"Язык", promo:"Промокод", enterPromo:"Введите промокод", apply:"Применить",
+    tutorialQ:"Хотите пройти обучение?", yesT:"Пройти", noT:"Пропустить",
+    tut1:"Свапните два кристалла чтобы собрать ряд из 3 или больше",
+    tut2:"Собирайте 4+ кристаллов для бонусов!",
+    tut3:"Используйте бонусы для прохождения уровня!",
+    claimReward:"Забрать", claimed:"Получено", come:"Приходите завтра!",
+    afkEarn:"Заработано в АФК", collect:"Забрать", perMin:"в минуту",
+    buy:"Купить", owned:"Куплено", notEnough:"Недостаточно монет!",
+    bombDesc:"Взрывает область 3x3", lineDesc:"Уничтожает ряд/столбец",
+    colorDesc:"Уничтожает все кристаллы цвета", shuffleDesc:"Перемешивает поле",
+    hammerDesc:"Уничтожает один кристалл", coins:"монет",
+    questRefresh:"Задания обновятся через", hours:"ч", min:"м",
+    noQuests:"Все задания выполнены!", levelLocked:"Уровень закрыт!",
+    doubleReward:"Удвоить награду?", watchAd:"Смотреть рекламу", noThanks:"Нет, спасибо",
+    adLoading:"Загрузка рекламы...", adError:"Реклама недоступна",
+    clearConfirm:"Вы уверены? Все данные будут удалены!",
+    promoSuccess:"Промокод активирован!", promoFail:"Неверный промокод",
+    progressSaved:"Прогресс сохранён", modes:"Режим", classic:"Классика", timed:"На время",
+    movesLimit:"Ограничение ходов", obstacles:"Препятствия", blind:"Вслепую"
+  },
+  en: {
+    title:"Crystal Match", play:"Play", settings:"Settings", quests:"Quests", afk:"AFK Room",
+    daily:"Daily Reward", shop:"Shop", back:"Back", level:"Level", score:"Score", moves:"Moves",
+    target:"Target", win:"Victory!", lose:"Defeat", retry:"Retry", next:"Next", menu:"Menu",
+    music:"Music", language:"Language", promo:"Promo Code", enterPromo:"Enter promo code", apply:"Apply",
+    tutorialQ:"Do you want to take the tutorial?", yesT:"Take it", noT:"Skip",
+    tut1:"Swap two crystals to match 3 or more in a row",
+    tut2:"Match 4+ crystals for power-ups!",
+    tut3:"Use power-ups to clear the level!",
+    claimReward:"Claim", claimed:"Claimed", come:"Come back tomorrow!",
+    afkEarn:"AFK Earnings", collect:"Collect", perMin:"per minute",
+    buy:"Buy", owned:"Owned", notEnough:"Not enough coins!",
+    bombDesc:"Explodes 3x3 area", lineDesc:"Destroys row/column",
+    colorDesc:"Destroys all same color", shuffleDesc:"Shuffles the board",
+    hammerDesc:"Destroys one crystal", coins:"coins",
+    questRefresh:"Quests refresh in", hours:"h", min:"m",
+    noQuests:"All quests completed!", levelLocked:"Level locked!",
+    doubleReward:"Double reward?", watchAd:"Watch Ad", noThanks:"No, thanks",
+    adLoading:"Loading ad...", adError:"Ad unavailable",
+    clearConfirm:"Are you sure? All data will be deleted!",
+    promoSuccess:"Promo activated!", promoFail:"Invalid promo code",
+    progressSaved:"Progress saved", modes:"Mode", classic:"Classic", timed:"Timed",
+    movesLimit:"Move Limit", obstacles:"Obstacles", blind:"Blind"
+  }
+};
+
+// ==================== GAME STATE ====================
+let G = {
+  lang:'ru',
+  coins:100,
+  currentLevel:1,
+  unlockedLevel:1,
+  musicOn:true,
+  tutorialDone:false,
+  powerups:{bomb:0,line:0,color:0,shuffle:0,hammer:0},
+  dailyLastClaim:null,
+  dailyStreak:0,
+  afkAccumulated:0,
+  afkLastVisit:Date.now(),
+  quests:[],
+  questsDate:null,
+  stats:{totalMatches:0, levelsCompleted:0, totalCoins:0 }
+};
+
+let currentScreen = null;
+
+// ==================== STORAGE (VK) ====================
+const STORAGE_KEY = 'crystal_match_data';
+
+async function saveData() {
+  if (vkAvailable) {
+    try {
+      await vkBridge.send("VKWebAppStorageSet", { key: STORAGE_KEY, value: JSON.stringify(G) });
+    } catch(e) {}
+  }
+}
+
+async function loadData() {
+  if (vkAvailable) {
+    try {
+      const r = await vkBridge.send("VKWebAppStorageGet", { keys: [STORAGE_KEY] });
+      if (r.keys && r.keys[0] && r.keys[0].value) {
+        const data = JSON.parse(r.keys[0].value);
+        Object.assign(G, data);
+      }
+    } catch(e) {}
+  }
+}
+
+// ==================== AUDIO ====================
+let audioCtx = null;
+let musicGain = null;
+let musicOscs = [];
+let musicPlaying = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+  }
+}
+
+function playMusic() {
+  if (!G.musicOn || !audioCtx) return;
+  if (musicPlaying) return;
+  musicPlaying = true;
+  musicGain = audioCtx.createGain();
+  musicGain.gain.value = 0.08;
+  musicGain.connect(audioCtx.destination);
+  
+  const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 392.00, 329.63, 293.66];
+  let ni = 0;
+  
+  function playNote() {
+    if (!musicPlaying || !G.musicOn) { stopMusic(); return; }
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = notes[ni];
+    osc.connect(musicGain);
+    osc.start();
+    musicOscs.push(osc);
+    ni = (ni+1) % notes.length;
+    setTimeout(() => { try{osc.stop();}catch(e){} }, 400);
+  }
+  playNote();
+  musicInterval = setInterval(playNote, 500);
+}
+
+let musicInterval = null;
+function stopMusic() {
+  musicPlaying = false;
+  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+  musicOscs.forEach(o => { try{o.stop();}catch(e){} });
+  musicOscs = [];
+  if (musicGain) { try{musicGain.disconnect();}catch(e){} }
+}
+
+function toggleMusic() {
+  G.musicOn = !G.musicOn;
+  if (G.musicOn) playMusic(); else stopMusic();
+  saveData();
+}
+
+function playSfx(type) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.1;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  if (type==='match') { osc.type='sine'; osc.frequency.setValueAtTime(523,audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(784,audioCtx.currentTime+0.1); }
+  else if (type==='swap') { osc.type='triangle'; osc.frequency.setValueAtTime(440,audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(554,audioCtx.currentTime+0.05); }
+  else if (type==='invalid') { osc.type='sawtooth'; osc.frequency.setValueAtTime(150,audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(80,audioCtx.currentTime+0.1); }
+  else if (type==='win') { osc.type='sine'; [523,659,784,1047].forEach((f,i)=>{osc.frequency.setValueAtTime(f,audioCtx.currentTime+i*0.1);}); }
+  else if (type==='click') { osc.type='square'; osc.frequency.setValueAtTime(800,audioCtx.currentTime); }
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.3);
+  osc.stop(audioCtx.currentTime+0.3);
+}
+
+// ==================== ADS ====================
+function showInterstitialAd(callback) {
+  stopMusic();
+  if (vkAvailable) {
+    try {
+      vkBridge.send("VKWebAppShowInterstitialAd", {}).then(()=>{
+        if (G.musicOn) playMusic();
+        callback && callback();
+      }).catch(e=>{
+        if (G.musicOn) playMusic();
+        callback && callback();
+      });
+    } catch(e) { if (G.musicOn) playMusic(); callback&&callback(); }
+  } else { setTimeout(()=>{ if(G.musicOn)playMusic(); callback&&callback(); },500); }
+}
+
+function showRewardedAd(onReward, onClose) {
+  stopMusic();
+  if (vkAvailable) {
+    try {
+      vkBridge.send("VKWebAppShowRewardedAd", {}).then(data=>{
+        if (G.musicOn) playMusic();
+        if (data && data.result) onReward && onReward();
+        else onClose && onClose();
+      }).catch(e=>{
+        if (G.musicOn) playMusic();
+        onClose && onClose();
+      });
+    } catch(e) { if(G.musicOn)playMusic(); onClose&&onClose(); }
+  } else { setTimeout(()=>{ if(G.musicOn)playMusic(); onReward&&onReward(); },500); }
+}
+
+let bannerShown = false;
+function showBanner() {
+  if (vkAvailable && !bannerShown) {
+    try {
+      vkBridge.send("VKWebAppShowBannerAd", { banner_width:'320', banner_height:'65' }).then(()=>{
+        const bc = document.getElementById('banner-container');
+        bc.style.display='flex'; bc.style.height='65px';
+        bannerShown = true;
+      }).catch(e=>{});
+    } catch(e){}
+  }
+}
+function hideBanner() {
+  if (vkAvailable && bannerShown) {
+    try { vkBridge.send("VKWebAppHideBannerAd"); } catch(e){}
+    document.getElementById('banner-container').style.display='none';
+    bannerShown = false;
+  }
+}
+
+// ==================== CRYSTAL DEFINITIONS ====================
+const CRYSTAL_TYPES = [
+  { color:'#ff4444', glow:'#ff8888', shape:'diamond', name:'ruby' },
+  { color:'#44aaff', glow:'#88ccff', shape:'circle', name:'sapphire' },
+  { color:'#44ff44', glow:'#88ff88', shape:'hexagon', name:'emerald' },
+  { color:'#ffaa22', glow:'#ffcc66', shape:'star', name:'topaz' },
+  { color:'#aa44ff', glow:'#cc88ff', shape:'square', name:'amethyst' },
+  { color:'#ff66aa', glow:'#ffaadd', shape:'triangle', name:'rose' },
+  { color:'#22dddd', glow:'#66eeee', shape:'pentagon', name:'aquamarine' }
+];
+
+const OBSTACLE_TYPE = { color:'#555', glow:'#777', shape:'rock', name:'rock' };
+
+function getCrystalTypesForLevel(level) {
+  if (level <= 30) return 5;
+  if (level <= 80) return 6;
+  return 7;
+}
+
+function getLevelMode(level) {
+  if (level <= 50) return 'classic';
+  if (level <= 120) return 'movesLimit';
+  if (level <= 200) return 'timed';
+  if (level <= 300) return 'obstacles';
+  if (level <= 400) return 'blind';
+  return 'classic';
+}
+
+function getLevelTarget(level) {
+  const base = 500 + level * 50;
+  return base;
+}
+
+function getLevelMoves(level) {
+  const mode = getLevelMode(level);
+  if (mode === 'movesLimit') return Math.max(15, 30 - Math.floor(level/20));
+  if (mode === 'timed') return 60;
+  return Math.max(20, 35 - Math.floor(level/25));
+}
+
+// ==================== MATCH-3 ENGINE ====================
+class Match3 {
+  constructor(canvas, level) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.cols = 8;
+    this.rows = 8;
+    this.cellSize = Math.min(canvas.width/this.cols, canvas.height/this.rows);
+    this.level = level;
+    this.mode = getLevelMode(level);
+    this.numTypes = getCrystalTypesForLevel(level);
+    this.target = getLevelTarget(level);
+    this.maxMoves = getLevelMoves(level);
+    this.movesLeft = this.maxMoves;
+    this.score = 0;
+    this.grid = [];
+    this.selected = null;
+    this.swapping = false;
+    this.animating = false;
+    this.particles = [];
+    this.gameOver = false;
+    this.won = false;
+    this.paused = false;
+    this.hasObstacles = (this.mode === 'obstacles' || level > 300);
+    this.blind = (this.mode === 'blind');
+    this.timeLeft = this.mode === 'timed' ? this.maxMoves : 0;
+    this.powerupMode = null;
+    this.init();
+  }
+  
+  init() {
+    this.grid = [];
+    for (let r=0; r<this.rows; r++) {
+      this.grid[r] = [];
+      for (let c=0; c<this.cols; c++) {
+        if (this.hasObstacles && Math.random() < 0.08 + this.level*0.0003) {
+          this.grid[r][c] = { type:-1, x:c*this.cellSize, y:r*this.cellSize, scale:1, alpha:1 };
+        } else {
+          this.grid[r][c] = this.makeCrystal(r,c);
+        }
+      }
+    }
+    // Ensure no initial matches
+    let tries = 0;
+    while (this.findAllMatches().length > 0 && tries < 50) {
+      this.grid = [];
+      for (let r=0; r<this.rows; r++) {
+        this.grid[r] = [];
+        for (let c=0; c<this.cols; c++) {
+          if (this.hasObstacles && Math.random() < 0.08) {
+            this.grid[r][c] = { type:-1, x:c*this.cellSize, y:r*this.cellSize, scale:1, alpha:1 };
+          } else {
+            this.grid[r][c] = this.makeCrystal(r,c);
+          }
+        }
+      }
+      tries++;
+    }
+  }
+  
+  makeCrystal(r, c) {
+    let type;
+    do { type = Math.floor(Math.random()*this.numTypes); }
+    while (
+      (c >= 2 && this.grid[r][c-1] && this.grid[r][c-1].type === type && this.grid[r][c-2] && this.grid[r][c-2].type === type) ||
+      (r >= 2 && this.grid[r-1][c] && this.grid[r-1][c].type === type && this.grid[r-2][c] && this.grid[r-2][c].type === type)
+    );
+    return { type, x:c*this.cellSize, y:r*this.cellSize, targetX:c*this.cellSize, targetY:r*this.cellSize, scale:1, alpha:1, special:null };
+  }
+  
+  findAllMatches() {
+    const matches = [];
+    // Horizontal
+    for (let r=0; r<this.rows; r++) {
+      let count = 1;
+      for (let c=1; c<=this.cols; c++) {
+        const prev = this.grid[r][c-1];
+        const curr = c < this.cols ? this.grid[r][c] : null;
+        if (curr && prev && curr.type >= 0 && prev.type >= 0 && curr.type === prev.type) {
+          count++;
+        } else {
+          if (count >= 3) {
+            const m = [];
+            for (let i=0; i<count; i++) m.push({r, c:c-1-i});
+            matches.push(m);
+          }
+          count = 1;
+        }
+      }
+    }
+    // Vertical
+    for (let c=0; c<this.cols; c++) {
+      let count = 1;
+      for (let r=1; r<=this.rows; r++) {
+        const prev = this.grid[r-1][c];
+        const curr = r < this.rows ? this.grid[r][c] : null;
+        if (curr && prev && curr.type >= 0 && prev.type >= 0 && curr.type === prev.type) {
+          count++;
+        } else {
+          if (count >= 3) {
+            const m = [];
+            for (let i=0; i<count; i++) m.push({r:r-1-i, c});
+            matches.push(m);
+          }
+          count = 1;
+        }
+      }
+    }
+    return matches;
+  }
+  
+  swap(r1,c1,r2,c2) {
+    const tmp = this.grid[r1][c1];
+    this.grid[r1][c1] = this.grid[r2][c2];
+    this.grid[r2][c2] = tmp;
+    // Update target positions
+    this.grid[r1][c1].targetX = c1*this.cellSize;
+    this.grid[r1][c1].targetY = r1*this.cellSize;
+    this.grid[r2][c2].targetX = c2*this.cellSize;
+    this.grid[r2][c2].targetY = r2*this.cellSize;
+  }
+  
+  trySwap(r1,c1,r2,c2) {
+    if (this.animating || this.gameOver || this.paused) return;
+    if (Math.abs(r1-r2)+Math.abs(c1-c2) !== 1) return;
+    if (this.grid[r1][c1].type < 0 || this.grid[r2][c2].type < 0) return;
+    
+    this.swapping = true;
+    this.swap(r1,c1,r2,c2);
+    playSfx('swap');
+    
+    const matches = this.findAllMatches();
+    
+    if (matches.length === 0) {
+      // Swap back
+      setTimeout(()=>{
+        this.swap(r1,c1,r2,c2);
+        playSfx('invalid');
+        this.swapping = false;
+      }, 250);
+    } else {
+      this.movesLeft--;
+      this.processMatches();
+      this.swapping = false;
+    }
+  }
+  
+  processMatches() {
+    this.animating = true;
+    let matches = this.findAllMatches();
+    if (matches.length === 0) { this.animating = false; this.checkGameOver(); return; }
+    
+    const matched = new Set();
+    let totalMatched = 0;
+    
+    matches.forEach(m => {
+      m.forEach(({r,c}) => {
+        const key = r*100+c;
+        if (!matched.has(key)) {
+          matched.add(key);
+          totalMatched++;
+          // Particle burst
+          this.addParticles(c*this.cellSize+this.cellSize/2, r*this.cellSize+this.cellSize/2, this.grid[r][c].type);
+        }
+      });
+      // Create special for 4+ matches
+      if (m.length >= 4) {
+        const mid = m[Math.floor(m.length/2)];
+        const crystal = this.grid[mid.r][mid.c];
+        if (crystal && crystal.type >= 0) {
+          crystal.special = m.length >= 5 ? 'color' : (m[0].r === m[1].r ? 'lineH' : 'lineV');
+        }
+      }
+    });
+    
+    // Keep special crystals (they triggered but shouldn't be removed if just created)
+    matched.forEach(key => {
+      const r = Math.floor(key/100);
+      const c = key%100;
+      const crystal = this.grid[r][c];
+      if (crystal && crystal.special && matches.some(m=>m.some(p=>p.r===r&&p.c===c)&&m.length>=4)) {
+        // Keep the special one
+      } else {
+        this.grid[r][c] = null;
+      }
+    });
+    
+    // Score
+    const points = totalMatched * 50 * (1 + Math.floor(totalMatched/5)*0.5);
+    this.score += Math.floor(points);
+    G.stats.totalMatches += totalMatched;
+    playSfx('match');
+    
+    // Drop and fill
+    setTimeout(()=>this.dropAndFill(), 300);
+  }
+  
+  dropAndFill() {
+    for (let c=0; c<this.cols; c++) {
+      let writeR = this.rows-1;
+      for (let r=this.rows-1; r>=0; r--) {
+        if (this.grid[r][c]) {
+          if (r !== writeR) {
+            this.grid[writeR][c] = this.grid[r][c];
+            this.grid[writeR][c].targetX = c*this.cellSize;
+            this.grid[writeR][c].targetY = writeR*this.cellSize;
+            this.grid[r][c] = null;
+          }
+          writeR--;
+        }
+      }
+      // Fill empty
+      for (let r=writeR; r>=0; r--) {
+        this.grid[r][c] = { type: Math.floor(Math.random()*this.numTypes), x:c*this.cellSize, y:-this.cellSize*(writeR-r+1), targetX:c*this.cellSize, targetY:r*this.cellSize, scale:1, alpha:1, special:null };
+      }
+    }
+    
+    // Animate falling
+    let animFrames = 0;
+    const animate = ()=>{
+      let allSettled = true;
+      for (let r=0; r<this.rows; r++) {
+        for (let c=0; c<this.cols; c++) {
+          const cr = this.grid[r][c];
+          if (!cr) continue;
+          const speed = 0.25;
+          if (Math.abs(cr.x - cr.targetX) > 1) { cr.x += (cr.targetX-cr.x)*speed; allSettled=false; }
+          else cr.x = cr.targetX;
+          if (Math.abs(cr.y - cr.targetY) > 1) { cr.y += (cr.targetY-cr.y)*speed; allSettled=false; }
+          else cr.y = cr.targetY;
+        }
+      }
+      animFrames++;
+      if (!allSettled && animFrames < 60) {
+        requestAnimationFrame(animate);
+      } else {
+        // Snap
+        for (let r=0; r<this.rows; r++)
+          for (let c=0; c<this.cols; c++)
+            if (this.grid[r][c]) { this.grid[r][c].x=this.grid[r][c].targetX; this.grid[r][c].y=this.grid[r][c].targetY; }
+        
+        // Check cascading matches
+        const cascMatches = this.findAllMatches();
+        if (cascMatches.length > 0) {
+          setTimeout(()=>this.processMatches(), 100);
+        } else {
+          this.animating = false;
+          this.checkGameOver();
+        }
+      }
+    };
+    animate();
+  }
+  
+  checkGameOver() {
+    if (this.score >= this.target) {
+      this.won = true;
+      this.gameOver = true;
+      onLevelWin(this.level, this.score);
+    } else if (this.mode === 'timed') {
+      if (this.timeLeft <= 0) { this.gameOver = true; onLevelLose(); }
+    } else {
+      if (this.movesLeft <= 0) { this.gameOver = true; onLevelLose(); }
+    }
+  }
+  
+  addParticles(x, y, type) {
+    const color = type >= 0 ? CRYSTAL_TYPES[type].color : '#888';
+    for (let i=0; i<8; i++) {
+      this.particles.push({
+        x, y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.5)*6-3,
+        life:1, color, size:Math.random()*4+2
+      });
+    }
+  }
+  
+  usePowerup(type, r, c) {
+    if (G.powerups[type] <= 0) return false;
+    if (type === 'bomb') {
+      for (let dr=-1; dr<=1; dr++)
+        for (let dc=-1; dc<=1; dc++) {
+          const nr=r+dr, nc=c+dc;
+          if (nr>=0&&nr<this.rows&&nc>=0&&nc<this.cols&&this.grid[nr][nc]&&this.grid[nr][nc].type>=0) {
+            this.addParticles(nc*this.cellSize+this.cellSize/2, nr*this.cellSize+this.cellSize/2, this.grid[nr][nc].type);
+            this.grid[nr][nc] = null;
+            this.score += 100;
+          }
+        }
+    } else if (type === 'line') {
+      for (let i=0; i<this.cols; i++) {
+        if (this.grid[r][i]&&this.grid[r][i].type>=0) { this.addParticles(i*this.cellSize+this.cellSize/2,r*this.cellSize+this.cellSize/2,this.grid[r][i].type); this.grid[r][i]=null; this.score+=100; }
+      }
+    } else if (type === 'color') {
+      const t = this.grid[r][c] ? this.grid[r][c].type : 0;
+      for (let rr=0; rr<this.rows; rr++)
+        for (let cc=0; cc<this.cols; cc++)
+          if (this.grid[rr][cc]&&this.grid[rr][cc].type===t) { this.addParticles(cc*this.cellSize+this.cellSize/2,rr*this.cellSize+this.cellSize/2,t); this.grid[rr][cc]=null; this.score+=100; }
+    } else if (type === 'shuffle') {
+      const types = [];
+      for (let rr=0; rr<this.rows; rr++)
+        for (let cc=0; cc<this.cols; cc++)
+          if (this.grid[rr][cc]&&this.grid[rr][cc].type>=0) types.push(this.grid[rr][cc].type);
+      types.sort(()=>Math.random()-0.5);
+      let idx=0;
+      for (let rr=0; rr<this.rows; rr++)
+        for (let cc=0; cc<this.cols; cc++)
+          if (this.grid[rr][cc]&&this.grid[rr][cc].type>=0) this.grid[rr][cc].type = types[idx++];
+    } else if (type === 'hammer') {
+      if (this.grid[r][c]&&this.grid[r][c].type>=0) { this.addParticles(c*this.cellSize+this.cellSize/2,r*this.cellSize+this.cellSize/2,this.grid[r][c].type); this.grid[r][c]=null; this.score+=50; }
+    }
+    G.powerups[type]--;
+    saveData();
+    this.dropAndFill();
+    return true;
+  }
+  
+  update(dt) {
+    // Update particles
+    this.particles = this.particles.filter(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.02;
+      return p.life > 0;
+    });
+    
+    // Timer
+    if (this.mode === 'timed' && !this.gameOver && !this.paused) {
+      this.timeLeft -= dt;
+      if (this.timeLeft <= 0) { this.timeLeft = 0; this.checkGameOver(); }
+    }
+  }
+  
+  draw() {
+    const ctx = this.ctx;
+    ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+    
+    // Background grid
+    ctx.fillStyle = 'rgba(10,10,30,0.5)';
+    ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+    
+    for (let r=0; r<this.rows; r++) {
+      for (let c=0; c<this.cols; c++) {
+        ctx.fillStyle = (r+c)%2===0 ? 'rgba(30,30,60,0.3)' : 'rgba(20,20,45,0.3)';
+        ctx.fillRect(c*this.cellSize, r*this.cellSize, this.cellSize, this.cellSize);
+      }
+    }
+    
+    // Draw crystals
+    for (let r=0; r<this.rows; r++) {
+      for (let c=0; c<this.cols; c++) {
+        const cr = this.grid[r][c];
+        if (!cr) continue;
+        
+        if (cr.type === -1) {
+          this.drawObstacle(cr.x, cr.y);
+        } else {
+          const ct = CRYSTAL_TYPES[cr.type];
+          if (this.blind) {
+            this.drawCrystal(cr.x, cr.y, '#444', '#666', 'circle', cr.special, cr.scale);
+          } else {
+            this.drawCrystal(cr.x, cr.y, ct.color, ct.glow, ct.shape, cr.special, cr.scale);
+          }
+        }
+        
+        // Selected highlight
+        if (this.selected && this.selected.r === r && this.selected.c === c) {
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(c*this.cellSize+2, r*this.cellSize+2, this.cellSize-4, this.cellSize-4);
+        }
+      }
+    }
+    
+    // Particles
+    this.particles.forEach(p => {
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+  
+  drawCrystal(x, y, color, glow, shape, special, scale) {
+    const ctx = this.ctx;
+    const s = this.cellSize * 0.4 * scale;
+    const cx = x + this.cellSize/2;
+    const cy = y + this.cellSize/2;
+    
+    ctx.save();
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = 15;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = glow;
+    ctx.lineWidth = 2;
+    
+    ctx.beginPath();
+    switch(shape) {
+      case 'diamond':
+        ctx.moveTo(cx, cy-s); ctx.lineTo(cx+s, cy); ctx.lineTo(cx, cy+s); ctx.lineTo(cx-s, cy); ctx.closePath();
+        break;
+      case 'circle':
+        ctx.arc(cx, cy, s, 0, Math.PI*2);
+        break;
+      case 'hexagon':
+        for (let i=0; i<6; i++) { const a=i*Math.PI/3; const px=cx+Math.cos(a)*s, py=cy+Math.sin(a)*s; i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
+        ctx.closePath();
+        break;
+      case 'star':
+        for (let i=0; i<10; i++) { const a=i*Math.PI/5-Math.PI/2; const r=i%2===0?s:s*0.4; const px=cx+Math.cos(a)*r, py=cy+Math.sin(a)*r; i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
+        ctx.closePath();
+        break;
+      case 'square':
+        const sr=s*0.8; ctx.rect(cx-sr, cy-sr, sr*2, sr*2);
+        break;
+      case 'triangle':
+        ctx.moveTo(cx, cy-s); ctx.lineTo(cx+s, cy+s*0.8); ctx.lineTo(cx-s, cy+s*0.8); ctx.closePath();
+        break;
+      case 'pentagon':
+        for (let i=0; i<5; i++) { const a=i*Math.PI*2/5-Math.PI/2; const px=cx+Math.cos(a)*s, py=cy+Math.sin(a)*s; i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
+        ctx.closePath();
+        break;
+    }
+    ctx.fill();
+    ctx.stroke();
+    
+    // Inner shine
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.beginPath();
+    ctx.arc(cx-s*0.3, cy-s*0.3, s*0.25, 0, Math.PI*2);
+    ctx.fill();
+    
+    // Special indicator
+    if (special) {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (special === 'color') ctx.fillText('★', cx, cy);
+      else ctx.fillText(special === 'lineH' ? '↔' : '↕', cx, cy);
+    }
+    
+    ctx.restore();
+  }
+  
+  drawObstacle(x, y) {
+    const ctx = this.ctx;
+    const s = this.cellSize * 0.4;
+    const cx = x + this.cellSize/2;
+    const cy = y + this.cellSize/2;
+    ctx.save();
+    ctx.fillStyle = '#444';
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx-s, cy-s*0.7);
+    ctx.lineTo(cx+s*0.8, cy-s);
+    ctx.lineTo(cx+s, cy+s*0.5);
+    ctx.lineTo(cx-s*0.3, cy+s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.beginPath();
+    ctx.arc(cx-s*0.2, cy-s*0.2, s*0.2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+  
+  handleClick(x, y) {
+    if (this.animating || this.gameOver || this.paused) return;
+    
+    // Powerup mode
+    if (this.powerupMode) {
+      const c = Math.floor(x / this.cellSize);
+      const r = Math.floor(y / this.cellSize);
+      if (r>=0&&r<this.rows&&c>=0&&c<this.cols&&this.grid[r][c]) {
+        if (this.usePowerup(this.powerupMode, r, c)) {
+          playSfx('match');
+          this.powerupMode = null;
+        }
+      }
+      return;
+    }
+    
+    const c = Math.floor(x / this.cellSize);
+    const r = Math.floor(y / this.cellSize);
+    if (r<0||r>=this.rows||c<0||c>=this.cols) return;
+    if (!this.grid[r][c] || this.grid[r][c].type < 0) return;
+    
+    if (this.selected) {
+      if (this.selected.r === r && this.selected.c === c) {
+        this.selected = null;
+        return;
+      }
+      const dr = Math.abs(this.selected.r - r);
+      const dc = Math.abs(this.selected.c - c);
+      if (dr + dc === 1) {
+        this.trySwap(this.selected.r, this.selected.c, r, c);
+        this.selected = null;
+      } else {
+        this.selected = {r, c};
+      }
+    } else {
+      this.selected = {r, c};
+    }
+  }
+}
+
+// ==================== SCREEN MANAGEMENT ====================
+let game = null;
+let gameLoopId = null;
+let lastTime = 0;
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(name+'-screen');
+  if (screen) screen.classList.add('active');
+  currentScreen = name;
+  hideBanner();
+  if (name === 'lobby' || name === 'game') setTimeout(showBanner, 300);
+}
+
+function t(key) { return I18N[G.lang][key] || key; }
+
+// ==================== LOBBY ====================
+function buildLobby() {
+  const container = document.getElementById('game-container');
+  if (!document.getElementById('lobby-screen')) {
+    const lobby = document.createElement('div');
+    lobby.id = 'lobby-screen';
+    lobby.className = 'screen active';
+    lobby.innerHTML = `
+      <div class="top-bar">
+        <div class="coin-display">
+          <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700" stroke="#daa520" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="12" font-weight="bold" fill="#b8860b">$</text></svg>
+          <span id="coin-amount">0</span>
+        </div>
+      </div>
+      <h1 class="title-text">${t('title')}</h1>
+      <div class="lobby-grid" id="lobby-grid"></div>
+    `;
+    container.appendChild(lobby);
+  }
+  
+  document.getElementById('coin-amount').textContent = G.coins;
+  document.querySelector('.title-text').textContent = t('title');
+  
+  const grid = document.getElementById('lobby-grid');
+  grid.innerHTML = '';
+  
+  const buttons = [
+    { key:'play', icon:playSVG(), screen:'levels', color:'linear-gradient(135deg,#667eea,#764ba2)' },
+    { key:'settings', icon:settingsSVG(), screen:'settings', color:'linear-gradient(135deg,#2c3e50,#3498db)' },
+    { key:'quests', icon:questsSVG(), screen:'quests', color:'linear-gradient(135deg,#e67e22,#f39c12)' },
+    { key:'afk', icon:afkSVG(), screen:'afk', color:'linear-gradient(135deg,#9b59b6,#8e44ad)' },
+    { key:'daily', icon:dailySVG(), screen:'daily', color:'linear-gradient(135deg,#e74c3c,#c0392b)' },
+    { key:'shop', icon:shopSVG(), screen:'shop', color:'linear-gradient(135deg,#1abc9c,#16a085)' }
+  ];
+  
+  buttons.forEach(btn => {
+    const el = document.createElement('div');
+    el.className = 'lobby-btn';
+    el.style.background = btn.color;
+    el.innerHTML = btn.icon + `<span>${t(btn.key)}</span>`;
+    el.onclick = () => { playSfx('click'); buildScreen(btn.screen); showScreen(btn.screen); };
+    grid.appendChild(el);
+  });
+}
+
+// ==================== SVG ICONS ====================
+function playSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>`;
+}
+function settingsSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`;
+}
+function questsSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+}
+function afkSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>`;
+}
+function dailySVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>`;
+}
+function shopSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+}
+
+// Powerup SVGs
+function bombSVG() { return `<svg viewBox="0 0 24 24" fill="#ff6644"><circle cx="12" cy="14" r="7" fill="#ff4444" stroke="#ff8888" stroke-width="2"/><line x1="12" y1="7" x2="16" y2="3" stroke="#ffaa00" stroke-width="2"/><circle cx="17" cy="2" r="2" fill="#ffd700"/></svg>`; }
+function lineSVG() { return `<svg viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="#44aaff"/><rect x="10" y="2" width="4" height="20" rx="2" fill="#44aaff" opacity="0.5"/></svg>`; }
+function colorSVG() { return `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="#aa44ff" stroke-width="3"/><circle cx="12" cy="12" r="4" fill="#aa44ff"/></svg>`; }
+function shuffleSVG() { return `<svg viewBox="0 0 24 24" fill="#22dddd"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`; }
+function hammerSVG() { return `<svg viewBox="0 0 24 24" fill="#ffaa22"><path d="M14.69 2.66L6.34 11l1.41 1.41 8.35-8.34-1.41-1.41zM2.66 14.69L11 6.34l1.41 1.41-8.34 8.35-1.41-1.41zM21.34 9.31L13 17.66l1.41 1.41 8.34-8.35-1.41-1.41z"/></svg>`; }
+
+// ==================== LEVELS SCREEN ====================
+function buildLevels() {
+  let screen = document.getElementById('levels-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'levels-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  screen.innerHTML = `
+    <div style="width:95%;max-width:500px;display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+      <button class="btn-back" onclick="playSfx('click');showScreen('lobby')">${t('back')}</button>
+      <h2 style="color:#aaddff;font-size:24px;">${t('level')} ${G.unlockedLevel}</h2>
+    </div>
+    <div class="level-grid-container">
+      <div class="level-grid" id="level-grid-el"></div>
+    </div>
+  `;
+  
+  const grid = document.getElementById('level-grid-el');
+  grid.innerHTML = '';
+  
+  const maxShow = Math.min(G.unlockedLevel + 20, 500);
+  for (let i=1; i<=maxShow; i++) {
+    const card = document.createElement('div');
+    card.className = 'level-card ' + (i <= G.unlockedLevel ? (i === G.unlockedLevel ? 'current' : 'unlocked') : 'locked');
+    
+    const mode = getLevelMode(i);
+    let modeIcon = '';
+    if (mode === 'timed') modeIcon = '⏱';
+    else if (mode === 'obstacles') modeIcon = '🪨';
+    else if (mode === 'blind') modeIcon = '🙈';
+    else if (mode === 'movesLimit') modeIcon = '🎯';
+    
+    card.innerHTML = `<div style="font-size:18px;">${i}</div><div style="font-size:10px;">${modeIcon}</div>`;
+    
+    if (i <= G.unlockedLevel) {
+      card.onclick = () => { playSfx('click'); startLevel(i); };
+    }
+    grid.appendChild(card);
+  }
+  
+  // Scroll to current
+  setTimeout(() => {
+    const container = screen.querySelector('.level-grid-container');
+    const current = screen.querySelector('.level-card.current');
+    if (current) container.scrollTop = current.offsetTop - container.clientHeight/2;
+  }, 50);
+}
+
+// ==================== GAME SCREEN ====================
+function buildGameScreen() {
+  let screen = document.getElementById('game-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'game-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+}
+
+function startLevel(level) {
+  buildGameScreen();
+  const screen = document.getElementById('game-screen');
+  
+  const isMobile = window.innerWidth < 600;
+  const boardSize = Math.min(isMobile ? window.innerWidth-20 : 500, window.innerHeight-250);
+  const canvasSize = Math.max(boardSize, 300);
+  
+  screen.innerHTML = `
+    <div class="game-top-bar">
+      <button class="btn-back" onclick="playSfx('click');stopGameLoop();showScreen('levels')">${t('back')}</button>
+      <div class="game-info-box"><div class="label">${t('level')}</div><div class="value">${level}</div></div>
+      <div class="game-info-box"><div class="label">${t('score')}</div><div class="value" id="g-score">0</div></div>
+      <div class="game-info-box"><div class="label">${t('target')}</div><div class="value">${getLevelTarget(level)}</div></div>
+      <div class="game-info-box"><div class="label" id="g-moves-label">${t('moves')}</div><div class="value" id="g-moves">${getLevelMoves(level)}</div></div>
+    </div>
+    <canvas id="game-canvas" width="${canvasSize}" height="${canvasSize}"></canvas>
+    <div class="power-up-bar" id="powerup-bar"></div>
+  `;
+  
+  const canvas = document.getElementById('game-canvas');
+  game = new Match3(canvas, level);
+  
+  // Powerup bar
+  const puBar = document.getElementById('powerup-bar');
+  const pus = [
+    { type:'bomb', svg:bombSVG(), desc:t('bombDesc') },
+    { type:'line', svg:lineSVG(), desc:t('lineDesc') },
+    { type:'color', svg:colorSVG(), desc:t('colorDesc') },
+    { type:'shuffle', svg:shuffleSVG(), desc:t('shuffleDesc') },
+    { type:'hammer', svg:hammerSVG(), desc:t('hammerDesc') }
+  ];
+  pus.forEach(pu => {
+    const el = document.createElement('div');
+    el.className = 'power-up-slot';
+    el.innerHTML = pu.svg + `<div class="power-up-count">${G.powerups[pu.type]||0}</div>`;
+    el.title = pu.desc;
+    el.onclick = () => {
+      if (G.powerups[pu.type] > 0) {
+        game.powerupMode = game.powerupMode === pu.type ? null : pu.type;
+        playSfx('click');
+      } else {
+        showToast(t('notEnough'));
+      }
+    };
+    puBar.appendChild(el);
+  });
+  
+  showScreen('game');
+  
+  // Show interstitial ad before level starts
+  game.paused = true;
+  showToast(t('adLoading'), 1500);
+  showInterstitialAd(() => {
+    game.paused = false;
+  });
+  
+  // Start game loop
+  lastTime = performance.now();
+  gameLoopId = requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(time) {
+  if (!game || currentScreen !== 'game') return;
+  const dt = (time - lastTime) / 1000;
+  lastTime = time;
+  
+  game.update(dt);
+  game.draw();
+  
+  // Update UI
+  const scoreEl = document.getElementById('g-score');
+  const movesEl = document.getElementById('g-moves');
+  const movesLabel = document.getElementById('g-moves-label');
+  if (scoreEl) scoreEl.textContent = game.score;
+  if (movesEl) {
+    if (game.mode === 'timed') { movesEl.textContent = Math.ceil(game.timeLeft); if(movesLabel) movesLabel.textContent = '⏱'; }
+    else { movesEl.textContent = game.movesLeft; }
+  }
+  
+  // Update powerup counts
+  const puSlots = document.querySelectorAll('.power-up-slot .power-up-count');
+  ['bomb','line','color','shuffle','hammer'].forEach((type,i) => {
+    if (puSlots[i]) puSlots[i].textContent = G.powerups[type]||0;
+  });
+  
+  gameLoopId = requestAnimationFrame(gameLoop);
+}
+
+function stopGameLoop() {
+  if (gameLoopId) { cancelAnimationFrame(gameLoopId); gameLoopId = null; }
+  game = null;
+}
+
+// ==================== LEVEL WIN/LOSE ====================
+function onLevelWin(level, score) {
+  playSfx('win');
+  G.stats.levelsCompleted++;
+  
+  const reward = 50 + level * 10;
+  const stars = score >= getLevelTarget(level)*1.5 ? 3 : score >= getLevelTarget(level)*1.2 ? 2 : 1;
+  
+  if (level >= G.unlockedLevel) {
+    G.unlockedLevel = Math.min(level + 1, 500);
+  }
+  
+  // Update quests
+  updateQuestProgress('win', 1);
+  updateQuestProgress('score', score);
+  updateQuestProgress('level', level);
+  
+  saveData();
+  
+  setTimeout(() => {
+    const screen = document.getElementById('game-screen');
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay-bg';
+    overlay.id = 'win-overlay';
+    overlay.innerHTML = `
+      <div class="overlay-content panel">
+        <h2 style="color:#38ef7d;font-size:32px;margin-bottom:10px;">${t('win')}</h2>
+        <div class="star-rating">
+          ${[0,1,2].map(i => `<svg class="star ${i<stars?'filled':''}" viewBox="0 0 24 24" fill="${i<stars?'#ffd700':'#444'}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`).join('')}
+        </div>
+        <p style="color:#ffd700;font-size:24px;margin:10px 0;">+${reward} ${t('coins')}</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap;">
+          <button class="btn btn-warning" id="double-btn">${t('watchAd')}</button>
+          <button class="btn btn-success" id="next-btn">${t('next')}</button>
+          <button class="btn btn-secondary" id="menu-btn">${t('menu')}</button>
+        </div>
+      </div>
+    `;
+    screen.appendChild(overlay);
+    
+    document.getElementById('next-btn').onclick = () => {
+      overlay.remove();
+      G.coins += reward;
+      saveData();
+      stopGameLoop();
+      if (level < 500) startLevel(level+1);
+      else { buildLobby(); showScreen('lobby'); }
+    };
+    document.getElementById('menu-btn').onclick = () => {
+      overlay.remove();
+      G.coins += reward;
+      saveData();
+      stopGameLoop();
+      buildLobby();
+      showScreen('lobby');
+    };
+    document.getElementById('double-btn').onclick = () => {
+      showToast(t('adLoading'), 1500);
+      showRewardedAd(() => {
+        G.coins += reward * 2;
+        saveData();
+        showToast(`+${reward*2} ${t('coins')}!`, 2000);
+        overlay.remove();
+      }, () => {
+        showToast(t('adError'), 1500);
+      });
+    };
+  }, 500);
+}
+
+function onLevelLose() {
+  setTimeout(() => {
+    const screen = document.getElementById('game-screen');
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay-bg';
+    overlay.innerHTML = `
+      <div class="overlay-content panel">
+        <h2 style="color:#e74c3c;font-size:32px;margin-bottom:10px;">${t('lose')}</h2>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:15px;">
+          <button class="btn btn-primary" onclick="this.parentElement.parentElement.parentElement.remove();stopGameLoop();startLevel(game?game.level:${G.currentLevel});">${t('retry')}</button>
+          <button class="btn btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove();stopGameLoop();buildLobby();showScreen('lobby');">${t('menu')}</button>
+        </div>
+      </div>
+    `;
+    screen.appendChild(overlay);
+  }, 500);
+}
+
+// ==================== SETTINGS ====================
+function buildSettings() {
+  let screen = document.getElementById('settings-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'settings-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  
+  screen.innerHTML = `
+    <div style="width:90%;max-width:420px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <h2 style="color:#aaddff;font-size:24px;">${t('settings')}</h2>
+      </div>
+      <div class="panel">
+        <div class="settings-row">
+          <span class="settings-label">${t('music')}</span>
+          <div class="toggle-switch ${G.musicOn?'on':''}" id="music-toggle"><div class="knob"></div></div>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">${t('language')}</span>
+          <div style="display:flex;gap:8px;">
+            <button class="lang-btn ${G.lang==='ru'?'active':''}" data-lang="ru">Русский</button>
+            <button class="lang-btn ${G.lang==='en'?'active':''}" data-lang="en">English</button>
+          </div>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:stretch;">
+          <span class="settings-label" style="margin-bottom:8px;">${t('promo')}</span>
+          <input type="text" class="promo-input" id="promo-input" placeholder="${t('enterPromo')}">
+          <button class="btn btn-primary" id="promo-apply">${t('apply')}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('music-toggle').onclick = (e) => { toggleMusic(); e.currentTarget.classList.toggle('on'); };
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.onclick = () => {
+      G.lang = b.dataset.lang;
+      saveData();
+      buildSettings();
+    };
+  });
+  document.getElementById('promo-apply').onclick = () => {
+    const code = document.getElementById('promo-input').value.trim().toLowerCase();
+    if (code === 'clear12') {
+      if (confirm(t('clearConfirm'))) {
+        G = { lang:G.lang, coins:100, currentLevel:1, unlockedLevel:1, musicOn:true, tutorialDone:true,
+          powerups:{bomb:0,line:0,color:0,shuffle:0,hammer:0}, dailyLastClaim:null, dailyStreak:0,
+          afkAccumulated:0, afkLastVisit:Date.now(), quests:[], questsDate:null,
+          stats:{totalMatches:0, levelsCompleted:0, totalCoins:0} };
+        saveData();
+        showToast(t('promoSuccess'));
+        setTimeout(()=>{ buildLobby(); showScreen('lobby'); }, 1000);
+      }
+    } else if (code === 'admin17') {
+      G.coins += 100000;
+      saveData();
+      showToast(`+100000 ${t('coins')}!`);
+      buildSettings();
+    } else {
+      showToast(t('promoFail'));
+    }
+  };
+}
+
+// ==================== QUESTS ====================
+const QUEST_TEMPLATES = [
+  { id:'win3', desc:{ru:'Выиграйте 3 уровня', en:'Win 3 levels'}, target:3, type:'win', reward:100 },
+  { id:'win5', desc:{ru:'Выиграйте 5 уровней', en:'Win 5 levels'}, target:5, type:'win', reward:200 },
+  { id:'score5000', desc:{ru:'Наберите 5000 очков за уровень', en:'Score 5000 in one level'}, target:5000, type:'scoreOne', reward:150 },
+  { id:'matches100', desc:{ru:'Соберите 100 кристаллов', en:'Match 100 crystals'}, target:100, type:'matches', reward:120 },
+  { id:'level10', desc:{ru:'Пройдите уровень 10', en:'Beat level 10'}, target:10, type:'levelBeat', reward:100 },
+  { id:'level25', desc:{ru:'Пройдите уровень 25', en:'Beat level 25'}, target:25, type:'levelBeat', reward:200 },
+  { id:'score20k', desc:{ru:'Наберите 20000 очков всего', en:'Score 20000 total'}, target:20000, type:'scoreTotal', reward:300 },
+  { id:'usePowerup', desc:{ru:'Используйте 5 бонусов', en:'Use 5 power-ups'}, target:5, type:'usePowerup', reward:150 },
+  { id:'winStreak', desc:{ru:'Выиграйте 3 уровня подряд', en:'Win 3 levels in a row'}, target:3, type:'winStreak', reward:250 },
+  { id:'matches500', desc:{ru:'Соберите 500 кристаллов', en:'Match 500 crystals'}, target:500, type:'matches', reward:400 }
+];
+
+function getQuestsDate() {
+  const d = new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+}
+
+function generateQuests() {
+  const today = getQuestsDate();
+  if (G.questsDate !== today || !G.quests.length) {
+    G.questsDate = today;
+    const shuffled = [...QUEST_TEMPLATES].sort(()=>Math.random()-0.5);
+    G.quests = shuffled.slice(0,10).map(q => ({ ...q, progress:0, claimed:false }));
+    saveData();
+  }
+}
+
+function updateQuestProgress(type, value) {
+  G.quests.forEach(q => {
+    if (q.claimed) return;
+    if (type === 'win' && q.type === 'win') q.progress = Math.min(q.target, q.progress+1);
+    if (type === 'win' && q.type === 'winStreak') q.progress = Math.min(q.target, q.progress+1);
+    if (type === 'score' && q.type === 'scoreOne') q.progress = Math.max(q.progress, value);
+    if (type === 'score' && q.type === 'scoreTotal') q.progress += value;
+    if (type === 'match' && q.type === 'matches') q.progress = Math.min(q.target, q.progress+value);
+    if (type === 'level' && q.type === 'levelBeat' && value >= q.target) q.progress = q.target;
+  });
+  saveData();
+}
+
+function buildQuests() {
+  generateQuests();
+  let screen = document.getElementById('quests-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'quests-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+  const hoursLeft = Math.floor((tomorrow - now) / 3600000);
+  const minsLeft = Math.floor(((tomorrow - now) % 3600000) / 60000);
+  
+  let questsHtml = G.quests.map((q,i) => `
+    <div class="quest-card">
+      <div class="quest-info">
+        <div class="quest-title">${q.desc[G.lang]}</div>
+        <div class="quest-progress">${q.progress}/${q.target}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="quest-reward"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700"/></svg>${q.reward}</div>
+        <button class="quest-claim-btn" ${q.progress>=q.target&&!q.claimed?'':'disabled'} data-idx="${i}">${q.claimed?t('claimed'):t('claimReward')}</button>
+      </div>
+    </div>
+  `).join('');
+  
+  const allDone = G.quests.every(q => q.claimed);
+  
+  screen.innerHTML = `
+    <div style="width:90%;max-width:460px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <h2 style="color:#aaddff;font-size:24px;">${t('quests')}</h2>
+      </div>
+      <div style="text-align:center;color:#8899bb;margin-bottom:15px;font-size:13px;">
+        ${allDone ? t('noQuests') : `${t('questRefresh')} ${hoursLeft}${t('hours')} ${minsLeft}${t('min')}`}
+      </div>
+      <div style="max-height:65vh;overflow-y:auto;">${questsHtml}</div>
+    </div>
+  `;
+  
+  screen.querySelectorAll('.quest-claim-btn').forEach(b => {
+    if (b.disabled) return;
+    b.onclick = () => {
+      const idx = parseInt(b.dataset.idx);
+      if (G.quests[idx].progress >= G.quests[idx].target && !G.quests[idx].claimed) {
+        G.quests[idx].claimed = true;
+        G.coins += G.quests[idx].reward;
+        saveData();
+        playSfx('win');
+        showToast(`+${G.quests[idx].reward} ${t('coins')}!`);
+        buildQuests();
+      }
+    };
+  });
+}
+
+// ==================== AFK ROOM ====================
+function buildAfk() {
+  let screen = document.getElementById('afk-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'afk-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  
+  const now = Date.now();
+  const elapsed = Math.floor((now - G.afkLastVisit) / 1000); // seconds
+  const earnPerMin = 5 + Math.floor(G.unlockedLevel/10);
+  const earned = Math.floor(elapsed / 60) * earnPerMin;
+  
+  G.afkAccumulated += earned;
+  G.afkLastVisit = now;
+  saveData();
+  
+  screen.innerHTML = `
+    <div style="width:90%;max-width:400px;text-align:center;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <h2 style="color:#aaddff;font-size:24px;">${t('afk')}</h2>
+      </div>
+      <div class="panel">
+        <div class="afk-coin">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="35" fill="#ffd700" stroke="#daa520" stroke-width="3"/>
+            <text x="40" y="50" text-anchor="middle" font-size="28" font-weight="bold" fill="#b8860b">$</text>
+          </svg>
+        </div>
+        <div class="afk-info">
+          <p style="color:#aaddff;font-size:18px;">${t('afkEarn')}</p>
+          <p style="color:#ffd700;font-size:32px;font-weight:bold;">${G.afkAccumulated}</p>
+          <p style="color:#8899bb;font-size:14px;">${earnPerMin} ${t('perMin')}</p>
+        </div>
+        <button class="btn btn-success" id="afk-collect" ${G.afkAccumulated>0?'':'disabled'}>${t('collect')} ${G.afkAccumulated}</button>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('afk-collect').onclick = () => {
+    if (G.afkAccumulated > 0) {
+      G.coins += G.afkAccumulated;
+      showToast(`+${G.afkAccumulated} ${t('coins')}!`);
+      G.afkAccumulated = 0;
+      saveData();
+      buildAfk();
+    }
+  };
+}
+
+// ==================== DAILY REWARD ====================
+function buildDaily() {
+  let screen = document.getElementById('daily-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'daily-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  
+  const today = getQuestsDate();
+  const canClaim = G.dailyLastClaim !== today;
+  const rewards = [50, 100, 150, 200, 300, 500, 1000];
+  const dayLabels = G.lang==='ru' ? ['День 1','День 2','День 3','День 4','День 5','День 6','День 7'] : ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'];
+  
+  let rowsHtml = rewards.map((r,i) => {
+    const claimed = !canClaim && G.dailyStreak > i;
+    const isCurrent = canClaim && G.dailyStreak === i;
+    return `
+      <div class="daily-row ${claimed?'claimed':''} ${isCurrent?'available':''}">
+        <span style="color:#aaddff;font-weight:bold;">${dayLabels[i]}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="color:#ffd700;font-weight:bold;">+${r}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700"/></svg>
+          ${claimed?'✓':isCurrent?`<button class="btn btn-success" style="padding:6px 14px;font-size:13px;" onclick="claimDaily(${i},${r})">${t('claimReward')}</button>`:''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  screen.innerHTML = `
+    <div style="width:90%;max-width:400px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <h2 style="color:#aaddff;font-size:24px;">${t('daily')}</h2>
+      </div>
+      <div class="panel">
+        ${canClaim ? '' : `<p style="text-align:center;color:#8899bb;margin-bottom:10px;">${t('come')}</p>`}
+        <div class="daily-grid">${rowsHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+function claimDaily(day, reward) {
+  G.dailyLastClaim = getQuestsDate();
+  G.dailyStreak = day + 1;
+  if (G.dailyStreak > 7) G.dailyStreak = 0;
+  G.coins += reward;
+  saveData();
+  playSfx('win');
+  showToast(`+${reward} ${t('coins')}!`);
+  buildDaily();
+}
+
+// ==================== SHOP ====================
+const SHOP_ITEMS = [
+  { type:'bomb', name:{ru:'Бомба',en:'Bomb'}, desc:'bombDesc', price:300, svg:'bomb' },
+  { type:'line', name:{ru:'Линия',en:'Line'}, desc:'lineDesc', price:200, svg:'line' },
+  { type:'color', name:{ru:'Цветовая бомба',en:'Color Bomb'}, desc:'colorDesc', price:500, svg:'color' },
+  { type:'shuffle', name:{ru:'Перемешивание',en:'Shuffle'}, desc:'shuffleDesc', price:150, svg:'shuffle' },
+  { type:'hammer', name:{ru:'Молоток',en:'Hammer'}, desc:'hammerDesc', price:100, svg:'hammer' },
+  { type:'bomb5', name:{ru:'5 Бомб (скидка)',en:'5 Bombs (discount)'}, desc:'bombDesc', price:1200, svg:'bomb', qty:5 },
+  { type:'line5', name:{ru:'5 Линий (скидка)',en:'5 Lines (discount)'}, desc:'lineDesc', price:800, svg:'line', qty:5 },
+  { type:'coins1000', name:{ru:'1000 монет',en:'1000 Coins'}, desc:'bombDesc', price:500, svg:'coin', isCoins:true, qty:1000 }
+];
+
+function buildShop() {
+  let screen = document.getElementById('shop-screen');
+  if (!screen) {
+    screen = document.createElement('div');
+    screen.id = 'shop-screen';
+    screen.className = 'screen';
+    document.getElementById('game-container').appendChild(screen);
+  }
+  
+  let itemsHtml = SHOP_ITEMS.map(item => {
+    let svg = '';
+    if (item.svg==='bomb') svg = bombSVG();
+    else if (item.svg==='line') svg = lineSVG();
+    else if (item.svg==='color') svg = colorSVG();
+    else if (item.svg==='shuffle') svg = shuffleSVG();
+    else if (item.svg==='hammer') svg = hammerSVG();
+    else if (item.svg==='coin') svg = '<svg viewBox="0 0 24 24" width="40" height="40"><circle cx="12" cy="12" r="10" fill="#ffd700" stroke="#daa520" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="bold" fill="#b8860b">$</text></svg>';
+    
+    const owned = item.isCoins ? '' : `<div class="owned">${t('owned')}: ${G.powerups[item.type.replace('5','')]||0}</div>`;
+    const canBuy = G.coins >= item.price;
+    
+    return `
+      <div class="shop-card">
+        ${svg}
+        <div class="name">${item.name[G.lang]}</div>
+        <div class="desc">${t(item.desc)}</div>
+        ${owned}
+        <div class="price"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700"/></svg>${item.price}</div>
+        <button class="buy-btn" ${canBuy?'':'disabled'} data-item="${item.type}">${t('buy')}</button>
+      </div>
+    `;
+  }).join('');
+  
+  screen.innerHTML = `
+    <div style="width:90%;max-width:480px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <h2 style="color:#aaddff;font-size:24px;">${t('shop')}</h2>
+        <div class="coin-display"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700"/></svg><span>${G.coins}</span></div>
+      </div>
+      <div class="shop-grid">${itemsHtml}</div>
+    </div>
+  `;
+  
+  screen.querySelectorAll('.buy-btn').forEach(b => {
+    if (b.disabled) return;
+    b.onclick = () => {
+      const itemType = b.dataset.item;
+      const item = SHOP_ITEMS.find(i=>i.type===itemType);
+      if (G.coins >= item.price) {
+        G.coins -= item.price;
+        if (item.isCoins) {
+          G.coins += item.qty;
+        } else {
+          const puType = item.type.replace('5','');
+          const qty = item.qty || 1;
+          G.powerups[puType] = (G.powerups[puType]||0) + qty;
+        }
+        saveData();
+        playSfx('win');
+        showToast(`${t('buy')} ✓`);
+        buildShop();
+      } else {
+        showToast(t('notEnough'));
+      }
+    };
+  });
+}
+
+// ==================== TUTORIAL ====================
+function showTutorialPrompt() {
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay-bg';
+  overlay.id = 'tutorial-prompt';
+  overlay.innerHTML = `
+    <div class="overlay-content panel" style="text-align:center;">
+      <svg width="60" height="60" viewBox="0 0 24 24" style="margin:0 auto 10px;"><path fill="#667eea" d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4 1.5-7.5L3 9l6.5-.5z"/></svg>
+      <h2 style="color:#aaddff;font-size:22px;margin-bottom:15px;">${t('tutorialQ')}</h2>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn btn-success" id="tut-yes">${t('yesT')}</button>
+        <button class="btn btn-secondary" id="tut-no">${t('noT')}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('game-container').appendChild(overlay);
+  
+  document.getElementById('tut-yes').onclick = () => {
+    overlay.remove();
+    G.tutorialDone = true;
+    saveData();
+    startTutorial();
+  };
+  document.getElementById('tut-no').onclick = () => {
+    overlay.remove();
+    G.tutorialDone = true;
+    saveData();
+  };
+}
+
+function startTutorial() {
+  startLevel(1);
+  setTimeout(() => {
+    const screen = document.getElementById('game-screen');
+    const steps = [
+      { text: t('tut1'), pos: '50%', top: '40%' },
+      { text: t('tut2'), pos: '50%', top: '50%' },
+      { text: t('tut3'), pos: '50%', top: '60%' }
+    ];
+    let step = 0;
+    
+    function showStep() {
+      const old = screen.querySelector('.tut-text');
+      if (old) old.remove();
+      if (step >= steps.length) return;
+      
+      const el = document.createElement('div');
+      el.className = 'tut-text';
+      el.style.left = '50%';
+      el.style.transform = 'translateX(-50%)';
+      el.style.top = steps[step].top;
+      el.innerHTML = steps[step].text + (step < steps.length-1 ? '<br><button class="btn btn-primary" style="margin-top:10px;padding:8px 20px;font-size:14px;">Далее →</button>' : '<br><button class="btn btn-success" style="margin-top:10px;padding:8px 20px;font-size:14px;">✓ Понятно</button>');
+      screen.appendChild(el);
+      
+      el.querySelector('button').onclick = () => {
+        step++;
+        if (step < steps.length) showStep();
+        else el.remove();
+      };
+    }
+    showStep();
+  }, 1000);
+}
+
+// ==================== SCREEN BUILDER DISPATCHER ====================
+function buildScreen(name) {
+  switch(name) {
+    case 'levels': buildLevels(); break;
+    case 'settings': buildSettings(); break;
+    case 'quests': buildQuests(); break;
+    case 'afk': buildAfk(); break;
+    case 'daily': buildDaily(); break;
+    case 'shop': buildShop(); break;
+  }
+}
+
+// ==================== TOAST ====================
+let toastTimer = null;
+function showToast(msg, duration=2000) {
+  const old = document.querySelector('.toast');
+  if (old) old.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.remove(), duration);
+}
+
+// ==================== INPUT HANDLING ====================
+function setupInput() {
+  document.addEventListener('click', () => { initAudio(); if (G.musicOn) playMusic(); }, { once: true });
+  document.addEventListener('touchstart', () => { initAudio(); if (G.musicOn) playMusic(); }, { once: true });
+  
+  document.addEventListener('click', (e) => {
+    if (currentScreen !== 'game' || !game) return;
+    const canvas = document.getElementById('game-canvas');
+    if (!canvas || !canvas.contains(e.target)) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    game.handleClick(x, y);
+  });
+  
+  let touchStart = null;
+  document.addEventListener('touchstart', (e) => {
+    if (currentScreen !== 'game' || !game) return;
+    const canvas = document.getElementById('game-canvas');
+    if (!canvas) return;
+    const t = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    if (t.clientX < rect.left || t.clientX > rect.right || t.clientY < rect.top || t.clientY > rect.bottom) return;
+    touchStart = { x: t.clientX, y: t.clientY };
+    e.preventDefault();
+  }, { passive: false });
+  
+  document.addEventListener('touchend', (e) => {
+    if (currentScreen !== 'game' || !game || !touchStart) return;
+    const canvas = document.getElementById('game-canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStart.x;
+    const dy = t.clientY - touchStart.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    
+    if (dist < 10) {
+      // Tap
+      const x = (t.clientX - rect.left) * scaleX;
+      const y = (t.clientY - rect.top) * scaleY;
+      game.handleClick(x, y);
+    } else {
+      // Swipe
+      const startX = (touchStart.x - rect.left) * scaleX;
+      const startY = (touchStart.y - rect.top) * scaleY;
+      const endX = (t.clientX - rect.left) * scaleX;
+      const endY = (t.clientY - rect.top) * scaleY;
+      const r1 = Math.floor(startY / game.cellSize);
+      const c1 = Math.floor(startX / game.cellSize);
+      let r2 = r1, c2 = c1;
+      if (Math.abs(dx) > Math.abs(dy)) { c2 = c1 + (dx > 0 ? 1 : -1); }
+      else { r2 = r1 + (dy > 0 ? 1 : -1); }
+      if (r2>=0&&r2<game.rows&&c2>=0&&c2<game.cols) {
+        game.selected = {r:r1, c:c1};
+        game.trySwap(r1, c1, r2, c2);
+        game.selected = null;
+      }
+    }
+    touchStart = null;
+    e.preventDefault();
+  }, { passive: false });
+}
+
+// ==================== INIT ====================
+async function init() {
+  await loadData();
+  generateQuests();
+  buildLobby();
+  showScreen('lobby');
+  showBanner();
+  setupInput();
+  
+  if (!G.tutorialDone) {
+    setTimeout(showTutorialPrompt, 500);
+  }
+}
+
+// Start when VK bridge is ready
+if (typeof vkBridge !== 'undefined') {
+  vkBridge.send("VKWebAppInit").then(() => { init(); }).catch(() => { init(); });
+} else {
+  init();
+}
+</script>
+</body>
+</html>
