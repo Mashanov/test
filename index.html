@@ -171,8 +171,10 @@ function showInviteBox() {
   }
 }
 
-// ==================== VK VIEW HIDE/RESTORE (music pause/resume) ====================
+// ==================== VK VIEW HIDE/RESTORE + PC BLUR/FOCUS (music pause/resume) ====================
 let musicWasPlaying = false;
+
+// VK events (mobile)
 if (typeof vkBridge !== 'undefined') {
   vkBridge.subscribe((e) => {
     if (e.detail && e.detail.type === 'VKWebAppViewHide') {
@@ -187,6 +189,32 @@ if (typeof vkBridge !== 'undefined') {
     }
   });
 }
+
+// PC: pause music when tab/window loses focus, resume when focus returns
+self.addEventListener('blur', () => {
+  musicWasPlaying = musicPlaying;
+  if (musicPlaying) stopMusic();
+});
+
+self.addEventListener('focus', () => {
+  if (musicWasPlaying && G.musicOn) {
+    musicWasPlaying = false;
+    playMusic();
+  }
+});
+
+// Fallback: visibilitychange (covers tab switch in some browsers where blur is unreliable)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    musicWasPlaying = musicPlaying;
+    if (musicPlaying) stopMusic();
+  } else {
+    if (musicWasPlaying && G.musicOn) {
+      musicWasPlaying = false;
+      playMusic();
+    }
+  }
+});
 
 // ==================== TRANSLATIONS ====================
 const I18N = {
