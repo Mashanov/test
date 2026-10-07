@@ -51,7 +51,10 @@ html,body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-f
 .coin-display span { color:#ffd700; font-weight:bold; font-size:16px; }
 
 /* Level Select */
-.level-grid-container { max-width:500px; width:95%; max-height:70vh; overflow-y:auto; padding:10px; }
+.level-grid-container { max-width:500px; width:95%; max-height:70vh; overflow-y:auto; padding:10px; scrollbar-width:thin; scrollbar-color:rgba(100,150,255,.4) rgba(30,30,70,.3); }
+.level-grid-container::-webkit-scrollbar { width:6px; }
+.level-grid-container::-webkit-scrollbar-track { background:rgba(30,30,70,.3); border-radius:3px; }
+.level-grid-container::-webkit-scrollbar-thumb { background:rgba(100,150,255,.4); border-radius:3px; }
 .level-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
 .level-card { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:12px; cursor:pointer; transition:transform .15s; font-weight:bold; }
 .level-card.unlocked { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; box-shadow:0 2px 10px rgba(102,126,234,.3); }
@@ -60,7 +63,9 @@ html,body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-f
 .level-card:active { transform:scale(.9); }
 
 /* Game board */
-#game-screen { flex-direction:column; }
+#game-screen { flex-direction:column; overflow:hidden; }
+#game-screen * { scrollbar-width:none; }
+#game-screen *::-webkit-scrollbar { display:none; }
 #game-canvas { border-radius:12px; box-shadow:0 0 40px rgba(100,150,255,.3); }
 .game-top-bar { width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
 .game-info-box { background:rgba(20,20,50,.8); padding:8px 16px; border-radius:12px; text-align:center; min-width:80px; }
@@ -102,7 +107,11 @@ html,body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-f
 .quest-claim-btn:disabled { opacity:.4; cursor:not-allowed; }
 
 /* Shop */
-.shop-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; max-width:460px; width:95%; }
+.shop-scroll-wrap { width:95%; max-width:460px; max-height:62vh; overflow-y:auto; padding:10px 5px; }
+.shop-scroll-wrap::-webkit-scrollbar { width:6px; }
+.shop-scroll-wrap::-webkit-scrollbar-track { background:rgba(30,30,70,.3); border-radius:3px; }
+.shop-scroll-wrap::-webkit-scrollbar-thumb { background:rgba(100,150,255,.4); border-radius:3px; }
+.shop-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; width:100%; }
 .shop-card { background:rgba(30,30,70,.7); border:1px solid rgba(100,150,255,.2); border-radius:14px; padding:14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; }
 .shop-card svg { width:40px; height:40px; }
 .shop-card .name { color:#aaddff; font-weight:bold; font-size:14px; }
@@ -167,7 +176,7 @@ const I18N = {
     hammerDesc:"Уничтожает один кристалл", coins:"монет",
     questRefresh:"Задания обновятся через", hours:"ч", min:"м",
     noQuests:"Все задания выполнены!", levelLocked:"Уровень закрыт!",
-    doubleReward:"Удвоить награду?", watchAd:"Смотреть рекламу", noThanks:"Нет, спасибо",
+    doubleReward:"Удвоить награду?", watchAd:"Удвоить за рекламу", noThanks:"Нет, спасибо", adDoubleHint:"Награда x2 за просмотр",
     adLoading:"Загрузка рекламы...", adError:"Реклама недоступна",
     clearConfirm:"Вы уверены? Все данные будут удалены!",
     promoSuccess:"Промокод активирован!", promoFail:"Неверный промокод",
@@ -191,7 +200,7 @@ const I18N = {
     hammerDesc:"Destroys one crystal", coins:"coins",
     questRefresh:"Quests refresh in", hours:"h", min:"m",
     noQuests:"All quests completed!", levelLocked:"Level locked!",
-    doubleReward:"Double reward?", watchAd:"Watch Ad", noThanks:"No, thanks",
+    doubleReward:"Double reward?", watchAd:"Double via Ad", noThanks:"No, thanks", adDoubleHint:"x2 reward for watching",
     adLoading:"Loading ad...", adError:"Ad unavailable",
     clearConfirm:"Are you sure? All data will be deleted!",
     promoSuccess:"Promo activated!", promoFail:"Invalid promo code",
@@ -248,6 +257,7 @@ let audioCtx = null;
 let musicGain = null;
 let musicOscs = [];
 let musicPlaying = false;
+let musicInterval = null;
 
 function initAudio() {
   if (!audioCtx) {
@@ -259,35 +269,132 @@ function playMusic() {
   if (!G.musicOn || !audioCtx) return;
   if (musicPlaying) return;
   musicPlaying = true;
+  
   musicGain = audioCtx.createGain();
-  musicGain.gain.value = 0.08;
+  musicGain.gain.value = 0.12;
   musicGain.connect(audioCtx.destination);
   
-  const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 392.00, 329.63, 293.66];
-  let ni = 0;
+  // Chord progression: Am - F - C - G  (vi - IV - I - V)
+  // Frequencies for each chord: [root, third, fifth, octave]
+  const chords = [
+    { bass: 130.81, notes: [261.63, 329.63, 392.00, 523.25] },  // Am
+    { bass: 174.61, notes: [261.63, 349.23, 440.00, 523.25] },  // F
+    { bass: 130.81, notes: [261.63, 329.63, 392.00, 523.25] },  // C
+    { bass: 196.00, notes: [293.66, 392.00, 440.00, 587.33] }   // G
+  ];
   
-  function playNote() {
-    if (!musicPlaying || !G.musicOn) { stopMusic(); return; }
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = notes[ni];
-    osc.connect(musicGain);
-    osc.start();
-    musicOscs.push(osc);
-    ni = (ni+1) % notes.length;
-    setTimeout(() => { try{osc.stop();}catch(e){} }, 400);
+  // Arpeggio pattern for melody
+  const arpPatterns = [
+    [0, 1, 2, 3, 2, 1],  // up-down
+    [0, 2, 1, 3, 1, 2],  // varied
+    [3, 2, 1, 0, 1, 2],  // down-up
+    [0, 1, 2, 3, 2, 0]   // arc
+  ];
+  
+  let chordIdx = 0;
+  let noteIdx = 0;
+  let step = 0;
+  const stepDuration = 280; // ms per step
+  let melodyOsc = null;
+  let bassOsc = null;
+  let padOscs = [];
+  
+  function startChord() {
+    const chord = chords[chordIdx];
+    const pattern = arpPatterns[chordIdx % arpPatterns.length];
+    
+    // Bass note
+    if (bassOsc) { try{bassOsc.stop();}catch(e){} }
+    bassOsc = audioCtx.createOscillator();
+    const bassGain = audioCtx.createGain();
+    bassGain.gain.value = 0.15;
+    bassGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + stepDuration*6/1000);
+    bassOsc.type = 'triangle';
+    bassOsc.frequency.value = chord.bass;
+    bassOsc.connect(bassGain);
+    bassGain.connect(musicGain);
+    bassOsc.start();
+    setTimeout(() => { try{bassOsc.stop();}catch(e){} }, stepDuration*6);
+    musicOscs.push(bassOsc);
+    
+    // Pad chord (sustained, soft)
+    padOscs.forEach(o => { try{o.stop();}catch(e){} });
+    padOscs = [];
+    chord.notes.forEach((freq, i) => {
+      const pad = audioCtx.createOscillator();
+      const padGain = audioCtx.createGain();
+      padGain.gain.value = 0.02;
+      pad.type = 'sine';
+      pad.frequency.value = freq;
+      pad.connect(padGain);
+      padGain.connect(musicGain);
+      pad.start();
+      padOscs.push(pad);
+      musicOscs.push(pad);
+      setTimeout(() => { try{pad.stop();}catch(e){} }, stepDuration*6);
+    });
+    
+    noteIdx = 0;
   }
-  playNote();
-  musicInterval = setInterval(playNote, 500);
+  
+  function playStep() {
+    if (!musicPlaying || !G.musicOn) { stopMusic(); return; }
+    
+    const chord = chords[chordIdx];
+    const pattern = arpPatterns[chordIdx % arpPatterns.length];
+    const noteFreq = chord.notes[pattern[noteIdx % pattern.length]];
+    
+    // Melody note
+    if (melodyOsc) { try{melodyOsc.stop();}catch(e){} }
+    melodyOsc = audioCtx.createOscillator();
+    const melodyGain = audioCtx.createGain();
+    melodyGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    melodyGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + stepDuration/1000 * 0.9);
+    melodyOsc.type = step % 2 === 0 ? 'sine' : 'triangle';
+    melodyOsc.frequency.value = noteFreq;
+    melodyOsc.connect(melodyGain);
+    melodyGain.connect(musicGain);
+    melodyOsc.start();
+    setTimeout(() => { try{melodyOsc.stop();}catch(e){} }, stepDuration);
+    musicOscs.push(melodyOsc);
+    
+    // Add a harmonic note every other step
+    if (step % 2 === 1) {
+      const harmOsc = audioCtx.createOscillator();
+      const harmGain = audioCtx.createGain();
+      harmGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      harmGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + stepDuration/1000 * 0.8);
+      harmOsc.type = 'sine';
+      harmOsc.frequency.value = noteFreq * 1.5; // Perfect fifth
+      harmOsc.connect(harmGain);
+      harmGain.connect(musicGain);
+      harmOsc.start();
+      setTimeout(() => { try{harmOsc.stop();}catch(e){} }, stepDuration);
+      musicOscs.push(harmOsc);
+    }
+    
+    noteIdx++;
+    step++;
+    
+    // Change chord every 6 steps
+    if (noteIdx >= 6) {
+      chordIdx = (chordIdx + 1) % chords.length;
+      startChord();
+    }
+  }
+  
+  startChord();
+  playStep();
+  musicInterval = setInterval(playStep, stepDuration);
 }
 
-let musicInterval = null;
 function stopMusic() {
   musicPlaying = false;
   if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
   musicOscs.forEach(o => { try{o.stop();}catch(e){} });
   musicOscs = [];
   if (musicGain) { try{musicGain.disconnect();}catch(e){} }
+  musicGain = null;
 }
 
 function toggleMusic() {
@@ -533,23 +640,69 @@ class Match3 {
     if (this.grid[r1][c1].type < 0 || this.grid[r2][c2].type < 0) return;
     
     this.swapping = true;
-    this.swap(r1,c1,r2,c2);
-    playSfx('swap');
+    this.animating = true;
     
-    const matches = this.findAllMatches();
+    // Animate swap visually
+    const cr1 = this.grid[r1][c1];
+    const cr2 = this.grid[r2][c2];
+    const tx1 = c2*this.cellSize, ty1 = r2*this.cellSize;
+    const tx2 = c1*this.cellSize, ty2 = r1*this.cellSize;
     
-    if (matches.length === 0) {
-      // Swap back
-      setTimeout(()=>{
+    let frames = 0;
+    const maxFrames = 10;
+    const animateSwap = () => {
+      frames++;
+      const t = frames / maxFrames;
+      const ease = 1 - Math.pow(1-t, 3); // ease-out cubic
+      cr1.x = (c1*this.cellSize) + (tx1 - c1*this.cellSize) * ease;
+      cr1.y = (r1*this.cellSize) + (ty1 - r1*this.cellSize) * ease;
+      cr2.x = (c2*this.cellSize) + (tx2 - c2*this.cellSize) * ease;
+      cr2.y = (r2*this.cellSize) + (ty2 - r2*this.cellSize) * ease;
+      if (frames < maxFrames) {
+        requestAnimationFrame(animateSwap);
+      } else {
+        // Actually swap in grid
         this.swap(r1,c1,r2,c2);
-        playSfx('invalid');
-        this.swapping = false;
-      }, 250);
-    } else {
-      this.movesLeft--;
-      this.processMatches();
-      this.swapping = false;
-    }
+        cr1.x = tx1; cr1.y = ty1;
+        cr2.x = tx2; cr2.y = ty2;
+        playSfx('swap');
+        
+        const matches = this.findAllMatches();
+        if (matches.length === 0) {
+          // Animate swap back
+          const crA = this.grid[r1][c1];
+          const crB = this.grid[r2][c2];
+          let f2 = 0;
+          const animateBack = () => {
+            f2++;
+            const t2 = f2 / maxFrames;
+            const ease2 = 1 - Math.pow(1-t2, 3);
+            crA.x = tx1 + (tx2 - tx1) * ease2;
+            crA.y = ty1 + (ty2 - ty1) * ease2;
+            crB.x = tx2 + (tx1 - tx2) * ease2;
+            crB.y = ty2 + (ty1 - ty2) * ease2;
+            if (f2 < maxFrames) {
+              requestAnimationFrame(animateBack);
+            } else {
+              this.swap(r1,c1,r2,c2);
+              this.grid[r1][c1].x = c1*this.cellSize;
+              this.grid[r1][c1].y = r1*this.cellSize;
+              this.grid[r2][c2].x = c2*this.cellSize;
+              this.grid[r2][c2].y = r2*this.cellSize;
+              playSfx('invalid');
+              this.swapping = false;
+              this.animating = false;
+            }
+          };
+          animateBack();
+        } else {
+          this.movesLeft--;
+          this.swapping = false;
+          this.processMatches();
+        }
+      }
+    };
+    animateSwap();
   }
   
   processMatches() {
@@ -568,6 +721,11 @@ class Match3 {
           totalMatched++;
           // Particle burst
           this.addParticles(c*this.cellSize+this.cellSize/2, r*this.cellSize+this.cellSize/2, this.grid[r][c].type);
+          // Add sparkle particles
+          this.addSparkles(c*this.cellSize+this.cellSize/2, r*this.cellSize+this.cellSize/2);
+          // Mark for removal animation
+          const cr = this.grid[r][c];
+          if (cr) { cr.removing = true; cr.removeProgress = 0; }
         }
       });
       // Create special for 4+ matches
@@ -576,30 +734,50 @@ class Match3 {
         const crystal = this.grid[mid.r][mid.c];
         if (crystal && crystal.type >= 0) {
           crystal.special = m.length >= 5 ? 'color' : (m[0].r === m[1].r ? 'lineH' : 'lineV');
+          crystal.removing = false; // Don't remove the special one
         }
       }
     });
     
-    // Keep special crystals (they triggered but shouldn't be removed if just created)
-    matched.forEach(key => {
-      const r = Math.floor(key/100);
-      const c = key%100;
-      const crystal = this.grid[r][c];
-      if (crystal && crystal.special && matches.some(m=>m.some(p=>p.r===r&&p.c===c)&&m.length>=4)) {
-        // Keep the special one
+    // Animate removal then actually remove
+    let frames = 0;
+    const maxFrames = 15;
+    const animateRemoval = () => {
+      frames++;
+      matched.forEach(key => {
+        const r = Math.floor(key/100);
+        const c = key%100;
+        const cr = this.grid[r][c];
+        if (cr && cr.removing) {
+          cr.removeProgress = frames / maxFrames;
+          cr.scale = 1 + cr.removeProgress * 0.5; // Scale up
+          cr.alpha = 1 - cr.removeProgress; // Fade out
+        }
+      });
+      if (frames < maxFrames) {
+        requestAnimationFrame(animateRemoval);
       } else {
-        this.grid[r][c] = null;
+        // Actually remove
+        matched.forEach(key => {
+          const r = Math.floor(key/100);
+          const c = key%100;
+          const cr = this.grid[r][c];
+          if (cr && cr.removing) {
+            this.grid[r][c] = null;
+          }
+        });
+        
+        // Score
+        const points = totalMatched * 50 * (1 + Math.floor(totalMatched/5)*0.5);
+        this.score += Math.floor(points);
+        G.stats.totalMatches += totalMatched;
+        playSfx('match');
+        
+        // Drop and fill
+        this.dropAndFill();
       }
-    });
-    
-    // Score
-    const points = totalMatched * 50 * (1 + Math.floor(totalMatched/5)*0.5);
-    this.score += Math.floor(points);
-    G.stats.totalMatches += totalMatched;
-    playSfx('match');
-    
-    // Drop and fill
-    setTimeout(()=>this.dropAndFill(), 300);
+    };
+    animateRemoval();
   }
   
   dropAndFill() {
@@ -673,10 +851,27 @@ class Match3 {
   
   addParticles(x, y, type) {
     const color = type >= 0 ? CRYSTAL_TYPES[type].color : '#888';
-    for (let i=0; i<8; i++) {
+    const glow = type >= 0 ? CRYSTAL_TYPES[type].glow : '#aaa';
+    for (let i=0; i<12; i++) {
+      const angle = (Math.PI*2*i)/12 + Math.random()*0.3;
+      const speed = Math.random()*5+2;
       this.particles.push({
-        x, y, vx:(Math.random()-0.5)*6, vy:(Math.random()-0.5)*6-3,
-        life:1, color, size:Math.random()*4+2
+        x, y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed-2,
+        life:1, color: i%2===0 ? color : glow, size:Math.random()*5+2,
+        type:'circle', rotation:0, rotSpeed:(Math.random()-0.5)*0.3
+      });
+    }
+  }
+  
+  addSparkles(x, y) {
+    for (let i=0; i<6; i++) {
+      const angle = Math.random()*Math.PI*2;
+      const dist = Math.random()*20+10;
+      this.particles.push({
+        x:x+Math.cos(angle)*dist, y:y+Math.sin(angle)*dist,
+        vx:Math.cos(angle)*1, vy:Math.sin(angle)*1-1,
+        life:1, color:'#ffffff', size:Math.random()*3+1,
+        type:'sparkle', rotation:Math.random()*Math.PI, rotSpeed:(Math.random()-0.5)*0.2
       });
     }
   }
@@ -724,7 +919,8 @@ class Match3 {
   update(dt) {
     // Update particles
     this.particles = this.particles.filter(p => {
-      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.02;
+      p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life -= 0.025;
+      if (p.rotSpeed) p.rotation += p.rotSpeed;
       return p.life > 0;
     });
     
@@ -756,16 +952,20 @@ class Match3 {
         const cr = this.grid[r][c];
         if (!cr) continue;
         
+        ctx.globalAlpha = cr.alpha !== undefined ? cr.alpha : 1;
+        
         if (cr.type === -1) {
           this.drawObstacle(cr.x, cr.y);
         } else {
           const ct = CRYSTAL_TYPES[cr.type];
           if (this.blind) {
-            this.drawCrystal(cr.x, cr.y, '#444', '#666', 'circle', cr.special, cr.scale);
+            this.drawCrystal(cr.x, cr.y, '#444', '#666', 'circle', cr.special, cr.scale || 1);
           } else {
-            this.drawCrystal(cr.x, cr.y, ct.color, ct.glow, ct.shape, cr.special, cr.scale);
+            this.drawCrystal(cr.x, cr.y, ct.color, ct.glow, ct.shape, cr.special, cr.scale || 1);
           }
         }
+        
+        ctx.globalAlpha = 1;
         
         // Selected highlight
         if (this.selected && this.selected.r === r && this.selected.c === c) {
@@ -779,10 +979,21 @@ class Match3 {
     // Particles
     this.particles.forEach(p => {
       ctx.globalAlpha = p.life;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-      ctx.fill();
+      if (p.type === 'sparkle') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation + p.life * 3);
+        ctx.fillStyle = p.color;
+        const sz = p.size * p.life;
+        ctx.fillRect(-sz, -sz*0.15, sz*2, sz*0.3);
+        ctx.fillRect(-sz*0.15, -sz, sz*0.3, sz*2);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI*2);
+        ctx.fill();
+      }
     });
     ctx.globalAlpha = 1;
   }
@@ -1077,9 +1288,22 @@ function startLevel(level) {
       <div class="game-info-box"><div class="label">${t('level')}</div><div class="value">${level}</div></div>
       <div class="game-info-box"><div class="label">${t('score')}</div><div class="value" id="g-score">0</div></div>
       <div class="game-info-box"><div class="label">${t('target')}</div><div class="value">${getLevelTarget(level)}</div></div>
+      <div class="game-info-box" style="min-width:100px;">
+        <div class="label">⭐⭐⭐</div>
+        <div class="value" style="font-size:13px;">${Math.floor(getLevelTarget(level)*1.0)} / ${Math.floor(getLevelTarget(level)*1.2)} / ${Math.floor(getLevelTarget(level)*1.5)}</div>
+      </div>
       <div class="game-info-box"><div class="label" id="g-moves-label">${t('moves')}</div><div class="value" id="g-moves">${getLevelMoves(level)}</div></div>
     </div>
-    <canvas id="game-canvas" width="${canvasSize}" height="${canvasSize}"></canvas>
+    <div id="star-progress" style="width:95%;max-width:500px;margin-bottom:8px;display:flex;align-items:center;gap:4px;">
+        <span style="color:#8899bb;font-size:11px;white-space:nowrap;">⭐</span>
+        <div style="flex:1;height:8px;background:rgba(30,30,70,.6);border-radius:4px;overflow:hidden;position:relative;">
+          <div id="star-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#ffd700,#ffaa00);border-radius:4px;transition:width .3s;"></div>
+          <div style="position:absolute;top:0;left:66.7%;width:2px;height:100%;background:rgba(255,255,255,.3);"></div>
+          <div style="position:absolute;top:0;left:80%;width:2px;height:100%;background:rgba(255,255,255,.3);"></div>
+        </div>
+        <span style="color:#8899bb;font-size:11px;white-space:nowrap;">⭐⭐⭐</span>
+      </div>
+      <canvas id="game-canvas" width="${canvasSize}" height="${canvasSize}"></canvas>
     <div class="power-up-bar" id="powerup-bar"></div>
   `;
   
@@ -1149,6 +1373,14 @@ function gameLoop(time) {
     if (puSlots[i]) puSlots[i].textContent = G.powerups[type]||0;
   });
   
+  // Update star progress bar
+  const starBar = document.getElementById('star-bar');
+  if (starBar && game) {
+    const target = game.target;
+    const pct = Math.min(100, (game.score / (target * 1.5)) * 100);
+    starBar.style.width = pct + '%';
+  }
+  
   gameLoopId = requestAnimationFrame(gameLoop);
 }
 
@@ -1189,7 +1421,7 @@ function onLevelWin(level, score) {
         </div>
         <p style="color:#ffd700;font-size:24px;margin:10px 0;">+${reward} ${t('coins')}</p>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap;">
-          <button class="btn btn-warning" id="double-btn">${t('watchAd')}</button>
+          <button class="btn btn-warning" id="double-btn">▶ ${t('watchAd')} (+${reward} ${t('coins')})</button>
           <button class="btn btn-success" id="next-btn">${t('next')}</button>
           <button class="btn btn-secondary" id="menu-btn">${t('menu')}</button>
         </div>
@@ -1415,6 +1647,9 @@ function buildQuests() {
 }
 
 // ==================== AFK ROOM ====================
+let afkTimerId = null;
+let afkAccumulator = 0;
+
 function buildAfk() {
   let screen = document.getElementById('afk-screen');
   if (!screen) {
@@ -1424,19 +1659,32 @@ function buildAfk() {
     document.getElementById('game-container').appendChild(screen);
   }
   
-  const now = Date.now();
-  const elapsed = Math.floor((now - G.afkLastVisit) / 1000); // seconds
   const earnPerMin = 5 + Math.floor(G.unlockedLevel/10);
-  const earned = Math.floor(elapsed / 60) * earnPerMin;
+  const earnPerSec = earnPerMin / 60;
   
-  G.afkAccumulated += earned;
-  G.afkLastVisit = now;
-  saveData();
+  // Start accumulating only while AFK screen is open
+  if (afkTimerId) { clearInterval(afkTimerId); afkTimerId = null; }
+  afkAccumulator = 0;
+  
+  function updateAfkDisplay() {
+    const coinEl = document.getElementById('afk-coins');
+    const btnEl = document.getElementById('afk-collect');
+    if (coinEl) coinEl.textContent = Math.floor(afkAccumulator);
+    if (btnEl) {
+      btnEl.textContent = `${t('collect')} ${Math.floor(afkAccumulator)}`;
+      btnEl.disabled = afkAccumulator < 1;
+    }
+  }
+  
+  afkTimerId = setInterval(() => {
+    afkAccumulator += earnPerSec;
+    updateAfkDisplay();
+  }, 1000);
   
   screen.innerHTML = `
     <div style="width:90%;max-width:400px;text-align:center;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
+        <button class="btn-back" id="afk-back">${t('back')}</button>
         <h2 style="color:#aaddff;font-size:24px;">${t('afk')}</h2>
       </div>
       <div class="panel">
@@ -1448,21 +1696,37 @@ function buildAfk() {
         </div>
         <div class="afk-info">
           <p style="color:#aaddff;font-size:18px;">${t('afkEarn')}</p>
-          <p style="color:#ffd700;font-size:32px;font-weight:bold;">${G.afkAccumulated}</p>
+          <p style="color:#ffd700;font-size:32px;font-weight:bold;" id="afk-coins">0</p>
           <p style="color:#8899bb;font-size:14px;">${earnPerMin} ${t('perMin')}</p>
+          <p style="color:#667788;font-size:12px;margin-top:8px;">💡 ${G.lang==='ru' ? 'Монеты начисляются, пока вы здесь' : 'Coins accrue while you are here'}</p>
         </div>
-        <button class="btn btn-success" id="afk-collect" ${G.afkAccumulated>0?'':'disabled'}>${t('collect')} ${G.afkAccumulated}</button>
+        <button class="btn btn-success" id="afk-collect" disabled>${t('collect')} 0</button>
       </div>
     </div>
   `;
   
-  document.getElementById('afk-collect').onclick = () => {
-    if (G.afkAccumulated > 0) {
-      G.coins += G.afkAccumulated;
-      showToast(`+${G.afkAccumulated} ${t('coins')}!`);
-      G.afkAccumulated = 0;
+  document.getElementById('afk-back').onclick = () => {
+    playSfx('click');
+    if (afkTimerId) { clearInterval(afkTimerId); afkTimerId = null; }
+    // Collect on leave
+    if (afkAccumulator >= 1) {
+      G.coins += Math.floor(afkAccumulator);
+      G.afkAccumulated = Math.floor(afkAccumulator);
       saveData();
-      buildAfk();
+    }
+    afkAccumulator = 0;
+    buildLobby();
+    showScreen('lobby');
+  };
+  
+  document.getElementById('afk-collect').onclick = () => {
+    const amount = Math.floor(afkAccumulator);
+    if (amount > 0) {
+      G.coins += amount;
+      showToast(`+${amount} ${t('coins')}!`);
+      afkAccumulator = 0;
+      saveData();
+      updateAfkDisplay();
     }
   };
 }
@@ -1568,13 +1832,13 @@ function buildShop() {
   }).join('');
   
   screen.innerHTML = `
-    <div style="width:90%;max-width:480px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div style="width:95%;max-width:480px;display:flex;flex-direction:column;align-items:center;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;width:100%;">
         <button class="btn-back" onclick="playSfx('click');buildLobby();showScreen('lobby')">${t('back')}</button>
         <h2 style="color:#aaddff;font-size:24px;">${t('shop')}</h2>
         <div class="coin-display"><svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd700"/></svg><span>${G.coins}</span></div>
       </div>
-      <div class="shop-grid">${itemsHtml}</div>
+      <div class="shop-scroll-wrap"><div class="shop-grid">${itemsHtml}</div></div>
     </div>
   `;
   
