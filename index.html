@@ -162,6 +162,32 @@ try {
   }
 } catch(e) { vkAvailable = false; }
 
+// ==================== INVITE FRIENDS ====================
+function showInviteBox() {
+  if (vkAvailable) {
+    vkBridge.send("VKWebAppShowInviteBox").then(() => {}).catch(() => {});
+  } else {
+    showToast(t('invite'));
+  }
+}
+
+// ==================== VK VIEW HIDE/RESTORE (music pause/resume) ====================
+let musicWasPlaying = false;
+if (typeof vkBridge !== 'undefined') {
+  vkBridge.subscribe((e) => {
+    if (e.detail && e.detail.type === 'VKWebAppViewHide') {
+      musicWasPlaying = musicPlaying;
+      if (musicPlaying) stopMusic();
+    }
+    if (e.detail && e.detail.type === 'VKWebAppViewRestore') {
+      if (musicWasPlaying && G.musicOn) {
+        musicWasPlaying = false;
+        playMusic();
+      }
+    }
+  });
+}
+
 // ==================== TRANSLATIONS ====================
 const I18N = {
   ru: {
@@ -186,7 +212,7 @@ const I18N = {
     clearConfirm:"Вы уверены? Все данные будут удалены!",
     promoSuccess:"Промокод активирован!", promoFail:"Неверный промокод",
     progressSaved:"Прогресс сохранён", modes:"Режим", classic:"Классика", timed:"На время",
-    movesLimit:"Ограничение ходов", obstacles:"Препятствия", blind:"Вслепую"
+    movesLimit:"Ограничение ходов", obstacles:"Препятствия", blind:"Вслепую", invite:"Пригласить"
   },
   en: {
     title:"Crystal Match", play:"Play", settings:"Settings", quests:"Quests", afk:"AFK Room",
@@ -210,7 +236,7 @@ const I18N = {
     clearConfirm:"Are you sure? All data will be deleted!",
     promoSuccess:"Promo activated!", promoFail:"Invalid promo code",
     progressSaved:"Progress saved", modes:"Mode", classic:"Classic", timed:"Timed",
-    movesLimit:"Move Limit", obstacles:"Obstacles", blind:"Blind"
+    movesLimit:"Move Limit", obstacles:"Obstacles", blind:"Blind", invite:"Invite"
   }
 };
 
@@ -1199,7 +1225,8 @@ function buildLobby() {
     { key:'quests', icon:questsSVG(), screen:'quests', color:'linear-gradient(135deg,#e67e22,#f39c12)' },
     { key:'afk', icon:afkSVG(), screen:'afk', color:'linear-gradient(135deg,#9b59b6,#8e44ad)' },
     { key:'daily', icon:dailySVG(), screen:'daily', color:'linear-gradient(135deg,#e74c3c,#c0392b)' },
-    { key:'shop', icon:shopSVG(), screen:'shop', color:'linear-gradient(135deg,#1abc9c,#16a085)' }
+    { key:'shop', icon:shopSVG(), screen:'shop', color:'linear-gradient(135deg,#1abc9c,#16a085)' },
+    { key:'invite', icon:inviteSVG(), screen:'invite', color:'linear-gradient(135deg,#f9d423,#ff4e50)' }
   ];
   
   buttons.forEach(btn => {
@@ -1207,7 +1234,11 @@ function buildLobby() {
     el.className = 'lobby-btn';
     el.style.background = btn.color;
     el.innerHTML = btn.icon + `<span>${t(btn.key)}</span>`;
-    el.onclick = () => { playSfx('click'); buildScreen(btn.screen); showScreen(btn.screen); };
+    if (btn.key === 'invite') {
+      el.onclick = () => { playSfx('click'); showInviteBox(); };
+    } else {
+      el.onclick = () => { playSfx('click'); buildScreen(btn.screen); showScreen(btn.screen); };
+    }
     grid.appendChild(el);
   });
 }
@@ -1233,6 +1264,10 @@ function shopSVG() {
 }
 
 // Powerup SVGs
+function inviteSVG() {
+  return `<svg viewBox="0 0 24 24" fill="white"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9 0v2c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2c0-2.21-3.58-4-8-4-1.79 0-3.42.27-4.69.73C11.42 11.27 9.21 12 6 12zM6 20h14v-2H6v2z"/><path d="M3.5 6l-1.5 1.5L4 9.5 2 11.5 3.5 13l2-2 2 2L9 11.5 7 9.5l2-2L7.5 6l-2 2z"/></svg>`;
+}
+
 function bombSVG() { return `<svg viewBox="0 0 24 24" fill="#ff6644"><circle cx="12" cy="14" r="7" fill="#ff4444" stroke="#ff8888" stroke-width="2"/><line x1="12" y1="7" x2="16" y2="3" stroke="#ffaa00" stroke-width="2"/><circle cx="17" cy="2" r="2" fill="#ffd700"/></svg>`; }
 function lineSVG() { return `<svg viewBox="0 0 24 24"><rect x="2" y="10" width="20" height="4" rx="2" fill="#44aaff"/><rect x="10" y="2" width="4" height="20" rx="2" fill="#44aaff" opacity="0.5"/></svg>`; }
 function colorSVG() { return `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="#aa44ff" stroke-width="3"/><circle cx="12" cy="12" r="4" fill="#aa44ff"/></svg>`; }
