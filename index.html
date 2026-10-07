@@ -1235,14 +1235,12 @@ function buildLobby() {
           <span id="coin-amount">0</span>
         </div>
       </div>
-      <h1 class="title-text">${t('title')}</h1>
       <div class="lobby-grid" id="lobby-grid"></div>
     `;
     container.appendChild(lobby);
   }
   
   document.getElementById('coin-amount').textContent = G.coins;
-  document.querySelector('.title-text').textContent = t('title');
   
   const grid = document.getElementById('lobby-grid');
   grid.innerHTML = '';
