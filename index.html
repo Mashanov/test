@@ -430,7 +430,7 @@ function showInterstitialAd(callback) {
   stopMusic();
   if (vkAvailable) {
     try {
-      vkBridge.send("VKWebAppShowInterstitialAd", {}).then(()=>{
+      vkBridge.send("VKWebAppShowNativeAds", {ad_format:'interstitial'}).then(()=>{
         if (G.musicOn) playMusic();
         callback && callback();
       }).catch(e=>{
@@ -445,7 +445,7 @@ function showRewardedAd(onReward, onClose) {
   stopMusic();
   if (vkAvailable) {
     try {
-      vkBridge.send("VKWebAppShowRewardedAd", {}).then(data=>{
+      vkBridge.send("VKWebAppShowNativeAds", {ad_format:'reward'}).then(data=>{
         if (G.musicOn) playMusic();
         if (data && data.result) onReward && onReward();
         else onClose && onClose();
