@@ -104,7 +104,12 @@ html,body { width:100%; height:100%; overflow:hidden; background:#0a0a1a; font-f
 .quest-progress { color:#8899bb; font-size:13px; margin-top:4px; }
 .quest-reward { display:flex; align-items:center; gap:4px; color:#ffd700; font-weight:bold; }
 .quest-claim-btn { background:linear-gradient(135deg,#38ef7d,#11998e); color:#fff; border:none; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:bold; font-size:13px; }
+
 .quest-claim-btn:disabled { opacity:.4; cursor:not-allowed; }
+.quest-scroll-wrap { max-height:65vh; overflow-y:auto; padding:10px 5px; scrollbar-width:thin; scrollbar-color:rgba(100,150,255,.4) rgba(30,30,70,.3); }
+.quest-scroll-wrap::-webkit-scrollbar { width:6px; }
+.quest-scroll-wrap::-webkit-scrollbar-track { background:rgba(30,30,70,.3); border-radius:3px; }
+.quest-scroll-wrap::-webkit-scrollbar-thumb { background:rgba(100,150,255,.4); border-radius:3px; }
 
 /* Shop */
 .shop-scroll-wrap { width:95%; max-width:460px; max-height:62vh; overflow-y:auto; padding:10px 5px; }
@@ -838,14 +843,35 @@ class Match3 {
   }
   
   checkGameOver() {
-    if (this.score >= this.target) {
+    // Win immediately only if 3 stars achieved (score >= target * 1.5)
+    if (this.score >= this.target * 1.5) {
       this.won = true;
       this.gameOver = true;
       onLevelWin(this.level, this.score);
     } else if (this.mode === 'timed') {
-      if (this.timeLeft <= 0) { this.gameOver = true; onLevelLose(); }
+      // Timed mode: when time runs out, check if score is enough for at least 1 star
+      if (this.timeLeft <= 0) {
+        if (this.score >= this.target) {
+          this.won = true;
+          this.gameOver = true;
+          onLevelWin(this.level, this.score);
+        } else {
+          this.gameOver = true;
+          onLevelLose();
+        }
+      }
     } else {
-      if (this.movesLeft <= 0) { this.gameOver = true; onLevelLose(); }
+      // Move-limited modes: when moves run out, check if score is enough for at least 1 star
+      if (this.movesLeft <= 0) {
+        if (this.score >= this.target) {
+          this.won = true;
+          this.gameOver = true;
+          onLevelWin(this.level, this.score);
+        } else {
+          this.gameOver = true;
+          onLevelLose();
+        }
+      }
     }
   }
   
@@ -1626,7 +1652,7 @@ function buildQuests() {
       <div style="text-align:center;color:#8899bb;margin-bottom:15px;font-size:13px;">
         ${allDone ? t('noQuests') : `${t('questRefresh')} ${hoursLeft}${t('hours')} ${minsLeft}${t('min')}`}
       </div>
-      <div style="max-height:65vh;overflow-y:auto;">${questsHtml}</div>
+      <div class="quest-scroll-wrap">${questsHtml}</div>
     </div>
   `;
   
