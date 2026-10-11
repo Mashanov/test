@@ -69,6 +69,7 @@ h1,h2,h3{margin:.2em 0;}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .row.between{justify-content:space-between;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 hr{border:none;border-top:1px dashed rgba(159,220,255,.3);margin:10px 0;}
 .muted{color:var(--muted);font-size:13px;}
 .big{font-size:20px;font-weight:800;}
@@ -76,7 +77,8 @@ canvas{display:block;border-radius:12px;background:#07304f;box-shadow:var(--shad
 .board-wrap{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;position:relative;z-index:2;}
 .board-box{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
 .board-title{font-size:13px;color:var(--muted);}
-.fx-canvas{position:absolute;top:0;left:0;pointer-events:none;border-radius:12px;}
+.fx-canvas{position:absolute;top:0;left:0;pointer-events:none;border-radius:12px;
+  background:transparent !important;box-shadow:none !important;}
 .board-wrap.shake{animation:shake .3s;}
 @keyframes shake{
   0%,100%{transform:translate(0,0);}
@@ -87,7 +89,7 @@ canvas{display:block;border-radius:12px;background:#07304f;box-shadow:var(--shad
 .overlay{position:fixed;inset:0;background:rgba(2,14,26,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:14px;}
 .overlay.active{display:flex;}
 .overlay.opaque{background:rgba(2,14,26,.96);}
-.modal{width:100%;max-width:440px;background:linear-gradient(180deg,#0d4d84,#082f52);
+.modal{width:100%;max-width:460px;background:linear-gradient(180deg,#0d4d84,#082f52);
   border:1px solid rgba(140,220,255,.25);border-radius:18px;padding:18px;box-shadow:var(--shadow);
   max-height:86vh;overflow-y:auto;}
 .modal h2{margin-top:0;}
@@ -117,13 +119,55 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
 .seg .btn{background:transparent;box-shadow:none;border-radius:9px;flex:1;padding:9px;font-size:14px;}
 .seg .btn.on{background:var(--panel2);box-shadow:inset 0 0 0 1px rgba(140,220,255,.4);}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0d4d84;border:1px solid rgba(140,220,255,.35);
-  padding:10px 16px;border-radius:12px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;font-size:14px;box-shadow:var(--shadow);}
+  padding:10px 16px;border-radius:12px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;font-size:14px;box-shadow:var(--shadow);max-width:92vw;text-align:center;}
 #toast.show{opacity:1;}
+
+/* ===== НОВОЕ: Прогрессия ===== */
+.rank-line{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0 8px;}
+.rank-badge{display:inline-block;padding:3px 12px;border-radius:20px;background:linear-gradient(90deg,#ffd257,#d99a1f);
+  color:#3b2500;font-weight:800;font-size:12px;letter-spacing:.3px;}
+.xp-mini{width:100%;height:8px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden;margin-top:4px;}
+.xp-mini i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);transition:width .4s;}
+.prog-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.prog-tabs .btn{flex:1;font-size:13px;padding:8px;}
+.prog-tabs .btn.on{background:linear-gradient(180deg,#ffd257,#d99a1f);color:#3b2500;}
+.tree-branch{margin-bottom:12px;background:rgba(255,255,255,.04);border-radius:12px;padding:10px;border:1px solid rgba(140,220,255,.15);}
+.tree-branch h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px;}
+.tree-item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:6px;}
+.tree-item .icon{font-size:22px;width:34px;text-align:center;flex-shrink:0;}
+.tree-item .info{flex:1;min-width:0;}
+.tree-item .info b{font-size:13px;}
+.tree-item .info .muted{font-size:11px;}
+.tree-item .dots{display:flex;gap:3px;margin-top:4px;}
+.tree-item .dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.15);}
+.tree-item .dots i.on{background:var(--gold);box-shadow:0 0 6px var(--gold);}
+.tree-item button{min-width:74px;font-size:11px;padding:7px 8px;}
+.season-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;}
+.season-bar{height:14px;background:rgba(255,255,255,.1);border-radius:8px;position:relative;overflow:hidden;margin:6px 0;}
+.season-bar i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);transition:width .4s;}
+.tier-row{display:flex;gap:6px;overflow-x:auto;padding:6px 0;}
+.tier{min-width:60px;height:84px;background:rgba(255,255,255,.05);border:1px solid rgba(140,220,255,.15);border-radius:10px;padding:6px;display:flex;flex-direction:column;align-items:center;font-size:11px;text-align:center;flex-shrink:0;}
+.tier.reached{border-color:var(--gold);background:rgba(255,210,87,.12);}
+.tier.claimed{opacity:.55;}
+.tier .num{font-weight:800;font-size:14px;color:var(--muted);}
+.tier.reached .num{color:var(--gold);}
+.tier .rew{font-size:11px;margin-top:4px;color:var(--muted);}
+.tier .claim{margin-top:auto;background:var(--gold);border:none;color:#3b2500;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;cursor:pointer;}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mod-card{padding:10px;background:rgba(255,255,255,.05);border:2px solid rgba(140,220,255,.15);border-radius:12px;cursor:pointer;text-align:center;}
+.mod-card.on{border-color:var(--gold);background:rgba(255,210,87,.12);}
+.mod-card .ico{font-size:24px;}
+.mod-card .nm{font-size:12px;font-weight:700;margin-top:4px;}
+.mod-card .ds{font-size:10px;color:var(--muted);margin-top:2px;}
+.points-badge{display:inline-block;background:linear-gradient(90deg,#5ad18a,#2fae6d);color:#062a12;font-weight:800;
+  padding:3px 10px;border-radius:20px;font-size:12px;margin-left:6px;}
+
 @media (max-width:480px){
   .topbar .logo span.name{display:none;}
   .board-wrap{gap:6px;}
   .btn{font-size:15px;}
   .skin-grid{grid-template-columns:1fr 1fr;}
+  .mod-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -173,8 +217,18 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
       </div>
     </div>
     <div class="rope"></div>
-    <div class="menu">
+    <div class="rank-line">
+      <span class="rank-badge" id="hud-rank">Матрос</span>
+      <span class="muted" id="hud-xp">0 / 40 XP</span>
+      <span class="points-badge" id="hud-points" style="display:none">🎖 <span id="hud-points-val">0</span></span>
+    </div>
+    <div class="xp-mini"><i id="hud-xp-bar" style="width:0%"></i></div>
+    <div class="menu" style="margin-top:14px">
       <button class="btn gold" id="btn-games">⚔️ <span data-i18n="play">Играть</span></button>
+      <div class="grid2">
+        <button class="btn" id="btn-tree">🎖 <span data-i18n="upgrades">Прокачка</span></button>
+        <button class="btn" id="btn-season">🌴 <span data-i18n="season">Сезон</span></button>
+      </div>
       <button class="btn" id="btn-tasks">📜 <span data-i18n="missions">Задания</span> <span id="tasks-dot" style="color:var(--gold)"></span></button>
       <div class="grid2">
         <button class="btn" id="btn-shop">🛒 <span data-i18n="shop">Магазин</span></button>
@@ -264,10 +318,32 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
     <button class="btn" id="shop-close" data-i18n="close">Закрыть</button>
   </div></div>
 
+  <!-- ДЕРЕВО ПРОКАЧКИ -->
+  <div class="overlay" id="ov-tree"><div class="modal">
+    <h2>🎖 <span data-i18n="upgrades">Прокачка</span> <span class="points-badge">Очки: <span id="tree-points">0</span></span></h2>
+    <p class="muted" data-i18n="treeHint">Повышайте навыки за очки умений, которые даются за уровни адмирала.</p>
+    <div id="tree-body"></div>
+    <button class="btn" id="tree-close" data-i18n="close">Закрыть</button>
+  </div></div>
+
+  <!-- СЕЗОН -->
+  <div class="overlay" id="ov-season"><div class="modal">
+    <h2>🌴 <span data-i18n="season">Сезон</span> <span class="muted" id="season-num"></span></h2>
+    <div class="season-head">
+      <span id="season-rank-label">Тир <b id="season-tier">0</b> / 50</span>
+      <span class="muted"><span id="season-xp">0</span> / <span id="season-xp-max">100</span> XP</span>
+    </div>
+    <div class="season-bar"><i id="season-bar" style="width:0%"></i></div>
+    <p class="muted" data-i18n="seasonHint">Играйте бои — за каждый начисляется сезонный опыт. Собирайте награды тира!</p>
+    <div class="tier-row" id="season-tiers"></div>
+    <button class="btn" id="season-close" data-i18n="close">Закрыть</button>
+  </div></div>
+
   <div class="overlay" id="ov-result"><div class="modal">
     <h2 id="result-title"></h2>
     <p id="result-text" class="muted"></p>
     <p class="big">💰 +<span id="result-coins">0</span> · ⭐ +<span id="result-xp">0</span></p>
+    <p class="muted" id="result-season"></p>
     <button class="btn gold" id="btn-double">📺 <span data-i18n="double">Удвоить за рекламу</span></button>
     <button class="btn" id="btn-collect" data-i18n="collect">Забрать</button>
   </div></div>
@@ -310,7 +386,12 @@ const I18N = {
     oppChoose:'С кем играем?',oppBot:'Против бота',oppFriend:'С другом на одном устройстве',
     modeChoose:'Выберите режим',p1n:'Игрок 1',p2n:'Игрок 2',pass:'Передайте устройство',
     passHint:'Теперь ходит: %s',passSetup:'Передайте устройство. Флот теперь расставляет %s',
-    goldHit:'Золотая клетка! +15💰',crit:'Критический выстрел!'},
+    goldHit:'Золотая клетка!',crit:'Критический выстрел!',
+    upgrades:'Прокачка', season:'Сезон', treeHint:'Повышайте навыки за очки умений, которые даются за уровни адмирала.',
+    seasonHint:'Играйте бои — за каждый начисляется сезонный опыт. Собирайте награды тира!',
+    rank:'Звание', lvlUp:'Новый уровень!', skillUp:'Навык улучшен!', noPoints:'Нет очков умений',
+    maxLvl:'Максимум', modifier:'Модификатор боя', modNone:'Без модификатора',
+    tier:'Тир', claimTier:'Забрать', tierClaimed:'Получено', seasonReward:'Награда сезона'},
   en:{title:'Battleship',play:'Play',missions:'Missions',settings:'Settings',daily:'Daily reward',
     afk:'AFK Room',invite:'Invite friends',music:'Music',language:'Language',promo:'Promo code',apply:'Apply',close:'Close',on:'On',off:'Off',placeTitle:'Place your fleet',rotate:'Rotate',
     random:'Random',clear:'Clear',ready:'Battle!',placeHint:'Pick a ship, tap the field. Double tap to rotate.',
@@ -327,10 +408,74 @@ const I18N = {
     oppChoose:'Choose your opponent',oppBot:'Vs bot',oppFriend:'With a friend (one device)',
     modeChoose:'Choose mode',p1n:'Player 1',p2n:'Player 2',pass:'Pass the device',
     passHint:'Now playing: %s',passSetup:'Pass the device. %s places the fleet now',
-    goldHit:'Gold cell! +15💰',crit:'CRIT!'}
+    goldHit:'Gold cell!',crit:'CRIT!',
+    upgrades:'Upgrades', season:'Season', treeHint:'Spend skill points earned from admiral levels.',
+    seasonHint:'Play battles — each grants season XP. Claim tier rewards!',
+    rank:'Rank', lvlUp:'Level up!', skillUp:'Skill upgraded!', noPoints:'No skill points',
+    maxLvl:'MAX', modifier:'Battle modifier', modNone:'No modifier',
+    tier:'Tier', claimTier:'Claim', tierClaimed:'Claimed', seasonReward:'Season reward'}
 };
 function t(k){return (I18N[P.lang]||I18N.ru)[k]||k;}
 function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));}
+
+/* ============ RANKS / UPGRADES / SEASON / MODIFIERS ============ */
+const RANKS=[
+  {min:1,  ru:'Матрос',           en:'Sailor',           bonus:0},
+  {min:5,  ru:'Старшина',         en:'Petty Officer',    bonus:2},
+  {min:10, ru:'Лейтенант',        en:'Lieutenant',       bonus:4},
+  {min:15, ru:'Капитан-лейтенант',en:'Lt. Commander',    bonus:7},
+  {min:20, ru:'Капитан 3 ранга',  en:'Captain 3rd rank', bonus:10},
+  {min:30, ru:'Капитан 2 ранга',  en:'Captain 2nd rank', bonus:15},
+  {min:40, ru:'Капитан 1 ранга',  en:'Captain 1st rank', bonus:20},
+  {min:50, ru:'Контр-адмирал',    en:'Rear Admiral',     bonus:30},
+  {min:75, ru:'Вице-адмирал',     en:'Vice Admiral',     bonus:50},
+  {min:100,ru:'Адмирал флота',    en:'Fleet Admiral',    bonus:80}
+];
+function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x.min)r=x;return r;}
+
+const UPGRADES={
+  artillery:{
+    ru:'Артиллерия', en:'Artillery', icon:'💥',
+    items:[
+      {id:'crit',  ru:'Точный выстрел', en:'Precise shot',  descRu:'+3% шанс крита', descEn:'+3% crit chance', max:5, cost:[1,2,2,3,3]},
+      {id:'goldc', ru:'Золотоискатель', en:'Gold digger',   descRu:'+5% монет с золотой клетки', descEn:'+5% coins from gold cells', max:5, cost:[1,2,2,3,3]},
+      {id:'combo', ru:'Комбо-мастер',   en:'Combo master',  descRu:'+3💰 к бонусу за серию', descEn:'+3💰 to combo bonus', max:5, cost:[1,2,2,3,3]},
+    ]
+  },
+  fleet:{
+    ru:'Флот', en:'Fleet', icon:'⚓',
+    items:[
+      {id:'goldCells', ru:'Обеспечение', en:'Provisioning', descRu:'+1 золотая клетка у врага', descEn:'+1 enemy gold cell', max:3, cost:[2,3,4]},
+      {id:'armor',     ru:'Броня',       en:'Armor',        descRu:'+2% шанс уклонения от выстрела', descEn:'+2% dodge chance', max:5, cost:[2,3,4,4,5]},
+      {id:'xpBoost',   ru:'Адмиральский опыт', en:'Admiral XP', descRu:'+10% опыта за бой', descEn:'+10% battle XP', max:5, cost:[1,2,3,3,4]},
+    ]
+  },
+  tactics:{
+    ru:'Тактика', en:'Tactics', icon:'🎯',
+    items:[
+      {id:'abilStart', ru:'Боезапас',   en:'Ammo reserve', descRu:'+1 заряд каждой способности', descEn:'+1 charge to each ability', max:3, cost:[3,4,5]},
+      {id:'reward',    ru:'Награда',    en:'Reward',       descRu:'+5% монет за бой', descEn:'+5% coins per battle', max:5, cost:[1,2,3,4,5]},
+      {id:'luck',      ru:'Удача',      en:'Luck',         descRu:'+1 к максимальной серии (за 3+ — бонус)', descEn:'+1 max combo (3+ gives bonus)', max:3, cost:[3,4,5]},
+    ]
+  }
+};
+function upgLvl(branch,id){return (P.upgrades&&P.upgrades[branch]&&P.upgrades[branch][id])||0;}
+
+const MODIFIERS=[
+  {id:'none',      ru:'Без модификатора',  en:'No modifier',      ico:'🎯', dRu:'Обычный бой',            dEn:'Classic battle'},
+  {id:'doubleGold',ru:'Двойное золото',    en:'Double gold',      ico:'💰', dRu:'Золотые клетки дают x2 монет', dEn:'Gold cells give x2 coins'},
+  {id:'lucky',     ru:'Попутный ветер',    en:'Lucky wind',       ico:'🍀', dRu:'+10% шанс крита',        dEn:'+10% crit chance'},
+  {id:'storm',     ru:'Шторм',             en:'Storm',            ico:'⛈️', dRu:'15% шанс промаха даже по кораблю', dEn:'15% chance to miss even on hit'},
+  {id:'goldRush',  ru:'Золотая лихорадка', en:'Gold rush',        ico:'🌟', dRu:'Вдвое больше золотых клеток', dEn:'Double gold cells'},
+];
+
+const SEASON_LEN_DAYS=30, SEASON_TIERS=50;
+function seasonIndex(){return Math.floor(Date.now()/(1000*60*60*24*SEASON_LEN_DAYS));}
+function seasonDayLeft(){
+  const ms=(seasonIndex()+1)*SEASON_LEN_DAYS*86400000-Date.now();
+  return Math.max(0,Math.ceil(ms/86400000));
+}
+function tierXP(tier){return 80+tier*20;} // XP to go from tier-1 to tier
 
 /* ============ SKINS ============ */
 const SKINS=[
@@ -358,18 +503,37 @@ function shipSvg(skin,len){
     '<rect x="2" y="4" width="'+(len*16)+'" height="10" rx="4" fill="'+skin.hull+'" stroke="'+skin.edge+'" stroke-width="1.5"/></svg>';
 }
 
-/* ============ PLAYER / SAVE (только VK Storage) ============ */
-let P = {lang:'ru', music:1, coins:0, xp:0, level:1, tutDone:0, lastDaily:'', streak:0,
-  missions:null, stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0},
-  skins:{owned:['classic'],active:'classic'}};
-let SAVE_KEY='battleship_save_v1', loaded=false;
+/* ============ PLAYER / SAVE ============ */
+let P = {lang:'ru', music:1, coins:0, xp:0, level:1, skillPoints:0, tutDone:0, lastDaily:'', streak:0,
+  missions:null, stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0,combo:0,crits:0,goldCells:0},
+  skins:{owned:['classic'],active:'classic'},
+  upgrades:{artillery:{},fleet:{},tactics:{}},
+  season:{idx:-1, xp:0, claimed:[]},
+  lastMod:'none'};
+let SAVE_KEY='battleship_save_v2', loaded=false;
 
 async function vkSave(){ try{ if(vk) await vk.send('VKWebAppStorageSet',{key:SAVE_KEY,value:JSON.stringify(P)}); }catch(e){} }
 function afterLoad(){
   if(!P.skins)P.skins={owned:['classic'],active:'classic'};
   if(!P.skins.owned.includes('classic'))P.skins.owned.push('classic');
+  if(!P.upgrades)P.upgrades={artillery:{},fleet:{},tactics:{}};
+  if(!P.upgrades.artillery)P.upgrades.artillery={};
+  if(!P.upgrades.fleet)P.upgrades.fleet={};
+  if(!P.upgrades.tactics)P.upgrades.tactics={};
+  if(!P.season)P.season={idx:-1,xp:0,claimed:[]};
+  if(typeof P.skillPoints!=='number')P.skillPoints=0;
+  if(!P.stats.crits)P.stats.crits=0;
+  if(!P.stats.goldCells)P.stats.goldCells=0;
+  if(!P.stats.combo)P.stats.combo=0;
+  rolloverSeason();
   loaded=true; refreshHud(); applyI18n(); checkMissionsRollover();
   if(!P.tutDone) showElement('ov-tut-start');
+}
+function rolloverSeason(){
+  const idx=seasonIndex();
+  if(P.season.idx!==idx){
+    P.season.idx=idx; P.season.xp=0; P.season.claimed=[];
+  }
 }
 if(vk){
   vk.send('VKWebAppStorageGet',{keys:[SAVE_KEY]}).then(r=>{
@@ -414,6 +578,7 @@ function sfx(kind){
   else if(kind==='splash'){tone(320,.25,'sine',.12);tone(160,.35,'sine',.1,c.currentTime+.06);}
   else if(kind==='gold'){tone(1175,.1,'sine',.15);tone(1568,.18,'sine',.12,c.currentTime+.09);}
   else if(kind==='crit'){tone(880,.09,'square',.16);tone(1320,.22,'sawtooth',.12,c.currentTime+.07);}
+  else if(kind==='rank'){[659,880,1175].forEach((f,i)=>tone(f,.3,'triangle',.13,c.currentTime+i*.12));}
 }
 let audioPausedBySystem=false;
 function pauseAudioSys(){ if(musicOn){audioPausedBySystem=true; musicStop();} }
@@ -432,23 +597,52 @@ const $=s=>document.querySelector(s);
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#'+id).classList.add('active');}
 function showElement(id){$('#'+id).classList.add('active');}
 function hideElement(id){$('#'+id).classList.remove('active');}
-function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._tm);el._tm=setTimeout(()=>el.classList.remove('show'),2200);}
+function xpNeeded(level){return Math.round(40*level*Math.sqrt(level));}
 function refreshHud(){
   $('#hud-lvl').textContent=P.level; $('#hud-coins').textContent=P.coins;
+  const rk=rankFor(P.level); const rkName=(P.lang==='en')?rk.en:rk.ru;
+  $('#hud-rank').textContent='🎖 '+rkName;
+  const need=xpNeeded(P.level);
+  $('#hud-xp').textContent=P.xp+' / '+need+' XP';
+  $('#hud-xp-bar').style.width=Math.min(100,(P.xp/need*100))+'%';
+  if(P.skillPoints>0){$('#hud-points').style.display='inline-block';$('#hud-points-val').textContent=P.skillPoints;}
+  else $('#hud-points').style.display='none';
   $('#hud-stats').textContent=t('stWins')+': '+P.stats.wins+' · '+t('stGames')+': '+P.stats.games+' · '+t('stSunk')+': '+P.stats.sunk;
   const d=tasksDot(); $('#tasks-dot').textContent=d?'★':'';
 }
 function tasksDot(){return P.missions&&P.missions.list&&P.missions.list.some(m=>!m.done&&m.progress>=m.target);}
 function addCoins(n){P.coins+=n;refreshHud();vkSave();}
-function addXP(n){P.xp+=n;const nl=1+Math.floor(Math.sqrt(P.xp/40));if(nl>P.level){P.level=nl;toast('⭐ Level '+nl);}refreshHud();vkSave();}
+function addXP(n){
+  const boost=1+upgLvl('fleet','xpBoost')*0.1;
+  const gained=Math.round(n*boost);
+  P.xp+=gained;
+  let need=xpNeeded(P.level), leveled=false;
+  while(P.xp>=need){ P.xp-=need; P.level++; P.skillPoints++; leveled=true; need=xpNeeded(P.level); }
+  if(leveled){
+    const rk=rankFor(P.level); const rkName=(P.lang==='en')?rk.en:rk.ru;
+    toast('🎖 '+t('lvlUp')+' Lv.'+P.level+' — '+rkName+' (+1 очко)');
+    sfx('rank');
+  }
+  refreshHud();vkSave();
+  return gained;
+}
+function addSeasonXP(n){
+  rolloverSeason();
+  P.season.xp+=n;
+  vkSave();
+}
 
 /* ============ ADS ============ */
 function interstitialAd(onDone){
   musicStop(); paused=true; updateTurnLabel();
+  let done=false;
+  const finish=()=>{if(done)return;done=true;resumeAfterAd(onDone);};
   if(vk){
     vk.send('VKWebAppShowNativeAds',{ad_format:'interstitial'})
-      .then(()=>resumeAfterAd(onDone)).catch(()=>resumeAfterAd(onDone));
-  } else { setTimeout(()=>resumeAfterAd(onDone),600); }
+      .then(finish).catch(finish);
+    setTimeout(finish,3500);
+  } else { setTimeout(finish,600); }
 }
 function resumeAfterAd(onDone){ paused=false; if(P.music)musicStart(); onDone&&onDone(); }
 function rewardAd(onReward,onFail){
@@ -490,7 +684,6 @@ function shipCells(s){
   for(let i=0;i<s.len;i++)out.push((s.y+(s.hor?0:i))*N+(s.x+(s.hor?i:0)));
   return out;
 }
-/* Мёртвые зоны: клетки вокруг потопленного корабля */
 function markDead(b,s){
   for(const ci of shipCells(s)){
     const cx=ci%N, cy=(ci-cx)/N;
@@ -510,17 +703,54 @@ function spawnGold(b,cnt){
     }
   }
 }
-/* Выстрел: попадание, крит, золото, мёртвые зоны */
+/* ===== Модификаторы и апгрейды ===== */
+function critChance(){
+  let c=0.15 + upgLvl('artillery','crit')*0.03;
+  if(activeMod==='lucky')c+=0.10;
+  return Math.min(0.75,c);
+}
+function goldCoins(){
+  let base=15*(1+upgLvl('artillery','goldc')*0.05);
+  if(activeMod==='doubleGold')base*=2;
+  return Math.round(base);
+}
+function comboBonusPerHit(){
+  return 5 + upgLvl('artillery','combo')*3;
+}
+function dodgeChance(){
+  return Math.min(0.35, upgLvl('fleet','armor')*0.02);
+}
+function startingGoldCells(){
+  let n=3+upgLvl('fleet','goldCells');
+  if(activeMod==='goldRush')n*=2;
+  return n;
+}
+function stormMiss(){
+  return activeMod==='storm'?0.15:0;
+}
+function abilityStart(){
+  const base={sonar:2,double:2,torpedo:1};
+  const add=upgLvl('tactics','abilStart');
+  return {sonar:base.sonar+add,double:base.double+add,torpedo:base.torpedo+add};
+}
+function rewardMultiplier(){
+  return 1 + upgLvl('tactics','reward')*0.05;
+}
+
 function shoot(b,idx){
   if(b.shots[idx]||b.dead[idx])return {hit:false,skip:true};
   const shipId=b.cells[idx];
   if(shipId){
+    /* Шторм: шанс промаха даже по кораблю */
+    if(Math.random()<stormMiss()){
+      b.shots[idx]=1; return {hit:false};
+    }
     b.shots[idx]=2;
     const s=shipById(b,shipId);
     if(s){
       s.hits++;
       let crit=false;
-      if(!isSunk(b,s)&&Math.random()<0.15){
+      if(!isSunk(b,s)&&Math.random()<critChance()){
         const rest=shipCells(s).filter(ci=>b.shots[ci]===0);
         if(rest.length){
           const ci=rest[Math.floor(Math.random()*rest.length)];
@@ -566,6 +796,7 @@ let hotseat=false;
 let boards=[emptyBoard(),emptyBoard()];
 let cur=0, placed=[false,false], setupIdx=0;
 let gameMode='normal', myTurn=true, gameOver=false, paused=false;
+let activeMod='none';
 let pendingAbil=null, extraShots=0, combo=0, comboMax=0, shipsLost=0;
 let ABILS=[{sonar:0,double:0,torpedo:0},{sonar:0,double:0,torpedo:0}];
 let selShip=null, selHor=true, selLen=4;
@@ -575,7 +806,7 @@ function myBoard(){return boards[cur];}
 function enemyBoard(){return boards[1-cur];}
 function pname(i){return t(i===0?'p1n':'p2n');}
 
-/* ============ FX (частицы взрывов и всплесков) ============ */
+/* ============ FX ============ */
 const FXL=[]; let fxRunning=false;
 function fxCanvas(cv){
   const box=cv.parentElement;
@@ -610,8 +841,8 @@ function spawnText(cv,idx,text,color){
   FXL.push({fx:F.fx,x:F.x,y:F.y-6,life:1.4,dec:.018,type:'txt',text:text,color:color});
   fxRun();
 }
-function spawnGoldFx(cv,idx){
-  spawnText(cv,idx,'+15💰','#ffd257');
+function spawnGoldFx(cv,idx,amount){
+  spawnText(cv,idx,'+'+amount+'💰','#ffd257');
   const F=fxCell(cv,idx);
   for(let i=0;i<10;i++){const a=Math.random()*Math.PI*2;
     FXL.push({fx:F.fx,x:F.x,y:F.y,vx:Math.cos(a)*1.8,vy:Math.sin(a)*1.8-1.2,life:1,dec:.035,type:'spark',color:'#ffd257'});}
@@ -678,7 +909,6 @@ function drawGrid(ctx,cell){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
   ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-/* Детализированный корабль: корпус, палуба, иллюминаторы, мачта с парусом и флаг */
 function drawShip(ctx,x,y,w,h,hor,sunk){
   const sk=activeSkin();
   const L=hor?w:h, T=hor?h:w;
@@ -713,7 +943,6 @@ function drawShip(ctx,x,y,w,h,hor,sunk){
   }
   ctx.restore();
 }
-/* На вражеском поле видим только подбитые палубы; корабль раскрывается когда потоплен */
 function drawShips(b,ctx,cell,showAll){
   for(const s of b.ships){
     const sunk=isSunk(b,s);
@@ -752,8 +981,9 @@ function drawMarks(b,ctx,cell){
 }
 
 /* ============ SETUP SCREEN ============ */
-function openSetup(opp,mode){
-  hotseat=(opp==='friend'); gameMode=mode;
+function openSetup(opp,mode,mod){
+  hotseat=(opp==='friend'); gameMode=mode; activeMod=mod||'none';
+  P.lastMod=activeMod; vkSave();
   boards=[emptyBoard(),emptyBoard()]; placed=[false,false]; setupIdx=0;
   selShip=null; selHor=true; selLen=4;
   buildShipPalette(); show('scr-setup'); renderSetup();
@@ -834,8 +1064,7 @@ $('#btn-ready').onclick=()=>{
   const placedIds=new Set();boards[setupIdx].cells.forEach(v=>{if(v)placedIds.add(v);});
   if(placedIds.size<10){toast(t('placeAll'));return;}
   placed[setupIdx]=true;
-  /* золотые клетки спавним на поле противника: с ботом — только на поле бота, в хот-сите — на обоих */
-  if(hotseat||setupIdx===1)spawnGold(boards[setupIdx],3);
+  if(hotseat||setupIdx===1)spawnGold(boards[setupIdx],startingGoldCells());
   if(hotseat&&setupIdx===0){
     passScreen(t('passSetup').replace('%s',pname(1)),()=>{
       setupIdx=1; selShip=null; selHor=true; selLen=4;
@@ -847,13 +1076,16 @@ $('#btn-ready').onclick=()=>{
 /* ============ BATTLE ============ */
 function startBattle(){
   interstitialAd(()=>{
-    if(!hotseat){ aiReset(); randomFleet(boards[1]); spawnGold(boards[1],3); }
+    if(!hotseat){ aiReset(); randomFleet(boards[1]); spawnGold(boards[1],startingGoldCells()); }
     cur=0; myTurn=true; gameOver=false; pendingAbil=null;
     extraShots=0; combo=0; comboMax=0; shipsLost=0;
-    const abInit=gameMode==='super'?{sonar:2,double:2,torpedo:1}:{sonar:0,double:0,torpedo:0};
+    const abInit=gameMode==='super'?abilityStart():{sonar:0,double:0,torpedo:0};
     ABILS=[Object.assign({},abInit),Object.assign({},abInit)];
     buildAbilities(); show('scr-game'); renderGame();
-    $('#mode-chip').textContent=(hotseat?'👥 ':'')+(gameMode==='super'?'⚡':('⚔️ '+t('modeNormal')));
+    let modeTxt=(hotseat?'👥 ':'')+(gameMode==='super'?'⚡':('⚔️ '+t('modeNormal')));
+    const modObj=MODIFIERS.find(m=>m.id===activeMod);
+    if(modObj&&activeMod!=='none')modeTxt+=' '+modObj.ico;
+    $('#mode-chip').textContent=modeTxt;
   });
 }
 function buildAbilities(){
@@ -898,14 +1130,13 @@ function drawFull(cv,b,showAll){
   const {ctx,cell}=fitCanvas(cv,N,N);
   drawWater(ctx,cv.getBoundingClientRect().width,cv.getBoundingClientRect().height);
   drawGrid(ctx,cell); drawShips(b,ctx,cell,showAll); drawMarks(b,ctx,cell);
-  fxCanvas(cv); /* синхронизируем слой эффектов */
+  fxCanvas(cv);
 }
 function updateTurnLabel(){
   if(gameOver){$('#turn-label').textContent='🏁';return;}
   if(paused){$('#turn-label').textContent=t('paused');return;}
   $('#turn-label').textContent=hotseat?('👤 '+pname(cur)):(myTurn?'🎯 '+t('turnYou'):'💀 '+t('turnEnemy'));
 }
-/* Экран «передайте устройство» для хот-сита */
 function passScreen(text,cb){
   const ov=document.createElement('div');ov.className='overlay active opaque';
   ov.innerHTML='<div class="modal"><h2>🤝 '+t('pass')+'</h2>'+
@@ -932,9 +1163,10 @@ function playerFire(idx){
   const cv=$('#cv-enemy');
   if(res.hit){
     P.stats.hits++; combo++; comboMax=Math.max(comboMax,combo);
+    P.stats.combo=Math.max(P.stats.combo||0,combo);
     sfx(res.crit?'crit':'hit');
     spawnBoom(cv,idx);
-    if(res.crit){spawnText(cv,idx,t('crit'),'#ffd257');missionProgress('crit',1);}
+    if(res.crit){P.stats.crits=(P.stats.crits||0)+1;spawnText(cv,idx,t('crit'),'#ffd257');missionProgress('crit',1);}
     if(combo>=2)spawnText(cv,idx,'🔥 x'+combo,'#ff7a3c');
     if(combo===3)missionProgress('combo',1);
     if(res.sunk){P.stats.sunk++;sfx('explode');shake();}
@@ -943,8 +1175,10 @@ function playerFire(idx){
   } else {
     combo=0;
     if(res.gold){
-      addCoins(15);toast(t('goldHit'));sfx('gold');
-      spawnGoldFx(cv,idx);missionProgress('gold',1);
+      const amount=goldCoins();
+      addCoins(amount);toast(t('goldHit')+' +'+amount+'💰');sfx('gold');
+      P.stats.goldCells=(P.stats.goldCells||0)+1;
+      spawnGoldFx(cv,idx,amount);missionProgress('gold',1);
     } else { sfx('miss'); spawnSplash(cv,idx); }
     missionProgress('shots',1);
   }
@@ -967,6 +1201,13 @@ function aiTurn(){
   if(gameOver||paused||hotseat)return;
   const mb=myBoard();
   const idx=aiPick(mb); if(idx<0)return;
+  /* Уклонение брони: имитируем промах врага */
+  if(dodgeChance()>0 && Math.random()<dodgeChance()){
+    sfx('miss'); spawnSplash($('#cv-my'),idx);
+    renderGame();
+    myTurn=true;combo=0;updateTurnLabel();updateComboChip();
+    return;
+  }
   const res=shoot(mb,idx);
   const cv=$('#cv-my');
   if(res.hit){
@@ -1000,11 +1241,16 @@ function useAbility(idx){
       P.stats.shots++;
       if(r.hit){
         P.stats.hits++; spawnBoom(cv,i);
-        if(r.crit)missionProgress('crit',1);
+        if(r.crit){P.stats.crits=(P.stats.crits||0)+1;missionProgress('crit',1);}
         if(r.sunk){P.stats.sunk++;sfx('explode');shake();}
         missionProgress('hits',1);
       }
-      else if(r.gold){golds++;addCoins(15);missionProgress('gold',1);spawnGoldFx(cv,i);}
+      else if(r.gold){
+        const amt=goldCoins();golds++;
+        addCoins(amt);missionProgress('gold',1);
+        P.stats.goldCells=(P.stats.goldCells||0)+1;
+        spawnGoldFx(cv,i,amt);
+      }
       else spawnSplash(cv,i);
     }
     sfx('explode'); shake(); missionProgress('shots',N);
@@ -1034,10 +1280,15 @@ function checkEnd(){
   }
   sfx((hotseat||winner===0)?'win':'lose');
   missionProgress('games',1);
+  const rk=rankFor(P.level);
+  const rmul=rewardMultiplier();
   let coins,xp;
   if(hotseat){coins=40+P.level*5;xp=30+P.level*4;}
   else{coins=winner===0?30+P.level*5:10;xp=winner===0?25+P.level*4:10;}
-  coins+=comboMax*5; /* бонус за серию попаданий */
+  coins+=comboMax*comboBonusPerHit();
+  coins+=rk.bonus;
+  coins=Math.round(coins*rmul);
+  xp=Math.round(xp);
   endReward={coins:coins,xp:xp,win:!hotseat?winner===0:true,who:winner};
   showResult(); vkSave(); return true;
 }
@@ -1047,18 +1298,21 @@ function showResult(){
     :(endReward.win?t('win'):t('lose'));
   $('#result-coins').textContent=endReward.coins;
   $('#result-xp').textContent=endReward.xp;
+  const seasonXP=Math.max(5,Math.round((endReward.win?30:15)+P.level));
+  endReward.seasonXP=seasonXP;
   $('#result-text').textContent=t('stShots')+': '+P.stats.shots+' · '+t('stSunk')+': '+P.stats.sunk+
     (comboMax>=2?(' · 🔥 x'+comboMax):'');
+  $('#result-season').textContent='🌴 '+t('season')+' +'+seasonXP+' XP';
   $('#btn-double').disabled=false;
   showElement('ov-result');
 }
 $('#btn-collect').onclick=()=>{
-  addCoins(endReward.coins); addXP(endReward.xp);
+  addCoins(endReward.coins); addXP(endReward.xp); addSeasonXP(endReward.seasonXP||0);
   hideElement('ov-result'); show('scr-lobby');
 };
 $('#btn-double').onclick=()=>{
   rewardAd(()=>{
-    addCoins(endReward.coins*2); addXP(endReward.xp*2);
+    addCoins(endReward.coins*2); addXP(endReward.xp*2); addSeasonXP(endReward.seasonXP||0);
     $('#result-coins').textContent=endReward.coins*2;
     $('#result-xp').textContent=endReward.xp*2;
     $('#btn-double').disabled=true; toast(t('doubled'));
@@ -1127,6 +1381,90 @@ function renderTasks(){
       '<div class="muted">'+Math.min(m.progress,m.target)+'/'+m.target+'</div>';
     wrap.appendChild(div);
   });
+}
+
+/* ============ UPGRADE TREE ============ */
+$('#btn-tree').onclick=()=>{if(tutActive)return;renderTree();showElement('ov-tree');sfx('click');};
+$('#tree-close').onclick=()=>hideElement('ov-tree');
+function renderTree(){
+  $('#tree-points').textContent=P.skillPoints;
+  const wrap=$('#tree-body');wrap.innerHTML='';
+  Object.keys(UPGRADES).forEach(bKey=>{
+    const b=UPGRADES[bKey];
+    const div=document.createElement('div');div.className='tree-branch';
+    const h=document.createElement('h3');
+    h.innerHTML=b.icon+' '+((P.lang==='en')?b.en:b.ru);
+    div.appendChild(h);
+    b.items.forEach(it=>{
+      const lvl=upgLvl(bKey,it.id);
+      const maxed=lvl>=it.max;
+      const cost=maxed?0:it.cost[lvl];
+      const row=document.createElement('div');row.className='tree-item';
+      let dots='';for(let i=0;i<it.max;i++)dots+='<i class="'+(i<lvl?'on':'')+'"></i>';
+      row.innerHTML=
+        '<div class="icon">'+(maxed?'✅':'⭐')+'</div>'+
+        '<div class="info"><b>'+((P.lang==='en')?it.en:it.ru)+'</b>'+
+          '<div class="muted">'+((P.lang==='en')?it.descEn:it.descRu)+'</div>'+
+          '<div class="dots">'+dots+'</div></div>';
+      const btn=document.createElement('button');
+      btn.className='btn small gold';
+      if(maxed){btn.textContent=t('maxLvl');btn.disabled=true;}
+      else{btn.textContent='+ '+cost+'🎖';btn.disabled=P.skillPoints<cost;
+        btn.onclick=()=>{
+          if(P.skillPoints<cost)return;
+          P.skillPoints-=cost;
+          P.upgrades[bKey][it.id]=lvl+1;
+          sfx('coin');toast(t('skillUp')+' '+((P.lang==='en')?it.en:it.ru));
+          vkSave();renderTree();refreshHud();
+        };}
+      row.appendChild(btn);
+      div.appendChild(row);
+    });
+    wrap.appendChild(div);
+  });
+}
+
+/* ============ SEASON ============ */
+$('#btn-season').onclick=()=>{if(tutActive)return;rolloverSeason();renderSeason();showElement('ov-season');sfx('click');};
+$('#season-close').onclick=()=>hideElement('ov-season');
+function currentTierAndProgress(){
+  let xp=P.season.xp;
+  let tier=0;
+  while(tier<SEASON_TIERS){
+    const need=tierXP(tier+1);
+    if(xp<need)break;
+    xp-=need; tier++;
+  }
+  return {tier,xp,need:tier<SEASON_TIERS?tierXP(tier+1):0};
+}
+function renderSeason(){
+  rolloverSeason();
+  const {tier,xp,need}=currentTierAndProgress();
+  $('#season-num').textContent='#'+(P.season.idx+1)+' · '+seasonDayLeft()+' дн.';
+  $('#season-tier').textContent=tier;
+  $('#season-xp').textContent=xp;
+  $('#season-xp-max').textContent=need||'-';
+  $('#season-bar').style.width=(tier>=SEASON_TIERS?100:Math.min(100,(xp/need*100)))+'%';
+  const wrap=$('#season-tiers');wrap.innerHTML='';
+  for(let i=1;i<=SEASON_TIERS;i++){
+    const reached=i<=tier;
+    const claimed=P.season.claimed.includes(i);
+    const isMilestone=i%5===0;
+    const reward=isMilestone?(200+i*20):(40+i*5);
+    const el=document.createElement('div');
+    el.className='tier'+(reached?' reached':'')+(claimed?' claimed':'');
+    let btn='';
+    if(reached&&!claimed)btn='<button class="claim">'+t('claimTier')+'</button>';
+    else if(claimed)btn='<span class="rew" style="color:var(--ok)">✓</span>';
+    el.innerHTML='<div class="num">'+i+'</div><div class="rew">💰'+reward+'</div>'+btn;
+    el.querySelector('.claim')&&(el.querySelector('.claim').onclick=()=>{
+      if(P.season.claimed.includes(i))return;
+      if(currentTierAndProgress().tier<i)return;
+      P.season.claimed.push(i);addCoins(reward);sfx('coin');toast(t('seasonReward')+' +'+reward+'💰');
+      vkSave();renderSeason();
+    });
+    wrap.appendChild(el);
+  }
 }
 
 /* ============ SHOP ============ */
@@ -1203,15 +1541,19 @@ document.querySelectorAll('#seg-lang .btn').forEach(b=>b.onclick=()=>{
 $('#btn-promo').onclick=()=>{
   const v=$('#promo-input').value.trim().toLowerCase();
   if(v==='clear12'){
-    P={lang:P.lang,music:P.music,coins:0,xp:0,level:1,tutDone:0,lastDaily:'',streak:0,
-      missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0},
-      skins:{owned:['classic'],active:'classic'}};
-    vkSave();refreshHud();checkMissionsRollover();
+    P={lang:P.lang,music:P.music,coins:0,xp:0,level:1,skillPoints:0,tutDone:0,lastDaily:'',streak:0,
+      missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0,combo:0,crits:0,goldCells:0},
+      skins:{owned:['classic'],active:'classic'},
+      upgrades:{artillery:{},fleet:{},tactics:{}},
+      season:{idx:-1,xp:0,claimed:[]},
+      lastMod:'none'};
+    vkSave();refreshHud();rolloverSeason();checkMissionsRollover();
     hideElement('ov-settings');
     showElement('ov-tut-start');
     toast(t('promoClear'));return;
   }
   if(v==='admin17'){addCoins(999999);toast(t('promoSucc')+' +999999💰');return;}
+  if(v==='skill7'){P.skillPoints+=7;vkSave();refreshHud();toast(t('promoSucc')+' +7 🎖');return;}
   toast(t('promoBad'));
 };
 
@@ -1233,27 +1575,55 @@ $('#btn-games').onclick=()=>{ if(tutActive)return; sfx('click');
     const ov2=document.createElement('div');ov2.className='overlay active';
     ov2.innerHTML='<div class="modal"><h2>'+t('modeChoose')+'</h2>'+
       '<button class="btn" id="m-normal">⚔️ '+t('modeNormal')+'</button>'+
-      '<button class="btn gold" id="m-super">⚡ '+t('modeSuper')+'</button></div>';
+      '<button class="btn gold" id="m-super">⚡ '+t('modeSuper')+'</button>'+
+      '<button class="btn" id="m-cancel">'+t('close')+'</button></div>';
     document.body.appendChild(ov2);
-    ov2.querySelector('#m-normal').onclick=()=>{ov2.remove();openSetup(opp,'normal');};
-    ov2.querySelector('#m-super').onclick=()=>{ov2.remove();openSetup(opp,'super');};
+    ov2.querySelector('#m-normal').onclick=()=>{ov2.remove();chooseModifier(opp,'normal');};
+    ov2.querySelector('#m-super').onclick=()=>{ov2.remove();chooseModifier(opp,'super');};
+    ov2.querySelector('#m-cancel').onclick=()=>ov2.remove();
   };
   ov.querySelector('#m-bot').onclick=()=>chooseMode('bot');
   ov.querySelector('#m-friend').onclick=()=>chooseMode('friend');
 };
 
+/* Выбор модификатора боя */
+function chooseModifier(opp,mode){
+  const ov=document.createElement('div');ov.className='overlay active';
+  const cards=MODIFIERS.map(m=>{
+    const on=(m.id===P.lastMod)?' on':'';
+    return '<div class="mod-card'+on+'" data-id="'+m.id+'">'+
+      '<div class="ico">'+m.ico+'</div>'+
+      '<div class="nm">'+((P.lang==='en')?m.en:m.ru)+'</div>'+
+      '<div class="ds">'+((P.lang==='en')?m.dEn:m.dRu)+'</div></div>';
+  }).join('');
+  ov.innerHTML='<div class="modal"><h2>'+t('modifier')+'</h2>'+
+    '<div class="mod-grid">'+cards+'</div>'+
+    '<button class="btn gold" id="mod-go" style="margin-top:12px">'+t('ready')+'</button>'+
+    '<button class="btn" id="mod-cancel">'+t('close')+'</button></div>';
+  document.body.appendChild(ov);
+  let chosen=P.lastMod||'none';
+  const paint=()=>{
+    ov.querySelectorAll('.mod-card').forEach(c=>c.classList.toggle('on',c.dataset.id===chosen));
+  };
+  ov.querySelectorAll('.mod-card').forEach(c=>c.onclick=()=>{chosen=c.dataset.id;paint();sfx('click');});
+  ov.querySelector('#mod-go').onclick=()=>{ov.remove();openSetup(opp,mode,chosen);};
+  ov.querySelector('#mod-cancel').onclick=()=>ov.remove();
+}
+
 /* ============ TUTORIAL ============ */
 const TUT=[
   {ru:'Это лобби. Кнопка «Играть» запускает матч: против бота или с другом на одном устройстве.',en:'This is the lobby. "Play" starts a match: vs bot or with a friend on one device.',el:'#btn-games'},
+  {ru:'Во вкладке «Прокачка» вы тратите очки умений (даются за уровни адмирала) на усиления артиллерии, флота и тактики.',en:'In "Upgrades" spend skill points (earned per admiral level) on artillery, fleet and tactics skills.',el:'#btn-tree'},
+  {ru:'«Сезон» — это 30-дневная прогрессия с 50 тирами наград. Опыт сезона капает за каждый бой.',en:'"Season" is 30-day progression with 50 reward tiers. Season XP is earned per battle.',el:'#btn-season'},
   {ru: 'В «Заданиях» — ежедневные миссии с наградами в монетах.',en:'In "Missions" there are daily quests with coin rewards.',el:'#btn-tasks'},
   {ru:'В «Магазине» покупайте и устанавливайте скины флота за монеты.',en:'In the "Shop" buy and equip fleet skins with coins.',el:'#btn-shop'},
-  {ru:'Настройки: музыка, язык и промокоды.',en:'Settings: music, language and promo codes.',el:'#btn-settings'},
   {ru:'Во время боя коснитесь клетки противника, чтобы выстрелить. Попадание даёт ещё один выстрел!',en:'During battle tap an enemy cell to fire. A hit grants another shot!',el:'#btn-games'},
   {ru:'Кстати: потопленный корабль открывает мёртвую зону вокруг себя — туда стрелять бессмысленно.',en:'By the way: a sunk ship reveals a dead zone around it — shooting there is pointless.',el:'#btn-games'},
   {ru:'В режиме «Суперспособности» вам доступны сонар, двойной залп и торпеда.',en:'In "Super abilities" mode you get sonar, double shot and torpedo.',el:'#btn-games'},
+  {ru:'Перед боем выбирайте модификатор: двойное золото, попутный ветер, шторм или золотая лихорадка.',en:'Before battle choose a modifier: double gold, lucky wind, storm or gold rush.',el:'#btn-games'},
 ];
 let tutStep=-1, tutSpot=null, tutBox=null, tutActive=false;
-const LOBBY_BTNS=['#btn-games','#btn-tasks','#btn-shop','#btn-settings','#btn-daily','#btn-afk','#btn-invite'];
+const LOBBY_BTNS=['#btn-games','#btn-tree','#btn-season','#btn-tasks','#btn-shop','#btn-settings','#btn-daily','#btn-afk','#btn-invite'];
 function lockLobby(locked){
   LOBBY_BTNS.forEach(s=>{const b=$(s);if(b)b.disabled=locked;});
 }
@@ -1261,7 +1631,7 @@ $('#tut-yes').onclick=()=>{hideElement('ov-tut-start');P.tutDone=1;vkSave();star
 $('#tut-no').onclick=()=>{hideElement('ov-tut-start');P.tutDone=1;vkSave();};
 function startTutorial(){
   tutActive=true; tutStep=-1;
-  lockLobby(true); /* во время обучения кнопки лобби заблокированы */
+  lockLobby(true);
   tutNext();
 }
 function tutNext(){
