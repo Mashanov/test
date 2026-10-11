@@ -349,6 +349,113 @@ html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:
 .streak-day.done{background:linear-gradient(135deg,#ff6b35,#ffd166);border-color:#ffd166;color:#fff;box-shadow:0 0 12px rgba(255,180,60,.6)}
 .streak-day.today{border-color:#4ecdc4;box-shadow:0 0 14px rgba(78,205,196,.7)}
 
+/* ============ AD LOADING OVERLAY ============ */
+.ad-loading-overlay{
+    position:fixed;inset:0;z-index:3000;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(5,2,15,.9);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    animation:adFadeIn .25s ease;
+}
+@keyframes adFadeIn{from{opacity:0}to{opacity:1}}
+.ad-loading-box{
+    display:flex;flex-direction:column;align-items:center;gap:18px;
+    padding:32px 44px;
+    background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+    border:1px solid rgba(255,200,100,.35);
+    border-radius:22px;
+    box-shadow:0 0 60px rgba(255,107,53,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.ad-spinner{
+    width:60px;height:60px;border-radius:50%;
+    border:4px solid rgba(255,209,102,.18);
+    border-top-color:#ff6b35;
+    border-right-color:#ffd166;
+    animation:adspin .9s linear infinite;
+    box-shadow:0 0 24px rgba(255,140,66,.45);
+}
+@keyframes adspin{to{transform:rotate(360deg)}}
+.ad-loading-text{
+    font-size:14px;font-weight:800;color:#ffd166;
+    text-align:center;max-width:260px;line-height:1.4;
+    text-shadow:0 0 12px rgba(255,209,102,.4);
+    letter-spacing:.3px;
+}
+
+/* ============ CUSTOM SELECT (Язык) ============ */
+.setting-row{
+    display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px;
+    margin:14px 0;font-size:15px;font-weight:700;color:#fff;
+}
+.custom-select{position:relative;width:100%;font-family:inherit;z-index:10}
+.custom-select-trigger{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:13px 16px;border-radius:14px;
+    border:1px solid rgba(255,200,100,.35);
+    background:
+        linear-gradient(135deg,rgba(255,107,53,.18),rgba(255,209,102,.06)),
+        rgba(255,255,255,.04);
+    color:#fff;font-size:15px;font-weight:800;cursor:pointer;
+    font-family:inherit;letter-spacing:.2px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 4px 14px rgba(0,0,0,.35);
+    transition:border-color .2s, box-shadow .2s, transform .1s;
+}
+.custom-select-trigger:hover{
+    border-color:#ffd166;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 0 0 3px rgba(255,209,102,.15),
+        0 6px 20px rgba(255,107,53,.4);
+}
+.custom-select-trigger:active{transform:scale(.98)}
+.custom-select-chevron{
+    width:18px;height:18px;color:#ffd166;flex-shrink:0;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+    filter:drop-shadow(0 0 6px rgba(255,209,102,.5));
+}
+.custom-select.open .custom-select-chevron{transform:rotate(180deg)}
+.custom-select-list{
+    position:absolute;top:calc(100% + 8px);left:0;right:0;
+    list-style:none;margin:0;padding:6px;
+    background:linear-gradient(160deg,#2a1850,#1a0f2e);
+    border:1px solid rgba(255,200,100,.45);
+    border-radius:14px;
+    box-shadow:
+        0 14px 44px rgba(0,0,0,.7),
+        0 0 24px rgba(255,107,53,.25),
+        inset 0 1px 0 rgba(255,255,255,.08);
+    opacity:0;visibility:hidden;
+    transform:translateY(-8px) scale(.97);
+    transform-origin:top center;
+    transition:opacity .2s, transform .2s, visibility .2s;
+    overflow:hidden;
+}
+.custom-select.open .custom-select-list{
+    opacity:1;visibility:visible;transform:translateY(0) scale(1);
+}
+.custom-select-list li{
+    padding:12px 14px;border-radius:10px;font-size:14px;font-weight:800;
+    color:#fff;cursor:pointer;
+    display:flex;align-items:center;gap:10px;
+    transition:background .18s, color .18s, transform .12s;
+    position:relative;
+}
+.custom-select-list li:hover{
+    background:linear-gradient(135deg,#ff6b35,#ff8c42);
+    color:#fff;
+    box-shadow:0 4px 14px rgba(255,107,53,.55);
+    transform:translateX(2px);
+}
+.custom-select-list li.selected{
+    background:linear-gradient(135deg,rgba(255,209,102,.28),rgba(255,140,66,.14));
+    color:#ffd166;
+}
+.custom-select-list li.selected::after{
+    content:'✓';margin-left:auto;font-weight:900;color:#ffd166;font-size:16px;
+}
+.custom-select-list li.selected:hover::after{color:#fff}
+.lang-flag{font-size:18px;line-height:1}
+
 @media (max-width:480px){
   .lobby-grid{max-width:340px;gap:8px}
   .menu-card{min-height:80px;padding:10px 6px}
@@ -785,13 +892,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:
             </label>
             <button id="save-name-btn" class="main-btn" style="margin-top:-4px;min-width:200px;padding:10px">Сохранить название</button>
             <label style="margin-top:14px"><input type="checkbox" id="music-toggle"> <span data-i18n="music_label">Музыка</span></label>
-            <label>
+
+            <div class="setting-row">
                 <span data-i18n="language_label">Язык:</span>
-                <select id="language-select">
+                <div class="custom-select" id="lang-custom">
+                    <button type="button" class="custom-select-trigger">
+                        <span class="custom-select-value" id="lang-select-value">Русский</span>
+                        <svg class="custom-select-chevron" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <ul class="custom-select-list">
+                        <li data-value="ru"><span class="lang-flag">🇷🇺</span> Русский</li>
+                        <li data-value="en"><span class="lang-flag">🇬🇧</span> English</li>
+                    </ul>
+                </div>
+                <!-- скрытый select для совместимости с существующим кодом -->
+                <select id="language-select" style="display:none">
                     <option value="ru">Русский</option>
                     <option value="en">English</option>
                 </select>
-            </label>
+            </div>
+
             <div class="promo-section">
                 <input type="text" id="promo-input" placeholder="Промокод">
                 <button id="promo-btn" class="secondary-btn">Активировать</button>
@@ -809,6 +929,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:
     </div>
 </div>
 
+<!-- Оверлей загрузки рекламы -->
+<div id="ad-loading" class="ad-loading-overlay" style="display:none">
+    <div class="ad-loading-box">
+        <div class="ad-spinner"></div>
+        <div class="ad-loading-text" id="ad-loading-text">Подождите, идёт загрузка рекламы…</div>
+    </div>
+</div>
+
 <script>
 /* ============================================================
    ИКОНКИ-ХЕЛПЕР
@@ -818,6 +946,59 @@ function icon(name, extra=''){
 }
 function ingIcon(id){
   return `<svg class="svg-icon"><use href="#ing-${id}"/></svg>`;
+}
+
+/* ===== ОКНО ЗАГРУЗКИ РЕКЛАМЫ ===== */
+function showAdLoading(){
+    const el = document.getElementById('ad-loading');
+    if(!el) return;
+    const txt = document.getElementById('ad-loading-text');
+    if(txt) txt.textContent = t('ad_loading');
+    el.style.display = 'flex';
+}
+function hideAdLoading(){
+    const el = document.getElementById('ad-loading');
+    if(el) el.style.display = 'none';
+}
+
+/* ===== КАСТОМНЫЙ SELECT ЯЗЫКА ===== */
+function syncLanguageSelect(){
+    const sel   = document.getElementById('language-select');
+    const wrap  = document.getElementById('lang-custom');
+    const label = document.getElementById('lang-select-value');
+    if(!sel || !wrap || !label) return;
+    const opt = sel.options[sel.selectedIndex];
+    if(opt) label.textContent = opt.textContent;
+    wrap.querySelectorAll('.custom-select-list li').forEach(li=>{
+        li.classList.toggle('selected', li.dataset.value === sel.value);
+    });
+}
+function initLanguageSelect(){
+    const sel  = document.getElementById('language-select');
+    const wrap = document.getElementById('lang-custom');
+    if(!sel || !wrap) return;
+    const trigger = wrap.querySelector('.custom-select-trigger');
+
+    trigger.addEventListener('click', e=>{
+        e.stopPropagation();
+        wrap.classList.toggle('open');
+    });
+    wrap.querySelectorAll('.custom-select-list li').forEach(li=>{
+        li.addEventListener('click', ()=>{
+            sel.value = li.dataset.value;
+            sel.dispatchEvent(new Event('change'));
+            syncLanguageSelect();
+            wrap.classList.remove('open');
+            AudioManager.playSound('click');
+        });
+    });
+    document.addEventListener('click', e=>{
+        if(!wrap.contains(e.target)) wrap.classList.remove('open');
+    });
+    document.addEventListener('keydown', e=>{
+        if(e.key === 'Escape') wrap.classList.remove('open');
+    });
+    syncLanguageSelect();
 }
 
 /* ============================================================
@@ -848,7 +1029,6 @@ const i18n = {
         achievements:'Достижения', unlocked:'Открыто', locked:'Закрыто',
         name_saved:'Название сохранено!', streak:'Серия',
         combo:'Комбо', milestone:'Награда за уровень!',
-        // Новые ключи
         placeholder_name:'Бургерная',
         placeholder_promo:'Промокод',
         levels_title:'Уровни',
@@ -877,7 +1057,8 @@ const i18n = {
         cat_chairs:'Стулья',
         cat_windows:'Окна',
         cat_tiles:'Плитка',
-        order_select:'Выберите клиента'
+        order_select:'Выберите клиента',
+        ad_loading:'Подождите, идёт загрузка рекламы…'
     },
     en: {
         play:'Play', levels:'Levels', tasks:'Tasks', afk_room:'AFK', daily_reward:'Reward',
@@ -903,7 +1084,6 @@ const i18n = {
         achievements:'Achievements', unlocked:'Unlocked', locked:'Locked',
         name_saved:'Name saved!', streak:'Streak', combo:'Combo',
         milestone:'Level milestone!',
-        // New keys
         placeholder_name:'Burger Shop',
         placeholder_promo:'Promo code',
         levels_title:'Levels',
@@ -932,7 +1112,8 @@ const i18n = {
         cat_chairs:'Chairs',
         cat_windows:'Windows',
         cat_tiles:'Tiles',
-        order_select:'Select a customer'
+        order_select:'Select a customer',
+        ad_loading:'Please wait, ad is loading…'
     }
 };
 let currentLang = 'ru';
@@ -971,15 +1152,34 @@ const VKBridge = {
     },
     async showInterstitial(){
         if(!this.available) return false;
-        try{ await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'interstitial'}); return true; }
-        catch(e){ return false; }
+        showAdLoading();
+        const minDelay = new Promise(r=>setTimeout(r, 700));
+        try{
+            const adPromise = vkBridge.send('VKWebAppShowNativeAds',{ad_format:'interstitial'});
+            await Promise.all([adPromise, minDelay]);
+            return true;
+        }catch(e){
+            await minDelay;
+            return false;
+        }finally{
+            hideAdLoading();
+        }
     },
     async showRewarded(){
         if(!this.available) return false;
+        showAdLoading();
+        const minDelay = new Promise(r=>setTimeout(r, 700));
         try{
-            const r = await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'reward'});
+            const adPromise = vkBridge.send('VKWebAppShowNativeAds',{ad_format:'reward'});
+            const r = await adPromise;
+            await minDelay;
             return r && r.result === true;
-        }catch(e){ return false; }
+        }catch(e){
+            await minDelay;
+            return false;
+        }finally{
+            hideAdLoading();
+        }
     },
     async showBanner(){
         if(!this.available) return;
@@ -1520,6 +1720,8 @@ class BurgerGame {
         if(!hasSave) Tasks.init(null);
 
         this.setupEventListeners();
+        initLanguageSelect();
+        syncLanguageSelect();
         this.updateCurrencyDisplay();
         this.checkDailyBadge();
         VKBridge.showBanner();
@@ -1578,6 +1780,7 @@ class BurgerGame {
 
         // 6) Обновляем HTML lang атрибут
         document.documentElement.lang = currentLang;
+        syncLanguageSelect();
 
         // 7) Перерисовка активных динамических экранов
         try{
