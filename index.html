@@ -19,38 +19,70 @@ body{
 }
 #app{position:fixed;inset:0;display:flex;flex-direction:column;}
 .waves{position:fixed;left:0;right:0;bottom:0;height:22vh;pointer-events:none;z-index:0;opacity:.5;}
+/* кастомные скроллбары */
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:rgba(0,20,40,.45);border-radius:8px;}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fd4ff,#0f4d80);border-radius:8px;border:1px solid rgba(140,220,255,.3);}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ffd257,#d99a1f);}
+*{scrollbar-width:thin;scrollbar-color:#1e8cdc rgba(0,20,40,.45);}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;padding:12px;z-index:1;}
 .screen.active{display:flex;}
 h1,h2,h3{margin:.2em 0;}
-.topbar{width:100%;max-width:560px;display:flex;align-items:center;gap:8px;padding:6px 4px;}
-.topbar .logo{font-weight:800;font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;}
-.chips{margin-left:auto;display:flex;gap:6px;}
-.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:5px 10px;font-size:13px;display:flex;gap:6px;align-items:center;}
+/* морской декор */
+.sea-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.sea-ray{position:absolute;top:-40%;width:30%;height:120%;background:linear-gradient(180deg,rgba(127,212,255,.06),transparent);
+  transform:rotate(18deg);animation:rayDrift 9s ease-in-out infinite alternate;}
+.sea-ray.r2{left:55%;transform:rotate(-14deg);animation-delay:2s;}
+@keyframes rayDrift{from{opacity:.3;transform:rotate(18deg) translateX(-30px);}to{opacity:.7;transform:rotate(18deg) translateX(30px);}}
+.bubble{position:absolute;bottom:-30px;width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(200,240,255,.7),rgba(127,212,255,.15));
+  animation:bubRise linear infinite;opacity:0;}
+@keyframes bubRise{0%{opacity:0;transform:translateY(0) scale(.6);}15%{opacity:.8;}100%{opacity:0;transform:translateY(-105vh) scale(1.15);}}
+.lobby-ship{position:fixed;right:4%;bottom:14vh;z-index:0;pointer-events:none;opacity:.9;animation:bob 5s ease-in-out infinite;}
+.lobby-ship2{position:fixed;left:3%;bottom:18vh;z-index:0;pointer-events:none;opacity:.55;animation:bob 6.5s ease-in-out infinite reverse;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-12px) rotate(2deg);}}
+.compass{position:fixed;top:10px;right:10px;z-index:0;pointer-events:none;opacity:.25;animation:spin 40s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.topbar{width:100%;max-width:560px;display:flex;align-items:center;gap:8px;padding:6px 4px;position:relative;z-index:2;}
+.topbar .logo{font-weight:800;font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;
+  text-shadow:0 2px 8px rgba(0,30,60,.8);}
+.chips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.chip{background:linear-gradient(180deg,rgba(30,90,150,.55),rgba(10,50,90,.55));
+  border:2px solid rgba(159,220,255,.35);border-radius:26px;padding:5px 12px;font-size:13px;
+  display:flex;gap:6px;align-items:center;box-shadow:inset 0 2px 6px rgba(255,255,255,.12),0 3px 10px rgba(0,20,40,.4);
+  backdrop-filter:blur(3px);}
 .chip b{color:var(--gold);}
+.rope{width:100%;max-width:560px;height:6px;margin:6px 0;border-radius:3px;
+  background:repeating-linear-gradient(45deg,#b98b4e 0 6px,#93683a 6px 12px);
+  box-shadow:0 2px 6px rgba(0,20,40,.5);}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
   font-weight:700;font-size:16px;color:var(--text);background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border-radius:var(--radius);padding:13px 16px;box-shadow:var(--shadow);transition:transform .08s, filter .15s;}
+  border-radius:var(--radius);padding:13px 16px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.18);
+  transition:transform .08s, filter .15s;position:relative;z-index:2;}
 .btn:active{transform:scale(.97);filter:brightness(1.15);}
-.btn.gold{background:linear-gradient(180deg,#ffd257,#d99a1f);color:#3b2500;}
+.btn.gold{background:linear-gradient(180deg,#ffd257,#d99a1f);color:#3b2500;box-shadow:0 8px 24px rgba(0,20,40,.45),inset 0 1px 0 rgba(255,255,255,.5);}
 .btn.small{font-size:13px;padding:8px 12px;border-radius:10px;}
 .btn:disabled{opacity:.45;filter:grayscale(.6);cursor:default;}
-.menu{width:100%;max-width:560px;display:flex;flex-direction:column;gap:10px;margin-top:14px;}
-.card{width:100%;max-width:560px;background:rgba(8,40,70,.55);border:1px solid rgba(120,200,255,.18);
-  border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(4px);}
+.menu{width:100%;max-width:560px;display:flex;flex-direction:column;gap:10px;margin-top:10px;position:relative;z-index:2;}
+.card{width:100%;max-width:560px;background:rgba(8,40,70,.6);border:1px solid rgba(120,200,255,.2);
+  border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(4px);position:relative;z-index:2;}
+.card::before{content:'';position:absolute;inset:4px;border-radius:10px;pointer-events:none;
+  border:1px dashed rgba(159,220,255,.15);}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .row.between{justify-content:space-between;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-hr{border:none;border-top:1px solid rgba(140,200,255,.2);margin:10px 0;}
+hr{border:none;border-top:1px dashed rgba(159,220,255,.3);margin:10px 0;}
 .muted{color:var(--muted);font-size:13px;}
 .big{font-size:20px;font-weight:800;}
 canvas{display:block;border-radius:12px;background:#07304f;box-shadow:var(--shadow);}
-.board-wrap{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;}
+.board-wrap{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;position:relative;z-index:2;}
 .board-box{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .board-title{font-size:13px;color:var(--muted);}
 .overlay{position:fixed;inset:0;background:rgba(2,14,26,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:14px;}
 .overlay.active{display:flex;}
 .modal{width:100%;max-width:440px;background:linear-gradient(180deg,#0d4d84,#082f52);
-  border:1px solid rgba(140,220,255,.25);border-radius:18px;padding:18px;box-shadow:var(--shadow);max-height:86vh;overflow-y:auto;}
+  border:1px solid rgba(140,220,255,.25);border-radius:18px;padding:18px;box-shadow:var(--shadow);
+  max-height:86vh;overflow-y:auto;}
 .modal h2{margin-top:0;}
 .modal .btn{width:100%;margin-top:8px;}
 .mission{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:8px;}
@@ -58,7 +90,13 @@ canvas{display:block;border-radius:12px;background:#07304f;box-shadow:var(--shad
 .mission .bar{height:8px;background:rgba(255,255,255,.12);border-radius:6px;margin-top:6px;overflow:hidden;}
 .mission .bar i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);border-radius:6px;transition:width .4s;}
 .mission.done .bar i{background:linear-gradient(90deg,#5ad18a,#2fae6d);}
-.abilities{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px;}
+/* магазин */
+.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.skin-card{background:rgba(255,255,255,.05);border:1px solid rgba(140,220,255,.2);border-radius:12px;
+  padding:10px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.skin-card.active-skin{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),var(--shadow);}
+.skin-card .nm{font-size:13px;font-weight:700;}
+.abilities{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px;position:relative;z-index:2;}
 .abilities .btn{flex-direction:column;padding:8px 10px;font-size:12px;min-width:74px;}
 .abilities .cnt{position:absolute;top:-6px;right:-6px;background:var(--gold);color:#3b2500;border-radius:12px;font-size:11px;padding:1px 6px;font-weight:800;}
 .ab-wrap{position:relative;}
@@ -79,10 +117,42 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
   .topbar .logo span.name{display:none;}
   .board-wrap{gap:6px;}
   .btn{font-size:15px;}
+  .skin-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
+
+<!-- морской декор -->
+<div class="sea-bg">
+  <div class="sea-ray"></div><div class="sea-ray r2"></div>
+</div>
+<svg class="compass" width="90" height="90" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="none" stroke="#7fd4ff" stroke-width="2"/>
+  <path d="M50 8 L58 50 L50 92 L42 50 Z" fill="#ffd257" opacity=".8"/>
+  <path d="M8 50 L50 42 L92 50 L50 58 Z" fill="#7fd4ff" opacity=".7"/>
+  <circle cx="50" cy="50" r="5" fill="#ffd257"/>
+</svg>
+<svg class="lobby-ship" width="130" height="90" viewBox="0 0 130 90">
+  <path d="M18 55 h94 l-12 22 h-70 Z" fill="#1e3a5f" stroke="#9fdcff" stroke-width="2"/>
+  <rect x="52" y="24" width="5" height="32" fill="#7a5636"/>
+  <path d="M57 24 h26 l-10 14 h-16 Z" fill="#ffd257" opacity=".9"/>
+  <rect x="28" y="44" width="52" height="12" rx="4" fill="#2b5d8f" stroke="#9fdcff" stroke-width="1.5"/>
+</svg>
+<svg class="lobby-ship2" width="90" height="64" viewBox="0 0 130 90">
+  <path d="M18 55 h94 l-12 22 h-70 Z" fill="#12314f" stroke="#5b8fb8" stroke-width="2"/>
+  <rect x="52" y="24" width="5" height="32" fill="#5d452b"/>
+  <path d="M57 24 h26 l-10 14 h-16 Z" fill="#e8a83c" opacity=".8"/>
+</svg>
+<svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none">
+  <path d="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z" fill="#0a3d6b" opacity=".7">
+    <animate attributeName="d" dur="7s" repeatCount="indefinite"
+      values="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z;
+              M0 70 C150 100 350 30 600 70 S1050 100 1200 70 V120 H0 Z;
+              M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z"/>
+  </path>
+</svg>
+
 <div id="app">
 
   <!-- ЛОББИ -->
@@ -97,10 +167,12 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
         <div class="chip">💰 <b id="hud-coins">0</b></div>
       </div>
     </div>
+    <div class="rope"></div>
     <div class="menu">
       <button class="btn gold" id="btn-games">⚔️ <span data-i18n="play">Играть</span></button>
       <button class="btn" id="btn-tasks">📜 <span data-i18n="missions">Задания</span> <span id="tasks-dot" style="color:var(--gold)"></span></button>
       <div class="grid2">
+        <button class="btn" id="btn-shop">🛒 <span data-i18n="shop">Магазин</span></button>
         <button class="btn" id="btn-settings">⚙️ <span data-i18n="settings">Настройки</span></button>
         <button class="btn" id="btn-daily">🎁 <span data-i18n="daily">Ежедневная награда</span></button>
         <button class="btn" id="btn-afk">🛏️ <span data-i18n="afk">Комната АФК</span></button>
@@ -177,6 +249,13 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
     <button class="btn" id="daily-close" data-i18n="close">Закрыть</button>
   </div></div>
 
+  <div class="overlay" id="ov-shop"><div class="modal">
+    <h2 data-i18n="shop">🛒 Магазин</h2>
+    <p class="muted" id="shop-coins"></p>
+    <div class="skin-grid" id="shop-list"></div>
+    <button class="btn" id="shop-close" data-i18n="close">Закрыть</button>
+  </div></div>
+
   <div class="overlay" id="ov-result"><div class="modal">
     <h2 id="result-title"></h2>
     <p id="result-text" class="muted"></p>
@@ -193,14 +272,6 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
   </div></div>
 
   <div id="toast"></div>
-  <svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none">
-    <path d="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z" fill="#0a3d6b" opacity=".7">
-      <animate attributeName="d" dur="7s" repeatCount="indefinite"
-        values="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z;
-                M0 70 C150 100 350 30 600 70 S1050 100 1200 70 V120 H0 Z;
-                M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z"/>
-    </path>
-  </svg>
 </div>
 
 <script src="https://vk.com/js/api/xd_connection.js?2"></script>
@@ -214,7 +285,7 @@ if(vk) vk.send('VKWebAppGetLaunchParams').then(()=>vk.send('VKWebAppShowBannerAd
 
 /* ============ I18N ============ */
 const I18N = {
-  ru:{title:'Морской бой',coins:'💰',play:'Играть',missions:'Задания',settings:'Настройки',daily:'Ежедневная награда',
+  ru:{title:'Морской бой',play:'Играть',missions:'Задания',settings:'Настройки',daily:'Ежедневная награда',
     afk:'Комната АФК',invite:'Пригласить друзей',music:'Музыка',language:'Язык',promo:'Промокод',apply:'Применить',
     close:'Закрыть',on:'Вкл',off:'Выкл',placeTitle:'Расставьте флот',rotate:'Повернуть',random:'Случайно',clear:'Очистить',
     ready:'В бой!',placeHint:'Выберите корабль, коснитесь поля. Двойное касание — поворот.',yourFleet:'Ваш флот',
@@ -224,11 +295,11 @@ const I18N = {
     modeSuper:'Суперспособности',next:'Далее',done:'Готово',win:'ПОБЕДА!',lose:'ПОРАЖЕНИЕ',turnYou:'Ваш ход',
     turnEnemy:'Ход противника',paused:'⏸ Пауза',promoSucc:'Промокод применён!',promoBad:'Неизвестный промокод',
     promoClear:'Прогресс сброшен',dailyGot:'Награда уже получена сегодня',dailyOk:'Награда получена!',
-    missionDone:'Задание выполнено!',noAbilities:'Способности только в режиме Суперспособностей',
-    abSonar:'Сонар',abDouble:'Двойной залп',abTorpedo:'Торпеда',pickCell:'Коснитесь клетки',
+    missionDone:'Задание выполнено!',abSonar:'Сонар',abDouble:'Двойной залп',abTorpedo:'Торпеда',pickCell:'Коснитесь клетки',
     stWins:'Побед',stGames:'Боёв',stSunk:'Потоплено',stShots:'Выстрелов',doubled:'Награда удвоена!',
-    adFail:'Реклама недоступна',placeAll:'Расставьте все корабли'},
-  en:{title:'Battleship',coins:'💰',play:'Play',missions:'Missions',settings:'Settings',daily:'Daily reward',
+    adFail:'Реклама недоступна',placeAll:'Расставьте все корабли',shop:'Магазин',buy:'Купить',equipped:'Установлен',
+    equip:'Установить',notEnough:'Не хватает монет',bought:'Скин куплен!',skinOn:'Скин установлен!'},
+  en:{title:'Battleship',play:'Play',missions:'Missions',settings:'Settings',daily:'Daily reward',
     afk:'AFK Room',invite:'Invite friends',music:'Music',language:'Language',promo:'Promo code',apply:'Apply',
     close:'Close',on:'On',off:'Off',placeTitle:'Place your fleet',rotate:'Rotate',random:'Random',clear:'Clear',
     ready:'Battle!',placeHint:'Pick a ship, tap the field. Double tap to rotate.',yourFleet:'Your fleet',
@@ -238,22 +309,42 @@ const I18N = {
     modeSuper:'Super abilities',next:'Next',done:'Done',win:'VICTORY!',lose:'DEFEAT',turnYou:'Your turn',
     turnEnemy:'Enemy turn',paused:'⏸ Paused',promoSucc:'Promo applied!',promoBad:'Unknown promo',
     promoClear:'Progress wiped',dailyGot:'Already claimed today',dailyOk:'Reward received!',
-    missionDone:'Mission complete!',noAbilities:'Abilities only in Super mode',
-    abSonar:'Sonar',abDouble:'Double shot',abTorpedo:'Torpedo',pickCell:'Tap a cell',
+    missionDone:'Mission complete!',abSonar:'Sonar',abDouble:'Double shot',abTorpedo:'Torpedo',pickCell:'Tap a cell',
     stWins:'Wins',stGames:'Games',stSunk:'Sunk',stShots:'Shots',doubled:'Reward doubled!',
-    adFail:'Ad unavailable',placeAll:'Place all ships'}
+    adFail:'Ad unavailable',placeAll:'Place all ships',shop:'Shop',buy:'Buy',equipped:'Equipped',
+    equip:'Equip',notEnough:'Not enough coins',bought:'Skin purchased!',skinOn:'Skin applied!'}
 };
 function t(k){return (I18N[P.lang]||I18N.ru)[k]||k;}
 function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));}
 
+/* ============ SKINS ============ */
+const SKINS=[
+  {id:'classic',price:0,  hull:'#1e8cdc',edge:'#9fdcff',glow:'#7fd4ff',ru:'Классический флот',en:'Classic fleet'},
+  {id:'pirate', price:250,hull:'#3a3a4a',edge:'#c0a060',glow:'#c0392b',ru:'Пиратский',en:'Pirate'},
+  {id:'neon',   price:400,hull:'#00e5a8',edge:'#aaffec',glow:'#00e5ff',ru:'Неоновый',en:'Neon'},
+  {id:'ice',    price:500,hull:'#9fd8ff',edge:'#ffffff',glow:'#cfeeff',ru:'Ледяной',en:'Ice'},
+  {id:'royal',  price:800,hull:'#8a5a2b',edge:'#ffd257',glow:'#ffdf80',ru:'Королевский',en:'Royal'},
+  {id:'ghost',  price:1000,hull:'rgba(200,230,255,.45)',edge:'#dfeaff',glow:'#eef6ff',ru:'Призрачный',en:'Ghost'}
+];
+function activeSkin(){
+  const s=SKINS.find(x=>x.id===(P.skins&&P.skins.active));
+  return s||SKINS[0];
+}
+function shipSvg(skin,len){
+  return '<svg width="'+(len*16+8)+'" height="18" viewBox="0 0 '+(len*16+8)+' 18">'+
+    '<rect x="2" y="4" width="'+(len*16)+'" height="10" rx="4" fill="'+skin.hull+'" stroke="'+skin.edge+'" stroke-width="1.5"/></svg>';
+}
+
 /* ============ PLAYER / SAVE (только VK Storage) ============ */
 let P = {lang:'ru', music:1, coins:0, xp:0, level:1, tutDone:0, lastDaily:'', streak:0,
-  missions:null, stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0}, doneIds:[]};
+  missions:null, stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0},
+  skins:{owned:['classic'],active:'classic'}};
 let SAVE_KEY='battleship_save_v1', loaded=false;
 
-function serialize(){return JSON.stringify(P);}
-async function vkSave(){ try{ if(vk) await vk.send('VKWebAppStorageSet',{key:SAVE_KEY,value:serialize()}); }catch(e){} }
+async function vkSave(){ try{ if(vk) await vk.send('VKWebAppStorageSet',{key:SAVE_KEY,value:JSON.stringify(P)}); }catch(e){} }
 function afterLoad(){
+  if(!P.skins)P.skins={owned:['classic'],active:'classic'};
+  if(!P.skins.owned.includes('classic'))P.skins.owned.push('classic');
   loaded=true; refreshHud(); applyI18n(); checkMissionsRollover();
   if(!P.tutDone) showElement('ov-tut-start');
 }
@@ -267,9 +358,9 @@ if(vk){
 } else {
   setTimeout(afterLoad, 300);
 }
-setInterval(vkSave, 20000); // автосейв
+setInterval(vkSave, 20000);
 
-/* ============ AUDIO (процедурная музыка, без файлов) ============ */
+/* ============ AUDIO ============ */
 let AC=null, musicOn=false, musicTimer=null, step=0;
 function audio(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } if(AC&&AC.state==='suspended')AC.resume(); return AC; }
 function tone(f,dur,type,vol,when){
@@ -293,11 +384,10 @@ function sfx(kind){
   if(kind==='hit'){tone(120,.25,'square',.2);tone(80,.4,'sawtooth',.12);}
   else if(kind==='miss'){tone(500,.15,'sine',.1);tone(380,.2,'sine',.07,c.currentTime+.1);}
   else if(kind==='click'){tone(700,.06,'sine',.08);}
+  else if(kind==='coin'){tone(880,.1,'sine',.12);tone(1320,.15,'sine',.1,c.currentTime+.08);}
   else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,.35,'triangle',.12,c.currentTime+i*.13));}
   else if(kind==='lose'){[330,262,196].forEach((f,i)=>tone(f,.4,'triangle',.12,c.currentTime+i*.18));}
 }
-
-/* паузы музыки при сворачивании вкладки и в VK */
 let audioPausedBySystem=false;
 function pauseAudioSys(){ if(musicOn){audioPausedBySystem=true; musicStop();} }
 function resumeAudioSys(){ if(audioPausedBySystem){audioPausedBySystem=false; musicStart();} }
@@ -365,6 +455,11 @@ function placeShip(b,x,y,len,hor){
 }
 function shipById(b,id){return b.ships.find(s=>s.id===id);}
 function isSunk(b,s){return s.hits>=s.len;}
+function shipCells(s){
+  const out=[];
+  for(let i=0;i<s.len;i++)out.push((s.y+(s.hor?0:i))*N+(s.x+(s.hor?i:0)));
+  return out;
+}
 function shoot(b,idx){
   const shipId=b.cells[idx];
   if(shipId){ b.shots[idx]=2; const s=shipById(b,shipId); if(s)s.hits++;
@@ -429,16 +524,33 @@ function drawGrid(ctx,cell){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
   ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function drawShipBody(ctx,x,y,w,h,sunk,ghostly){
+  const sk=activeSkin();
+  ctx.fillStyle=sunk?'rgba(255,90,90,.75)':sk.hull;
+  ctx.strokeStyle=sunk?'#ff5a5a':sk.edge;ctx.lineWidth=2;
+  roundRect(ctx,x+2,y+2,w-4,h-4,6);ctx.fill();ctx.stroke();
+  if(!sunk){ctx.fillStyle='rgba(255,255,255,.28)';roundRect(ctx,x+5,y+5,w-10,h-10,4);ctx.fill();}
+}
+/* ВАЖНО: на вражеском поле видим только подбитые палубы;
+   весь корабль раскрывается только когда потоплен */
 function drawShips(b,ctx,cell,showAll){
   for(const s of b.ships){
     const sunk=isSunk(b,s);
-    const visible=showAll||sunk||s.hits>0;
-    if(!visible)continue;
-    const x=s.x*cell,y=s.y*cell,w=(s.hor?s.len:1)*cell,h=(s.hor?1:s.len)*cell;
-    ctx.fillStyle=sunk?'rgba(255,90,90,.75)':'rgba(30,140,220,.85)';
-    ctx.strokeStyle=sunk?'#ff5a5a':'#9fdcff';ctx.lineWidth=2;
-    roundRect(ctx,x+2,y+2,w-4,h-4,6);ctx.fill();ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.35)';roundRect(ctx,x+5,y+5,w-10,h-10,4);ctx.fill();
+    if(showAll){ // своё поле — виден целиком
+      const x=s.x*cell,y=s.y*cell,w=(s.hor?s.len:1)*cell,h=(s.hor?1:s.len)*cell;
+      drawShipBody(ctx,x,y,w,h,sunk);
+    } else if(sunk){ // потоплен — раскрываем весь
+      const x=s.x*cell,y=s.y*cell,w=(s.hor?s.len:1)*cell,h=(s.hor?1:s.len)*cell;
+      drawShipBody(ctx,x,y,w,h,true);
+    } else { // частично подбит — видны только попадания
+      const cells=shipCells(s);
+      for(const ci of cells){
+        if(b.shots[ci]!==2)continue;
+        const cx=(ci%N)*cell,cy=Math.floor(ci/N)*cell;
+        ctx.fillStyle='rgba(255,90,90,.8)';ctx.strokeStyle='#ff5a5a';ctx.lineWidth=1.5;
+        roundRect(ctx,cx+4,cy+4,cell-8,cell-8,4);ctx.fill();ctx.stroke();
+      }
+    }
   }
 }
 function drawMarks(b,ctx,cell){
@@ -463,6 +575,7 @@ function openSetup(mode){
 }
 function buildShipPalette(){
   const bar=$('#setup-ships'); bar.innerHTML='';
+  const sk=activeSkin();
   let id=1;
   FLEET.forEach(ty=>{
     for(let i=0;i<ty.n;i++){
@@ -470,8 +583,7 @@ function buildShipPalette(){
       const b=document.createElement('button');
       b.className='btn small ab-wrap';
       b.dataset.sid=shipId; b.dataset.len=ty.len;
-      b.innerHTML='<svg width="'+(ty.len*16+8)+'" height="18" viewBox="0 0 '+(ty.len*16+8)+' 18">'+
-        '<rect x="2" y="4" width="'+(ty.len*16)+'" height="10" rx="4" fill="#1e8cdc" stroke="#9fdcff" stroke-width="1.5"/></svg>';
+      b.innerHTML=shipSvg(sk,ty.len);
       b.onclick=()=>{ selShip=shipId; selLen=ty.len; sfx('click'); highlightPalette(); };
       bar.appendChild(b);
     }
@@ -743,6 +855,39 @@ function renderTasks(){
   });
 }
 
+/* ============ SHOP ============ */
+$('#btn-shop').onclick=()=>{renderShop();showElement('ov-shop');sfx('click');};
+$('#shop-close').onclick=()=>hideElement('ov-shop');
+function renderShop(){
+  $('#shop-coins').textContent='💰 '+P.coins;
+  const wrap=$('#shop-list');wrap.innerHTML='';
+  SKINS.forEach(sk=>{
+    const owned=P.skins.owned.includes(sk.id);
+    const isActive=P.skins.active===sk.id;
+    const name=P.lang==='en'?sk.en:sk.ru;
+    const card=document.createElement('div');
+    card.className='skin-card'+(isActive?' active-skin':'');
+    card.innerHTML='<svg width="84" height="34" viewBox="0 0 130 50">'+
+      '<path d="M10 36 h110 l-14 12 H24 Z" fill="'+sk.hull+'" stroke="'+sk.edge+'" stroke-width="2"/>'+
+      '<rect x="58" y="14" width="4" height="22" fill="'+sk.edge+'"/>'+
+      '<path d="M62 14 h22 l-8 10 h-14 Z" fill="'+sk.glow+'"/></svg>'+
+      '<div class="nm">'+name+'</div>';
+    const b=document.createElement('button');
+    if(isActive){ b.className='btn small gold'; b.textContent=t('equipped'); b.disabled=true; }
+    else if(owned){ b.className='btn small'; b.textContent=t('equip'); b.onclick=()=>{
+      P.skins.active=sk.id; sfx('coin'); vkSave(); renderShop(); toast(t('skinOn'));
+      if($('#scr-setup').classList.contains('active'))buildShipPalette();
+    };}
+    else { b.className='btn small gold'; b.textContent=t('buy')+' · '+sk.price+'💰'; b.onclick=()=>{
+      if(P.coins<sk.price){toast(t('notEnough'));return;}
+      P.coins-=sk.price; P.skins.owned.push(sk.id); P.skins.active=sk.id;
+      sfx('coin'); vkSave(); refreshHud(); renderShop(); toast(t('bought'));
+    };}
+    card.appendChild(b);
+    wrap.appendChild(card);
+  });
+}
+
 /* ============ DAILY ============ */
 $('#btn-daily').onclick=()=>{renderDaily();showElement('ov-daily');sfx('click');};
 $('#daily-close').onclick=()=>hideElement('ov-daily');
@@ -782,9 +927,15 @@ document.querySelectorAll('#seg-lang .btn').forEach(b=>b.onclick=()=>{
 });
 $('#btn-promo').onclick=()=>{
   const v=$('#promo-input').value.trim().toLowerCase();
-  if(v==='clear12'){ P={lang:P.lang,music:P.music,coins:0,xp:0,level:1,tutDone:1,lastDaily:'',streak:0,
-    missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0},doneIds:[]};
-    vkSave();refreshHud();toast(t('promoClear'));return;}
+  if(v==='clear12'){
+    P={lang:P.lang,music:P.music,coins:0,xp:0,level:1,tutDone:0,lastDaily:'',streak:0,
+      missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0},
+      skins:{owned:['classic'],active:'classic'}};
+    vkSave();refreshHud();
+    hideElement('ov-settings');
+    showElement('ov-tut-start'); // обучение снова доступно
+    toast(t('promoClear'));return;
+  }
   if(v==='admin17'){addCoins(999999);toast(t('promoSucc')+' +999999💰');return;}
   toast(t('promoBad'));
 };
@@ -810,6 +961,7 @@ $('#btn-games').onclick=()=>{ sfx('click');
 const TUT=[
   {ru:'Это лобби. Кнопка «Играть» запускает матч.',en:'This is the lobby. "Play" starts a match.',el:'#btn-games'},
   {ru:'В «Заданиях» — 10 ежедневных миссий с наградой.',en:'In "Missions" there are 10 daily quests with rewards.',el:'#btn-tasks'},
+  {ru:'В «Магазине» покупайте и устанавливайте скины флота за монеты.',en:'In the "Shop" buy and equip fleet skins with coins.',el:'#btn-shop'},
   {ru:'Настройки: музыка, язык и промокоды.',en:'Settings: music, language and promo codes.',el:'#btn-settings'},
   {ru:'Разместите корабли: выберите корабль и коснитесь поля. Двойное касание поворачивает корабль.',en:'Place ships: pick a ship and tap the field. Double tap rotates.',el:'#cv-setup'},
   {ru:'В бою касайтесь поля противника. Попадание даёт ещё один выстрел!',en:'In battle tap the enemy field. A hit grants another shot!',el:'#cv-enemy'},
@@ -841,6 +993,19 @@ function tutNext(){
   $('#tut-next').onclick=tutNext;
   $('#tut-skip').onclick=()=>{tutStep=TUT.length;tutNext();};
 }
+
+/* ============ BUBBLES DECOR ============ */
+(function bubbles(){
+  const bg=document.querySelector('.sea-bg');
+  for(let i=0;i<8;i++){
+    const b=document.createElement('div');b.className='bubble';
+    b.style.left=(5+Math.random()*90)+'%';
+    b.style.animationDuration=(7+Math.random()*8)+'s';
+    b.style.animationDelay=(Math.random()*9)+'s';
+    const s=6+Math.random()*10;b.style.width=s+'px';b.style.height=s+'px';
+    bg.appendChild(b);
+  }
+})();
 
 /* ============ INIT ============ */
 window.addEventListener('resize',()=>{
