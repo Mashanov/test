@@ -6,62 +6,262 @@
 <meta name="theme-color" content="#ff6b35">
 <title>Бургерная</title>
 
-<!-- VK Bridge SDK -->
 <script src="https://vk.com/js/api/xd_connection.js?2"></script>
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',Roboto,sans-serif;color:#fff}
-#game-container{position:relative;width:100%;height:100%;display:flex;justify-content:center;align-items:center;overflow:hidden}
-#game-canvas{display:block;width:100%;height:100%;background:#16213e;position:absolute;inset:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',Roboto,sans-serif;color:#fff;font-size:14px}
+#game-container{position:relative;width:100%;height:100%;overflow:hidden}
+#game-canvas{position:absolute;inset:0;width:100%;height:100%;background:#16213e}
 #ui-layer{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;z-index:2}
 #ui-layer>*{pointer-events:auto}
-#top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1);z-index:10}
-#currency-display,#level-display{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:700;color:#ffd166}
+
+/* Верхняя панель — исправлено: relative + высокий z-index */
+#top-bar{
+    position:relative;
+    z-index:100;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 12px;
+    background:linear-gradient(180deg,rgba(26,26,46,.98),rgba(26,26,46,.85));
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,.12);
+    height:44px;
+    flex-shrink:0;
+}
+#currency-display,#level-display{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(0,0,0,.4)}
+#currency-display{color:#ffd166;text-shadow:0 0 8px rgba(255,209,102,.5)}
 #level-display{color:#4ecdc4}
-.icon-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:4px 8px;border-radius:8px;color:#fff}
-.icon-btn:active{background:rgba(255,255,255,.1)}
-.screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;padding:20px;padding-top:70px;background:rgba(26,26,46,.95);backdrop-filter:blur(12px);z-index:5;overflow-y:auto}
+.icon-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:18px;cursor:pointer;padding:6px 10px;border-radius:50%;color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.icon-btn:active{background:rgba(255,255,255,.2)}
+
+/* Экраны */
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;padding:56px 16px 16px;background:linear-gradient(180deg,rgba(26,26,46,.96),rgba(22,33,62,.98));z-index:5;overflow-y:auto}
 .screen.active{display:flex}
-#lobby h1{font-size:42px;margin-bottom:30px;background:linear-gradient(135deg,#ff6b35,#ffd166);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
-.lobby-buttons{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
-.main-btn{padding:16px 24px;font-size:18px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#ff6b35,#ff8c42);color:#fff;cursor:pointer;box-shadow:0 4px 15px rgba(255,107,53,.4)}
-.main-btn:active{transform:scale(.96)}
+
+/* ===== ЛОББИ ===== */
+#lobby{justify-content:flex-start;padding-top:60px}
+.lobby-hero{
+    width:140px;height:140px;margin-bottom:8px;
+    filter:drop-shadow(0 8px 24px rgba(255,107,53,.4));
+    animation:float 3s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.lobby-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    width:100%;
+    max-width:400px;
+    margin-top:10px;
+}
+.menu-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:14px 8px;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:16px;
+    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
+    color:#fff;
+    cursor:pointer;
+    transition:transform .1s,background .2s,box-shadow .2s;
+    box-shadow:0 4px 12px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15);
+    font-family:inherit;
+    min-height:88px;
+}
+.menu-card:active{transform:scale(.95);background:rgba(255,255,255,.15)}
+.menu-icon{font-size:26px;line-height:1}
+.menu-label{font-size:11px;font-weight:700;text-align:center;letter-spacing:.3px}
+.menu-card.play-card{
+    grid-column:1 / -1;
+    flex-direction:row;
+    gap:14px;
+    min-height:70px;
+    background:linear-gradient(135deg,#ff6b35,#ff8c42);
+    border-color:rgba(255,209,102,.5);
+    box-shadow:0 8px 24px rgba(255,107,53,.5), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.menu-card.play-card .menu-icon{font-size:32px}
+.menu-card.play-card .menu-label{font-size:20px;font-weight:800;letter-spacing:1px}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+
+/* ===== ЭКРАН УРОВНЯ ===== */
+#level-screen{
+    padding:50px 0 0 0;
+    justify-content:flex-start;
+    overflow:hidden;
+    background:linear-gradient(180deg,rgba(26,26,46,.98),rgba(22,33,62,.98));
+}
+#restaurant-scene{
+    width:100%;
+    height:32vh;
+    min-height:160px;
+    max-height:230px;
+    flex-shrink:0;
+    background:#0d0d1a;
+    position:relative;
+    overflow:hidden;
+}
+#restaurant-svg{width:100%;height:100%;display:block}
+#level-content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:8px;
+    overflow-y:auto;
+    min-height:0;
+}
+
+#order-panel{
+    background:linear-gradient(135deg,rgba(255,107,53,.2),rgba(255,107,53,.08));
+    border:1px solid rgba(255,107,53,.4);
+    border-radius:14px;
+    padding:8px 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+#order-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:4px}
+#order-customer{font-size:13px;font-weight:700;color:#ffd166}
+#order-timer{font-size:14px;font-weight:800;color:#4ecdc4}
+#order-items{display:flex;flex-wrap:wrap;gap:4px;width:100%}
+.order-item{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,.12);border-radius:8px;font-size:20px}
+
+#burger-stack{
+    display:flex;
+    flex-direction:column-reverse;
+    align-items:center;
+    gap:2px;
+    min-height:80px;
+    max-height:130px;
+    overflow-y:auto;
+    padding:6px;
+    border:2px dashed rgba(255,209,102,.35);
+    border-radius:12px;
+    background:rgba(0,0,0,.35);
+}
+.burger-layer{
+    width:85%;
+    min-height:18px;
+    border-radius:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    color:#333;
+    font-weight:800;
+    padding:2px 6px;
+    box-shadow:0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+    animation:layerPop .2s ease-out;
+}
+@keyframes layerPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+#ingredients-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(66px,1fr));
+    gap:6px;
+}
+.ingredient-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    padding:8px 4px;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:10px;
+    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
+    color:#fff;
+    font-size:10px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:transform .1s,background .15s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.15);
+}
+.ingredient-btn:active{background:rgba(255,255,255,.2);transform:scale(.95)}
+.ingredient-btn .emoji{font-size:24px;line-height:1}
+
+#level-actions{display:flex;gap:8px;margin-top:auto;padding-top:4px}
+#level-actions button{flex:1}
+
+/* Общие кнопки */
+.main-btn{
+    padding:14px 20px;
+    font-size:16px;
+    font-weight:800;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ff6b35,#ff8c42);
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(255,107,53,.4), inset 0 1px 0 rgba(255,255,255,.3);
+    font-family:inherit;
+    letter-spacing:.3px;
+}
+.main-btn:active{transform:scale(.97)}
 .main-btn:disabled{opacity:.5;cursor:not-allowed}
-.secondary-btn{padding:12px 20px;font-size:16px;font-weight:600;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
-.secondary-btn:active{background:rgba(255,255,255,.15)}
-#order-panel{background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:16px;padding:16px;margin:10px;width:calc(100% - 20px);max-width:500px}
-#order-items{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-.order-item{background:rgba(255,255,255,.1);padding:6px 12px;border-radius:20px;font-size:14px}
-#order-timer{font-size:18px;font-weight:700;color:#ffd166}
-#ingredients-panel{margin:10px;width:calc(100% - 20px);max-width:500px}
-#ingredients-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;margin-top:10px}
-.ingredient-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.05);color:#fff;font-size:12px;cursor:pointer}
-.ingredient-btn:active{background:rgba(255,255,255,.15);transform:scale(.95)}
-.ingredient-btn .emoji{font-size:28px}
-#burger-assembly{margin:10px;width:calc(100% - 20px);max-width:500px}
-#burger-stack{min-height:120px;border:2px dashed rgba(255,255,255,.2);border-radius:12px;padding:10px;margin:10px 0;display:flex;flex-direction:column-reverse;align-items:center;gap:4px}
-.burger-layer{width:80%;min-height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;font-weight:700;padding:2px}
-#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;max-height:60vh;overflow-y:auto;width:100%;max-width:500px;padding:10px}
-.level-btn{aspect-ratio:1;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
-.level-btn.completed{background:rgba(78,205,196,.3);border-color:#4ecdc4}
+.secondary-btn{
+    padding:12px 18px;
+    font-size:14px;
+    font-weight:700;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    cursor:pointer;
+    font-family:inherit;
+}
+.secondary-btn:active{background:rgba(255,255,255,.18)}
+
+/* ===== Прочие экраны ===== */
+#lobby h2,#levels-screen h2,#tasks-screen h2,#afk-screen h2,#daily-screen h2,#shop-screen h2,#settings-screen h2,#tutorial-screen h2,#result-screen h2{
+    font-size:22px;font-weight:800;margin-bottom:14px;color:#ffd166;text-align:center;
+}
+#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;max-height:60vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
+.level-btn{aspect-ratio:1;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.05);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.level-btn.completed{background:linear-gradient(135deg,rgba(78,205,196,.4),rgba(78,205,196,.15));border-color:#4ecdc4;color:#c8fff6}
 .level-btn.locked{opacity:.3;cursor:not-allowed}
-#tasks-list{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
-.task-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.05);border-radius:10px;border:1px solid rgba(255,255,255,.1);gap:10px}
-.task-item.completed{border-color:#4ecdc4;background:rgba(78,205,196,.1)}
-#settings-screen label{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:16px}
-#settings-screen select,#promo-input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;width:100%;max-width:300px}
+.level-btn.current{border-color:#ffd166;box-shadow:0 0 10px rgba(255,209,102,.6)}
+
+#tasks-list{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:4px}
+.task-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.1);gap:10px}
+.task-item.completed{border-color:#4ecdc4;background:rgba(78,205,196,.15)}
+
+#settings-screen label{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:15px}
+#settings-screen select,#promo-input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:15px;width:100%;max-width:300px;font-family:inherit}
 .promo-section{display:flex;flex-direction:column;gap:8px;margin:16px 0;width:100%;max-width:300px}
-#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;max-height:60vh;overflow-y:auto;width:100%;max-width:500px;padding:10px}
-.shop-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-align:center}
-.shop-item .price{color:#ffd166;font-weight:700}
-.shop-item button{width:100%}
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,107,53,.95);padding:12px 24px;border-radius:12px;color:#fff;font-weight:700;z-index:1000;animation:fadeInOut 2.2s ease-in-out;max-width:80%;text-align:center;font-size:14px}
+
+#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:60vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
+.shop-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;text-align:center}
+.shop-item .price{color:#ffd166;font-weight:800}
+.shop-item button{width:100%;padding:8px;font-size:12px}
+
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(255,107,53,.95);padding:10px 20px;border-radius:12px;color:#fff;font-weight:800;z-index:1000;animation:fadeInOut 2.2s ease-in-out;max-width:80%;text-align:center;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 @keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:1000;padding:20px;text-align:center}
-.modal-bg h2{font-size:20px;max-width:400px}
-@media (max-width:480px){#lobby h1{font-size:32px}.main-btn{font-size:16px;padding:14px 20px}.secondary-btn{font-size:14px;padding:10px 16px}#top-bar{font-size:14px;padding:6px 12px}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:1000;padding:20px;text-align:center}
+.modal-bg h2{font-size:18px;max-width:400px;line-height:1.4}
+.modal-bg button{min-width:180px}
+
+/* SVG-клиенты */
+.customer-svg{cursor:pointer;transition:transform .2s}
+.customer-svg.selected{filter:drop-shadow(0 0 10px #ffd166)}
+.customer-svg.served{opacity:0;pointer-events:none}
+
+@media (max-width:480px){
+    .lobby-grid{max-width:340px;gap:8px}
+    .menu-card{min-height:78px;padding:10px 6px}
+    .menu-icon{font-size:22px}
+    .menu-label{font-size:10px}
+    .menu-card.play-card .menu-label{font-size:18px}
+    #restaurant-scene{height:28vh;min-height:140px}
+}
 </style>
 </head>
 <body>
@@ -78,95 +278,140 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
                 <span>Ур.</span>
                 <span id="level-number">1</span>
             </div>
-            <button id="settings-btn" class="icon-btn">⚙️</button>
+            <button id="settings-btn" class="icon-btn" aria-label="Настройки">⚙</button>
         </div>
 
+        <!-- ЛОББИ -->
         <div id="lobby" class="screen active">
-            <h1 id="game-title">Бургерная</h1>
-            <div class="lobby-buttons">
-                <button id="play-btn" class="main-btn">Играть</button>
-                <button id="levels-btn" class="secondary-btn">Уровни</button>
-                <button id="tasks-btn" class="secondary-btn">Задания</button>
-                <button id="afk-btn" class="secondary-btn">AFK‑комната</button>
-                <button id="daily-btn" class="secondary-btn">Ежедневная награда</button>
-                <button id="shop-btn" class="secondary-btn">Магазин</button>
-                <button id="invite-btn" class="secondary-btn">Пригласить друзей</button>
+            <svg class="lobby-hero" viewBox="0 0 200 200">
+                <ellipse cx="100" cy="50" rx="72" ry="34" fill="#e0a96d" stroke="#b8814a" stroke-width="2"/>
+                <ellipse cx="100" cy="42" rx="60" ry="20" fill="#f0c78a" opacity="0.6"/>
+                <circle cx="82" cy="34" r="2" fill="#fff" opacity="0.8"/>
+                <circle cx="102" cy="30" r="2" fill="#fff" opacity="0.8"/>
+                <circle cx="120" cy="36" r="2" fill="#fff" opacity="0.8"/>
+                <path d="M32 60 Q100 42 168 60 L168 74 Q100 56 32 74 Z" fill="#8fd860"/>
+                <path d="M28 76 Q100 60 172 76 L172 96 Q100 80 28 96 Z" fill="#8b3d15"/>
+                <path d="M30 98 Q100 84 170 98 L170 112 Q100 98 30 112 Z" fill="#ffd93d"/>
+                <path d="M30 114 Q100 100 170 114 L170 130 Q100 118 30 130 Z" fill="#e63946"/>
+                <ellipse cx="100" cy="150" rx="72" ry="22" fill="#d99758" stroke="#b8814a" stroke-width="2"/>
+                <ellipse cx="100" cy="144" rx="60" ry="12" fill="#f0c78a" opacity="0.5"/>
+            </svg>
+            <div class="lobby-grid">
+                <button id="play-btn" class="menu-card play-card">
+                    <span class="menu-icon">▶</span>
+                    <span class="menu-label">ИГРАТЬ</span>
+                </button>
+                <button id="levels-btn" class="menu-card">
+                    <span class="menu-icon">🗺️</span>
+                    <span class="menu-label">Уровни</span>
+                </button>
+                <button id="shop-btn" class="menu-card">
+                    <span class="menu-icon">🛒</span>
+                    <span class="menu-label">Магазин</span>
+                </button>
+                <button id="tasks-btn" class="menu-card">
+                    <span class="menu-icon">📋</span>
+                    <span class="menu-label">Задания</span>
+                </button>
+                <button id="daily-btn" class="menu-card">
+                    <span class="menu-icon">🎁</span>
+                    <span class="menu-label">Награда</span>
+                </button>
+                <button id="afk-btn" class="menu-card">
+                    <span class="menu-icon">💤</span>
+                    <span class="menu-label">AFK</span>
+                </button>
+                <button id="invite-btn" class="menu-card">
+                    <span class="menu-icon">👥</span>
+                    <span class="menu-label">Друзья</span>
+                </button>
             </div>
         </div>
 
+        <!-- ЭКРАН УРОВНЯ -->
         <div id="level-screen" class="screen">
-            <div id="order-panel">
-                <h2>Заказ</h2>
-                <div id="order-items"></div>
-                <div id="order-timer">⏱ <span id="timer-value">60</span>с</div>
+            <div id="restaurant-scene">
+                <svg id="restaurant-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#2a2a3e"/>
+                            <stop offset="1" stop-color="#1a1a2e"/>
+                        </linearGradient>
+                    </defs>
+                    <g id="scene-bg"></g>
+                    <g id="customers-layer"></g>
+                </svg>
             </div>
-            <div id="ingredients-panel">
-                <h3>Ингредиенты</h3>
-                <div id="ingredients-list"></div>
-            </div>
-            <div id="burger-assembly">
-                <h3>Сборка</h3>
+            <div id="level-content">
+                <div id="order-panel">
+                    <div id="order-header">
+                        <span id="order-customer">Выберите клиента</span>
+                        <span id="order-timer">⏱ <span id="timer-value">60</span>с</span>
+                    </div>
+                    <div id="order-items"></div>
+                </div>
                 <div id="burger-stack"></div>
-                <button id="serve-btn" class="main-btn">Подать</button>
-                <button id="clear-btn" class="secondary-btn" style="margin-top:8px">Очистить</button>
+                <div id="ingredients-list"></div>
+                <div id="level-actions">
+                    <button id="clear-btn" class="secondary-btn">Очистить</button>
+                    <button id="serve-btn" class="main-btn">Подать</button>
+                </div>
             </div>
         </div>
 
-        <div id="tutorial-screen" class="screen">
-            <h2 id="tutorial-title">Обучение</h2>
-            <p id="tutorial-text" style="max-width:400px;text-align:center;margin:20px 0;line-height:1.6"></p>
-            <button id="tutorial-next" class="main-btn">Далее</button>
-            <button id="tutorial-skip" class="secondary-btn" style="margin-top:12px">Пропустить</button>
-        </div>
-
+        <!-- РЕЗУЛЬТАТ -->
         <div id="result-screen" class="screen">
             <h2 id="result-title">Уровень пройден!</h2>
             <div id="result-stats" style="margin:20px 0;text-align:center;line-height:1.8"></div>
-            <button id="double-reward-btn" class="main-btn">Удвоить награду (реклама)</button>
-            <button id="next-level-btn" class="main-btn" style="margin-top:12px">Следующий уровень</button>
-            <button id="back-lobby-btn" class="secondary-btn" style="margin-top:12px">В лобби</button>
+            <button id="double-reward-btn" class="main-btn" style="min-width:240px">Удвоить награду (реклама)</button>
+            <button id="next-level-btn" class="main-btn" style="margin-top:12px;min-width:240px">Следующий уровень</button>
+            <button id="back-lobby-btn" class="secondary-btn" style="margin-top:12px;min-width:240px">В лобби</button>
         </div>
 
+        <!-- УРОВНИ -->
         <div id="levels-screen" class="screen">
             <h2>Уровни</h2>
             <div id="levels-grid"></div>
             <button id="levels-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
 
+        <!-- ЗАДАНИЯ -->
         <div id="tasks-screen" class="screen">
             <h2>Задания</h2>
             <div id="tasks-list"></div>
             <button id="tasks-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
 
+        <!-- AFK -->
         <div id="afk-screen" class="screen">
             <h2>AFK‑комната</h2>
-            <p style="margin:20px 0;line-height:2;text-align:center">
+            <p style="margin:20px 0;line-height:2;text-align:center;font-size:15px">
                 Доход: <span id="afk-rate">1</span> 🪙 / мин<br>
-                Заработано за сессию: <span id="afk-earned">0</span><br>
+                Заработано: <span id="afk-earned">0</span><br>
                 Всего минут: <span id="afk-total">0</span>
             </p>
             <button id="afk-back" class="secondary-btn">Назад</button>
         </div>
 
+        <!-- ЕЖЕДНЕВНАЯ НАГРАДА -->
         <div id="daily-screen" class="screen">
             <h2>Ежедневная награда</h2>
             <p id="daily-status" style="margin:20px 0;text-align:center"></p>
-            <button id="daily-claim" class="main-btn">Получить</button>
+            <button id="daily-claim" class="main-btn" style="min-width:200px">Получить</button>
             <button id="daily-back" class="secondary-btn" style="margin-top:12px">Назад</button>
         </div>
 
+        <!-- МАГАЗИН -->
         <div id="shop-screen" class="screen">
             <h2>Магазин</h2>
             <div id="shop-items"></div>
             <button id="shop-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
 
+        <!-- НАСТРОЙКИ -->
         <div id="settings-screen" class="screen">
             <h2>Настройки</h2>
-            <label>
-                <input type="checkbox" id="music-toggle"> Музыка
-            </label>
+            <label><input type="checkbox" id="music-toggle"> Музыка</label>
             <label>
                 Язык:
                 <select id="language-select">
@@ -180,6 +425,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
             </div>
             <button id="settings-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
+
+        <!-- ОБУЧЕНИЕ -->
+        <div id="tutorial-screen" class="screen">
+            <h2 id="tutorial-title">Обучение</h2>
+            <p id="tutorial-text" style="max-width:400px;text-align:center;margin:20px 0;line-height:1.6"></p>
+            <button id="tutorial-next" class="main-btn" style="min-width:200px">Далее</button>
+            <button id="tutorial-skip" class="secondary-btn" style="margin-top:12px">Пропустить</button>
+        </div>
     </div>
 </div>
 
@@ -189,57 +442,59 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 ============================================================ */
 const i18n = {
     ru: {
-        game_title:'Бургерная', play:'Играть', levels:'Уровни', tasks:'Задания',
-        afk_room:'AFK‑комната', daily_reward:'Ежедневная награда',
-        invite_friends:'Пригласить друзей', shop:'Магазин', settings:'Настройки',
-        music:'Музыка', language:'Язык', promo_code:'Промокод', activate:'Активировать',
-        back:'Назад', order:'Заказ', ingredients:'Ингредиенты', assembly:'Сборка',
-        serve:'Подать', clear:'Очистить', level_complete:'Уровень пройден!',
-        double_reward:'Удвоить награду (реклама)', next_level:'Следующий уровень',
-        back_lobby:'В лобби', tutorial_title:'Обучение', tutorial_next:'Далее',
-        tutorial_skip:'Пропустить',
-        tutorial_welcome:'Добро пожаловать в Бургерную! Сейчас мы научим вас готовить бургеры.',
-        tutorial_order:'Клиенты делают заказ. Соберите бургер из нужных ингредиентов.',
-        tutorial_ingredients:'Нажимайте на ингредиенты, чтобы добавить их в бургер.',
-        tutorial_serve:'Когда бургер собран правильно, нажмите «Подать».',
-        tutorial_timer:'Успейте выполнить заказ до окончания времени!',
-        daily_available:'Награда доступна!', daily_claimed:'Награда уже получена сегодня. Возвращайтесь завтра!',
+        play:'Играть', levels:'Уровни', tasks:'Задания', afk_room:'AFK‑комната',
+        daily_reward:'Ежедневная награда', invite_friends:'Пригласить друзей',
+        shop:'Магазин', settings:'Настройки', music:'Музыка', language:'Язык',
+        promo_code:'Промокод', activate:'Активировать', back:'Назад',
+        order:'Заказ', serve:'Подать', clear:'Очистить',
+        level_complete:'Уровень пройден!', double_reward:'Удвоить награду (реклама)',
+        next_level:'Следующий уровень', back_lobby:'В лобби',
+        tutorial_title:'Обучение', tutorial_next:'Далее', tutorial_skip:'Пропустить',
+        tutorial_welcome:'Добро пожаловать в Бургерную! Клиенты приходят в ваш ресторан и делают заказ.',
+        tutorial_order:'Над головой клиента — пузырь с ингредиентами, которые он хочет в бургере.',
+        tutorial_ingredients:'Нажмите на клиента, чтобы выбрать его, затем добавляйте ингредиенты в бургер.',
+        tutorial_serve:'Соберите бургер по заказу (булка, котлета, начинки, булка) и нажмите «Подать».',
+        tutorial_timer:'Успейте обслужить всех клиентов до окончания времени!',
+        daily_available:'Награда доступна!', daily_claimed:'Награда уже получена сегодня.',
         claim:'Получить', level:'Уровень', coins:'монет', purchase:'Купить',
         promo_invalid:'Неверный промокод', promo_clear:'Все данные сброшены!',
         promo_admin:'Начислено 1 000 000 монет!', not_enough_coins:'Недостаточно монет',
-        purchased:'Куплено!', already_owned:'Уже куплено',
+        purchased:'Куплено!', already_owned:'Уже куплено', apply:'Применить',
         time_out:'Время вышло!', wrong_order:'Неправильный заказ!',
-        tutorial_prompt:'Хотите пройти обучение?', tutorial_yes:'Пройти', tutorial_no:'Пропустить'
+        select_customer:'Выберите клиента', tutorial_prompt:'Хотите пройти обучение?',
+        tutorial_yes:'Пройти', tutorial_no:'Пропустить',
+        ingredients:'Ингредиенты', interior:'Интерьер', upgrades:'Улучшения'
     },
     en: {
-        game_title:'Burger Shop', play:'Play', levels:'Levels', tasks:'Tasks',
-        afk_room:'AFK Room', daily_reward:'Daily Reward',
-        invite_friends:'Invite Friends', shop:'Shop', settings:'Settings',
-        music:'Music', language:'Language', promo_code:'Promo Code', activate:'Activate',
-        back:'Back', order:'Order', ingredients:'Ingredients', assembly:'Assembly',
-        serve:'Serve', clear:'Clear', level_complete:'Level Complete!',
-        double_reward:'Double Reward (Ad)', next_level:'Next Level',
-        back_lobby:'Back to Lobby', tutorial_title:'Tutorial', tutorial_next:'Next',
-        tutorial_skip:'Skip',
-        tutorial_welcome:'Welcome to Burger Shop! Let\'s learn how to make burgers.',
-        tutorial_order:'Customers place orders. Assemble a burger with the right ingredients.',
-        tutorial_ingredients:'Tap ingredients to add them to the burger.',
-        tutorial_serve:'When the burger is correct, press "Serve".',
-        tutorial_timer:'Complete the order before time runs out!',
-        daily_available:'Reward available!', daily_claimed:'Reward already claimed today. Come back tomorrow!',
+        play:'Play', levels:'Levels', tasks:'Tasks', afk_room:'AFK Room',
+        daily_reward:'Daily Reward', invite_friends:'Invite Friends',
+        shop:'Shop', settings:'Settings', music:'Music', language:'Language',
+        promo_code:'Promo Code', activate:'Activate', back:'Back',
+        order:'Order', serve:'Serve', clear:'Clear',
+        level_complete:'Level Complete!', double_reward:'Double Reward (Ad)',
+        next_level:'Next Level', back_lobby:'Back to Lobby',
+        tutorial_title:'Tutorial', tutorial_next:'Next', tutorial_skip:'Skip',
+        tutorial_welcome:'Welcome to Burger Shop! Customers come to your restaurant and place orders.',
+        tutorial_order:'Above each customer — a bubble with ingredients they want in their burger.',
+        tutorial_ingredients:'Tap a customer to select them, then add ingredients to the burger.',
+        tutorial_serve:'Assemble the burger (bun, patty, fillings, bun) and press "Serve".',
+        tutorial_timer:'Serve all customers before time runs out!',
+        daily_available:'Reward available!', daily_claimed:'Reward already claimed today.',
         claim:'Claim', level:'Level', coins:'coins', purchase:'Buy',
         promo_invalid:'Invalid promo code', promo_clear:'All data cleared!',
         promo_admin:'1,000,000 coins added!', not_enough_coins:'Not enough coins',
-        purchased:'Purchased!', already_owned:'Already owned',
+        purchased:'Purchased!', already_owned:'Already owned', apply:'Apply',
         time_out:'Time out!', wrong_order:'Wrong order!',
-        tutorial_prompt:'Do you want to take the tutorial?', tutorial_yes:'Start', tutorial_no:'Skip'
+        select_customer:'Select a customer', tutorial_prompt:'Do you want to take the tutorial?',
+        tutorial_yes:'Start', tutorial_no:'Skip',
+        ingredients:'Ingredients', interior:'Interior', upgrades:'Upgrades'
     }
 };
 let currentLang = 'ru';
 function t(key){ return i18n[currentLang][key] || key; }
 
 /* ============================================================
-   VK BRIDGE WRAPPER
+   VK BRIDGE
 ============================================================ */
 const VKBridge = {
     available: typeof vkBridge !== 'undefined',
@@ -251,7 +506,7 @@ const VKBridge = {
     async saveData(key, value){
         if(!this.available) return false;
         try{ await vkBridge.send('VKWebAppStorageSet',{key, value:JSON.stringify(value)}); return true; }
-        catch(e){ console.warn('save error',e); return false; }
+        catch(e){ return false; }
     },
     async loadData(key){
         if(!this.available) return null;
@@ -259,59 +514,53 @@ const VKBridge = {
             const r = await vkBridge.send('VKWebAppStorageGet',{keys:[key]});
             if(r.keys && r.keys[0] && r.keys[0].value) return JSON.parse(r.keys[0].value);
             return null;
-        }catch(e){ console.warn('load error',e); return null; }
+        }catch(e){ return null; }
     },
     async clearAllData(){
         if(!this.available) return false;
         try{
             const r = await vkBridge.send('VKWebAppStorageGetKeys',{count:1000, offset:0});
-            if(r.keys){
-                for(const k of r.keys){
-                    await vkBridge.send('VKWebAppStorageSet',{key:k, value:''});
-                }
-            }
+            if(r.keys) for(const k of r.keys) await vkBridge.send('VKWebAppStorageSet',{key:k, value:''});
             return true;
-        }catch(e){ console.warn('clear error',e); return false; }
+        }catch(e){ return false; }
     },
     async showInterstitial(){
         if(!this.available) return false;
         try{ await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'interstitial'}); return true; }
-        catch(e){ console.warn('interstitial error',e); return false; }
+        catch(e){ return false; }
     },
     async showRewarded(){
         if(!this.available) return false;
         try{
             const r = await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'reward'});
             return r && r.result === true;
-        }catch(e){ console.warn('reward error',e); return false; }
+        }catch(e){ return false; }
     },
     async showBanner(){
         if(!this.available) return;
         try{
             await vkBridge.send('VKWebAppGetLaunchParams');
             await vkBridge.send('VKWebAppShowBannerAd',{banner_location:'bottom'});
-        }catch(e){ console.warn('banner error',e); }
+        }catch(e){}
     },
     async inviteFriends(){
         if(!this.available) return false;
         try{ await vkBridge.send('VKWebAppShowInviteBox'); return true; }
-        catch(e){ console.warn('invite error',e); return false; }
+        catch(e){ return false; }
     },
     setupViewHandlers(){
-        if(!this.available) return;
-        try{
-            vkBridge.subscribe(e=>{
-                if(!e || !e.detail) return;
-                if(e.detail.type === 'VKWebAppViewHide'){
-                    AudioManager.pauseMusic();
-                    if(window.Game) Game.pause();
-                } else if(e.detail.type === 'VKWebAppViewRestore'){
-                    AudioManager.resumeMusic();
-                    if(window.Game) Game.resume();
-                }
-            });
-        }catch(e){ console.warn(e); }
-
+        if(this.available){
+            try{
+                vkBridge.subscribe(e=>{
+                    if(!e || !e.detail) return;
+                    if(e.detail.type === 'VKWebAppViewHide'){
+                        AudioManager.pauseMusic(); if(window.Game) Game.pause();
+                    } else if(e.detail.type === 'VKWebAppViewRestore'){
+                        AudioManager.resumeMusic(); if(window.Game) Game.resume();
+                    }
+                });
+            }catch(e){}
+        }
         document.addEventListener('visibilitychange',()=>{
             if(document.hidden){ AudioManager.pauseMusic(); if(window.Game) Game.pause(); }
             else { AudioManager.resumeMusic(); if(window.Game) Game.resume(); }
@@ -322,7 +571,7 @@ const VKBridge = {
 };
 
 /* ============================================================
-   AUDIO MANAGER
+   AUDIO
 ============================================================ */
 const AudioManager = {
     musicEnabled: true,
@@ -330,21 +579,18 @@ const AudioManager = {
     audioContext: null,
     musicTimer: null,
     notes: [262, 294, 330, 349, 392, 440, 494, 523],
-
     init(){
-        const initAudio = ()=>{
+        const go = ()=>{
             if(!this.audioContext){
-                try{ this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
-                catch(e){ console.warn(e); }
+                try{ this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
             }
             if(this.audioContext && this.audioContext.state === 'suspended') this.audioContext.resume();
-            document.removeEventListener('touchstart', initAudio);
-            document.removeEventListener('click', initAudio);
+            document.removeEventListener('touchstart', go);
+            document.removeEventListener('click', go);
         };
-        document.addEventListener('touchstart', initAudio, {once:true});
-        document.addEventListener('click', initAudio, {once:true});
+        document.addEventListener('touchstart', go, {once:true});
+        document.addEventListener('click', go, {once:true});
     },
-
     playNote(){
         if(!this.musicPlaying || !this.musicEnabled || !this.audioContext) return;
         const osc = this.audioContext.createOscillator();
@@ -352,32 +598,27 @@ const AudioManager = {
         osc.type = 'sine';
         osc.frequency.value = this.notes[Math.floor(Math.random()*this.notes.length)];
         const now = this.audioContext.currentTime;
-        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.setValueAtTime(0.035, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
         osc.connect(gain); gain.connect(this.audioContext.destination);
         osc.start(now); osc.stop(now + 0.6);
         this.musicTimer = setTimeout(()=>this.playNote(), 700);
     },
-
     startMusic(){
         if(!this.musicEnabled || this.musicPlaying || !this.audioContext) return;
         this.musicPlaying = true;
         this.playNote();
     },
-
     stopMusic(){
         this.musicPlaying = false;
         if(this.musicTimer){ clearTimeout(this.musicTimer); this.musicTimer = null; }
     },
-
     pauseMusic(){ this.stopMusic(); },
     resumeMusic(){ if(this.musicEnabled) this.startMusic(); },
     toggleMusic(enabled){
         this.musicEnabled = enabled;
-        if(enabled) this.startMusic();
-        else this.stopMusic();
+        if(enabled) this.startMusic(); else this.stopMusic();
     },
-
     playSound(type){
         if(!this.audioContext) return;
         const osc = this.audioContext.createOscillator();
@@ -385,26 +626,26 @@ const AudioManager = {
         const now = this.audioContext.currentTime;
         if(type === 'click'){
             osc.frequency.value = 800;
-            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.setValueAtTime(0.07, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
         } else if(type === 'correct'){
             osc.frequency.value = 523;
             osc.frequency.linearRampToValueAtTime(1046, now + 0.2);
-            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.setValueAtTime(0.1, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if(type === 'error'){
             osc.type = 'sawtooth';
             osc.frequency.value = 200;
             osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.setValueAtTime(0.07, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if(type === 'coin'){
             osc.frequency.value = 1200;
             osc.frequency.linearRampToValueAtTime(1800, now + 0.1);
-            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.setValueAtTime(0.07, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
             osc.start(now); osc.stop(now + 0.15);
         }
@@ -413,63 +654,101 @@ const AudioManager = {
 };
 
 /* ============================================================
-   LEVELS
+   ИНГРЕДИЕНТЫ И УРОВНИ
 ============================================================ */
 const Levels = {
     totalLevels: 500,
     baseIngredients: [
-        {id:'bun_bottom', name:'Нижняя булочка', emoji:'🍞'},
-        {id:'bun_top',    name:'Верхняя булочка', emoji:'🍞'},
-        {id:'patty',      name:'Котлета',        emoji:'🥩'},
-        {id:'cheese',     name:'Сыр',            emoji:'🧀'},
-        {id:'lettuce',    name:'Салат',          emoji:'🥬'},
-        {id:'tomato',     name:'Помидор',        emoji:'🍅'},
-        {id:'onion',      name:'Лук',            emoji:'🧅'},
-        {id:'pickle',     name:'Огурец',         emoji:'🥒'},
-        {id:'sauce',      name:'Соус',           emoji:'🥫'},
-        {id:'bacon',      name:'Бекон',          emoji:'🥓'}
+        {id:'bun_bottom', name:'Нижняя булка', emoji:'🍞', color:'#d4a574'},
+        {id:'bun_top',    name:'Верхняя булка', emoji:'🍔', color:'#c89566'},
+        {id:'patty',      name:'Котлета',      emoji:'🥩', color:'#8b4513'},
+        {id:'cheese',     name:'Сыр',          emoji:'🧀', color:'#ffd700'},
+        {id:'lettuce',    name:'Салат',        emoji:'🥬', color:'#90ee90'},
+        {id:'tomato',     name:'Помидор',      emoji:'🍅', color:'#ff6347'},
+        {id:'onion',      name:'Лук',          emoji:'🧅', color:'#dda0dd'},
+        {id:'pickle',     name:'Огурец',       emoji:'🥒', color:'#6b8e23'},
+        {id:'bacon',      name:'Бекон',        emoji:'🥓', color:'#b22222'}
     ],
     premiumIngredients: [
-        {id:'double_patty', name:'Двойная котлета', emoji:'🥩', price:500},
-        {id:'cheddar',      name:'Чеддер',          emoji:'🧀', price:400},
-        {id:'avocado',      name:'Авокадо',         emoji:'🥑', price:800},
-        {id:'truffle',      name:'Трюфель',         emoji:'🍄', price:1500},
-        {id:'gold_leaf',    name:'Золотой лист',    emoji:'✨', price:3000}
+        {id:'double_patty', name:'Двойная котлета', emoji:'🍖', price:500,  color:'#654321'},
+        {id:'cheddar',      name:'Чеддер',          emoji:'🧀', price:400,  color:'#ffa500'},
+        {id:'avocado',      name:'Авокадо',         emoji:'🥑', price:800,  color:'#556b2f'},
+        {id:'truffle',      name:'Трюфель',         emoji:'🍄', price:1500, color:'#2f2f2f'},
+        {id:'gold_leaf',    name:'Золотой лист',    emoji:'✨', price:3000, color:'#ffd700'}
     ],
     all(){ return this.baseIngredients.concat(this.premiumIngredients); },
-
-    getLevel(n){
-        const ingredientCount = Math.min(3 + Math.floor(n / 100), 8);
-        const timeLimit = Math.max(60 - Math.floor(n / 10) * 2, 20);
-        const reward = 50 + n * 10;
-        let available = [...this.baseIngredients];
-        if(n > 200) available = available.concat(this.premiumIngredients.slice(0,2));
-        if(n > 350) available = available.concat(this.premiumIngredients.slice(2,4));
-
-        const shuffled = [...available].sort(()=>Math.random()-0.5);
-        const order = [];
-        for(let i=0; i<Math.min(ingredientCount, shuffled.length); i++){
-            order.push(shuffled[i].id);
-        }
-        return {
-            level:n, order, timeLimit, reward,
-            availableIngredients: available.map(i=>i.id)
-        };
+    getColor(id){
+        const ing = this.all().find(i=>i.id === id);
+        return ing ? ing.color : '#ccc';
+    },
+    getName(id){
+        const ing = this.all().find(i=>i.id === id);
+        return ing ? ing.name : id;
+    },
+    getEmoji(id){
+        const ing = this.all().find(i=>i.id === id);
+        return ing ? ing.emoji : '❓';
     },
 
-    getColor(id){
-        const c = {
-            bun_bottom:'#d4a574', bun_top:'#d4a574', patty:'#8b4513', cheese:'#ffd700',
-            lettuce:'#90ee90', tomato:'#ff6347', onion:'#dda0dd', pickle:'#6b8e23',
-            sauce:'#ff4500', bacon:'#b22222', double_patty:'#654321', cheddar:'#ffa500',
-            avocado:'#556b2f', truffle:'#2f2f2f', gold_leaf:'#ffd700'
+    // Генерация уровня: несколько клиентов с заказами
+    getLevel(n){
+        const customerCount = Math.min(2 + Math.floor(n/100), 6);
+        const fillingCount = Math.min(1 + Math.floor(n/80), 4);
+        const timeLimit = Math.max(90 - Math.floor(n/30)*10, 60) + customerCount * 15;
+        const rewardPerCustomer = 40 + n * 5;
+        const totalReward = rewardPerCustomer * customerCount;
+
+        // Доступные ингредиенты для этого уровня
+        let available = [...this.baseIngredients];
+        this.premiumIngredients.forEach(ing=>{
+            if(GameState.purchasedIngredients.includes(ing.id)) available.push(ing);
+        });
+
+        const fillings = available.filter(i=>i.id !== 'bun_bottom' && i.id !== 'bun_top');
+
+        // Генерируем заказ для каждого клиента
+        const customers = [];
+        for(let i=0; i<customerCount; i++){
+            const shuffled = [...fillings].sort(()=>Math.random()-0.5);
+            const chosen = shuffled.slice(0, fillingCount);
+            const order = ['bun_bottom', 'patty', ...chosen.map(c=>c.id), 'bun_top'];
+            customers.push(order);
+        }
+
+        return {
+            level: n,
+            customers: customers,
+            timeLimit: timeLimit,
+            reward: totalReward,
+            rewardPerCustomer: rewardPerCustomer,
+            availableIngredients: available.map(i=>i.id)
         };
-        return c[id] || '#ccc';
     }
 };
 
 /* ============================================================
-   TASKS
+   ТЕМЫ РЕСТОРАНА
+============================================================ */
+const RestaurantThemes = {
+    classic: { id:'classic', name:'Классика', price:0, wall1:'#3d2f4f', wall2:'#2a1f3a',
+        floor:'#5a3a24', floorLine:'#3d2419', counter:'#d4a574', counterTop:'#8b5a3c',
+        menuBg:'#1a0f0a', menuText:'#ffd166', accent:'#ff6b35' },
+    retro: { id:'retro', name:'Ретро 50х', price:2000, wall1:'#ffb6c1', wall2:'#ff8fab',
+        floor:'#000000', floorLine:'#333333', counter:'#ffffff', counterTop:'#ff1493',
+        menuBg:'#000000', menuText:'#ff1493', accent:'#ff1493' },
+    modern: { id:'modern', name:'Модерн', price:5000, wall1:'#e0e0e0', wall2:'#b0b0b0',
+        floor:'#2c2c2c', floorLine:'#444444', counter:'#4a4a4a', counterTop:'#1a1a1a',
+        menuBg:'#1a1a1a', menuText:'#00d9ff', accent:'#00d9ff' },
+    neon: { id:'neon', name:'Неон', price:10000, wall1:'#1a0033', wall2:'#0d001a',
+        floor:'#000000', floorLine:'#330066', counter:'#ff00ff', counterTop:'#00ffff',
+        menuBg:'#000000', menuText:'#00ffff', accent:'#ff00ff' },
+    luxury: { id:'luxury', name:'Люкс', price:20000, wall1:'#2c1810', wall2:'#1a0f0a',
+        floor:'#1a0f0a', floorLine:'#000000', counter:'#d4af37', counterTop:'#8b6914',
+        menuBg:'#1a0f0a', menuText:'#ffd700', accent:'#ffd700' }
+};
+
+/* ============================================================
+   ЗАДАНИЯ
 ============================================================ */
 const Tasks = {
     taskPool: [
@@ -489,7 +768,6 @@ const Tasks = {
     dailyTasks: [],
     progress: {},
     lastUpdate: null,
-
     init(saved){
         const today = new Date().toDateString();
         if(saved && saved.lastTaskUpdate === today && saved.dailyTasks){
@@ -542,7 +820,6 @@ const AFKRoom = {
     accumulatedCoins: 0,
     totalMinutes: 0,
     rate: 1,
-
     start(){
         if(this.active) return;
         this.active = true;
@@ -555,6 +832,7 @@ const AFKRoom = {
             GameState.coins += this.rate;
             GameState.save();
             this.updateUI();
+            if(window.Game) Game.updateCurrencyDisplay();
         }, 60000);
     },
     stop(){
@@ -583,6 +861,8 @@ const GameState = {
     musicEnabled: true,
     language: 'ru',
     purchasedIngredients: [],
+    purchasedThemes: ['classic'],
+    restaurantTheme: 'classic',
     hasCoffeeMachine: false,
     hasLemonadeMachine: false,
     lastDailyReward: null,
@@ -602,6 +882,8 @@ const GameState = {
         this.musicEnabled = saved.musicEnabled !== false;
         this.language = saved.language || 'ru';
         this.purchasedIngredients = saved.purchasedIngredients || [];
+        this.purchasedThemes = saved.purchasedThemes || ['classic'];
+        this.restaurantTheme = saved.restaurantTheme || 'classic';
         this.hasCoffeeMachine = saved.hasCoffeeMachine || false;
         this.hasLemonadeMachine = saved.hasLemonadeMachine || false;
         this.lastDailyReward = saved.lastDailyReward || null;
@@ -609,8 +891,7 @@ const GameState = {
         this.totalBurgersServed = saved.totalBurgersServed || 0;
         this.totalPerfectBurgers = saved.totalPerfectBurgers || 0;
         this.totalCoinsEarned = saved.totalCoinsEarned || 0;
-        if(saved.tasks) Tasks.init(saved.tasks);
-        else Tasks.init(null);
+        if(saved.tasks) Tasks.init(saved.tasks); else Tasks.init(null);
         if(saved.afk){
             AFKRoom.totalMinutes = saved.afk.totalMinutes || 0;
             AFKRoom.rate = saved.afk.rate || 1;
@@ -619,13 +900,13 @@ const GameState = {
     },
 
     save(){
-        // Дебаунс сохранения, чтобы не спамить VK
         if(this._saveTimeout) clearTimeout(this._saveTimeout);
         this._saveTimeout = setTimeout(async()=>{
             const data = {
                 coins: this.coins, currentLevel: this.currentLevel, maxLevel: this.maxLevel,
                 completedLevels: this.completedLevels, musicEnabled: this.musicEnabled,
                 language: this.language, purchasedIngredients: this.purchasedIngredients,
+                purchasedThemes: this.purchasedThemes, restaurantTheme: this.restaurantTheme,
                 hasCoffeeMachine: this.hasCoffeeMachine, hasLemonadeMachine: this.hasLemonadeMachine,
                 lastDailyReward: this.lastDailyReward, tutorialCompleted: this.tutorialCompleted,
                 totalBurgersServed: this.totalBurgersServed, totalPerfectBurgers: this.totalPerfectBurgers,
@@ -639,13 +920,22 @@ const GameState = {
 };
 
 /* ============================================================
+   ИМЕНА КЛИЕНТОВ
+============================================================ */
+const CUSTOMER_NAMES = ['Аня','Иван','Маша','Петя','Оля','Сергей','Катя','Дима','Лена','Ваня','Даша','Миша'];
+const CUSTOMER_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e'];
+const SKIN_COLORS = ['#f5c6a0','#e0ac69','#c68642','#8d5524','#ffdbac'];
+const HAIR_COLORS = ['#2c1810','#000000','#ffd700','#8b4513','#a0522d','#4a2c17'];
+
+/* ============================================================
    MAIN GAME
 ============================================================ */
 class BurgerGame {
     constructor(){
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.currentOrder = [];
+        this.customers = [];
+        this.selectedCustomer = null;
         this.currentBurger = [];
         this.timeLeft = 60;
         this.timerInterval = null;
@@ -655,6 +945,9 @@ class BurgerGame {
         this.lastTime = 0;
         this.backgroundOffset = 0;
         this.currentReward = 0;
+        this.rewardPerCustomer = 0;
+        this.customersServed = 0;
+        this.customersTotal = 0;
         this.availableIngredients = [];
         this.tutorialStep = 0;
     }
@@ -662,7 +955,6 @@ class BurgerGame {
     async init(){
         this.resizeCanvas();
         window.addEventListener('resize', ()=>this.resizeCanvas());
-
         VKBridge.init();
         const hasSave = await GameState.load();
 
@@ -689,14 +981,15 @@ class BurgerGame {
     }
 
     applyLanguage(){
-        document.getElementById('game-title').textContent = t('game_title');
-        document.getElementById('play-btn').textContent = t('play');
-        document.getElementById('levels-btn').textContent = t('levels');
-        document.getElementById('tasks-btn').textContent = t('tasks');
-        document.getElementById('afk-btn').textContent = t('afk_room');
-        document.getElementById('daily-btn').textContent = t('daily_reward');
-        document.getElementById('shop-btn').textContent = t('shop');
-        document.getElementById('invite-btn').textContent = t('invite_friends');
+        document.getElementById('play-btn').querySelector('.menu-label').textContent = t('play');
+        const buttons = {
+            'levels-btn': 'levels', 'shop-btn': 'shop', 'tasks-btn': 'tasks',
+            'daily-btn': 'daily_reward', 'afk-btn': 'afk_room', 'invite-btn': 'invite_friends'
+        };
+        for(const [id, key] of Object.entries(buttons)){
+            const el = document.getElementById(id);
+            if(el) el.querySelector('.menu-label').textContent = t(key);
+        }
         document.getElementById('serve-btn').textContent = t('serve');
         document.getElementById('clear-btn').textContent = t('clear');
         document.getElementById('double-reward-btn').textContent = t('double_reward');
@@ -737,11 +1030,7 @@ class BurgerGame {
         }
         this.animationFrame = requestAnimationFrame(t=>this.gameLoop(t));
     }
-
-    update(dt){
-        this.backgroundOffset = (this.backgroundOffset + dt * 20) % 40;
-    }
-
+    update(dt){ this.backgroundOffset = (this.backgroundOffset + dt * 20) % 40; }
     render(){
         const w = this.canvas._w || 300;
         const h = this.canvas._h || 300;
@@ -750,13 +1039,11 @@ class BurgerGame {
         grad.addColorStop(1, '#16213e');
         this.ctx.fillStyle = grad;
         this.ctx.fillRect(0, 0, w, h);
-
         this.ctx.fillStyle = 'rgba(255,255,255,0.02)';
         const tile = 40;
-        const off = this.backgroundOffset;
         for(let x = -tile; x < w + tile; x += tile){
             for(let y = -tile; y < h + tile; y += tile){
-                this.ctx.fillRect(x + off, y, tile - 2, tile - 2);
+                this.ctx.fillRect(x + this.backgroundOffset, y, tile - 2, tile - 2);
             }
         }
     }
@@ -793,11 +1080,7 @@ class BurgerGame {
         bind('promo-btn', ()=>this.handlePromoCode());
         bind('tutorial-next', ()=>this.nextTutorialStep());
         bind('tutorial-skip', ()=>this.skipTutorial());
-
-        bind('next-level-btn', ()=>{
-            const next = Math.min(GameState.currentLevel + 1, 500);
-            this.startLevel(next);
-        });
+        bind('next-level-btn', ()=>{ this.startLevel(Math.min(GameState.currentLevel + 1, 500)); });
         bind('back-lobby-btn', ()=>this.showScreen('lobby'));
 
         document.getElementById('music-toggle').addEventListener('change', e=>{
@@ -811,7 +1094,6 @@ class BurgerGame {
             this.applyLanguage();
             GameState.save();
         });
-
         document.getElementById('double-reward-btn').addEventListener('click', async ()=>{
             AudioManager.pauseMusic();
             const ok = await VKBridge.showRewarded();
@@ -822,13 +1104,13 @@ class BurgerGame {
                 this.updateCurrencyDisplay();
                 const btn = document.getElementById('double-reward-btn');
                 btn.disabled = true;
-                btn.textContent = '✓ Награда удвоена!';
+                btn.textContent = '✓ +' + this.currentReward + ' 🪙';
             }
         });
     }
 
+    /* ===== ЗАПУСК УРОВНЯ ===== */
     async startLevel(levelNum){
-        // Пауза и реклама перед уровнем
         this.paused = true;
         AudioManager.pauseMusic();
         await VKBridge.showInterstitial();
@@ -838,13 +1120,32 @@ class BurgerGame {
         GameState.currentLevel = levelNum;
         const data = Levels.getLevel(levelNum);
 
-        this.currentOrder = data.order;
-        this.currentBurger = [];
-        this.timeLeft = data.timeLimit;
+        this.customersTotal = data.customers.length;
+        this.customersServed = 0;
         this.currentReward = data.reward;
+        this.rewardPerCustomer = data.rewardPerCustomer;
+        this.timeLeft = data.timeLimit;
         this.availableIngredients = data.availableIngredients;
 
-        this.renderOrder();
+        // Создаём клиентов
+        const positions = this.getCustomerPositions(this.customersTotal);
+        this.customers = data.customers.map((order, i)=>({
+            x: positions[i],
+            y: 250,
+            color: CUSTOMER_COLORS[Math.floor(Math.random()*CUSTOMER_COLORS.length)],
+            skin: SKIN_COLORS[Math.floor(Math.random()*SKIN_COLORS.length)],
+            hair: HAIR_COLORS[Math.floor(Math.random()*HAIR_COLORS.length)],
+            order: order,
+            served: false,
+            name: CUSTOMER_NAMES[Math.floor(Math.random()*CUSTOMER_NAMES.length)]
+        }));
+
+        this.selectedCustomer = 0;
+        this.currentBurger = [];
+
+        this.renderScene();
+        this.renderCustomers();
+        this.renderOrderPanel();
         this.renderIngredients();
         this.renderBurgerStack();
         this.updateTimerDisplay();
@@ -862,25 +1163,144 @@ class BurgerGame {
         GameState.save();
     }
 
-    renderOrder(){
-        const c = document.getElementById('order-items');
-        c.innerHTML = '';
-        this.currentOrder.forEach(id=>{
-            const ing = Levels.all().find(i=>i.id === id);
-            if(!ing) return;
+    getCustomerPositions(count){
+        const spacing = 800 / (count + 1);
+        const positions = [];
+        for(let i=0; i<count; i++) positions.push(spacing * (i + 1));
+        return positions;
+    }
+
+    /* ===== SVG РЕСТОРАН ===== */
+    renderScene(){
+        const theme = RestaurantThemes[GameState.restaurantTheme] || RestaurantThemes.classic;
+        const bg = document.getElementById('scene-bg');
+        if(!bg) return;
+        bg.innerHTML = `
+            <defs>
+                <pattern id="floorTiles" x="0" y="0" width="60" height="40" patternUnits="userSpaceOnUse">
+                    <rect width="60" height="40" fill="${theme.floor}"/>
+                    <line x1="0" y1="0" x2="0" y2="40" stroke="${theme.floorLine}" stroke-width="1.5"/>
+                    <line x1="0" y1="0" x2="60" y2="0" stroke="${theme.floorLine}" stroke-width="1.5"/>
+                </pattern>
+                <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="${theme.wall1}"/>
+                    <stop offset="1" stop-color="${theme.wall2}"/>
+                </linearGradient>
+            </defs>
+            <!-- Стена -->
+            <rect x="0" y="0" width="800" height="205" fill="url(#wallGrad)"/>
+            <!-- Меню-борд -->
+            <rect x="260" y="15" width="280" height="85" rx="8" fill="${theme.menuBg}" stroke="${theme.accent}" stroke-width="3"/>
+            <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="800" fill="${theme.menuText}" font-family="sans-serif">🍔 БУРГЕРНАЯ</text>
+            <text x="400" y="70" text-anchor="middle" font-size="13" fill="${theme.menuText}" font-family="sans-serif" opacity="0.85">★ СВЕЖИЕ БУРГЕРЫ КАЖДЫЙ ДЕНЬ ★</text>
+            <text x="400" y="88" text-anchor="middle" font-size="11" fill="${theme.menuText}" font-family="sans-serif" opacity="0.7">— ОТКРЫТО —</text>
+            <!-- Лампы -->
+            <circle cx="100" cy="30" r="6" fill="${theme.accent}" opacity="0.7"/>
+            <line x1="100" y1="0" x2="100" y2="24" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="700" cy="30" r="6" fill="${theme.accent}" opacity="0.7"/>
+            <line x1="700" y1="0" x2="700" y2="24" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
+            <!-- Плинтус -->
+            <rect x="0" y="198" width="800" height="8" fill="${theme.counterTop}"/>
+            <!-- Пол -->
+            <rect x="0" y="205" width="800" height="95" fill="url(#floorTiles)"/>
+            <!-- Прилавок (передний план) -->
+            <rect x="0" y="272" width="800" height="28" fill="${theme.counter}"/>
+            <rect x="0" y="272" width="800" height="5" fill="${theme.counterTop}"/>
+        `;
+    }
+
+    renderCustomers(){
+        const layer = document.getElementById('customers-layer');
+        if(!layer) return;
+        layer.innerHTML = '';
+
+        this.customers.forEach((c, i)=>{
+            if(c.served) return;
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('class', 'customer-svg' + (i === this.selectedCustomer ? ' selected' : ''));
+            g.setAttribute('transform', `translate(${c.x}, ${c.y})`);
+            g.style.cursor = 'pointer';
+
+            // Пузырь с заказом
+            const emojis = c.order.map(id => Levels.getEmoji(id)).join('');
+            const bubbleWidth = Math.max(56, c.order.length * 22 + 16);
+            const bubbleX = -bubbleWidth / 2;
+
+            let inner = `
+                <!-- тень -->
+                <ellipse cx="0" cy="4" rx="24" ry="5" fill="rgba(0,0,0,0.35)"/>
+                <!-- тело -->
+                <path d="M -20 0 Q -20 -52 0 -56 Q 20 -52 20 0 Z" fill="${c.color}" stroke="rgba(0,0,0,0.25)" stroke-width="1.2"/>
+                <!-- руки -->
+                <path d="M -17 -34 Q -28 -22 -25 -8" stroke="${c.color}" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <path d="M 17 -34 Q 28 -22 25 -8" stroke="${c.color}" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <!-- шея -->
+                <rect x="-5" y="-60" width="10" height="6" fill="${c.skin}"/>
+                <!-- голова -->
+                <circle cx="0" cy="-76" r="15" fill="${c.skin}" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+                <!-- волосы -->
+                <path d="M -15 -78 Q -15 -94 0 -94 Q 15 -94 15 -78 Q 10 -85 0 -85 Q -10 -85 -15 -78 Z" fill="${c.hair}"/>
+                <!-- глаза -->
+                <circle cx="-5" cy="-77" r="1.8" fill="#222"/>
+                <circle cx="5" cy="-77" r="1.8" fill="#222"/>
+                <!-- румянец -->
+                <circle cx="-9" cy="-71" r="2.5" fill="rgba(255,120,120,0.4)"/>
+                <circle cx="9" cy="-71" r="2.5" fill="rgba(255,120,120,0.4)"/>
+                <!-- улыбка -->
+                <path d="M -5 -70 Q 0 -66 5 -70" stroke="#222" fill="none" stroke-width="1.3" stroke-linecap="round"/>
+                <!-- пузырь с заказом -->
+                <g transform="translate(0, -118)">
+                    <rect x="${bubbleX}" y="-16" width="${bubbleWidth}" height="24" rx="10" fill="white" stroke="${c.color}" stroke-width="2"/>
+                    <polygon points="-5,7 5,7 0,13" fill="white" stroke="${c.color}" stroke-width="2" stroke-linejoin="round"/>
+                    <text x="0" y="2" text-anchor="middle" font-size="13" fill="#222" font-family="sans-serif">${emojis}</text>
+                </g>
+            `;
+
+            if(i === this.selectedCustomer){
+                inner += `<circle cx="0" cy="-76" r="21" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 4"><animateTransform attributeName="transform" type="rotate" from="0 0 -76" to="360 0 -76" dur="8s" repeatCount="indefinite"/></circle>`;
+            }
+
+            g.innerHTML = inner;
+            g.addEventListener('click', ()=>this.selectCustomer(i));
+            layer.appendChild(g);
+        });
+    }
+
+    selectCustomer(i){
+        if(!this.gameActive) return;
+        if(!this.customers[i] || this.customers[i].served) return;
+        this.selectedCustomer = i;
+        AudioManager.playSound('click');
+        this.renderCustomers();
+        this.renderOrderPanel();
+    }
+
+    renderOrderPanel(){
+        const nameEl = document.getElementById('order-customer');
+        const itemsEl = document.getElementById('order-items');
+
+        if(this.selectedCustomer === null || !this.customers[this.selectedCustomer] || this.customers[this.selectedCustomer].served){
+            nameEl.textContent = t('select_customer');
+            itemsEl.innerHTML = '';
+            return;
+        }
+        const c = this.customers[this.selectedCustomer];
+        nameEl.textContent = '👤 ' + c.name;
+        itemsEl.innerHTML = '';
+        c.order.forEach(id=>{
             const el = document.createElement('div');
             el.className = 'order-item';
-            el.textContent = `${ing.emoji} ${ing.name}`;
-            c.appendChild(el);
+            el.textContent = Levels.getEmoji(id);
+            el.title = Levels.getName(id);
+            itemsEl.appendChild(el);
         });
     }
 
     renderIngredients(){
         const c = document.getElementById('ingredients-list');
         c.innerHTML = '';
-        const all = Levels.all();
         this.availableIngredients.forEach(id=>{
-            const ing = all.find(i=>i.id === id);
+            const ing = Levels.all().find(i=>i.id === id);
             if(!ing) return;
             const btn = document.createElement('button');
             btn.className = 'ingredient-btn';
@@ -892,6 +1312,10 @@ class BurgerGame {
 
     addIngredient(id){
         if(!this.gameActive) return;
+        if(this.selectedCustomer === null) {
+            this.showToast(t('select_customer'));
+            return;
+        }
         this.currentBurger.push(id);
         this.renderBurgerStack();
         AudioManager.playSound('click');
@@ -901,36 +1325,66 @@ class BurgerGame {
     renderBurgerStack(){
         const c = document.getElementById('burger-stack');
         c.innerHTML = '';
-        const all = Levels.all();
         this.currentBurger.forEach(id=>{
-            const ing = all.find(i=>i.id === id);
-            if(!ing) return;
             const layer = document.createElement('div');
             layer.className = 'burger-layer';
             layer.style.background = Levels.getColor(id);
-            layer.textContent = ing.name;
+            layer.textContent = Levels.getEmoji(id) + ' ' + Levels.getName(id);
             c.appendChild(layer);
         });
     }
 
     serveBurger(){
         if(!this.gameActive) return;
-        const correct = this.arraysEqual(this.currentBurger, this.currentOrder);
-        if(correct){
+        if(this.selectedCustomer === null){
+            this.showToast(t('select_customer'));
+            return;
+        }
+        const c = this.customers[this.selectedCustomer];
+        if(!c || c.served) return;
+
+        if(this.arraysEqualSet(this.currentBurger, c.order)){
             AudioManager.playSound('correct');
-            this.completeLevel();
+            c.served = true;
+            this.customersServed++;
+
+            // Награда за клиента
+            GameState.coins += this.rewardPerCustomer;
+            GameState.totalCoinsEarned += this.rewardPerCustomer;
+            GameState.totalBurgersServed++;
+            GameState.totalPerfectBurgers++;
+            this.updateCurrencyDisplay();
+
+            Tasks.updateProgress('serve', 1);
+            Tasks.updateProgress('earn', this.rewardPerCustomer);
+            Tasks.updateProgress('perfect', 1);
+
+            this.currentBurger = [];
+            this.renderBurgerStack();
+            this.renderCustomers();
+
+            if(this.customersServed >= this.customersTotal){
+                this.completeLevel();
+            } else {
+                const next = this.customers.findIndex(cu=>!cu.served);
+                this.selectedCustomer = next >= 0 ? next : null;
+                this.renderOrderPanel();
+                this.renderCustomers();
+            }
+            GameState.save();
         } else {
             AudioManager.playSound('error');
             this.showToast(t('wrong_order'));
-            this.clearBurger();
+            this.currentBurger = [];
+            this.renderBurgerStack();
         }
     }
 
-    arraysEqual(a, b){
+    arraysEqualSet(a, b){
         if(a.length !== b.length) return false;
         const sa = [...a].sort();
         const sb = [...b].sort();
-        return sa.every((v,i)=>v === sb[i]);
+        return sa.every((v, i)=>v === sb[i]);
     }
 
     clearBurger(){
@@ -944,19 +1398,13 @@ class BurgerGame {
 
         GameState.coins += this.currentReward;
         GameState.totalCoinsEarned += this.currentReward;
-        GameState.totalBurgersServed++;
 
-        if(this.arraysEqual(this.currentBurger, this.currentOrder)){
-            GameState.totalPerfectBurgers++;
-            Tasks.updateProgress('perfect', 1);
-        }
         if(!GameState.completedLevels.includes(GameState.currentLevel)){
             GameState.completedLevels.push(GameState.currentLevel);
         }
         if(GameState.currentLevel >= GameState.maxLevel){
             GameState.maxLevel = GameState.currentLevel + 1;
         }
-        Tasks.updateProgress('serve', 1);
         Tasks.updateProgress('earn', this.currentReward);
         Tasks.updateProgress('complete_levels', 1);
 
@@ -975,8 +1423,9 @@ class BurgerGame {
     showLevelResult(){
         const stats = document.getElementById('result-stats');
         stats.innerHTML = `
-            <p style="font-size:20px;color:#4ecdc4;font-weight:700">Уровень ${GameState.currentLevel} пройден!</p>
-            <p style="color:#ffd166;font-weight:700;margin-top:10px">+${this.currentReward} 🪙</p>
+            <p style="font-size:18px;color:#4ecdc4;font-weight:800">Уровень ${GameState.currentLevel}</p>
+            <p style="color:#aaa;margin-top:6px">Обслужено клиентов: ${this.customersServed}/${this.customersTotal}</p>
+            <p style="color:#ffd166;font-weight:800;margin-top:10px;font-size:20px">+${this.currentReward} 🪙</p>
         `;
         const btn = document.getElementById('double-reward-btn');
         btn.disabled = false;
@@ -998,6 +1447,7 @@ class BurgerGame {
             btn.textContent = i;
             if(GameState.completedLevels.includes(i)) btn.classList.add('completed');
             if(i > GameState.maxLevel){ btn.classList.add('locked'); btn.disabled = true; }
+            if(i === GameState.currentLevel) btn.classList.add('current');
             btn.addEventListener('click', ()=>{ if(!btn.disabled) this.startLevel(i); });
             c.appendChild(btn);
         }
@@ -1013,13 +1463,13 @@ class BurgerGame {
             const progText = task.completed ? '✅' : `${prog}/${task.target}`;
             el.innerHTML = `
                 <div style="flex:1;min-width:0">
-                    <div style="font-size:14px">${task.text}</div>
+                    <div style="font-size:13px">${task.text}</div>
                     <small style="color:#aaa">${progText}</small>
                 </div>
                 <div style="text-align:right">
-                    <div style="color:#ffd166;font-weight:700">${task.reward} 🪙</div>
-                    ${task.completed && !task.claimed ? `<button class="main-btn" data-tid="${task.id}" style="margin-top:6px;padding:6px 12px;font-size:12px">${t('claim')}</button>` : ''}
-                    ${task.claimed ? '<div style="margin-top:6px">✅</div>' : ''}
+                    <div style="color:#ffd166;font-weight:800">${task.reward} 🪙</div>
+                    ${task.completed && !task.claimed ? `<button class="main-btn" data-tid="${task.id}" style="margin-top:4px;padding:6px 12px;font-size:11px">${t('claim')}</button>` : ''}
+                    ${task.claimed ? '<div style="margin-top:4px">✅</div>' : ''}
                 </div>
             `;
             c.appendChild(el);
@@ -1063,6 +1513,12 @@ class BurgerGame {
         const c = document.getElementById('shop-items');
         c.innerHTML = '';
 
+        // === ИНГРЕДИЕНТЫ ===
+        const header1 = document.createElement('div');
+        header1.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:6px';
+        header1.textContent = '🥩 ' + t('ingredients');
+        c.appendChild(header1);
+
         Levels.premiumIngredients.forEach(ing=>{
             const owned = GameState.purchasedIngredients.includes(ing.id);
             const el = document.createElement('div');
@@ -1071,24 +1527,67 @@ class BurgerGame {
                 <div style="font-size:32px">${ing.emoji}</div>
                 <div style="font-size:12px">${ing.name}</div>
                 <div class="price">${ing.price} 🪙</div>
-                <button class="main-btn" ${owned ? 'disabled' : ''} style="font-size:12px;padding:8px 12px">
+                <button class="main-btn" ${owned ? 'disabled' : ''}>
                     ${owned ? t('already_owned') : t('purchase')}
                 </button>
             `;
-            if(!owned){
-                el.querySelector('button').addEventListener('click', ()=>{
-                    if(GameState.coins >= ing.price){
-                        GameState.coins -= ing.price;
-                        GameState.purchasedIngredients.push(ing.id);
-                        GameState.save();
-                        this.updateCurrencyDisplay();
-                        this.renderShop();
-                        AudioManager.playSound('coin');
-                    } else this.showToast(t('not_enough_coins'));
-                });
-            }
+            if(!owned) el.querySelector('button').addEventListener('click', ()=>{
+                if(GameState.coins >= ing.price){
+                    GameState.coins -= ing.price;
+                    GameState.purchasedIngredients.push(ing.id);
+                    GameState.save();
+                    this.updateCurrencyDisplay();
+                    this.renderShop();
+                    AudioManager.playSound('coin');
+                } else this.showToast(t('not_enough_coins'));
+            });
             c.appendChild(el);
         });
+
+        // === ИНТЕРЬЕР ===
+        const header2 = document.createElement('div');
+        header2.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:12px';
+        header2.textContent = '🎨 ' + t('interior');
+        c.appendChild(header2);
+
+        Object.values(RestaurantThemes).forEach(theme=>{
+            const owned = GameState.purchasedThemes.includes(theme.id);
+            const active = GameState.restaurantTheme === theme.id;
+            const el = document.createElement('div');
+            el.className = 'shop-item';
+            el.innerHTML = `
+                <div style="width:100%;height:40px;border-radius:8px;background:linear-gradient(135deg,${theme.wall1},${theme.accent});position:relative;overflow:hidden">
+                    <div style="position:absolute;bottom:0;left:0;right:0;height:12px;background:${theme.floor}"></div>
+                </div>
+                <div style="font-size:12px;font-weight:700">${theme.name}</div>
+                <div class="price">${owned ? (active ? '✓ Активна' : '—') : theme.price + ' 🪙'}</div>
+                <button class="main-btn" ${active ? 'disabled' : ''}>
+                    ${owned ? (active ? '✓' : t('apply')) : t('purchase')}
+                </button>
+            `;
+            if(!active) el.querySelector('button').addEventListener('click', ()=>{
+                if(owned){
+                    GameState.restaurantTheme = theme.id;
+                    GameState.save();
+                    this.renderShop();
+                } else if(GameState.coins >= theme.price){
+                    GameState.coins -= theme.price;
+                    GameState.purchasedThemes.push(theme.id);
+                    GameState.restaurantTheme = theme.id;
+                    GameState.save();
+                    this.updateCurrencyDisplay();
+                    this.renderShop();
+                    AudioManager.playSound('coin');
+                } else this.showToast(t('not_enough_coins'));
+            });
+            c.appendChild(el);
+        });
+
+        // === УЛУЧШЕНИЯ ===
+        const header3 = document.createElement('div');
+        header3.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:12px';
+        header3.textContent = '⚡ ' + t('upgrades');
+        c.appendChild(header3);
 
         if(!GameState.hasCoffeeMachine){
             const el = document.createElement('div');
@@ -1097,7 +1596,7 @@ class BurgerGame {
                 <div style="font-size:32px">☕</div>
                 <div style="font-size:12px">Кофемашина</div>
                 <div class="price">5000 🪙</div>
-                <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+                <button class="main-btn">${t('purchase')}</button>
             `;
             el.querySelector('button').addEventListener('click', ()=>{
                 if(GameState.coins >= 5000){
@@ -1110,7 +1609,6 @@ class BurgerGame {
             });
             c.appendChild(el);
         }
-
         if(!GameState.hasLemonadeMachine){
             const el = document.createElement('div');
             el.className = 'shop-item';
@@ -1118,7 +1616,7 @@ class BurgerGame {
                 <div style="font-size:32px">🍋</div>
                 <div style="font-size:12px">Машина для лимонада</div>
                 <div class="price">4000 🪙</div>
-                <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+                <button class="main-btn">${t('purchase')}</button>
             `;
             el.querySelector('button').addEventListener('click', ()=>{
                 if(GameState.coins >= 4000){
@@ -1131,15 +1629,14 @@ class BurgerGame {
             });
             c.appendChild(el);
         }
-
         const cost = AFKRoom.rate * 1000;
         const el = document.createElement('div');
         el.className = 'shop-item';
         el.innerHTML = `
-            <div style="font-size:32px">⚡</div>
+            <div style="font-size:32px">💤</div>
             <div style="font-size:12px">+1 🪙 / мин в AFK</div>
             <div class="price">${cost} 🪙</div>
-            <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+            <button class="main-btn">${t('purchase')}</button>
         `;
         el.querySelector('button').addEventListener('click', ()=>{
             if(GameState.coins >= cost){
@@ -1195,13 +1692,7 @@ class BurgerGame {
     }
 
     nextTutorialStep(){
-        const steps = [
-            t('tutorial_welcome'),
-            t('tutorial_order'),
-            t('tutorial_ingredients'),
-            t('tutorial_serve'),
-            t('tutorial_timer')
-        ];
+        const steps = [t('tutorial_welcome'), t('tutorial_order'), t('tutorial_ingredients'), t('tutorial_serve'), t('tutorial_timer')];
         if(this.tutorialStep >= steps.length){
             GameState.tutorialCompleted = true;
             GameState.save();
@@ -1230,7 +1721,7 @@ class BurgerGame {
     updateCurrencyDisplay(){
         const c = document.getElementById('coin-count');
         const l = document.getElementById('level-number');
-        if(c) c.textContent = GameState.coins;
+        if(c) c.textContent = GameState.coins.toLocaleString('ru-RU');
         if(l) l.textContent = GameState.maxLevel;
     }
 
