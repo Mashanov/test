@@ -2,1752 +2,1252 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Морской бой — BattleSea</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ff6b35">
+<title>Бургерная</title>
+
+<!-- VK Bridge SDK -->
+<script src="https://vk.com/js/api/xd_connection.js?2"></script>
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
 <style>
-:root{
-  --gold:#ffd257; --danger:#ff5a5a; --ok:#5ad18a; --panel:#0b3a63;
-  --panel2:#0f4d80; --text:#eaf6ff; --muted:#9cc7e8;
-  --radius:14px; --shadow:0 8px 24px rgba(0,20,40,.45);
-}
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
-html,body{margin:0;padding:0;height:100%;}
-body{
-  font-family:'Segoe UI',system-ui,Roboto,Arial,sans-serif; color:var(--text);
-  background:linear-gradient(180deg,#03192e 0%,#062a4a 30%,#0d4f8b 75%,#0a3d6b 100%);
-  overflow:hidden; touch-action:manipulation;
-}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;}
-.waves{position:fixed;left:0;right:0;bottom:0;height:22vh;pointer-events:none;z-index:0;opacity:.5;}
-::-webkit-scrollbar{width:8px;height:8px;}
-::-webkit-scrollbar-track{background:rgba(0,20,40,.45);border-radius:8px;}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7fd4ff,#0f4d80);border-radius:8px;border:1px solid rgba(140,220,255,.3);}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ffd257,#d99a1f);}
-*{scrollbar-width:thin;scrollbar-color:#1e8cdc rgba(0,20,40,.45);}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;padding:12px;z-index:1;}
-.screen.active{display:flex;}
-h1,h2,h3{margin:.2em 0;}
-.sea-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.sea-ray{position:absolute;top:-40%;width:30%;height:120%;background:linear-gradient(180deg,rgba(127,212,255,.06),transparent);
-  transform:rotate(18deg);animation:rayDrift 9s ease-in-out infinite alternate;}
-.sea-ray.r2{left:55%;transform:rotate(-14deg);animation-delay:2s;}
-@keyframes rayDrift{from{opacity:.3;transform:rotate(18deg) translateX(-30px);}to{opacity:.7;transform:rotate(18deg) translateX(30px);}}
-.bubble{position:absolute;bottom:-30px;width:10px;height:10px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,rgba(200,240,255,.7),rgba(127,212,255,.15));
-  animation:bubRise linear infinite;opacity:0;}
-@keyframes bubRise{0%{opacity:0;transform:translateY(0) scale(.6);}15%{opacity:.8;}100%{opacity:0;transform:translateY(-105vh) scale(1.15);}}
-.lobby-ship{position:fixed;right:4%;bottom:14vh;z-index:0;pointer-events:none;opacity:.9;animation:bob 5s ease-in-out infinite;}
-.lobby-ship2{position:fixed;left:3%;bottom:18vh;z-index:0;pointer-events:none;opacity:.55;animation:bob 6.5s ease-in-out infinite reverse;}
-@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-12px) rotate(2deg);}}
-.compass{position:fixed;top:10px;right:10px;z-index:0;pointer-events:none;opacity:.25;animation:spin 40s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.topbar{width:100%;max-width:560px;display:flex;align-items:center;gap:8px;padding:6px 4px;position:relative;z-index:2;}
-.topbar .logo{font-weight:800;font-size:18px;letter-spacing:.5px;display:flex;align-items:center;gap:8px;
-  text-shadow:0 2px 8px rgba(0,30,60,.8);}
-.chips{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
-.chip{background:linear-gradient(180deg,rgba(30,90,150,.55),rgba(10,50,90,.55));
-  border:2px solid rgba(159,220,255,.35);border-radius:26px;padding:5px 12px;font-size:13px;
-  display:flex;gap:6px;align-items:center;box-shadow:inset 0 2px 6px rgba(255,255,255,.12),0 3px 10px rgba(0,20,40,.4);
-  backdrop-filter:blur(3px);}
-.chip b{color:var(--gold);}
-.rope{width:100%;max-width:560px;height:6px;margin:6px 0;border-radius:3px;
-  background:repeating-linear-gradient(45deg,#b98b4e 0 6px,#93683a 6px 12px);
-  box-shadow:0 2px 6px rgba(0,20,40,.5);}
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
-  font-weight:700;font-size:16px;color:var(--text);background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border-radius:var(--radius);padding:13px 16px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.18);
-  transition:transform .08s, filter .15s;position:relative;z-index:2;}
-.btn:active{transform:scale(.97);filter:brightness(1.15);}
-.btn.gold{background:linear-gradient(180deg,#ffd257,#d99a1f);color:#3b2500;box-shadow:0 8px 24px rgba(0,20,40,.45),inset 0 1px 0 rgba(255,255,255,.5);}
-.btn.small{font-size:13px;padding:8px 12px;border-radius:10px;}
-.btn:disabled{opacity:.45;filter:grayscale(.6);cursor:default;}
-.menu{width:100%;max-width:560px;display:flex;flex-direction:column;gap:10px;margin-top:10px;position:relative;z-index:2;}
-.card{width:100%;max-width:560px;background:rgba(8,40,70,.6);border:1px solid rgba(120,200,255,.2);
-  border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);backdrop-filter:blur(4px);position:relative;z-index:2;}
-.card::before{content:'';position:absolute;inset:4px;border-radius:10px;pointer-events:none;
-  border:1px dashed rgba(159,220,255,.15);}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.row.between{justify-content:space-between;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-hr{border:none;border-top:1px dashed rgba(159,220,255,.3);margin:10px 0;}
-.muted{color:var(--muted);font-size:13px;}
-.big{font-size:20px;font-weight:800;}
-canvas{display:block;border-radius:12px;background:#07304f;box-shadow:var(--shadow);}
-.board-wrap{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;position:relative;z-index:2;}
-.board-box{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;}
-.board-title{font-size:13px;color:var(--muted);}
-.fx-canvas{position:absolute;top:0;left:0;pointer-events:none;border-radius:12px;
-  background:transparent !important;box-shadow:none !important;}
-.board-wrap.shake{animation:shake .3s;}
-@keyframes shake{
-  0%,100%{transform:translate(0,0);}
-  25%{transform:translate(-4px,2px);}
-  50%{transform:translate(4px,-2px);}
-  75%{transform:translate(-2px,-2px);}
-}
-.overlay{position:fixed;inset:0;background:rgba(2,14,26,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:14px;}
-.overlay.active{display:flex;}
-.overlay.opaque{background:rgba(2,14,26,.99);}
-.modal{width:100%;max-width:460px;background:linear-gradient(180deg,#0d4d84,#082f52);
-  border:1px solid rgba(140,220,255,.25);border-radius:18px;padding:18px;box-shadow:var(--shadow);
-  max-height:86vh;overflow-y:auto;}
-.modal h2{margin-top:0;}
-.modal .btn{width:100%;margin-top:8px;}
-.mission{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:8px;}
-.mission .info{flex:1;min-width:0;}
-.mission .bar{height:8px;background:rgba(255,255,255,.12);border-radius:6px;margin-top:6px;overflow:hidden;}
-.mission .bar i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);border-radius:6px;transition:width .4s;}
-.mission.done .bar i{background:linear-gradient(90deg,#5ad18a,#2fae6d);}
-.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.skin-card{background:rgba(255,255,255,.05);border:1px solid rgba(140,220,255,.2);border-radius:12px;
-  padding:10px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;}
-.skin-card.active-skin{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),var(--shadow);}
-.skin-card .nm{font-size:13px;font-weight:700;}
-.abilities{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px;position:relative;z-index:2;}
-.abilities .btn{flex-direction:column;padding:8px 10px;font-size:12px;min-width:74px;}
-.abilities .cnt{position:absolute;top:-6px;right:-6px;background:var(--gold);color:#3b2500;border-radius:12px;font-size:11px;padding:1px 6px;font-weight:800;}
-.ab-wrap{position:relative;}
-.tut-spot{position:fixed;z-index:60;border:3px solid var(--gold);border-radius:14px;box-shadow:0 0 0 4000px rgba(2,14,26,.75);pointer-events:none;transition:all .3s;}
-.tut-box{position:fixed;z-index:61;left:50%;transform:translateX(-50%);bottom:24px;width:min(92vw,420px);
-  background:#0d4d84;border:1px solid rgba(140,220,255,.3);border-radius:14px;padding:14px;box-shadow:var(--shadow);}
-.tut-box .row{gap:8px;margin-top:10px;}
-.tut-box .btn{flex:1;margin:0;}
-input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(140,200,255,.3);
-  background:rgba(0,0,0,.25);color:var(--text);font-size:16px;outline:none;}
-.seg{display:flex;background:rgba(0,0,0,.25);border-radius:12px;padding:4px;gap:4px;}
-.seg .btn{background:transparent;box-shadow:none;border-radius:9px;flex:1;padding:9px;font-size:14px;}
-.seg .btn.on{background:var(--panel2);box-shadow:inset 0 0 0 1px rgba(140,220,255,.4);}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0d4d84;border:1px solid rgba(140,220,255,.35);
-  padding:10px 16px;border-radius:12px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;font-size:14px;box-shadow:var(--shadow);max-width:92vw;text-align:center;}
-#toast.show{opacity:1;}
-
-/* ===== НОВОЕ: Прогрессия ===== */
-.rank-line{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0 8px;}
-.rank-badge{display:inline-block;padding:3px 12px;border-radius:20px;background:linear-gradient(90deg,#ffd257,#d99a1f);
-  color:#3b2500;font-weight:800;font-size:12px;letter-spacing:.3px;}
-.xp-mini{width:100%;height:8px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden;margin-top:4px;}
-.xp-mini i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);transition:width .4s;}
-.prog-tabs{display:flex;gap:6px;margin-bottom:10px;}
-.prog-tabs .btn{flex:1;font-size:13px;padding:8px;}
-.prog-tabs .btn.on{background:linear-gradient(180deg,#ffd257,#d99a1f);color:#3b2500;}
-.tree-branch{margin-bottom:12px;background:rgba(255,255,255,.04);border-radius:12px;padding:10px;border:1px solid rgba(140,220,255,.15);}
-.tree-branch h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px;}
-.tree-item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:rgba(255,255,255,.05);margin-bottom:6px;}
-.tree-item .icon{font-size:22px;width:34px;text-align:center;flex-shrink:0;}
-.tree-item .info{flex:1;min-width:0;display: inline-table;}
-.tree-item .info b{font-size:13px;}
-.tree-item .info .muted{font-size:11px;}
-.tree-item .dots{display:flex;gap:3px;margin-top:4px;}
-.tree-item .dots i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.15);}
-.tree-item .dots i.on{background:var(--gold);box-shadow:0 0 6px var(--gold);}
-.tree-item button{min-width:74px;font-size:11px;padding:7px 8px;}
-.season-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;}
-.season-bar{height:14px;background:rgba(255,255,255,.1);border-radius:8px;position:relative;overflow:hidden;margin:6px 0;}
-.season-bar i{display:block;height:100%;background:linear-gradient(90deg,#7fd4ff,#ffd257);transition:width .4s;}
-.tier-row{display:flex;gap:6px;overflow-x:auto;padding:6px 0;}
-.tier{min-width:60px;height:84px;background:rgba(255,255,255,.05);border:1px solid rgba(140,220,255,.15);border-radius:10px;padding:6px;display:flex;flex-direction:column;align-items:center;font-size:11px;text-align:center;flex-shrink:0;}
-.tier.reached{border-color:var(--gold);background:rgba(255,210,87,.12);}
-.tier.claimed{opacity:.55;}
-.tier .num{font-weight:800;font-size:14px;color:var(--muted);}
-.tier.reached .num{color:var(--gold);}
-.tier .rew{font-size:11px;margin-top:4px;color:var(--muted);}
-.tier .claim{margin-top:auto;background:var(--gold);border:none;color:#3b2500;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;cursor:pointer;}
-.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.mod-card{padding:10px;background:rgba(255,255,255,.05);border:2px solid rgba(140,220,255,.15);border-radius:12px;cursor:pointer;text-align:center;}
-.mod-card.on{border-color:var(--gold);background:rgba(255,210,87,.12);}
-.mod-card .ico{font-size:24px;}
-.mod-card .nm{font-size:12px;font-weight:700;margin-top:4px;}
-.mod-card .ds{font-size:10px;color:var(--muted);margin-top:2px;}
-.points-badge{display:inline-block;background:linear-gradient(90deg,#5ad18a,#2fae6d);color:#062a12;font-weight:800;
-  padding:3px 10px;border-radius:20px;font-size:12px;margin-left:6px;}
-
-/* === ИЗМЕНЕНО: стили блокирующего экрана загрузки боя === */
-#ov-adload{z-index:200;} /* выше всех прочих оверлеев */
-#ov-adload .modal{text-align:center;}
-#ov-adload .spinner{
-  width:52px;height:52px;margin:18px auto;
-  border:4px solid rgba(159,220,255,.2);
-  border-top-color:var(--gold);
-  border-radius:50%;
-  animation:adloadSpin .9s linear infinite;
-}
-@keyframes adloadSpin{to{transform:rotate(360deg);}}
-#ov-adload .pulse{display:inline-block;animation:adloadPulse 1.4s ease-in-out infinite;}
-@keyframes adloadPulse{0%,100%{opacity:.55;}50%{opacity:1;}}
-
-@media (max-width:480px){
-  .topbar .logo span.name{display:none;}
-  .board-wrap{gap:6px;}
-  .btn{font-size:15px;}
-  .skin-grid{grid-template-columns:1fr 1fr;}
-  .mod-grid{grid-template-columns:1fr 1fr;}
-}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
+html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',Roboto,sans-serif;color:#fff}
+#game-container{position:relative;width:100%;height:100%;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#game-canvas{display:block;width:100%;height:100%;background:#16213e;position:absolute;inset:0}
+#ui-layer{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;z-index:2}
+#ui-layer>*{pointer-events:auto}
+#top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.1);z-index:10}
+#currency-display,#level-display{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:700;color:#ffd166}
+#level-display{color:#4ecdc4}
+.icon-btn{background:none;border:none;font-size:24px;cursor:pointer;padding:4px 8px;border-radius:8px;color:#fff}
+.icon-btn:active{background:rgba(255,255,255,.1)}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;padding:20px;padding-top:70px;background:rgba(26,26,46,.95);backdrop-filter:blur(12px);z-index:5;overflow-y:auto}
+.screen.active{display:flex}
+#lobby h1{font-size:42px;margin-bottom:30px;background:linear-gradient(135deg,#ff6b35,#ffd166);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.lobby-buttons{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
+.main-btn{padding:16px 24px;font-size:18px;font-weight:700;border:none;border-radius:12px;background:linear-gradient(135deg,#ff6b35,#ff8c42);color:#fff;cursor:pointer;box-shadow:0 4px 15px rgba(255,107,53,.4)}
+.main-btn:active{transform:scale(.96)}
+.main-btn:disabled{opacity:.5;cursor:not-allowed}
+.secondary-btn{padding:12px 20px;font-size:16px;font-weight:600;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+.secondary-btn:active{background:rgba(255,255,255,.15)}
+#order-panel{background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:16px;padding:16px;margin:10px;width:calc(100% - 20px);max-width:500px}
+#order-items{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.order-item{background:rgba(255,255,255,.1);padding:6px 12px;border-radius:20px;font-size:14px}
+#order-timer{font-size:18px;font-weight:700;color:#ffd166}
+#ingredients-panel{margin:10px;width:calc(100% - 20px);max-width:500px}
+#ingredients-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;margin-top:10px}
+.ingredient-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.05);color:#fff;font-size:12px;cursor:pointer}
+.ingredient-btn:active{background:rgba(255,255,255,.15);transform:scale(.95)}
+.ingredient-btn .emoji{font-size:28px}
+#burger-assembly{margin:10px;width:calc(100% - 20px);max-width:500px}
+#burger-stack{min-height:120px;border:2px dashed rgba(255,255,255,.2);border-radius:12px;padding:10px;margin:10px 0;display:flex;flex-direction:column-reverse;align-items:center;gap:4px}
+.burger-layer{width:80%;min-height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333;font-weight:700;padding:2px}
+#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;max-height:60vh;overflow-y:auto;width:100%;max-width:500px;padding:10px}
+.level-btn{aspect-ratio:1;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.level-btn.completed{background:rgba(78,205,196,.3);border-color:#4ecdc4}
+.level-btn.locked{opacity:.3;cursor:not-allowed}
+#tasks-list{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
+.task-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.05);border-radius:10px;border:1px solid rgba(255,255,255,.1);gap:10px}
+.task-item.completed{border-color:#4ecdc4;background:rgba(78,205,196,.1)}
+#settings-screen label{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:16px}
+#settings-screen select,#promo-input{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:16px;width:100%;max-width:300px}
+.promo-section{display:flex;flex-direction:column;gap:8px;margin:16px 0;width:100%;max-width:300px}
+#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;max-height:60vh;overflow-y:auto;width:100%;max-width:500px;padding:10px}
+.shop-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-align:center}
+.shop-item .price{color:#ffd166;font-weight:700}
+.shop-item button{width:100%}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:rgba(255,107,53,.95);padding:12px 24px;border-radius:12px;color:#fff;font-weight:700;z-index:1000;animation:fadeInOut 2.2s ease-in-out;max-width:80%;text-align:center;font-size:14px}
+@keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:1000;padding:20px;text-align:center}
+.modal-bg h2{font-size:20px;max-width:400px}
+@media (max-width:480px){#lobby h1{font-size:32px}.main-btn{font-size:16px;padding:14px 20px}.secondary-btn{font-size:14px;padding:10px 16px}#top-bar{font-size:14px;padding:6px 12px}}
 </style>
 </head>
 <body>
 
-<div class="sea-bg">
-  <div class="sea-ray"></div><div class="sea-ray r2"></div>
-</div>
-<svg class="compass" width="90" height="90" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="46" fill="none" stroke="#7fd4ff" stroke-width="2"/>
-  <path d="M50 8 L58 50 L50 92 L42 50 Z" fill="#ffd257" opacity=".8"/>
-  <path d="M8 50 L50 42 L92 50 L50 58 Z" fill="#7fd4ff" opacity=".7"/>
-  <circle cx="50" cy="50" r="5" fill="#ffd257"/>
-</svg>
-<svg class="lobby-ship" width="130" height="90" viewBox="0 0 130 90">
-  <path d="M18 55 h94 l-12 22 h-70 Z" fill="#1e3a5f" stroke="#9fdcff" stroke-width="2"/>
-  <rect x="52" y="24" width="5" height="32" fill="#7a5636"/>
-  <path d="M57 24 h26 l-10 14 h-16 Z" fill="#ffd257" opacity=".9"/>
-  <rect x="28" y="44" width="52" height="12" rx="4" fill="#2b5d8f" stroke="#9fdcff" stroke-width="1.5"/>
-</svg>
-<svg class="lobby-ship2" width="90" height="64" viewBox="0 0 130 90">
-  <path d="M18 55 h94 l-12 22 h-70 Z" fill="#12314f" stroke="#5b8fb8" stroke-width="2"/>
-  <rect x="52" y="24" width="5" height="32" fill="#5d452b"/>
-  <path d="M57 24 h26 l-10 14 h-16 Z" fill="#e8a83c" opacity=".8"/>
-</svg>
-<svg class="waves" viewBox="0 0 1200 120" preserveAspectRatio="none">
-  <path d="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z" fill="#0a3d6b" opacity=".7">
-    <animate attributeName="d" dur="7s" repeatCount="indefinite"
-      values="M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z;
-              M0 70 C150 100 350 30 600 70 S1050 100 1200 70 V120 H0 Z;
-              M0 60 C150 20 350 100 600 60 S1050 20 1200 60 V120 H0 Z"/>
-  </path>
-</svg>
-
-<div id="app">
-
-  <!-- ЛОББИ -->
-  <div class="screen active" id="scr-lobby">
-    <div class="topbar">
-      <div class="logo">
-        <svg width="30" height="30" viewBox="0 0 32 32"><path d="M16 2l4 8h-8z" fill="#ffd257"/><rect x="14" y="10" width="4" height="8" fill="#c9e9ff"/><path d="M4 20c4 4 20 4 24 0-2 6-8 9-12 9S6 26 4 20z" fill="#7fd4ff"/></svg>
-        <span class="name" data-i18n="title">Морской бой</span>
-      </div>
-      <div class="chips">
-        <div class="chip">⚓ <b id="hud-lvl">1</b></div>
-        <div class="chip">💰 <b id="hud-coins">0</b></div>
-      </div>
-    </div>
-    <div class="rope"></div>
-    <div class="rank-line">
-      <span class="rank-badge" id="hud-rank">Матрос</span>
-      <span class="muted" id="hud-xp">0 / 40 XP</span>
-      <span class="points-badge" id="hud-points" style="display:none">🎖 <span id="hud-points-val">0</span></span>
-    </div>
-    <div class="xp-mini"><i id="hud-xp-bar" style="width:0%"></i></div>
-    <div class="menu" style="margin-top:14px">
-      <button class="btn gold" id="btn-games">⚔️ <span data-i18n="play">Играть</span></button>
-      <div class="grid2">
-        <button class="btn" id="btn-tree">🎖 <span data-i18n="upgrades">Прокачка</span></button>
-        <button class="btn" id="btn-season">🌴 <span data-i18n="season">Сезон</span></button>
-      </div>
-      <button class="btn" id="btn-tasks">📜 <span data-i18n="missions">Задания</span> <span id="tasks-dot" style="color:var(--gold)"></span></button>
-      <div class="grid2">
-        <button class="btn" id="btn-shop">🛒 <span data-i18n="shop">Магазин</span></button>
-        <button class="btn" id="btn-settings">⚙️ <span data-i18n="settings">Настройки</span></button>
-        <button class="btn" id="btn-daily">🎁 <span data-i18n="daily">Ежедневная награда</span></button>
-        <button class="btn" id="btn-afk">🛏️ <span data-i18n="afk">Комната АФК</span></button>
-        <button class="btn" id="btn-invite">👥 <span data-i18n="invite">Пригласить друзей</span></button>
-      </div>
-      <div class="muted" id="hud-stats" style="text-align:center"></div>
-    </div>
-  </div>
-
-  <!-- РАССТАНОВКА -->
-  <div class="screen" id="scr-setup">
-    <div class="topbar"><button class="btn small" id="setup-back">←</button><div class="logo" data-i18n="placeTitle">Расставьте флот</div></div>
-    <div class="card" style="display:flex;justify-content:center;">
-      <div class="board-box">
-        <canvas id="cv-setup"></canvas>
-        <div class="abilities" id="setup-ships"></div>
-        <div class="row">
-          <button class="btn small" id="btn-rotate">🔄 <span data-i18n="rotate">Повернуть</span></button>
-          <button class="btn small" id="btn-random">🎲 <span data-i18n="random">Случайно</span></button>
-          <button class="btn small" id="btn-clear">🧹 <span data-i18n="clear">Очистить</span></button>
-          <button class="btn small gold" id="btn-ready">✔ <span data-i18n="ready">В бой!</span></button>
+<div id="game-container">
+    <canvas id="game-canvas"></canvas>
+    <div id="ui-layer">
+        <div id="top-bar">
+            <div id="currency-display">
+                <span>🪙</span>
+                <span id="coin-count">0</span>
+            </div>
+            <div id="level-display">
+                <span>Ур.</span>
+                <span id="level-number">1</span>
+            </div>
+            <button id="settings-btn" class="icon-btn">⚙️</button>
         </div>
-      </div>
+
+        <div id="lobby" class="screen active">
+            <h1 id="game-title">Бургерная</h1>
+            <div class="lobby-buttons">
+                <button id="play-btn" class="main-btn">Играть</button>
+                <button id="levels-btn" class="secondary-btn">Уровни</button>
+                <button id="tasks-btn" class="secondary-btn">Задания</button>
+                <button id="afk-btn" class="secondary-btn">AFK‑комната</button>
+                <button id="daily-btn" class="secondary-btn">Ежедневная награда</button>
+                <button id="shop-btn" class="secondary-btn">Магазин</button>
+                <button id="invite-btn" class="secondary-btn">Пригласить друзей</button>
+            </div>
+        </div>
+
+        <div id="level-screen" class="screen">
+            <div id="order-panel">
+                <h2>Заказ</h2>
+                <div id="order-items"></div>
+                <div id="order-timer">⏱ <span id="timer-value">60</span>с</div>
+            </div>
+            <div id="ingredients-panel">
+                <h3>Ингредиенты</h3>
+                <div id="ingredients-list"></div>
+            </div>
+            <div id="burger-assembly">
+                <h3>Сборка</h3>
+                <div id="burger-stack"></div>
+                <button id="serve-btn" class="main-btn">Подать</button>
+                <button id="clear-btn" class="secondary-btn" style="margin-top:8px">Очистить</button>
+            </div>
+        </div>
+
+        <div id="tutorial-screen" class="screen">
+            <h2 id="tutorial-title">Обучение</h2>
+            <p id="tutorial-text" style="max-width:400px;text-align:center;margin:20px 0;line-height:1.6"></p>
+            <button id="tutorial-next" class="main-btn">Далее</button>
+            <button id="tutorial-skip" class="secondary-btn" style="margin-top:12px">Пропустить</button>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <h2 id="result-title">Уровень пройден!</h2>
+            <div id="result-stats" style="margin:20px 0;text-align:center;line-height:1.8"></div>
+            <button id="double-reward-btn" class="main-btn">Удвоить награду (реклама)</button>
+            <button id="next-level-btn" class="main-btn" style="margin-top:12px">Следующий уровень</button>
+            <button id="back-lobby-btn" class="secondary-btn" style="margin-top:12px">В лобби</button>
+        </div>
+
+        <div id="levels-screen" class="screen">
+            <h2>Уровни</h2>
+            <div id="levels-grid"></div>
+            <button id="levels-back" class="secondary-btn" style="margin-top:16px">Назад</button>
+        </div>
+
+        <div id="tasks-screen" class="screen">
+            <h2>Задания</h2>
+            <div id="tasks-list"></div>
+            <button id="tasks-back" class="secondary-btn" style="margin-top:16px">Назад</button>
+        </div>
+
+        <div id="afk-screen" class="screen">
+            <h2>AFK‑комната</h2>
+            <p style="margin:20px 0;line-height:2;text-align:center">
+                Доход: <span id="afk-rate">1</span> 🪙 / мин<br>
+                Заработано за сессию: <span id="afk-earned">0</span><br>
+                Всего минут: <span id="afk-total">0</span>
+            </p>
+            <button id="afk-back" class="secondary-btn">Назад</button>
+        </div>
+
+        <div id="daily-screen" class="screen">
+            <h2>Ежедневная награда</h2>
+            <p id="daily-status" style="margin:20px 0;text-align:center"></p>
+            <button id="daily-claim" class="main-btn">Получить</button>
+            <button id="daily-back" class="secondary-btn" style="margin-top:12px">Назад</button>
+        </div>
+
+        <div id="shop-screen" class="screen">
+            <h2>Магазин</h2>
+            <div id="shop-items"></div>
+            <button id="shop-back" class="secondary-btn" style="margin-top:16px">Назад</button>
+        </div>
+
+        <div id="settings-screen" class="screen">
+            <h2>Настройки</h2>
+            <label>
+                <input type="checkbox" id="music-toggle"> Музыка
+            </label>
+            <label>
+                Язык:
+                <select id="language-select">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </label>
+            <div class="promo-section">
+                <input type="text" id="promo-input" placeholder="Промокод">
+                <button id="promo-btn" class="secondary-btn">Активировать</button>
+            </div>
+            <button id="settings-back" class="secondary-btn" style="margin-top:16px">Назад</button>
+        </div>
     </div>
-    <div class="muted" style="margin-top:8px" data-i18n="placeHint">Выберите корабль, коснитесь поля. Двойное касание — поворот.</div>
-  </div>
-
-  <!-- БОЙ -->
-  <div class="screen" id="scr-game">
-    <div class="topbar">
-      <button class="btn small" id="game-exit">🏠</button>
-      <div class="logo" id="turn-label">🎯</div>
-      <div class="chips">
-        <div class="chip" id="combo-chip" style="display:none">🔥 <b id="combo-val">0</b></div>
-        <div class="chip" id="mode-chip">⚔️</div>
-      </div>
-    </div>
-    <div class="board-wrap" id="board-wrap">
-      <div class="board-box"><canvas id="cv-my"></canvas><div class="board-title" id="ttl-my" data-i18n="yourFleet">Ваш флот</div></div>
-      <div class="board-box"><canvas id="cv-enemy"></canvas><div class="board-title" id="ttl-en" data-i18n="enemyFleet">Флот противника</div></div>
-    </div>
-    <div class="abilities" id="ab-bar"></div>
-  </div>
-
-  <!-- ОВЕРЛЕИ -->
-  <div class="overlay" id="ov-settings"><div class="modal">
-    <h2 data-i18n="settings">⚙️ Настройки</h2>
-    <div class="row between"><span data-i18n="music">Музыка</span>
-      <div class="seg" id="seg-music"><button class="btn" data-val="1" data-i18n="on">Вкл</button><button class="btn" data-val="0" data-i18n="off">Выкл</button></div>
-    </div><hr>
-    <div class="row between"><span data-i18n="language">Язык</span>
-      <div class="seg" id="seg-lang"><button class="btn" data-val="ru">Русский</button><button class="btn" data-val="en">English</button></div>
-    </div><hr>
-    <div data-i18n="promo">Промокод</div>
-    <input type="text" id="promo-input" placeholder="XXXX">
-    <button class="btn gold" id="btn-promo" data-i18n="apply">Применить</button>
-    <button class="btn" id="settings-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <div class="overlay" id="ov-tasks"><div class="modal">
-    <h2 data-i18n="missions">📜 Задания</h2>
-    <div id="tasks-list"></div>
-    <button class="btn" id="tasks-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <div class="overlay" id="ov-afk"><div class="modal">
-    <h2 data-i18n="afk">🛏️ Комната АФК</h2>
-    <p class="muted" data-i18n="afkHint">Пока это окно открыто, каждую минуту вам капает валюта. Отдыхайте, адмирал!</p>
-    <div class="big" style="text-align:center">💰 <span id="afk-earned">0</span></div>
-    <button class="btn" id="afk-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <div class="overlay" id="ov-daily"><div class="modal">
-    <h2 data-i18n="daily">🎁 Ежедневная награда</h2>
-    <p class="muted" id="daily-streak"></p>
-    <button class="btn gold" id="daily-claim" data-i18n="claim">Забрать награду</button>
-    <button class="btn" id="daily-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <div class="overlay" id="ov-shop"><div class="modal">
-    <h2 data-i18n="shop">🛒 Магазин</h2>
-    <p class="muted" id="shop-coins"></p>
-    <div class="skin-grid" id="shop-list"></div>
-    <button class="btn" id="shop-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <!-- ДЕРЕВО ПРОКАЧКИ -->
-  <div class="overlay" id="ov-tree"><div class="modal">
-    <h2>🎖 <span data-i18n="upgrades">Прокачка</span> <span class="points-badge">Очки: <span id="tree-points">0</span></span></h2>
-    <p class="muted" data-i18n="treeHint">Повышайте навыки за очки умений, которые даются за уровни адмирала.</p>
-    <div id="tree-body"></div>
-    <button class="btn" id="tree-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <!-- СЕЗОН -->
-  <div class="overlay" id="ov-season"><div class="modal">
-    <h2>🌴 <span data-i18n="season">Сезон</span> <span class="muted" id="season-num"></span></h2>
-    <div class="season-head">
-      <span id="season-rank-label">Тир <b id="season-tier">0</b> / 50</span>
-      <span class="muted"><span id="season-xp">0</span> / <span id="season-xp-max">100</span> XP</span>
-    </div>
-    <div class="season-bar"><i id="season-bar" style="width:0%"></i></div>
-    <p class="muted" data-i18n="seasonHint">Играйте бои — за каждый начисляется сезонный опыт. Собирайте награды тира!</p>
-    <div class="tier-row" id="season-tiers"></div>
-    <button class="btn" id="season-close" data-i18n="close">Закрыть</button>
-  </div></div>
-
-  <div class="overlay" id="ov-result"><div class="modal">
-    <h2 id="result-title"></h2>
-    <p id="result-text" class="muted"></p>
-    <p class="big">💰 +<span id="result-coins">0</span> · ⭐ +<span id="result-xp">0</span></p>
-    <p class="muted" id="result-season"></p>
-    <button class="btn gold" id="btn-double">📺 <span data-i18n="double">Удвоить за рекламу</span></button>
-    <button class="btn" id="btn-collect" data-i18n="collect">Забрать</button>
-  </div></div>
-
-  <div class="overlay" id="ov-tut-start"><div class="modal">
-    <h2 data-i18n="tutTitle">⚓ Обучение</h2>
-    <p class="muted" data-i18n="tutAsk">Хотите пройти обучение?</p>
-    <button class="btn gold" id="tut-yes" data-i18n="tutYes">Пройти обучение</button>
-    <button class="btn" id="tut-no" data-i18n="tutNo">Пропустить</button>
-  </div></div>
-
-  <!-- === ИЗМЕНЕНО: блокирующий экран перед боем === -->
-  <div class="overlay opaque" id="ov-adload"><div class="modal">
-    <h2>⚓ <span data-i18n="loadingBattle">Загрузка боя…</span></h2>
-    <div class="spinner"></div>
-    <p class="muted pulse" data-i18n="loadingHint">
-      Пожалуйста, подождите. Не нажимайте на экран — сейчас начнётся реклама.
-    </p>
-  </div></div>
-
-  <div id="toast"></div>
 </div>
 
-<script src="https://vk.com/js/api/xd_connection.js?2"></script>
-<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
-'use strict';
-/* ============ VK BRIDGE ============ */
-const vk = (typeof vkBridge !== 'undefined') ? vkBridge : null;
-try{ if(vk) vk.send('VKWebAppInit'); }catch(e){}
-if(vk) vk.send('VKWebAppGetLaunchParams').then(()=>vk.send('VKWebAppShowBannerAd')).catch(()=>{});
-
-/* ============ I18N ============ */
-const I18N = {
-  ru:{title:'Морской бой',play:'Играть',missions:'Задания',settings:'Настройки',daily:'Ежедневная награда',
-    afk:'Комната АФК',invite:'Пригласить друзей',music:'Музыка',language:'Язык',promo:'Промокод',apply:'Применить',
-    close:'Закрыть',on:'Вкл',off:'Выкл',placeTitle:'Расставьте флот',rotate:'Повернуть',random:'Случайно',clear:'Очистить',
-    ready:'В бой!',placeHint:'Выберите корабль, коснитесь поля. Двойное касание — поворот.',yourFleet:'Ваш флот',
-    enemyFleet:'Флот противника',afkHint:'Пока это окно открыто, каждую минуту вам капает валюта. Отдыхайте, адмирал!',
-    claim:'Забрать награду',double:'Удвоить за рекламу',collect:'Забрать',tutTitle:'⚓ Обучение',
-    tutAsk:'Хотите пройти обучение?',tutYes:'Пройти обучение',tutNo:'Пропустить',modeNormal:'Обычный бой',
-    modeSuper:'Суперспособности',next:'Далее',done:'Готово',win:'ПОБЕДА!',lose:'ПОРАЖЕНИЕ',turnYou:'Ваш ход',
-    turnEnemy:'Ход противника',paused:'⏸ Пауза',promoSucc:'Промокод применён!',promoBad:'Неизвестный промокод',
-    promoClear:'Прогресс сброшен',dailyGot:'Награда уже получена сегодня',dailyOk:'Награда получена!',
-    missionDone:'Задание выполнено!',abSonar:'Сонар',abDouble:'Двойной залп',abTorpedo:'Торпеда',pickCell:'Коснитесь клетки',
-    stWins:'Побед',stGames:'Боёв',stSunk:'Потоплено',stShots:'Выстрелов',doubled:'Награда удвоена!',
-    adFail:'Реклама недоступна',placeAll:'Расставьте все корабли',shop:'Магазин',buy:'Купить',equipped:'Установлен',
-    equip:'Установить',notEnough:'Не хватает монет',bought:'Скин куплен!',skinOn:'Скин установлен!',
-    oppChoose:'С кем играем?',oppBot:'Против бота',oppFriend:'С другом на одном устройстве',
-    modeChoose:'Выберите режим',p1n:'Игрок 1',p2n:'Игрок 2',pass:'Передайте устройство',
-    passHint:'Теперь ходит: %s',passSetup:'Передайте устройство. Флот теперь расставляет %s',
-    goldHit:'Золотая клетка!',crit:'Критический выстрел!',
-    upgrades:'Прокачка', season:'Сезон', treeHint:'Повышайте навыки за очки умений, которые даются за уровни адмирала.',
-    seasonHint:'Играйте бои — за каждый начисляется сезонный опыт. Собирайте награды тира!',
-    rank:'Звание', lvlUp:'Новый уровень!', skillUp:'Навык улучшен!', noPoints:'Нет очков умений',
-    maxLvl:'Максимум', modifier:'Модификатор боя', modNone:'Без модификатора',
-    tier:'Тир', claimTier:'Забрать', tierClaimed:'Получено', seasonReward:'Награда сезона',
-    /* === ИЗМЕНЕНО === */
-    loadingBattle:'Загрузка боя…',
-    loadingHint:'Пожалуйста, подождите. Не нажимайте на экран — сейчас начнётся реклама.'},
-  en:{title:'Battleship',play:'Play',missions:'Missions',settings:'Settings',daily:'Daily reward',
-    afk:'AFK Room',invite:'Invite friends',music:'Music',language:'Language',promo:'Promo code',apply:'Apply',close:'Close',on:'On',off:'Off',placeTitle:'Place your fleet',rotate:'Rotate',
-    random:'Random',clear:'Clear',ready:'Battle!',placeHint:'Pick a ship, tap the field. Double tap to rotate.',
-    yourFleet:'Your fleet',enemyFleet:'Enemy fleet',afkHint:'While this window is open, coins drip every minute. Rest, admiral!',
-    claim:'Claim',double:'Double for an ad',collect:'Collect',tutTitle:'⚓ Tutorial',
-    tutAsk:'Would you like a tutorial?',tutYes:'Start tutorial',tutNo:'Skip',modeNormal:'Classic battle',
-    modeSuper:'Super abilities',next:'Next',done:'Done',win:'VICTORY!',lose:'DEFEAT',turnYou:'Your turn',
-    turnEnemy:'Enemy turn',paused:'⏸ Paused',promoSucc:'Promo applied!',promoBad:'Unknown promo',
-    promoClear:'Progress wiped',dailyGot:'Already claimed today',dailyOk:'Reward received!',
-    missionDone:'Mission complete!',abSonar:'Sonar',abDouble:'Double shot',abTorpedo:'Torpedo',pickCell:'Tap a cell',
-    stWins:'Wins',stGames:'Games',stSunk:'Sunk',stShots:'Shots',doubled:'Reward doubled!',
-    adFail:'Ad unavailable',placeAll:'Place all ships',shop:'Shop',buy:'Buy',equipped:'Equipped',
-    equip:'Equip',notEnough:'Not enough coins',bought:'Skin purchased!',skinOn:'Skin applied!',
-    oppChoose:'Choose your opponent',oppBot:'Vs bot',oppFriend:'With a friend (one device)',
-    modeChoose:'Choose mode',p1n:'Player 1',p2n:'Player 2',pass:'Pass the device',
-    passHint:'Now playing: %s',passSetup:'Pass the device. %s places the fleet now',
-    goldHit:'Gold cell!',crit:'CRIT!',
-    upgrades:'Upgrades', season:'Season', treeHint:'Spend skill points earned from admiral levels.',
-    seasonHint:'Play battles — each grants season XP. Claim tier rewards!',
-    rank:'Rank', lvlUp:'Level up!', skillUp:'Skill upgraded!', noPoints:'No skill points',
-    maxLvl:'MAX', modifier:'Battle modifier', modNone:'No modifier',
-    tier:'Tier', claimTier:'Claim', tierClaimed:'Claimed', seasonReward:'Season reward',
-    /* === ИЗМЕНЕНО === */
-    loadingBattle:'Loading battle…',
-    loadingHint:'Please wait. Do not tap the screen — an ad is about to start.'}
+/* ============================================================
+   ЛОКАЛИЗАЦИЯ
+============================================================ */
+const i18n = {
+    ru: {
+        game_title:'Бургерная', play:'Играть', levels:'Уровни', tasks:'Задания',
+        afk_room:'AFK‑комната', daily_reward:'Ежедневная награда',
+        invite_friends:'Пригласить друзей', shop:'Магазин', settings:'Настройки',
+        music:'Музыка', language:'Язык', promo_code:'Промокод', activate:'Активировать',
+        back:'Назад', order:'Заказ', ingredients:'Ингредиенты', assembly:'Сборка',
+        serve:'Подать', clear:'Очистить', level_complete:'Уровень пройден!',
+        double_reward:'Удвоить награду (реклама)', next_level:'Следующий уровень',
+        back_lobby:'В лобби', tutorial_title:'Обучение', tutorial_next:'Далее',
+        tutorial_skip:'Пропустить',
+        tutorial_welcome:'Добро пожаловать в Бургерную! Сейчас мы научим вас готовить бургеры.',
+        tutorial_order:'Клиенты делают заказ. Соберите бургер из нужных ингредиентов.',
+        tutorial_ingredients:'Нажимайте на ингредиенты, чтобы добавить их в бургер.',
+        tutorial_serve:'Когда бургер собран правильно, нажмите «Подать».',
+        tutorial_timer:'Успейте выполнить заказ до окончания времени!',
+        daily_available:'Награда доступна!', daily_claimed:'Награда уже получена сегодня. Возвращайтесь завтра!',
+        claim:'Получить', level:'Уровень', coins:'монет', purchase:'Купить',
+        promo_invalid:'Неверный промокод', promo_clear:'Все данные сброшены!',
+        promo_admin:'Начислено 1 000 000 монет!', not_enough_coins:'Недостаточно монет',
+        purchased:'Куплено!', already_owned:'Уже куплено',
+        time_out:'Время вышло!', wrong_order:'Неправильный заказ!',
+        tutorial_prompt:'Хотите пройти обучение?', tutorial_yes:'Пройти', tutorial_no:'Пропустить'
+    },
+    en: {
+        game_title:'Burger Shop', play:'Play', levels:'Levels', tasks:'Tasks',
+        afk_room:'AFK Room', daily_reward:'Daily Reward',
+        invite_friends:'Invite Friends', shop:'Shop', settings:'Settings',
+        music:'Music', language:'Language', promo_code:'Promo Code', activate:'Activate',
+        back:'Back', order:'Order', ingredients:'Ingredients', assembly:'Assembly',
+        serve:'Serve', clear:'Clear', level_complete:'Level Complete!',
+        double_reward:'Double Reward (Ad)', next_level:'Next Level',
+        back_lobby:'Back to Lobby', tutorial_title:'Tutorial', tutorial_next:'Next',
+        tutorial_skip:'Skip',
+        tutorial_welcome:'Welcome to Burger Shop! Let\'s learn how to make burgers.',
+        tutorial_order:'Customers place orders. Assemble a burger with the right ingredients.',
+        tutorial_ingredients:'Tap ingredients to add them to the burger.',
+        tutorial_serve:'When the burger is correct, press "Serve".',
+        tutorial_timer:'Complete the order before time runs out!',
+        daily_available:'Reward available!', daily_claimed:'Reward already claimed today. Come back tomorrow!',
+        claim:'Claim', level:'Level', coins:'coins', purchase:'Buy',
+        promo_invalid:'Invalid promo code', promo_clear:'All data cleared!',
+        promo_admin:'1,000,000 coins added!', not_enough_coins:'Not enough coins',
+        purchased:'Purchased!', already_owned:'Already owned',
+        time_out:'Time out!', wrong_order:'Wrong order!',
+        tutorial_prompt:'Do you want to take the tutorial?', tutorial_yes:'Start', tutorial_no:'Skip'
+    }
 };
-function t(k){return (I18N[P.lang]||I18N.ru)[k]||k;}
-function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));}
+let currentLang = 'ru';
+function t(key){ return i18n[currentLang][key] || key; }
 
-/* ============ RANKS / UPGRADES / SEASON / MODIFIERS ============ */
-const RANKS=[
-  {min:1,  ru:'Матрос',           en:'Sailor',           bonus:0},
-  {min:5,  ru:'Старшина',         en:'Petty Officer',    bonus:2},
-  {min:10, ru:'Лейтенант',        en:'Lieutenant',       bonus:4},
-  {min:15, ru:'Капитан-лейтенант',en:'Lt. Commander',    bonus:7},
-  {min:20, ru:'Капитан 3 ранга',  en:'Captain 3rd rank', bonus:10},
-  {min:30, ru:'Капитан 2 ранга',  en:'Captain 2nd rank', bonus:15},
-  {min:40, ru:'Капитан 1 ранга',  en:'Captain 1st rank', bonus:20},
-  {min:50, ru:'Контр-адмирал',    en:'Rear Admiral',     bonus:30},
-  {min:75, ru:'Вице-адмирал',     en:'Vice Admiral',     bonus:50},
-  {min:100,ru:'Адмирал флота',    en:'Fleet Admiral',    bonus:80}
-];
-function rankFor(lvl){let r=RANKS[0];for(const x of RANKS)if(lvl>=x.min)r=x;return r;}
+/* ============================================================
+   VK BRIDGE WRAPPER
+============================================================ */
+const VKBridge = {
+    available: typeof vkBridge !== 'undefined',
+    init(){
+        if(!this.available){ console.warn('VK Bridge не загружен'); return; }
+        vkBridge.send('VKWebAppInit').catch(e=>console.warn(e));
+        this.setupViewHandlers();
+    },
+    async saveData(key, value){
+        if(!this.available) return false;
+        try{ await vkBridge.send('VKWebAppStorageSet',{key, value:JSON.stringify(value)}); return true; }
+        catch(e){ console.warn('save error',e); return false; }
+    },
+    async loadData(key){
+        if(!this.available) return null;
+        try{
+            const r = await vkBridge.send('VKWebAppStorageGet',{keys:[key]});
+            if(r.keys && r.keys[0] && r.keys[0].value) return JSON.parse(r.keys[0].value);
+            return null;
+        }catch(e){ console.warn('load error',e); return null; }
+    },
+    async clearAllData(){
+        if(!this.available) return false;
+        try{
+            const r = await vkBridge.send('VKWebAppStorageGetKeys',{count:1000, offset:0});
+            if(r.keys){
+                for(const k of r.keys){
+                    await vkBridge.send('VKWebAppStorageSet',{key:k, value:''});
+                }
+            }
+            return true;
+        }catch(e){ console.warn('clear error',e); return false; }
+    },
+    async showInterstitial(){
+        if(!this.available) return false;
+        try{ await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'interstitial'}); return true; }
+        catch(e){ console.warn('interstitial error',e); return false; }
+    },
+    async showRewarded(){
+        if(!this.available) return false;
+        try{
+            const r = await vkBridge.send('VKWebAppShowNativeAds',{ad_format:'reward'});
+            return r && r.result === true;
+        }catch(e){ console.warn('reward error',e); return false; }
+    },
+    async showBanner(){
+        if(!this.available) return;
+        try{
+            await vkBridge.send('VKWebAppGetLaunchParams');
+            await vkBridge.send('VKWebAppShowBannerAd',{banner_location:'bottom'});
+        }catch(e){ console.warn('banner error',e); }
+    },
+    async inviteFriends(){
+        if(!this.available) return false;
+        try{ await vkBridge.send('VKWebAppShowInviteBox'); return true; }
+        catch(e){ console.warn('invite error',e); return false; }
+    },
+    setupViewHandlers(){
+        if(!this.available) return;
+        try{
+            vkBridge.subscribe(e=>{
+                if(!e || !e.detail) return;
+                if(e.detail.type === 'VKWebAppViewHide'){
+                    AudioManager.pauseMusic();
+                    if(window.Game) Game.pause();
+                } else if(e.detail.type === 'VKWebAppViewRestore'){
+                    AudioManager.resumeMusic();
+                    if(window.Game) Game.resume();
+                }
+            });
+        }catch(e){ console.warn(e); }
 
-const UPGRADES={
-  artillery:{
-    ru:'Артиллерия', en:'Artillery', icon:'💥',
-    items:[
-      {id:'crit',  ru:'Точный выстрел', en:'Precise shot',  descRu:'+3% шанс крита', descEn:'+3% crit chance', max:5, cost:[1,2,2,3,3]},
-      {id:'goldc', ru:'Золотоискатель', en:'Gold digger',   descRu:'+5% монет с золотой клетки', descEn:'+5% coins from gold cells', max:5, cost:[1,2,2,3,3]},
-      {id:'combo', ru:'Комбо-мастер',   en:'Combo master',  descRu:'+3💰 к бонусу за серию', descEn:'+3💰 to combo bonus', max:5, cost:[1,2,2,3,3]},
-    ]
-  },
-  fleet:{
-    ru:'Флот', en:'Fleet', icon:'⚓',
-    items:[
-      {id:'goldCells', ru:'Обеспечение', en:'Provisioning', descRu:'+1 золотая клетка у врага', descEn:'+1 enemy gold cell', max:3, cost:[2,3,4]},
-      {id:'armor',     ru:'Броня',       en:'Armor',        descRu:'+2% шанс уклонения от выстрела', descEn:'+2% dodge chance', max:5, cost:[2,3,4,4,5]},
-      {id:'xpBoost',   ru:'Адмиральский опыт', en:'Admiral XP', descRu:'+10% опыта за бой', descEn:'+10% battle XP', max:5, cost:[1,2,3,3,4]},
-    ]
-  },
-  tactics:{
-    ru:'Тактика', en:'Tactics', icon:'🎯',
-    items:[
-      {id:'abilStart', ru:'Боезапас',   en:'Ammo reserve', descRu:'+1 заряд каждой способности', descEn:'+1 charge to each ability', max:3, cost:[3,4,5]},
-      {id:'reward',    ru:'Награда',    en:'Reward',       descRu:'+5% монет за бой', descEn:'+5% coins per battle', max:5, cost:[1,2,3,4,5]},
-      {id:'luck',      ru:'Удача',      en:'Luck',         descRu:'+1 к максимальной серии (за 3+ — бонус)', descEn:'+1 max combo (3+ gives bonus)', max:3, cost:[3,4,5]},
-    ]
-  }
+        document.addEventListener('visibilitychange',()=>{
+            if(document.hidden){ AudioManager.pauseMusic(); if(window.Game) Game.pause(); }
+            else { AudioManager.resumeMusic(); if(window.Game) Game.resume(); }
+        });
+        window.addEventListener('blur',()=>AudioManager.pauseMusic());
+        window.addEventListener('focus',()=>AudioManager.resumeMusic());
+    }
 };
-function upgLvl(branch,id){return (P.upgrades&&P.upgrades[branch]&&P.upgrades[branch][id])||0;}
 
-const MODIFIERS=[
-  {id:'none',      ru:'Без модификатора',  en:'No modifier',      ico:'🎯', dRu:'Обычный бой',            dEn:'Classic battle'},
-  {id:'doubleGold',ru:'Двойное золото',    en:'Double gold',      ico:'💰', dRu:'Золотые клетки дают x2 монет', dEn:'Gold cells give x2 coins'},
-  {id:'lucky',     ru:'Попутный ветер',    en:'Lucky wind',       ico:'🍀', dRu:'+10% шанс крита',        dEn:'+10% crit chance'},
-  {id:'storm',     ru:'Шторм',             en:'Storm',            ico:'⛈️', dRu:'15% шанс промаха даже по кораблю', dEn:'15% chance to miss even on hit'},
-  {id:'goldRush',  ru:'Золотая лихорадка', en:'Gold rush',        ico:'🌟', dRu:'Вдвое больше золотых клеток', dEn:'Double gold cells'},
-];
+/* ============================================================
+   AUDIO MANAGER
+============================================================ */
+const AudioManager = {
+    musicEnabled: true,
+    musicPlaying: false,
+    audioContext: null,
+    musicTimer: null,
+    notes: [262, 294, 330, 349, 392, 440, 494, 523],
 
-const SEASON_LEN_DAYS=30, SEASON_TIERS=50;
-function seasonIndex(){return Math.floor(Date.now()/(1000*60*60*24*SEASON_LEN_DAYS));}
-function seasonDayLeft(){
-  const ms=(seasonIndex()+1)*SEASON_LEN_DAYS*86400000-Date.now();
-  return Math.max(0,Math.ceil(ms/86400000));
-}
-function tierXP(tier){return 80+tier*20;} // XP to go from tier-1 to tier
+    init(){
+        const initAudio = ()=>{
+            if(!this.audioContext){
+                try{ this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
+                catch(e){ console.warn(e); }
+            }
+            if(this.audioContext && this.audioContext.state === 'suspended') this.audioContext.resume();
+            document.removeEventListener('touchstart', initAudio);
+            document.removeEventListener('click', initAudio);
+        };
+        document.addEventListener('touchstart', initAudio, {once:true});
+        document.addEventListener('click', initAudio, {once:true});
+    },
 
-/* ============ SKINS ============ */
-const SKINS=[
-  {id:'classic',price:0,  hull:'#1e8cdc',edge:'#9fdcff',glow:'#7fd4ff',ru:'Классический флот',en:'Classic fleet'},
-  {id:'pirate', price:250,hull:'#3a3a4a',edge:'#c0a060',glow:'#c0392b',ru:'Пиратский',en:'Pirate'},
-  {id:'neon',   price:400,hull:'#00e5a8',edge:'#aaffec',glow:'#00e5ff',ru:'Неоновый',en:'Neon'},
-  {id:'ice',    price:500,hull:'#9fd8ff',edge:'#ffffff',glow:'#cfeeff',ru:'Ледяной',en:'Ice'},
-  {id:'royal',  price:800,hull:'#8a5a2b',edge:'#ffd257',glow:'#ffdf80',ru:'Королевский',en:'Royal'},
-  {id:'ghost',  price:1000,hull:'rgba(200,230,255,.45)',edge:'#dfeaff',glow:'#eef6ff',ru:'Призрачный',en:'Ghost'}
-];
-function activeSkin(){
-  const s=SKINS.find(x=>x.id===(P.skins&&P.skins.active));
-  return s||SKINS[0];
-}
-function shade(hex,amt){
-  if(!hex||hex[0]!=='#')return hex;
-  let c=hex.slice(1);
-  if(c.length===3)c=c.split('').map(ch=>ch+ch).join('');
-  let r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);
-  r=Math.max(0,Math.min(255,r+amt));g=Math.max(0,Math.min(255,g+amt));b=Math.max(0,Math.min(255,b+amt));
-  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
-function shipSvg(skin,len){
-  return '<svg width="'+(len*16+8)+'" height="18" viewBox="0 0 '+(len*16+8)+' 18">'+
-    '<rect x="2" y="4" width="'+(len*16)+'" height="10" rx="4" fill="'+skin.hull+'" stroke="'+skin.edge+'" stroke-width="1.5"/></svg>';
-}
+    playNote(){
+        if(!this.musicPlaying || !this.musicEnabled || !this.audioContext) return;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = this.notes[Math.floor(Math.random()*this.notes.length)];
+        const now = this.audioContext.currentTime;
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain); gain.connect(this.audioContext.destination);
+        osc.start(now); osc.stop(now + 0.6);
+        this.musicTimer = setTimeout(()=>this.playNote(), 700);
+    },
 
-/* ============ PLAYER / SAVE ============ */
-let P = {lang:'ru', music:1, coins:0, xp:0, level:1, skillPoints:0, tutDone:0, lastDaily:'', streak:0,
-  missions:null, stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0,combo:0,crits:0,goldCells:0},
-  skins:{owned:['classic'],active:'classic'},
-  upgrades:{artillery:{},fleet:{},tactics:{}},
-  season:{idx:-1, xp:0, claimed:[]},
-  lastMod:'none'};
-let SAVE_KEY='battleship_save_v2', loaded=false;
+    startMusic(){
+        if(!this.musicEnabled || this.musicPlaying || !this.audioContext) return;
+        this.musicPlaying = true;
+        this.playNote();
+    },
 
-async function vkSave(){ try{ if(vk) await vk.send('VKWebAppStorageSet',{key:SAVE_KEY,value:JSON.stringify(P)}); }catch(e){} }
-function afterLoad(){
-  if(!P.skins)P.skins={owned:['classic'],active:'classic'};
-  if(!P.skins.owned.includes('classic'))P.skins.owned.push('classic');
-  if(!P.upgrades)P.upgrades={artillery:{},fleet:{},tactics:{}};
-  if(!P.upgrades.artillery)P.upgrades.artillery={};
-  if(!P.upgrades.fleet)P.upgrades.fleet={};
-  if(!P.upgrades.tactics)P.upgrades.tactics={};
-  if(!P.season)P.season={idx:-1,xp:0,claimed:[]};
-  if(typeof P.skillPoints!=='number')P.skillPoints=0;
-  if(!P.stats.crits)P.stats.crits=0;
-  if(!P.stats.goldCells)P.stats.goldCells=0;
-  if(!P.stats.combo)P.stats.combo=0;
-  rolloverSeason();
-  loaded=true; refreshHud(); applyI18n(); checkMissionsRollover();
-  if(!P.tutDone) showElement('ov-tut-start');
-}
-function rolloverSeason(){
-  const idx=seasonIndex();
-  if(P.season.idx!==idx){
-    P.season.idx=idx; P.season.xp=0; P.season.claimed=[];
-  }
-}
-if(vk){
-  vk.send('VKWebAppStorageGet',{keys:[SAVE_KEY]}).then(r=>{
-    if(r && r.keys && r.keys[0] && r.keys[0].value){
-      try{ P = Object.assign(P, JSON.parse(r.keys[0].value)); }catch(e){}
-    }
-    afterLoad();
-  }).catch(()=>{ afterLoad(); });
-} else {
-  setTimeout(afterLoad, 300);
-}
-setInterval(vkSave, 20000);
+    stopMusic(){
+        this.musicPlaying = false;
+        if(this.musicTimer){ clearTimeout(this.musicTimer); this.musicTimer = null; }
+    },
 
-/* ============ AUDIO ============ */
-let AC=null, musicOn=false, musicTimer=null, step=0;
-function audio(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } if(AC&&AC.state==='suspended')AC.resume(); return AC; }
-function tone(f,dur,type,vol,when){
-  const c=audio(); if(!c)return; const o=c.createOscillator(),g=c.createGain();
-  o.type=type||'sine'; o.frequency.value=f; o.connect(g); g.connect(c.destination);
-  const t0=(when||c.currentTime); g.gain.setValueAtTime(0,t0);
-  g.gain.linearRampToValueAtTime(vol||.15,t0+.02); g.gain.exponentialRampToValueAtTime(.001,t0+dur);
-  o.start(t0); o.stop(t0+dur+.05);
-}
-const SCALE=[196,220,247,294,330,392,440,494];
-function musicTick(){
-  const c=audio(); if(!c)return;
-  const bass=[98,98,131,110][step%4]; tone(bass,1.8,'triangle',.06);
-  tone(SCALE[(step*3)%8],.5,'sine',.05); if(step%4===2) tone(SCALE[(step*5+2)%8]*2,.3,'sine',.04);
-  step++;
-}
-function musicStart(){ if(!P.music||musicOn)return; musicOn=true; musicTick(); musicTimer=setInterval(musicTick,1000); }
-function musicStop(){ musicOn=false; if(musicTimer){clearInterval(musicTimer);musicTimer=null;} }
-function sfx(kind){
-  if(!P.music)return; const c=audio(); if(!c)return;
-  if(kind==='hit'){tone(120,.25,'square',.2);tone(80,.4,'sawtooth',.12);}
-  else if(kind==='miss'){tone(500,.15,'sine',.1);tone(380,.2,'sine',.07,c.currentTime+.1);}
-  else if(kind==='click'){tone(700,.06,'sine',.08);}
-  else if(kind==='coin'){tone(880,.1,'sine',.12);tone(1320,.15,'sine',.1,c.currentTime+.08);}
-  else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,.35,'triangle',.12,c.currentTime+i*.13));}
-  else if(kind==='lose'){[330,262,196].forEach((f,i)=>tone(f,.4,'triangle',.12,c.currentTime+i*.18));}
-  else if(kind==='explode'){tone(55,.5,'sawtooth',.3);tone(38,.6,'square',.2);}
-  else if(kind==='splash'){tone(320,.25,'sine',.12);tone(160,.35,'sine',.1,c.currentTime+.06);}
-  else if(kind==='gold'){tone(1175,.1,'sine',.15);tone(1568,.18,'sine',.12,c.currentTime+.09);}
-  else if(kind==='crit'){tone(880,.09,'square',.16);tone(1320,.22,'sawtooth',.12,c.currentTime+.07);}
-  else if(kind==='rank'){[659,880,1175].forEach((f,i)=>tone(f,.3,'triangle',.13,c.currentTime+i*.12));}
-}
-let audioPausedBySystem=false;
-function pauseAudioSys(){ if(musicOn){audioPausedBySystem=true; musicStop();} }
-function resumeAudioSys(){ if(audioPausedBySystem){audioPausedBySystem=false; musicStart();} }
-document.addEventListener('visibilitychange',()=>document.hidden?pauseAudioSys():resumeAudioSys());
-window.addEventListener('blur',pauseAudioSys); window.addEventListener('focus',resumeAudioSys);
-if(vk){
-  vk.subscribe((e)=>{
-    if(e.detail && e.detail.type==='VKWebAppViewHide') pauseAudioSys();
-    if(e.detail && e.detail.type==='VKWebAppViewRestore') resumeAudioSys();
-  });
-}
+    pauseMusic(){ this.stopMusic(); },
+    resumeMusic(){ if(this.musicEnabled) this.startMusic(); },
+    toggleMusic(enabled){
+        this.musicEnabled = enabled;
+        if(enabled) this.startMusic();
+        else this.stopMusic();
+    },
 
-/* ============ UI helpers ============ */
-const $=s=>document.querySelector(s);
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#'+id).classList.add('active');}
-function showElement(id){$('#'+id).classList.add('active');}
-function hideElement(id){$('#'+id).classList.remove('active');}
-function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._tm);el._tm=setTimeout(()=>el.classList.remove('show'),2200);}
-function xpNeeded(level){return Math.round(40*level*Math.sqrt(level));}
-function refreshHud(){
-  $('#hud-lvl').textContent=P.level; $('#hud-coins').textContent=P.coins;
-  const rk=rankFor(P.level); const rkName=(P.lang==='en')?rk.en:rk.ru;
-  $('#hud-rank').textContent='🎖 '+rkName;
-  const need=xpNeeded(P.level);
-  $('#hud-xp').textContent=P.xp+' / '+need+' XP';
-  $('#hud-xp-bar').style.width=Math.min(100,(P.xp/need*100))+'%';
-  if(P.skillPoints>0){$('#hud-points').style.display='inline-block';$('#hud-points-val').textContent=P.skillPoints;}
-  else $('#hud-points').style.display='none';
-  $('#hud-stats').textContent=t('stWins')+': '+P.stats.wins+' · '+t('stGames')+': '+P.stats.games+' · '+t('stSunk')+': '+P.stats.sunk;
-  const d=tasksDot(); $('#tasks-dot').textContent=d?'★':'';
-}
-function tasksDot(){return P.missions&&P.missions.list&&P.missions.list.some(m=>!m.done&&m.progress>=m.target);}
-function addCoins(n){P.coins+=n;refreshHud();vkSave();}
-function addXP(n){
-  const boost=1+upgLvl('fleet','xpBoost')*0.1;
-  const gained=Math.round(n*boost);
-  P.xp+=gained;
-  let need=xpNeeded(P.level), leveled=false;
-  while(P.xp>=need){ P.xp-=need; P.level++; P.skillPoints++; leveled=true; need=xpNeeded(P.level); }
-  if(leveled){
-    const rk=rankFor(P.level); const rkName=(P.lang==='en')?rk.en:rk.ru;
-    toast('🎖 '+t('lvlUp')+' Lv.'+P.level+' — '+rkName+' (+1 очко)');
-    sfx('rank');
-  }
-  refreshHud();vkSave();
-  return gained;
-}
-function addSeasonXP(n){
-  rolloverSeason();
-  P.season.xp+=n;
-  vkSave();
-}
-
-/* ============ ADS ============ */
-/* === ИЗМЕНЕНО: более надёжная функция показа рекламы === */
-function interstitialAd(onDone){
-  musicStop();
-  paused = true;
-
-  let done = false;
-  const finish = (reason)=>{
-    if(done) return; done = true;
-    resumeAfterAd(onDone);
-  };
-
-  if(vk){
-    vk.send('VKWebAppShowNativeAds', {ad_format:'interstitial'})
-      .then(()=>finish('ok'))
-      .catch(()=>finish('fail'));
-
-    // Резервный таймаут: если VK молчит (нет сети / баннер недоступен),
-    // всё равно отпускаем игрока в бой через 8 секунд.
-    setTimeout(()=>finish('timeout'), 8000);
-  } else {
-    // Не VK-платформа — просто короткая пауза, чтобы оверлей мелькнул.
-    setTimeout(()=>finish('offvk'), 700);
-  }
-}
-function resumeAfterAd(onDone){ paused=false; if(P.music)musicStart(); onDone&&onDone(); }
-function rewardAd(onReward,onFail){
-  musicStop();
-  if(vk){
-    vk.send('VKWebAppShowNativeAds',{ad_format:'reward'})
-      .then(()=>{if(P.music)musicStart();onReward();})
-      .catch(()=>{if(P.music)musicStart();onFail&&onFail();});
-  } else { if(P.music)musicStart(); onReward(); }
-}
-
-/* ============ BOARD / GAME CORE ============ */
-const N=10;
-const FLEET=[{len:4,n:1},{len:3,n:2},{len:2,n:3},{len:1,n:4}];
-function emptyBoard(){
-  return {cells:new Array(N*N).fill(0), shots:new Array(N*N).fill(0),
-    dead:new Array(N*N).fill(0), gold:new Array(N*N).fill(0), reveal:new Array(N*N).fill(0), ships:[]};
-}
-function canPlace(b,x,y,len,hor){
-  for(let i=0;i<len;i++){const nx=x+(hor?i:0),ny=y+(hor?0:i);
-    if(nx>=N||ny>=N)return false;
-    if(b.cells[ny*N+nx])return false;
-    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const ax=nx+dx,ay=ny+dy;
-      if(ax>=0&&ax<N&&ay>=0&&ay<N&&b.cells[ay*N+ax])return false;}
-  }
-  return true;
-}
-function placeShip(b,x,y,len,hor){
-  if(!canPlace(b,x,y,len,hor))return false;
-  const id=b.ships.length+1;
-  b.ships.push({id,len,x,y,hor,hits:0});
-  for(let i=0;i<len;i++)b.cells[(y+(hor?0:i))*N+(x+(hor?i:0))]=id;
-  return true;
-}
-function shipById(b,id){return b.ships.find(s=>s.id===id);}
-function isSunk(b,s){return s.hits>=s.len;}
-function shipCells(s){
-  const out=[];
-  for(let i=0;i<s.len;i++)out.push((s.y+(s.hor?0:i))*N+(s.x+(s.hor?i:0)));
-  return out;
-}
-function markDead(b,s){
-  for(const ci of shipCells(s)){
-    const cx=ci%N, cy=(ci-cx)/N;
-    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      const nx=cx+dx,ny=cy+dy;
-      if(nx<0||nx>=N||ny<0||ny>=N)continue;
-      const i=ny*N+nx;
-      if(!b.cells[i]&&!b.shots[i])b.dead[i]=1;
-    }
-  }
-}
-function spawnGold(b,cnt){
-  for(let k=0;k<cnt;k++){
-    for(let tr=0;tr<300;tr++){
-      const i=Math.floor(Math.random()*N*N);
-      if(!b.cells[i]&&!b.gold[i]&&!b.dead[i]){b.gold[i]=1;break;}
-    }
-  }
-}
-/* ===== Модификаторы и апгрейды ===== */
-function critChance(){
-  let c=0.15 + upgLvl('artillery','crit')*0.03;
-  if(activeMod==='lucky')c+=0.10;
-  return Math.min(0.75,c);
-}
-function goldCoins(){
-  let base=15*(1+upgLvl('artillery','goldc')*0.05);
-  if(activeMod==='doubleGold')base*=2;
-  return Math.round(base);
-}
-function comboBonusPerHit(){
-  return 5 + upgLvl('artillery','combo')*3;
-}
-function dodgeChance(){
-  return Math.min(0.35, upgLvl('fleet','armor')*0.02);
-}
-function startingGoldCells(){
-  let n=3+upgLvl('fleet','goldCells');
-  if(activeMod==='goldRush')n*=2;
-  return n;
-}
-function stormMiss(){
-  return activeMod==='storm'?0.15:0;
-}
-function abilityStart(){
-  const base={sonar:2,double:2,torpedo:1};
-  const add=upgLvl('tactics','abilStart');
-  return {sonar:base.sonar+add,double:base.double+add,torpedo:base.torpedo+add};
-}
-function rewardMultiplier(){
-  return 1 + upgLvl('tactics','reward')*0.05;
-}
-
-function shoot(b,idx){
-  if(b.shots[idx]||b.dead[idx])return {hit:false,skip:true};
-  const shipId=b.cells[idx];
-  if(shipId){
-    /* Шторм: шанс промаха даже по кораблю */
-    if(Math.random()<stormMiss()){
-      b.shots[idx]=1; return {hit:false};
-    }
-    b.shots[idx]=2;
-    const s=shipById(b,shipId);
-    if(s){
-      s.hits++;
-      let crit=false;
-      if(!isSunk(b,s)&&Math.random()<critChance()){
-        const rest=shipCells(s).filter(ci=>b.shots[ci]===0);
-        if(rest.length){
-          const ci=rest[Math.floor(Math.random()*rest.length)];
-          b.shots[ci]=2; s.hits++; crit=true;
+    playSound(type){
+        if(!this.audioContext) return;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        const now = this.audioContext.currentTime;
+        if(type === 'click'){
+            osc.frequency.value = 800;
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if(type === 'correct'){
+            osc.frequency.value = 523;
+            osc.frequency.linearRampToValueAtTime(1046, now + 0.2);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if(type === 'error'){
+            osc.type = 'sawtooth';
+            osc.frequency.value = 200;
+            osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if(type === 'coin'){
+            osc.frequency.value = 1200;
+            osc.frequency.linearRampToValueAtTime(1800, now + 0.1);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
         }
-      }
-      if(isSunk(b,s))markDead(b,s);
-      return {hit:true,sunk:isSunk(b,s),ship:s,crit:crit};
+        osc.connect(gain); gain.connect(this.audioContext.destination);
     }
-  }
-  b.shots[idx]=1;
-  if(b.gold[idx]){b.gold[idx]=0;return {hit:false,gold:true};}
-  return {hit:false};
-}
-function randomFleet(b){
-  for(const ty of FLEET)for(let i=0;i<ty.n;i++){
-    let tries=0;
-    while(tries++<500){const x=Math.floor(Math.random()*N),y=Math.floor(Math.random()*N),hor=Math.random()<.5;
-      if(placeShip(b,x,y,ty.len,hor))break;}
-  }
-}
+};
 
-/* --- AI --- */
-let aiQueue=[];
-function aiReset(){aiQueue=[];}
-function aiPick(mb){
-  while(aiQueue.length){const q=aiQueue.pop();if(mb.shots[q]===0&&!mb.dead[q])return q;}
-  for(let i=0;i<400;i++){const c=Math.floor(Math.random()*N*N);if(mb.shots[c]===0&&!mb.dead[c])return c;}
-  for(let c=0;c<N*N;c++)if(mb.shots[c]===0&&!mb.dead[c])return c;
-  return -1;
-}
-function aiRegisterHit(mb,idx,sunkShip){
-  if(sunkShip){ aiQueue=[]; return; }
-  const x=idx%N,y=(idx-x)/N;
-  [[1,0],[-1,0],[0,1],[0,-1]].forEach(d=>{
-    const nx=x+d[0],ny=y+d[1];
-    if(nx>=0&&nx<N&&ny>=0&&ny<N&&mb.shots[ny*N+nx]===0&&!mb.dead[ny*N+nx])aiQueue.push(ny*N+nx);
-  });
-}
+/* ============================================================
+   LEVELS
+============================================================ */
+const Levels = {
+    totalLevels: 500,
+    baseIngredients: [
+        {id:'bun_bottom', name:'Нижняя булочка', emoji:'🍞'},
+        {id:'bun_top',    name:'Верхняя булочка', emoji:'🍞'},
+        {id:'patty',      name:'Котлета',        emoji:'🥩'},
+        {id:'cheese',     name:'Сыр',            emoji:'🧀'},
+        {id:'lettuce',    name:'Салат',          emoji:'🥬'},
+        {id:'tomato',     name:'Помидор',        emoji:'🍅'},
+        {id:'onion',      name:'Лук',            emoji:'🧅'},
+        {id:'pickle',     name:'Огурец',         emoji:'🥒'},
+        {id:'sauce',      name:'Соус',           emoji:'🥫'},
+        {id:'bacon',      name:'Бекон',          emoji:'🥓'}
+    ],
+    premiumIngredients: [
+        {id:'double_patty', name:'Двойная котлета', emoji:'🥩', price:500},
+        {id:'cheddar',      name:'Чеддер',          emoji:'🧀', price:400},
+        {id:'avocado',      name:'Авокадо',         emoji:'🥑', price:800},
+        {id:'truffle',      name:'Трюфель',         emoji:'🍄', price:1500},
+        {id:'gold_leaf',    name:'Золотой лист',    emoji:'✨', price:3000}
+    ],
+    all(){ return this.baseIngredients.concat(this.premiumIngredients); },
 
-/* ============ GAME STATE ============ */
-let hotseat=false;
-let boards=[emptyBoard(),emptyBoard()];
-let cur=0, placed=[false,false], setupIdx=0;
-let gameMode='normal', myTurn=true, gameOver=false, paused=false;
-let activeMod='none';
-let pendingAbil=null, extraShots=0, combo=0, comboMax=0, shipsLost=0;
-let ABILS=[{sonar:0,double:0,torpedo:0},{sonar:0,double:0,torpedo:0}];
-let selShip=null, selHor=true, selLen=4;
-let endReward=null;
-function AB(){return ABILS[cur];}
-function myBoard(){return boards[cur];}
-function enemyBoard(){return boards[1-cur];}
-function pname(i){return t(i===0?'p1n':'p2n');}
+    getLevel(n){
+        const ingredientCount = Math.min(3 + Math.floor(n / 100), 8);
+        const timeLimit = Math.max(60 - Math.floor(n / 10) * 2, 20);
+        const reward = 50 + n * 10;
+        let available = [...this.baseIngredients];
+        if(n > 200) available = available.concat(this.premiumIngredients.slice(0,2));
+        if(n > 350) available = available.concat(this.premiumIngredients.slice(2,4));
 
-/* ============ FX ============ */
-const FXL=[]; let fxRunning=false;
-function fxCanvas(cv){
-  const box=cv.parentElement;
-  let fx=box.querySelector('.fx-canvas');
-  if(!fx){fx=document.createElement('canvas');fx.className='fx-canvas';box.appendChild(fx);}
-  fx.style.top=cv.offsetTop+'px'; fx.style.left=cv.offsetLeft+'px';
-  fx.style.width=cv.style.width; fx.style.height=cv.style.height;
-  fx.width=cv.width; fx.height=cv.height;
-  const dpr=window.devicePixelRatio||1;
-  const ctx=fx.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {fx:fx,w:cv.getBoundingClientRect().width,h:cv.getBoundingClientRect().height};
-}
-function fxCell(cv,idx){const F=fxCanvas(cv);return {fx:F.fx,x:(idx%N+0.5)*F.w/N,y:(Math.floor(idx/N)+0.5)*F.h/N,sz:F.w/N};}
-function spawnBoom(cv,idx){
-  const F=fxCell(cv,idx);
-  for(let i=0;i<16;i++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*3.2;
-    FXL.push({fx:F.fx,x:F.x,y:F.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,dec:.045,type:'spark',color:i%2?'#ffd257':'#ff7a3c'});}
-  for(let i=0;i<5;i++){const a=Math.random()*Math.PI*2;
-    FXL.push({fx:F.fx,x:F.x+(Math.random()*10-5),y:F.y+(Math.random()*10-5),vx:Math.cos(a)*.4,vy:-.4-Math.random()*.4,life:1,dec:.02,type:'smoke',color:'rgb(70,70,75)'});}
-  FXL.push({fx:F.fx,x:F.x,y:F.y,life:1,dec:.05,type:'ring',r0:3,r1:F.sz*1.1,color:'rgba(255,210,120,.9)'});
-  fxRun();
-}
-function spawnSplash(cv,idx){
-  const F=fxCell(cv,idx);
-  for(let i=0;i<10;i++){const a=-Math.PI/2+(Math.random()-.5)*1.6,sp=1+Math.random()*2.4;
-    FXL.push({fx:F.fx,x:F.x,y:F.y,vx:Math.cos(a)*sp*.7,vy:Math.sin(a)*sp,life:1,dec:.04,type:'drop',color:'rgba(160,225,255,.9)'});}
-  FXL.push({fx:F.fx,x:F.x,y:F.y,life:1,dec:.05,type:'ring',r0:2,r1:F.sz*.8,color:'rgba(180,230,255,.7)'});
-  fxRun();
-}
-function spawnText(cv,idx,text,color){
-  const F=fxCell(cv,idx);
-  FXL.push({fx:F.fx,x:F.x,y:F.y-6,life:1.4,dec:.018,type:'txt',text:text,color:color});
-  fxRun();
-}
-function spawnGoldFx(cv,idx,amount){
-  spawnText(cv,idx,'+'+amount+'💰','#ffd257');
-  const F=fxCell(cv,idx);
-  for(let i=0;i<10;i++){const a=Math.random()*Math.PI*2;
-    FXL.push({fx:F.fx,x:F.x,y:F.y,vx:Math.cos(a)*1.8,vy:Math.sin(a)*1.8-1.2,life:1,dec:.035,type:'spark',color:'#ffd257'});}
-  fxRun();
-}
-function fxRun(){
-  if(fxRunning)return; fxRunning=true; requestAnimationFrame(fxTick);
-}
-function fxTick(){
-  fxRunning=false;
-  const cvs=new Set(); FXL.forEach(p=>cvs.add(p.fx));
-  const dpr=window.devicePixelRatio||1;
-  cvs.forEach(fx=>{const c=fx.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,fx.width,fx.height);});
-  for(let i=FXL.length-1;i>=0;i--){
-    const p=FXL[i]; p.life-=p.dec;
-    const c=p.fx.getContext('2d');
-    if(p.type==='spark'){p.x+=p.vx;p.y+=p.vy;p.vy+=.08;
-      c.globalAlpha=Math.max(0,Math.min(1,p.life));c.fillStyle=p.color;c.fillRect(p.x-2,p.y-2,4,4);}
-    else if(p.type==='drop'){p.x+=p.vx;p.y+=p.vy;p.vy+=.12;
-      c.globalAlpha=Math.max(0,Math.min(1,p.life));c.fillStyle=p.color;
-      c.beginPath();c.arc(p.x,p.y,2.5,0,7);c.fill();}
-    else if(p.type==='smoke'){p.x+=p.vx;p.y+=p.vy;
-      c.globalAlpha=Math.max(0,p.life*.45);c.fillStyle=p.color;
-      c.beginPath();c.arc(p.x,p.y,6+(1.4-p.life)*8,0,7);c.fill();}
-    else if(p.type==='ring'){const r=p.r0+(1-p.life)*(p.r1-p.r0);
-      c.globalAlpha=Math.max(0,Math.min(1,p.life));c.strokeStyle=p.color;c.lineWidth=3;
-      c.beginPath();c.arc(p.x,p.y,r,0,7);c.stroke();}
-    else if(p.type==='txt'){p.y-=.5;
-      c.globalAlpha=Math.max(0,Math.min(1,p.life));c.fillStyle=p.color;
-      c.font='bold 14px Segoe UI,Arial';c.textAlign='center';c.fillText(p.text,p.x,p.y);}
-    if(p.life<=0)FXL.splice(i,1);
-  }
-  cvs.forEach(fx=>{fx.getContext('2d').globalAlpha=1;});
-  if(FXL.length){fxRunning=true;requestAnimationFrame(fxTick);}
-}
-function shake(){
-  const w=$('#board-wrap');
-  w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
-  setTimeout(()=>w.classList.remove('shake'),400);
-}
+        const shuffled = [...available].sort(()=>Math.random()-0.5);
+        const order = [];
+        for(let i=0; i<Math.min(ingredientCount, shuffled.length); i++){
+            order.push(shuffled[i].id);
+        }
+        return {
+            level:n, order, timeLimit, reward,
+            availableIngredients: available.map(i=>i.id)
+        };
+    },
 
-/* ============ CANVAS RENDER ============ */
-function fitCanvas(cv, cols, rows){
-  const maxW=Math.min(340, window.innerWidth-32);
-  const maxH=Math.min(320, window.innerHeight*0.34);
-  const cell=Math.floor(Math.min(maxW/cols,maxH/rows));
-  const w=cell*cols, h=cell*rows, dpr=window.devicePixelRatio||1;
-  cv.style.width=w+'px'; cv.style.height=h+'px';
-  cv.width=w*dpr; cv.height=h*dpr;
-  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {cell,w,h,ctx};
-}
-function drawWater(ctx,w,h){
-  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0a4272');g.addColorStop(1,'#07304f');
-  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='rgba(120,200,255,.08)';ctx.lineWidth=1;
-  for(let y=6;y<h;y+=14){ctx.beginPath();ctx.moveTo(0,y);
-    for(let x=0;x<w;x+=20)ctx.quadraticCurveTo(x+10,y-3,x+20,y);ctx.stroke();}
-}
-function drawGrid(ctx,cell){
-  ctx.strokeStyle='rgba(140,210,255,.25)';ctx.lineWidth=1;
-  for(let i=0;i<=N;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,N*cell);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,i*cell);ctx.lineTo(N*cell,i*cell);ctx.stroke();}
-}
-function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function drawShip(ctx,x,y,w,h,hor,sunk){
-  const sk=activeSkin();
-  const L=hor?w:h, T=hor?h:w;
-  ctx.save();
-  if(hor)ctx.translate(x,y);
-  else{ctx.translate(x+T,y);ctx.rotate(Math.PI/2);}
-  const g=ctx.createLinearGradient(0,0,0,T);
-  g.addColorStop(0,sunk?'#a33d3d':shade(sk.hull,30));
-  g.addColorStop(1,sunk?'#5a1f1f':shade(sk.hull,-40));
-  ctx.fillStyle=g;ctx.strokeStyle=sunk?'#ff5a5a':sk.edge;ctx.lineWidth=2;
-  roundRect(ctx,2,2,L-4,T-4,Math.min(6,T/3));ctx.fill();ctx.stroke();
-  ctx.fillStyle=sunk?'rgba(60,20,20,.5)':'rgba(255,255,255,.18)';
-  roundRect(ctx,5,5,L-10,T-10,3);ctx.fill();
-  ctx.strokeStyle=sunk?'rgba(40,10,10,.5)':'rgba(0,30,60,.22)';ctx.lineWidth=1;
-  for(let px=T;px<L-2;px+=T){ctx.beginPath();ctx.moveTo(px,6);ctx.lineTo(px,T-6);ctx.stroke();}
-  ctx.fillStyle=sunk?'rgba(80,10,10,.7)':'rgba(0,25,50,.5)';
-  ctx.fillRect(3,T-4,L-6,2.5);
-  ctx.fillStyle=sunk?'rgba(30,10,10,.8)':'rgba(235,248,255,.9)';
-  const cnt=Math.max(1,Math.round(L/T));
-  for(let i=0;i<cnt;i++){const px=L*((i+.5)/cnt);
-    ctx.beginPath();ctx.arc(px,T*.42,Math.max(1.6,T*.13),0,7);ctx.fill();}
-  if(!sunk){
-    const mx=L/2;
-    ctx.strokeStyle='#5d452b';ctx.lineWidth=Math.max(2,T*.11);
-    ctx.beginPath();ctx.moveTo(mx,T*.5);ctx.lineTo(mx,-T*.75);ctx.stroke();
-    ctx.fillStyle=sk.glow;ctx.globalAlpha=.92;
-    ctx.beginPath();ctx.moveTo(mx+1,-T*.7);
-    ctx.quadraticCurveTo(mx+T*.9,-T*.35,mx+1,-T*.05);ctx.closePath();ctx.fill();
-    ctx.globalAlpha=1;
-    ctx.beginPath();ctx.moveTo(L-3,3);
-    ctx.lineTo(L-3-Math.min(T*.6,L*.2),.5);ctx.lineTo(L-3,T*.3);ctx.closePath();ctx.fill();
-  }
-  ctx.restore();
-}
-function drawShips(b,ctx,cell,showAll){
-  for(const s of b.ships){
-    const sunk=isSunk(b,s);
-    const x=s.x*cell,y=s.y*cell,w=(s.hor?s.len:1)*cell,h=(s.hor?1:s.len)*cell;
-    if(showAll||sunk){drawShip(ctx,x,y,w,h,s.hor,sunk);}
-    else{
-      for(const ci of shipCells(s)){
-        if(b.shots[ci]!==2)continue;
-        const cx=(ci%N)*cell,cy=Math.floor(ci/N)*cell;
-        ctx.fillStyle='rgba(255,90,90,.8)';ctx.strokeStyle='#ff5a5a';ctx.lineWidth=1.5;
-        roundRect(ctx,cx+4,cy+4,cell-8,cell-8,4);ctx.fill();ctx.stroke();
-      }
+    getColor(id){
+        const c = {
+            bun_bottom:'#d4a574', bun_top:'#d4a574', patty:'#8b4513', cheese:'#ffd700',
+            lettuce:'#90ee90', tomato:'#ff6347', onion:'#dda0dd', pickle:'#6b8e23',
+            sauce:'#ff4500', bacon:'#b22222', double_patty:'#654321', cheddar:'#ffa500',
+            avocado:'#556b2f', truffle:'#2f2f2f', gold_leaf:'#ffd700'
+        };
+        return c[id] || '#ccc';
     }
-  }
-}
-function drawMarks(b,ctx,cell){
-  for(let i=0;i<N*N;i++){
-    const x=(i%N)*cell,y=Math.floor(i/N)*cell;
-    if(b.dead[i]&&!b.shots[i]){
-      ctx.fillStyle='rgba(12,32,54,.65)';ctx.fillRect(x+1,y+1,cell-2,cell-2);
-      ctx.strokeStyle='rgba(140,220,255,.3)';ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(x+5,y+cell*.55);
-      ctx.quadraticCurveTo(x+cell*.35,y+cell*.3,x+cell*.5,y+cell*.55);
-      ctx.quadraticCurveTo(x+cell*.65,y+cell*.8,x+cell-5,y+cell*.55);ctx.stroke();
+};
+
+/* ============================================================
+   TASKS
+============================================================ */
+const Tasks = {
+    taskPool: [
+        {id:'serve_5',          type:'serve',           target:5,  reward:100, text:'Подайте 5 бургеров'},
+        {id:'serve_10',         type:'serve',           target:10, reward:200, text:'Подайте 10 бургеров'},
+        {id:'serve_20',         type:'serve',           target:20, reward:500, text:'Подайте 20 бургеров'},
+        {id:'perfect_3',        type:'perfect',         target:3,  reward:150, text:'Соберите 3 идеальных бургера'},
+        {id:'perfect_5',        type:'perfect',         target:5,  reward:300, text:'Соберите 5 идеальных бургеров'},
+        {id:'earn_500',         type:'earn',            target:500,reward:150, text:'Заработайте 500 монет'},
+        {id:'earn_1000',        type:'earn',            target:1000,reward:300,text:'Заработайте 1000 монет'},
+        {id:'complete_3_levels',type:'complete_levels', target:3,  reward:200, text:'Пройдите 3 уровня'},
+        {id:'complete_5_levels',type:'complete_levels', target:5,  reward:400, text:'Пройдите 5 уровней'},
+        {id:'use_ing_10',       type:'use_ingredient',  target:10, reward:100, text:'Используйте 10 ингредиентов'},
+        {id:'use_ing_25',       type:'use_ingredient',  target:25, reward:250, text:'Используйте 25 ингредиентов'},
+        {id:'invite_friend',    type:'invite',          target:1,  reward:500, text:'Пригласите друга'}
+    ],
+    dailyTasks: [],
+    progress: {},
+    lastUpdate: null,
+
+    init(saved){
+        const today = new Date().toDateString();
+        if(saved && saved.lastTaskUpdate === today && saved.dailyTasks){
+            this.dailyTasks = saved.dailyTasks;
+            this.progress = saved.taskProgress || {};
+            this.lastUpdate = today;
+        } else {
+            this.generateDailyTasks();
+        }
+    },
+    generateDailyTasks(){
+        const shuffled = [...this.taskPool].sort(()=>Math.random()-0.5);
+        this.dailyTasks = shuffled.slice(0,10).map(t=>({...t, completed:false, claimed:false}));
+        this.progress = {};
+        this.lastUpdate = new Date().toDateString();
+    },
+    updateProgress(type, amount=1){
+        this.dailyTasks.forEach(task=>{
+            if(task.completed || task.type !== type) return;
+            this.progress[task.id] = (this.progress[task.id] || 0) + amount;
+            if(this.progress[task.id] >= task.target){
+                task.completed = true;
+                GameState.save();
+                if(window.Game) Game.showToast('✓ ' + task.text);
+            }
+        });
+    },
+    claimReward(taskId){
+        const task = this.dailyTasks.find(t=>t.id === taskId);
+        if(task && task.completed && !task.claimed){
+            task.claimed = true;
+            GameState.coins += task.reward;
+            GameState.save();
+            AudioManager.playSound('coin');
+            return task.reward;
+        }
+        return 0;
+    },
+    getSaveData(){
+        return { lastTaskUpdate: this.lastUpdate, dailyTasks: this.dailyTasks, taskProgress: this.progress };
     }
-    if(b.shots[i]===1){ ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;
-      ctx.beginPath();ctx.arc(x+cell/2,y+cell/2,cell*.18,0,7);ctx.stroke(); }
-    else if(b.shots[i]===2){ ctx.strokeStyle='#ff5a5a';ctx.lineWidth=3;const m=cell*.25;
-      ctx.beginPath();ctx.moveTo(x+m,y+m);ctx.lineTo(x+cell-m,y+cell-m);
-      ctx.moveTo(x+cell-m,y+m);ctx.lineTo(x+m,y+cell-m);ctx.stroke(); }
-    if(b.reveal[i]===1&&b.shots[i]===0&&b.cells[i]){ ctx.fillStyle='rgba(255,210,87,.9)';
-      ctx.beginPath();ctx.arc(x+cell/2,y+cell/2,cell*.14,0,7);ctx.fill(); }
-    else if(b.reveal[i]===1&&b.shots[i]===0&&!b.cells[i]){ ctx.strokeStyle='rgba(127,212,255,.5)';
-      ctx.strokeRect(x+3,y+3,cell-6,cell-6); }
-  }
-}
+};
 
-/* ============ SETUP SCREEN ============ */
-function openSetup(opp,mode,mod){
-  hotseat=(opp==='friend'); gameMode=mode; activeMod=mod||'none';
-  P.lastMod=activeMod; vkSave();
-  boards=[emptyBoard(),emptyBoard()]; placed=[false,false]; setupIdx=0;
-  selShip=null; selHor=true; selLen=4;
-  buildShipPalette(); show('scr-setup'); renderSetup();
-}
-function buildShipPalette(){
-  const bar=$('#setup-ships'); bar.innerHTML='';
-  const sk=activeSkin();
-  let id=1;
-  FLEET.forEach(ty=>{
-    for(let i=0;i<ty.n;i++){
-      const shipId=id++;
-      const b=document.createElement('button');
-      b.className='btn small ab-wrap';
-      b.dataset.sid=shipId; b.dataset.len=ty.len;
-      b.innerHTML=shipSvg(sk,ty.len);
-      b.onclick=()=>{ selShip=shipId; selLen=ty.len; sfx('click'); highlightPalette(); };
-      bar.appendChild(b);
+/* ============================================================
+   AFK ROOM
+============================================================ */
+const AFKRoom = {
+    active: false,
+    interval: null,
+    accumulatedCoins: 0,
+    totalMinutes: 0,
+    rate: 1,
+
+    start(){
+        if(this.active) return;
+        this.active = true;
+        this.accumulatedCoins = 0;
+        this.updateUI();
+        this.interval = setInterval(()=>{
+            if(!this.active) return;
+            this.accumulatedCoins += this.rate;
+            this.totalMinutes += 1;
+            GameState.coins += this.rate;
+            GameState.save();
+            this.updateUI();
+        }, 60000);
+    },
+    stop(){
+        this.active = false;
+        if(this.interval){ clearInterval(this.interval); this.interval = null; }
+    },
+    updateUI(){
+        const r = document.getElementById('afk-rate');
+        const e = document.getElementById('afk-earned');
+        const tm = document.getElementById('afk-total');
+        if(r) r.textContent = this.rate;
+        if(e) e.textContent = this.accumulatedCoins;
+        if(tm) tm.textContent = this.totalMinutes;
+    },
+    upgradeRate(){ this.rate += 1; }
+};
+
+/* ============================================================
+   GAME STATE
+============================================================ */
+const GameState = {
+    coins: 0,
+    currentLevel: 1,
+    maxLevel: 1,
+    completedLevels: [],
+    musicEnabled: true,
+    language: 'ru',
+    purchasedIngredients: [],
+    hasCoffeeMachine: false,
+    hasLemonadeMachine: false,
+    lastDailyReward: null,
+    tutorialCompleted: false,
+    totalBurgersServed: 0,
+    totalPerfectBurgers: 0,
+    totalCoinsEarned: 0,
+    _saveTimeout: null,
+
+    async load(){
+        const saved = await VKBridge.loadData('burger_game_save');
+        if(!saved) return false;
+        this.coins = saved.coins || 0;
+        this.currentLevel = saved.currentLevel || 1;
+        this.maxLevel = saved.maxLevel || 1;
+        this.completedLevels = saved.completedLevels || [];
+        this.musicEnabled = saved.musicEnabled !== false;
+        this.language = saved.language || 'ru';
+        this.purchasedIngredients = saved.purchasedIngredients || [];
+        this.hasCoffeeMachine = saved.hasCoffeeMachine || false;
+        this.hasLemonadeMachine = saved.hasLemonadeMachine || false;
+        this.lastDailyReward = saved.lastDailyReward || null;
+        this.tutorialCompleted = saved.tutorialCompleted || false;
+        this.totalBurgersServed = saved.totalBurgersServed || 0;
+        this.totalPerfectBurgers = saved.totalPerfectBurgers || 0;
+        this.totalCoinsEarned = saved.totalCoinsEarned || 0;
+        if(saved.tasks) Tasks.init(saved.tasks);
+        else Tasks.init(null);
+        if(saved.afk){
+            AFKRoom.totalMinutes = saved.afk.totalMinutes || 0;
+            AFKRoom.rate = saved.afk.rate || 1;
+        }
+        return true;
+    },
+
+    save(){
+        // Дебаунс сохранения, чтобы не спамить VK
+        if(this._saveTimeout) clearTimeout(this._saveTimeout);
+        this._saveTimeout = setTimeout(async()=>{
+            const data = {
+                coins: this.coins, currentLevel: this.currentLevel, maxLevel: this.maxLevel,
+                completedLevels: this.completedLevels, musicEnabled: this.musicEnabled,
+                language: this.language, purchasedIngredients: this.purchasedIngredients,
+                hasCoffeeMachine: this.hasCoffeeMachine, hasLemonadeMachine: this.hasLemonadeMachine,
+                lastDailyReward: this.lastDailyReward, tutorialCompleted: this.tutorialCompleted,
+                totalBurgersServed: this.totalBurgersServed, totalPerfectBurgers: this.totalPerfectBurgers,
+                totalCoinsEarned: this.totalCoinsEarned,
+                tasks: Tasks.getSaveData(),
+                afk: { totalMinutes: AFKRoom.totalMinutes, rate: AFKRoom.rate }
+            };
+            await VKBridge.saveData('burger_game_save', data);
+        }, 500);
     }
-  });
-  selShip=1; selLen=FLEET[0].len; highlightPalette();
-}
-function highlightPalette(){
-  document.querySelectorAll('#setup-ships .btn').forEach(b=>{
-    b.style.outline = (+b.dataset.sid===selShip)?'2px solid var(--gold)':'none';});
-}
-function renderSetup(){
-  const cv=$('#cv-setup');
-  const {ctx,cell}=fitCanvas(cv,N,N);
-  drawWater(ctx,N*cell,N*cell);drawGrid(ctx,cell);
-  drawShips(boards[setupIdx],ctx,cell,true);
-  if(hoverCell&&selShip)drawHoverGhost();
-}
-function drawHoverGhost(){
-  if(!hoverCell||!selShip)return;
-  const cv=$('#cv-setup'),ctx=cv.getContext('2d');
-  const cell=cv.getBoundingClientRect().width/N;
-  const x=hoverCell.x,y=hoverCell.y;
-  const ok=canPlace(boards[setupIdx],x,y,selLen,selHor);
-  ctx.fillStyle=ok?'rgba(90,209,138,.35)':'rgba(255,90,90,.35)';
-  for(let i=0;i<selLen;i++){const nx=x+(selHor?i:0),ny=y+(selHor?0:i);
-    if(nx<N&&ny<N)ctx.fillRect(nx*cell,ny*cell,cell,cell);}
-}
-function cellFromEvent(e,cv){
-  const r=cv.getBoundingClientRect();
-  const x=Math.floor((e.clientX-r.left)/r.width*N), y=Math.floor((e.clientY-r.top)/r.height*N);
-  if(x<0||x>=N||y<0||y>=N)return null; return {x,y};
-}
-let hoverCell=null, lastTapTime=0;
-$('#cv-setup').addEventListener('pointermove',e=>{
-  if(e.pointerType==='mouse'){hoverCell=cellFromEvent(e,$('#cv-setup'));renderSetup();}
-});
-$('#cv-setup').addEventListener('pointerdown',e=>{
-  const now=Date.now();
-  if(now-lastTapTime<300){selHor=!selHor;renderSetup();lastTapTime=0;sfx('click');return;}
-  lastTapTime=now;
-  const c=cellFromEvent(e,$('#cv-setup')); if(!c||!selShip)return;
-  if(placeShip(boards[setupIdx],c.x,c.y,selLen,selHor)){ sfx('click'); advancePalette(); renderSetup(); }
-});
-function advancePalette(){
-  const placedIds=new Set(); boards[setupIdx].cells.forEach(v=>{if(v)placedIds.add(v);});
-  let found=false;
-  document.querySelectorAll('#setup-ships .btn').forEach(b=>{
-    const sid=+b.dataset.sid;
-    if(placedIds.has(sid)){b.style.opacity=.3;return;}
-    b.style.opacity=1;
-    if(!found){ selShip=sid; selLen=+b.dataset.len; highlightPalette(); found=true; }
-  });
-  if(!found){selShip=null;highlightPalette();}
-}
-$('#btn-rotate').onclick=()=>{selHor=!selHor;renderSetup();sfx('click');};
-$('#btn-clear').onclick=()=>{boards[setupIdx]=emptyBoard();buildShipPalette();renderSetup();sfx('click');};
-$('#btn-random').onclick=()=>{
-  boards[setupIdx]=emptyBoard();randomFleet(boards[setupIdx]);buildShipPalette();markAllPlaced();renderSetup();sfx('click');
-};
-function markAllPlaced(){document.querySelectorAll('#setup-ships .btn').forEach(b=>b.style.opacity=.3);selShip=null;}
-$('#setup-back').onclick=()=>{show('scr-lobby');};
-$('#btn-ready').onclick=()=>{
-  const placedIds=new Set();boards[setupIdx].cells.forEach(v=>{if(v)placedIds.add(v);});
-  if(placedIds.size<10){toast(t('placeAll'));return;}
-  placed[setupIdx]=true;
-  if(hotseat||setupIdx===1)spawnGold(boards[setupIdx],startingGoldCells());
-  if(hotseat&&setupIdx===0){
-    passScreen(t('passSetup').replace('%s',pname(1)),()=>{
-      setupIdx=1; selShip=null; selHor=true; selLen=4;
-      buildShipPalette(); renderSetup();
-    });
-  } else startBattle();
 };
 
-/* ============ BATTLE ============ */
-/* === ИЗМЕНЕНО: теперь показываем блокирующий оверлей перед рекламой === */
-function startBattle(){
-  // 1) Сразу блокируем экран оверлеем
-  showElement('ov-adload');
-
-  // 2) Даём браузеру отрисовать оверлей, потом запускаем рекламу
-  const minShow = 700;                 // минимум, сколько оверлей должен провисеть
-  const t0 = Date.now();
-
-  requestAnimationFrame(()=>{
-    // Запускаем интерстишиал. Колбэк вызовется, когда рекламу
-    // показали и закрыли (или когда она не смогла загрузиться).
-    interstitialAd(()=>{
-      const elapsed = Date.now() - t0;
-      const wait = Math.max(0, minShow - elapsed);
-
-      setTimeout(()=>{
-        // 3) Инициализация боя (то, что было в оригинале)
-        if(!hotseat){ aiReset(); randomFleet(boards[1]); spawnGold(boards[1],startingGoldCells()); }
-        cur=0; myTurn=true; gameOver=false; pendingAbil=null;
-        extraShots=0; combo=0; comboMax=0; shipsLost=0;
-
-        const abInit = gameMode==='super' ? abilityStart() : {sonar:0,double:0,torpedo:0};
-        ABILS=[Object.assign({},abInit), Object.assign({},abInit)];
-
-        buildAbilities();
-        show('scr-game');
-        renderGame();
-
-        let modeTxt = (hotseat?'👥 ':'') + (gameMode==='super'?'⚡':('⚔️ '+t('modeNormal')));
-        const modObj = MODIFIERS.find(m=>m.id===activeMod);
-        if(modObj && activeMod!=='none') modeTxt += ' '+modObj.ico;
-        $('#mode-chip').textContent = modeTxt;
-
-        // 4) Снимаем блокировку ТОЛЬКО когда бой уже готов
-        hideElement('ov-adload');
-      }, wait);
-    });
-  });
-}
-function buildAbilities(){
-  const bar=$('#ab-bar');bar.innerHTML='';
-  if(gameMode!=='super'){bar.style.display='none';return;} bar.style.display='flex';
-  const defs=[['sonar','🔊',t('abSonar')],['double','💥',t('abDouble')],['torpedo','🚀',t('abTorpedo')]];
-  for(const d of defs){
-    const w=document.createElement('div');w.className='ab-wrap';w.dataset.ab=d[0];
-    const b=document.createElement('button');b.className='btn small';b.innerHTML=d[1]+'<span>'+d[2]+'</span>';
-    b.disabled=AB()[d[0]]<=0;
-    const c=document.createElement('span');c.className='cnt';c.textContent=AB()[d[0]];
-    b.onclick=()=>{ if(AB()[d[0]]<=0||!myTurn||gameOver||paused)return;
-      pendingAbil=d[0]; sfx('click'); toast(t('pickCell')); };
-    w.appendChild(b);w.appendChild(c);bar.appendChild(w);
-  }
-}
-function updateAbilities(){
-  document.querySelectorAll('#ab-bar .ab-wrap').forEach(w=>{
-    const k=w.dataset.ab;
-    const b=w.querySelector('button'),c=w.querySelector('.cnt');
-    if(!c)return; c.textContent=AB()[k]; b.disabled=AB()[k]<=0;
-  });
-}
-function updateComboChip(){
-  const ch=$('#combo-chip');
-  if(combo>=2){ch.style.display='flex';$('#combo-val').textContent='x'+combo;}
-  else ch.style.display='none';
-}
-function renderGame(){
-  drawFull($('#cv-my'),boards[cur],true);
-  drawFull($('#cv-enemy'),boards[1-cur],false);
-  if(hotseat){
-    $('#ttl-my').textContent=pname(cur)+' · '+t('yourFleet');
-    $('#ttl-en').textContent=pname(1-cur)+' · '+t('enemyFleet');
-  } else {
-    $('#ttl-my').textContent=t('yourFleet');
-    $('#ttl-en').textContent=t('enemyFleet');
-  }
-  updateTurnLabel(); updateComboChip(); updateAbilities();
-}
-function drawFull(cv,b,showAll){
-  const {ctx,cell}=fitCanvas(cv,N,N);
-  drawWater(ctx,cv.getBoundingClientRect().width,cv.getBoundingClientRect().height);
-  drawGrid(ctx,cell); drawShips(b,ctx,cell,showAll); drawMarks(b,ctx,cell);
-  fxCanvas(cv);
-}
-function updateTurnLabel(){
-  if(gameOver){$('#turn-label').textContent='🏁';return;}
-  if(paused){$('#turn-label').textContent=t('paused');return;}
-  $('#turn-label').textContent=hotseat?('👤 '+pname(cur)):(myTurn?'🎯 '+t('turnYou'):'💀 '+t('turnEnemy'));
-}
-function passScreen(text,cb){
-  const ov=document.createElement('div');ov.className='overlay active opaque';
-  ov.innerHTML='<div class="modal"><h2>🤝 '+t('pass')+'</h2>'+
-    '<p class="muted" style="font-size:15px">'+text+'</p>'+
-    '<button class="btn gold" id="pass-ok">'+t('done')+'</button></div>';
-  document.body.appendChild(ov);
-  ov.querySelector('#pass-ok').onclick=()=>{ov.remove();cb&&cb();};
-}
-$('#cv-enemy').addEventListener('pointerdown',e=>{
-  if(!myTurn||gameOver||paused)return;
-  const c=cellFromEvent(e,$('#cv-enemy')); if(!c)return;
-  const idx=c.y*N+c.x;
-  if(pendingAbil){ useAbility(idx); return; }
-  const eb=enemyBoard();
-  if(eb.shots[idx])return;
-  if(eb.dead[idx])return;
-  playerFire(idx);
-});
-function playerFire(idx){
-  const eb=enemyBoard();
-  const res=shoot(eb,idx);
-  if(res.skip)return;
-  P.stats.shots++;
-  const cv=$('#cv-enemy');
-  if(res.hit){
-    P.stats.hits++; combo++; comboMax=Math.max(comboMax,combo);
-    P.stats.combo=Math.max(P.stats.combo||0,combo);
-    sfx(res.crit?'crit':'hit');
-    spawnBoom(cv,idx);
-    if(res.crit){P.stats.crits=(P.stats.crits||0)+1;spawnText(cv,idx,t('crit'),'#ffd257');missionProgress('crit',1);}
-    if(combo>=2)spawnText(cv,idx,'🔥 x'+combo,'#ff7a3c');
-    if(combo===3)missionProgress('combo',1);
-    if(res.sunk){P.stats.sunk++;sfx('explode');shake();}
-    missionProgress('shots',1);missionProgress('hits',1);
-    if(res.sunk)missionProgress('sunk',1);
-  } else {
-    combo=0;
-    if(res.gold){
-      const amount=goldCoins();
-      addCoins(amount);toast(t('goldHit')+' +'+amount+'💰');sfx('gold');
-      P.stats.goldCells=(P.stats.goldCells||0)+1;
-      spawnGoldFx(cv,idx,amount);missionProgress('gold',1);
-    } else { sfx('miss'); spawnSplash(cv,idx); }
-    missionProgress('shots',1);
-  }
-  renderGame();
-  if(checkEnd())return;
-  if(!res.hit){
-    if(extraShots>0){extraShots--;updateTurnLabel();return;}
-    myTurn=false;updateTurnLabel();
-    if(hotseat){
-      passScreen(t('passHint').replace('%s',pname(1-cur)),()=>{
-        cur=1-cur;myTurn=true;combo=0;extraShots=0;pendingAbil=null;
-        renderGame();
-      });
-    } else setTimeout(aiTurn,900);
-    return;
-  }
-  updateTurnLabel(); vkSave();
-}
-function aiTurn(){
-  if(gameOver||paused||hotseat)return;
-  const mb=myBoard();
-  const idx=aiPick(mb); if(idx<0)return;
-  /* Уклонение брони: имитируем промах врага */
-  if(dodgeChance()>0 && Math.random()<dodgeChance()){
-    sfx('miss'); spawnSplash($('#cv-my'),idx);
-    renderGame();
-    myTurn=true;combo=0;updateTurnLabel();updateComboChip();
-    return;
-  }
-  const res=shoot(mb,idx);
-  const cv=$('#cv-my');
-  if(res.hit){
-    sfx(res.crit?'crit':'hit'); spawnBoom(cv,idx);
-    if(res.sunk){shipsLost++;sfx('explode');shake();}
-    aiRegisterHit(mb,idx,res.sunk);
-  } else { sfx('miss'); spawnSplash(cv,idx); }
-  renderGame();
-  if(checkEnd())return;
-  if(res.hit){ setTimeout(aiTurn,900); }
-  else { myTurn=true;combo=0;updateTurnLabel();updateComboChip(); }
-}
-function useAbility(idx){
-  const k=pendingAbil; pendingAbil=null;
-  if(AB()[k]<=0)return; AB()[k]--; P.stats.abUsed++; missionProgress('ab',1); updateAbilities();
-  const cv=$('#cv-enemy');
-  if(k==='sonar'){
-    const cx=idx%N,cy=Math.floor(idx/N);
-    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      const nx=cx+dx,ny=cy+dy;if(nx<0||nx>=N||ny<0||ny>=N)continue;
-      enemyBoard().reveal[ny*N+nx]=1;}
-    sfx('miss'); spawnText(cv,idx,'🔊','#9fdcff');
-  } else if(k==='double'){
-    extraShots=1; sfx('click'); spawnText(cv,idx,'💥','#ffd257');
-  } else if(k==='torpedo'){
-    const row=Math.floor(idx/N); let golds=0;
-    for(let x=0;x<N;x++){const i=row*N+x;
-      if(enemyBoard().dead[i])continue;
-      const r=shoot(enemyBoard(),i);
-      if(r.skip)continue;
-      P.stats.shots++;
-      if(r.hit){
-        P.stats.hits++; spawnBoom(cv,i);
-        if(r.crit){P.stats.crits=(P.stats.crits||0)+1;missionProgress('crit',1);}
-        if(r.sunk){P.stats.sunk++;sfx('explode');shake();}
-        missionProgress('hits',1);
-      }
-      else if(r.gold){
-        const amt=goldCoins();golds++;
-        addCoins(amt);missionProgress('gold',1);
-        P.stats.goldCells=(P.stats.goldCells||0)+1;
-        spawnGoldFx(cv,i,amt);
-      }
-      else spawnSplash(cv,i);
+/* ============================================================
+   MAIN GAME
+============================================================ */
+class BurgerGame {
+    constructor(){
+        this.canvas = document.getElementById('game-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.currentOrder = [];
+        this.currentBurger = [];
+        this.timeLeft = 60;
+        this.timerInterval = null;
+        this.gameActive = false;
+        this.paused = false;
+        this.animationFrame = null;
+        this.lastTime = 0;
+        this.backgroundOffset = 0;
+        this.currentReward = 0;
+        this.availableIngredients = [];
+        this.tutorialStep = 0;
     }
-    sfx('explode'); shake(); missionProgress('shots',N);
-    if(golds)toast(t('goldHit'));
-  }
-  renderGame();
-  if(checkEnd())return;
-  if(k==='torpedo'){
-    myTurn=false;updateTurnLabel();
-    if(hotseat){
-      passScreen(t('passHint').replace('%s',pname(1-cur)),()=>{
-        cur=1-cur;myTurn=true;combo=0;extraShots=0;renderGame();
-      });
-    } else setTimeout(aiTurn,900);
-  }
-}
-function checkEnd(){
-  const aAlive=boards[0].ships.some(s=>!isSunk(boards[0],s));
-  const bAlive=boards[1].ships.some(s=>!isSunk(boards[1],s));
-  if(aAlive&&bAlive)return false;
-  gameOver=true;
-  const winner=aAlive?0:(bAlive?1:-1);
-  P.stats.games++;
-  if(!hotseat){
-    if(winner===0){P.stats.wins++;if(shipsLost===0)missionProgress('flawless',1);}
-    missionProgress(winner===0?'wins':'losses',1);
-  }
-  sfx((hotseat||winner===0)?'win':'lose');
-  missionProgress('games',1);
-  const rk=rankFor(P.level);
-  const rmul=rewardMultiplier();
-  let coins,xp;
-  if(hotseat){coins=40+P.level*5;xp=30+P.level*4;}
-  else{coins=winner===0?30+P.level*5:10;xp=winner===0?25+P.level*4:10;}
-  coins+=comboMax*comboBonusPerHit();
-  coins+=rk.bonus;
-  coins=Math.round(coins*rmul);
-  xp=Math.round(xp);
-  endReward={coins:coins,xp:xp,win:!hotseat?winner===0:true,who:winner};
-  showResult(); vkSave(); return true;
-}
-function showResult(){
-  $('#result-title').textContent=hotseat
-    ?('🏆 '+pname(endReward.who)+' — '+t('win'))
-    :(endReward.win?t('win'):t('lose'));
-  $('#result-coins').textContent=endReward.coins;
-  $('#result-xp').textContent=endReward.xp;
-  const seasonXP=Math.max(5,Math.round((endReward.win?30:15)+P.level));
-  endReward.seasonXP=seasonXP;
-  $('#result-text').textContent=t('stShots')+': '+P.stats.shots+' · '+t('stSunk')+': '+P.stats.sunk+
-    (comboMax>=2?(' · 🔥 x'+comboMax):'');
-  $('#result-season').textContent='🌴 '+t('season')+' +'+seasonXP+' XP';
-  $('#btn-double').disabled=false;
-  showElement('ov-result');
-}
-$('#btn-collect').onclick=()=>{
-  addCoins(endReward.coins); addXP(endReward.xp); addSeasonXP(endReward.seasonXP||0);
-  hideElement('ov-result'); show('scr-lobby');
-};
-$('#btn-double').onclick=()=>{
-  rewardAd(()=>{
-    addCoins(endReward.coins*2); addXP(endReward.xp*2); addSeasonXP(endReward.seasonXP||0);
-    $('#result-coins').textContent=endReward.coins*2;
-    $('#result-xp').textContent=endReward.xp*2;
-    $('#btn-double').disabled=true; toast(t('doubled'));
-  },()=>{ toast(t('adFail')); });
-};
-$('#game-exit').onclick=()=>{gameOver=true;show('scr-lobby');};
 
-/* ============ MISSIONS ============ */
-const POOL=[
-  {id:'w1',ru:{n:'Первая победа',d:'Победите 1 раз'},en:{n:'First victory',d:'Win 1 time'},target:()=>1,ev:'wins',rew:60},
-  {id:'w2',ru:{n:'Две победы',d:'Победите 2 раза'},en:{n:'Two victories',d:'Win 2 times'},target:()=>2,ev:'wins',rew:100},
-  {id:'s1',ru:{n:'Артиллерист',d:'Сделайте 30 выстрелов'},en:{n:'Gunner',d:'Make 30 shots'},target:()=>30,ev:'shots',rew:50},
-  {id:'s2',ru:{n:'Снайпер',d:'Попадите 15 раз'},en:{n:'Sniper',d:'Hit 15 times'},target:()=>15,ev:'hits',rew:70},
-  {id:'k1',ru:{n:'Охотник',d:'Потопите 5 кораблей'},en:{n:'Hunter',d:'Sink 5 ships'},target:()=>5,ev:'sunk',rew:80},
-  {id:'a1',ru:{n:'Сила титанов',d:'Используйте 3 способности'},en:{n:'Titan power',d:'Use 3 abilities'},target:()=>3,ev:'ab',rew:70},
-  {id:'g1',ru:{n:'Моряк',d:'Сыграйте 3 боя'},en:{n:'Sailor',d:'Play 3 games'},target:()=>3,ev:'games',rew:60},
-  {id:'l1',ru:{n:'Тренировка',d:'Проиграйте 1 бой'},en:{n:'Training',d:'Lose 1 battle'},target:()=>1,ev:'losses',rew:40},
-  {id:'gd1',ru:{n:'Золото на дне',d:'Поднимите 3 золотые клетки'},en:{n:'Gold on the bottom',d:'Collect 3 gold cells'},target:()=>3,ev:'gold',rew:70},
-  {id:'cb1',ru:{n:'Серия огня',d:'Добейтесь серии из 3 попаданий подряд'},en:{n:'Fire streak',d:'Get a 3-hit combo'},target:()=>1,ev:'combo',rew:80},
-  {id:'cr1',ru:{n:'Критический ум',d:'Нанесите 5 критических выстрелов'},en:{n:'Critical mind',d:'Land 5 crit hits'},target:()=>5,ev:'crit',rew:80},
-  {id:'fl1',ru:{n:'Непотопляемый',d:'Победите, не потеряв ни одного корабля'},en:{n:'Unsinkable',d:'Win without losing a ship'},target:()=>1,ev:'flawless',rew:120},
-  {id:'g2',ru:{n:'Морской волк',d:'Сыграйте 10 боёв'},en:{n:'Sea wolf',d:'Play 10 battles'},target:()=>10,ev:'games',rew:120},
-];
-function todayKey(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
-function hashStr(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))>>>0;return h;}
-function genMissions(){
-  const seed=hashStr(todayKey());
-  const order=POOL.map((p,i)=>({p:p,i:i}))
-    .sort((a,b)=>((seed*(a.i+3))%97)-((seed*(b.i+3))%97));
-  const list=[];
-  for(let i=0;i<10&&i<order.length;i++){
-    const p=order[i].p;
-    list.push({id:p.id,progress:0,target:p.target(),reward:p.rew,done:false});
-  }
-  return {date:todayKey(),list:list};
-}
-function checkMissionsRollover(){
-  if(!P.missions||!P.missions.list||P.missions.date!==todayKey()){P.missions=genMissions();vkSave();}
-}
-function missionProgress(ev,n){
-  if(!P.missions)return; let changed=false;
-  P.missions.list.forEach(m=>{
-    if(m.done)return;
-    const def=POOL.find(p=>p.id===m.id);
-    if(def&&def.ev===ev){m.progress=Math.min(m.target,m.progress+n);changed=true;}
-  });
-  if(changed){
-    P.missions.list.forEach(m=>{
-      const def=POOL.find(p=>p.id===m.id);
-      if(def&&!m.done&&m.progress>=m.target){m.done=true;addCoins(m.reward);toast(t('missionDone')+' +'+m.reward+'💰');}
-    });
-    refreshHud();vkSave();
-  }
-}
-$('#btn-tasks').onclick=()=>{if(tutActive)return;checkMissionsRollover();renderTasks();showElement('ov-tasks');sfx('click');};
-$('#tasks-close').onclick=()=>hideElement('ov-tasks');
-function renderTasks(){
-  const wrap=$('#tasks-list');wrap.innerHTML='';
-  P.missions.list.forEach(m=>{
-    const def=POOL.find(p=>p.id===m.id)||{ru:{n:'??',d:''},en:{n:'??',d:''}};
-    const txt=(P.lang==='en')?def.en:def.ru;
-    const div=document.createElement('div');
-    div.className='mission'+(m.done?' done':'');
-    div.innerHTML='<div class="info"><b>'+txt.n+'</b><div class="muted">'+txt.d+' · +'+m.reward+'💰</div>'+
-      '<div class="bar"><i style="width:'+Math.min(100,m.progress/m.target*100)+'%"></i></div></div>'+
-      '<div class="muted">'+Math.min(m.progress,m.target)+'/'+m.target+'</div>';
-    wrap.appendChild(div);
-  });
+    async init(){
+        this.resizeCanvas();
+        window.addEventListener('resize', ()=>this.resizeCanvas());
+
+        VKBridge.init();
+        const hasSave = await GameState.load();
+
+        AudioManager.toggleMusic(GameState.musicEnabled);
+        document.getElementById('music-toggle').checked = GameState.musicEnabled;
+        document.getElementById('language-select').value = GameState.language;
+        currentLang = GameState.language;
+        this.applyLanguage();
+
+        if(!hasSave) Tasks.init(null);
+
+        this.setupEventListeners();
+        this.updateCurrencyDisplay();
+        VKBridge.showBanner();
+
+        if(!GameState.tutorialCompleted){
+            this.showTutorialPrompt();
+        } else {
+            this.showScreen('lobby');
+        }
+
+        this.lastTime = performance.now();
+        this.gameLoop(this.lastTime);
+    }
+
+    applyLanguage(){
+        document.getElementById('game-title').textContent = t('game_title');
+        document.getElementById('play-btn').textContent = t('play');
+        document.getElementById('levels-btn').textContent = t('levels');
+        document.getElementById('tasks-btn').textContent = t('tasks');
+        document.getElementById('afk-btn').textContent = t('afk_room');
+        document.getElementById('daily-btn').textContent = t('daily_reward');
+        document.getElementById('shop-btn').textContent = t('shop');
+        document.getElementById('invite-btn').textContent = t('invite_friends');
+        document.getElementById('serve-btn').textContent = t('serve');
+        document.getElementById('clear-btn').textContent = t('clear');
+        document.getElementById('double-reward-btn').textContent = t('double_reward');
+        document.getElementById('next-level-btn').textContent = t('next_level');
+        document.getElementById('back-lobby-btn').textContent = t('back_lobby');
+        document.getElementById('tutorial-next').textContent = t('tutorial_next');
+        document.getElementById('tutorial-skip').textContent = t('tutorial_skip');
+        document.getElementById('daily-claim').textContent = t('claim');
+        document.getElementById('levels-back').textContent = t('back');
+        document.getElementById('tasks-back').textContent = t('back');
+        document.getElementById('afk-back').textContent = t('back');
+        document.getElementById('daily-back').textContent = t('back');
+        document.getElementById('shop-back').textContent = t('back');
+        document.getElementById('settings-back').textContent = t('back');
+        document.getElementById('promo-btn').textContent = t('activate');
+        document.getElementById('promo-input').placeholder = t('promo_code');
+    }
+
+    resizeCanvas(){
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+        this.ctx.setTransform(1,0,0,1,0,0);
+        this.ctx.scale(dpr, dpr);
+        this.canvas.style.width = rect.width + 'px';
+        this.canvas.style.height = rect.height + 'px';
+        this.canvas._w = rect.width;
+        this.canvas._h = rect.height;
+    }
+
+    gameLoop(timestamp){
+        const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
+        this.lastTime = timestamp;
+        if(!this.paused){
+            this.update(dt);
+            this.render();
+        }
+        this.animationFrame = requestAnimationFrame(t=>this.gameLoop(t));
+    }
+
+    update(dt){
+        this.backgroundOffset = (this.backgroundOffset + dt * 20) % 40;
+    }
+
+    render(){
+        const w = this.canvas._w || 300;
+        const h = this.canvas._h || 300;
+        const grad = this.ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#1a1a2e');
+        grad.addColorStop(1, '#16213e');
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(0, 0, w, h);
+
+        this.ctx.fillStyle = 'rgba(255,255,255,0.02)';
+        const tile = 40;
+        const off = this.backgroundOffset;
+        for(let x = -tile; x < w + tile; x += tile){
+            for(let y = -tile; y < h + tile; y += tile){
+                this.ctx.fillRect(x + off, y, tile - 2, tile - 2);
+            }
+        }
+    }
+
+    showScreen(id){
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        const el = document.getElementById(id);
+        if(el) el.classList.add('active');
+    }
+
+    setupEventListeners(){
+        const bind = (id, fn)=>{
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('click', ()=>{ AudioManager.playSound('click'); fn(); });
+        };
+
+        bind('play-btn', ()=>this.startLevel(GameState.currentLevel));
+        bind('levels-btn', ()=>{ this.renderLevelsGrid(); this.showScreen('levels-screen'); });
+        bind('tasks-btn', ()=>{ this.renderTasks(); this.showScreen('tasks-screen'); });
+        bind('afk-btn', ()=>{ this.showScreen('afk-screen'); AFKRoom.start(); AFKRoom.updateUI(); });
+        bind('daily-btn', ()=>{ this.checkDailyReward(); this.showScreen('daily-screen'); });
+        bind('shop-btn', ()=>{ this.renderShop(); this.showScreen('shop-screen'); });
+        bind('invite-btn', ()=>{ VKBridge.inviteFriends(); Tasks.updateProgress('invite', 1); });
+        bind('settings-btn', ()=>this.showScreen('settings-screen'));
+        bind('settings-back', ()=>this.showScreen('lobby'));
+        bind('levels-back', ()=>this.showScreen('lobby'));
+        bind('tasks-back', ()=>this.showScreen('lobby'));
+        bind('afk-back', ()=>{ AFKRoom.stop(); this.showScreen('lobby'); });
+        bind('daily-back', ()=>this.showScreen('lobby'));
+        bind('shop-back', ()=>this.showScreen('lobby'));
+        bind('serve-btn', ()=>this.serveBurger());
+        bind('clear-btn', ()=>this.clearBurger());
+        bind('daily-claim', ()=>this.claimDailyReward());
+        bind('promo-btn', ()=>this.handlePromoCode());
+        bind('tutorial-next', ()=>this.nextTutorialStep());
+        bind('tutorial-skip', ()=>this.skipTutorial());
+
+        bind('next-level-btn', ()=>{
+            const next = Math.min(GameState.currentLevel + 1, 500);
+            this.startLevel(next);
+        });
+        bind('back-lobby-btn', ()=>this.showScreen('lobby'));
+
+        document.getElementById('music-toggle').addEventListener('change', e=>{
+            GameState.musicEnabled = e.target.checked;
+            AudioManager.toggleMusic(e.target.checked);
+            GameState.save();
+        });
+        document.getElementById('language-select').addEventListener('change', e=>{
+            GameState.language = e.target.value;
+            currentLang = e.target.value;
+            this.applyLanguage();
+            GameState.save();
+        });
+
+        document.getElementById('double-reward-btn').addEventListener('click', async ()=>{
+            AudioManager.pauseMusic();
+            const ok = await VKBridge.showRewarded();
+            AudioManager.resumeMusic();
+            if(ok){
+                GameState.coins += this.currentReward;
+                GameState.save();
+                this.updateCurrencyDisplay();
+                const btn = document.getElementById('double-reward-btn');
+                btn.disabled = true;
+                btn.textContent = '✓ Награда удвоена!';
+            }
+        });
+    }
+
+    async startLevel(levelNum){
+        // Пауза и реклама перед уровнем
+        this.paused = true;
+        AudioManager.pauseMusic();
+        await VKBridge.showInterstitial();
+        AudioManager.resumeMusic();
+        this.paused = false;
+
+        GameState.currentLevel = levelNum;
+        const data = Levels.getLevel(levelNum);
+
+        this.currentOrder = data.order;
+        this.currentBurger = [];
+        this.timeLeft = data.timeLimit;
+        this.currentReward = data.reward;
+        this.availableIngredients = data.availableIngredients;
+
+        this.renderOrder();
+        this.renderIngredients();
+        this.renderBurgerStack();
+        this.updateTimerDisplay();
+        this.showScreen('level-screen');
+        this.gameActive = true;
+
+        if(this.timerInterval) clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(()=>{
+            if(!this.gameActive || this.paused) return;
+            this.timeLeft--;
+            this.updateTimerDisplay();
+            if(this.timeLeft <= 0) this.failLevel();
+        }, 1000);
+
+        GameState.save();
+    }
+
+    renderOrder(){
+        const c = document.getElementById('order-items');
+        c.innerHTML = '';
+        this.currentOrder.forEach(id=>{
+            const ing = Levels.all().find(i=>i.id === id);
+            if(!ing) return;
+            const el = document.createElement('div');
+            el.className = 'order-item';
+            el.textContent = `${ing.emoji} ${ing.name}`;
+            c.appendChild(el);
+        });
+    }
+
+    renderIngredients(){
+        const c = document.getElementById('ingredients-list');
+        c.innerHTML = '';
+        const all = Levels.all();
+        this.availableIngredients.forEach(id=>{
+            const ing = all.find(i=>i.id === id);
+            if(!ing) return;
+            const btn = document.createElement('button');
+            btn.className = 'ingredient-btn';
+            btn.innerHTML = `<span class="emoji">${ing.emoji}</span><span>${ing.name}</span>`;
+            btn.addEventListener('click', ()=>this.addIngredient(id));
+            c.appendChild(btn);
+        });
+    }
+
+    addIngredient(id){
+        if(!this.gameActive) return;
+        this.currentBurger.push(id);
+        this.renderBurgerStack();
+        AudioManager.playSound('click');
+        Tasks.updateProgress('use_ingredient', 1);
+    }
+
+    renderBurgerStack(){
+        const c = document.getElementById('burger-stack');
+        c.innerHTML = '';
+        const all = Levels.all();
+        this.currentBurger.forEach(id=>{
+            const ing = all.find(i=>i.id === id);
+            if(!ing) return;
+            const layer = document.createElement('div');
+            layer.className = 'burger-layer';
+            layer.style.background = Levels.getColor(id);
+            layer.textContent = ing.name;
+            c.appendChild(layer);
+        });
+    }
+
+    serveBurger(){
+        if(!this.gameActive) return;
+        const correct = this.arraysEqual(this.currentBurger, this.currentOrder);
+        if(correct){
+            AudioManager.playSound('correct');
+            this.completeLevel();
+        } else {
+            AudioManager.playSound('error');
+            this.showToast(t('wrong_order'));
+            this.clearBurger();
+        }
+    }
+
+    arraysEqual(a, b){
+        if(a.length !== b.length) return false;
+        const sa = [...a].sort();
+        const sb = [...b].sort();
+        return sa.every((v,i)=>v === sb[i]);
+    }
+
+    clearBurger(){
+        this.currentBurger = [];
+        this.renderBurgerStack();
+    }
+
+    completeLevel(){
+        this.gameActive = false;
+        clearInterval(this.timerInterval);
+
+        GameState.coins += this.currentReward;
+        GameState.totalCoinsEarned += this.currentReward;
+        GameState.totalBurgersServed++;
+
+        if(this.arraysEqual(this.currentBurger, this.currentOrder)){
+            GameState.totalPerfectBurgers++;
+            Tasks.updateProgress('perfect', 1);
+        }
+        if(!GameState.completedLevels.includes(GameState.currentLevel)){
+            GameState.completedLevels.push(GameState.currentLevel);
+        }
+        if(GameState.currentLevel >= GameState.maxLevel){
+            GameState.maxLevel = GameState.currentLevel + 1;
+        }
+        Tasks.updateProgress('serve', 1);
+        Tasks.updateProgress('earn', this.currentReward);
+        Tasks.updateProgress('complete_levels', 1);
+
+        GameState.save();
+        this.updateCurrencyDisplay();
+        this.showLevelResult();
+    }
+
+    failLevel(){
+        this.gameActive = false;
+        clearInterval(this.timerInterval);
+        this.showToast(t('time_out'));
+        setTimeout(()=>this.showScreen('lobby'), 1400);
+    }
+
+    showLevelResult(){
+        const stats = document.getElementById('result-stats');
+        stats.innerHTML = `
+            <p style="font-size:20px;color:#4ecdc4;font-weight:700">Уровень ${GameState.currentLevel} пройден!</p>
+            <p style="color:#ffd166;font-weight:700;margin-top:10px">+${this.currentReward} 🪙</p>
+        `;
+        const btn = document.getElementById('double-reward-btn');
+        btn.disabled = false;
+        btn.textContent = t('double_reward');
+        this.showScreen('result-screen');
+    }
+
+    updateTimerDisplay(){
+        const el = document.getElementById('timer-value');
+        if(el) el.textContent = Math.max(0, this.timeLeft);
+    }
+
+    renderLevelsGrid(){
+        const c = document.getElementById('levels-grid');
+        c.innerHTML = '';
+        for(let i=1; i<=500; i++){
+            const btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.textContent = i;
+            if(GameState.completedLevels.includes(i)) btn.classList.add('completed');
+            if(i > GameState.maxLevel){ btn.classList.add('locked'); btn.disabled = true; }
+            btn.addEventListener('click', ()=>{ if(!btn.disabled) this.startLevel(i); });
+            c.appendChild(btn);
+        }
+    }
+
+    renderTasks(){
+        const c = document.getElementById('tasks-list');
+        c.innerHTML = '';
+        Tasks.dailyTasks.forEach(task=>{
+            const el = document.createElement('div');
+            el.className = 'task-item' + (task.completed ? ' completed' : '');
+            const prog = Tasks.progress[task.id] || 0;
+            const progText = task.completed ? '✅' : `${prog}/${task.target}`;
+            el.innerHTML = `
+                <div style="flex:1;min-width:0">
+                    <div style="font-size:14px">${task.text}</div>
+                    <small style="color:#aaa">${progText}</small>
+                </div>
+                <div style="text-align:right">
+                    <div style="color:#ffd166;font-weight:700">${task.reward} 🪙</div>
+                    ${task.completed && !task.claimed ? `<button class="main-btn" data-tid="${task.id}" style="margin-top:6px;padding:6px 12px;font-size:12px">${t('claim')}</button>` : ''}
+                    ${task.claimed ? '<div style="margin-top:6px">✅</div>' : ''}
+                </div>
+            `;
+            c.appendChild(el);
+        });
+        c.querySelectorAll('button[data-tid]').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+                Tasks.claimReward(btn.dataset.tid);
+                this.renderTasks();
+                this.updateCurrencyDisplay();
+            });
+        });
+    }
+
+    checkDailyReward(){
+        const today = new Date().toDateString();
+        const status = document.getElementById('daily-status');
+        const btn = document.getElementById('daily-claim');
+        if(GameState.lastDailyReward === today){
+            status.textContent = t('daily_claimed');
+            btn.disabled = true;
+        } else {
+            status.textContent = t('daily_available');
+            btn.disabled = false;
+        }
+    }
+
+    claimDailyReward(){
+        const today = new Date().toDateString();
+        if(GameState.lastDailyReward === today) return;
+        GameState.lastDailyReward = today;
+        GameState.coins += 500;
+        GameState.save();
+        this.updateCurrencyDisplay();
+        document.getElementById('daily-status').textContent = t('daily_claimed');
+        document.getElementById('daily-claim').disabled = true;
+        AudioManager.playSound('coin');
+        this.showToast('+500 🪙');
+    }
+
+    renderShop(){
+        const c = document.getElementById('shop-items');
+        c.innerHTML = '';
+
+        Levels.premiumIngredients.forEach(ing=>{
+            const owned = GameState.purchasedIngredients.includes(ing.id);
+            const el = document.createElement('div');
+            el.className = 'shop-item';
+            el.innerHTML = `
+                <div style="font-size:32px">${ing.emoji}</div>
+                <div style="font-size:12px">${ing.name}</div>
+                <div class="price">${ing.price} 🪙</div>
+                <button class="main-btn" ${owned ? 'disabled' : ''} style="font-size:12px;padding:8px 12px">
+                    ${owned ? t('already_owned') : t('purchase')}
+                </button>
+            `;
+            if(!owned){
+                el.querySelector('button').addEventListener('click', ()=>{
+                    if(GameState.coins >= ing.price){
+                        GameState.coins -= ing.price;
+                        GameState.purchasedIngredients.push(ing.id);
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                        AudioManager.playSound('coin');
+                    } else this.showToast(t('not_enough_coins'));
+                });
+            }
+            c.appendChild(el);
+        });
+
+        if(!GameState.hasCoffeeMachine){
+            const el = document.createElement('div');
+            el.className = 'shop-item';
+            el.innerHTML = `
+                <div style="font-size:32px">☕</div>
+                <div style="font-size:12px">Кофемашина</div>
+                <div class="price">5000 🪙</div>
+                <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+            `;
+            el.querySelector('button').addEventListener('click', ()=>{
+                if(GameState.coins >= 5000){
+                    GameState.coins -= 5000;
+                    GameState.hasCoffeeMachine = true;
+                    GameState.save();
+                    this.updateCurrencyDisplay();
+                    this.renderShop();
+                } else this.showToast(t('not_enough_coins'));
+            });
+            c.appendChild(el);
+        }
+
+        if(!GameState.hasLemonadeMachine){
+            const el = document.createElement('div');
+            el.className = 'shop-item';
+            el.innerHTML = `
+                <div style="font-size:32px">🍋</div>
+                <div style="font-size:12px">Машина для лимонада</div>
+                <div class="price">4000 🪙</div>
+                <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+            `;
+            el.querySelector('button').addEventListener('click', ()=>{
+                if(GameState.coins >= 4000){
+                    GameState.coins -= 4000;
+                    GameState.hasLemonadeMachine = true;
+                    GameState.save();
+                    this.updateCurrencyDisplay();
+                    this.renderShop();
+                } else this.showToast(t('not_enough_coins'));
+            });
+            c.appendChild(el);
+        }
+
+        const cost = AFKRoom.rate * 1000;
+        const el = document.createElement('div');
+        el.className = 'shop-item';
+        el.innerHTML = `
+            <div style="font-size:32px">⚡</div>
+            <div style="font-size:12px">+1 🪙 / мин в AFK</div>
+            <div class="price">${cost} 🪙</div>
+            <button class="main-btn" style="font-size:12px;padding:8px 12px">${t('purchase')}</button>
+        `;
+        el.querySelector('button').addEventListener('click', ()=>{
+            if(GameState.coins >= cost){
+                GameState.coins -= cost;
+                AFKRoom.upgradeRate();
+                GameState.save();
+                this.updateCurrencyDisplay();
+                this.renderShop();
+            } else this.showToast(t('not_enough_coins'));
+        });
+        c.appendChild(el);
+    }
+
+    async handlePromoCode(){
+        const input = document.getElementById('promo-input');
+        const code = input.value.trim().toLowerCase();
+        if(code === 'clear12'){
+            await VKBridge.clearAllData();
+            this.showToast(t('promo_clear'));
+            setTimeout(()=>location.reload(), 1200);
+        } else if(code === 'admin17'){
+            GameState.coins += 1000000;
+            GameState.save();
+            this.updateCurrencyDisplay();
+            this.showToast(t('promo_admin'));
+        } else {
+            this.showToast(t('promo_invalid'));
+        }
+        input.value = '';
+    }
+
+    showTutorialPrompt(){
+        const modal = document.createElement('div');
+        modal.className = 'modal-bg';
+        modal.innerHTML = `<h2>${t('tutorial_prompt')}</h2>`;
+        const yes = document.createElement('button');
+        yes.className = 'main-btn';
+        yes.textContent = t('tutorial_yes');
+        yes.onclick = ()=>{ modal.remove(); this.startTutorial(); };
+        const no = document.createElement('button');
+        no.className = 'secondary-btn';
+        no.textContent = t('tutorial_no');
+        no.onclick = ()=>{ modal.remove(); this.skipTutorial(); };
+        modal.appendChild(yes);
+        modal.appendChild(no);
+        document.body.appendChild(modal);
+    }
+
+    startTutorial(){
+        this.tutorialStep = 0;
+        this.showScreen('tutorial-screen');
+        this.nextTutorialStep();
+    }
+
+    nextTutorialStep(){
+        const steps = [
+            t('tutorial_welcome'),
+            t('tutorial_order'),
+            t('tutorial_ingredients'),
+            t('tutorial_serve'),
+            t('tutorial_timer')
+        ];
+        if(this.tutorialStep >= steps.length){
+            GameState.tutorialCompleted = true;
+            GameState.save();
+            this.showScreen('lobby');
+            return;
+        }
+        document.getElementById('tutorial-title').textContent = t('tutorial_title');
+        document.getElementById('tutorial-text').textContent = steps[this.tutorialStep];
+        this.tutorialStep++;
+    }
+
+    skipTutorial(){
+        GameState.tutorialCompleted = true;
+        GameState.save();
+        this.showScreen('lobby');
+    }
+
+    showToast(text){
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.textContent = text;
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(), 2200);
+    }
+
+    updateCurrencyDisplay(){
+        const c = document.getElementById('coin-count');
+        const l = document.getElementById('level-number');
+        if(c) c.textContent = GameState.coins;
+        if(l) l.textContent = GameState.maxLevel;
+    }
+
+    pause(){ this.paused = true; }
+    resume(){ this.paused = false; }
 }
 
-/* ============ UPGRADE TREE ============ */
-$('#btn-tree').onclick=()=>{if(tutActive)return;renderTree();showElement('ov-tree');sfx('click');};
-$('#tree-close').onclick=()=>hideElement('ov-tree');
-function renderTree(){
-  $('#tree-points').textContent=P.skillPoints;
-  const wrap=$('#tree-body');wrap.innerHTML='';
-  Object.keys(UPGRADES).forEach(bKey=>{
-    const b=UPGRADES[bKey];
-    const div=document.createElement('div');div.className='tree-branch';
-    const h=document.createElement('h3');
-    h.innerHTML=b.icon+' '+((P.lang==='en')?b.en:b.ru);
-    div.appendChild(h);
-    b.items.forEach(it=>{
-      const lvl=upgLvl(bKey,it.id);
-      const maxed=lvl>=it.max;
-      const cost=maxed?0:it.cost[lvl];
-      const row=document.createElement('div');row.className='tree-item';
-      let dots='';for(let i=0;i<it.max;i++)dots+='<i class="'+(i<lvl?'on':'')+'"></i>';
-      row.innerHTML=
-        '<div class="icon">'+(maxed?'✅':'⭐')+'</div>'+
-        '<div class="info"><b>'+((P.lang==='en')?it.en:it.ru)+'</b>'+
-          '<div class="muted">'+((P.lang==='en')?it.descEn:it.descRu)+'</div>'+
-          '<div class="dots">'+dots+'</div></div>';
-      const btn=document.createElement('button');
-      btn.className='btn small gold';
-      if(maxed){btn.textContent=t('maxLvl');btn.disabled=true;}
-      else{btn.textContent='+ '+cost+'🎖';btn.disabled=P.skillPoints<cost;
-        btn.onclick=()=>{
-          if(P.skillPoints<cost)return;
-          P.skillPoints-=cost;
-          P.upgrades[bKey][it.id]=lvl+1;
-          sfx('coin');toast(t('skillUp')+' '+((P.lang==='en')?it.en:it.ru));
-          vkSave();renderTree();refreshHud();
-        };}
-      row.appendChild(btn);
-      div.appendChild(row);
-    });
-    wrap.appendChild(div);
-  });
-}
-
-/* ============ SEASON ============ */
-$('#btn-season').onclick=()=>{if(tutActive)return;rolloverSeason();renderSeason();showElement('ov-season');sfx('click');};
-$('#season-close').onclick=()=>hideElement('ov-season');
-function currentTierAndProgress(){
-  let xp=P.season.xp;
-  let tier=0;
-  while(tier<SEASON_TIERS){
-    const need=tierXP(tier+1);
-    if(xp<need)break;
-    xp-=need; tier++;
-  }
-  return {tier,xp,need:tier<SEASON_TIERS?tierXP(tier+1):0};
-}
-function renderSeason(){
-  rolloverSeason();
-  const {tier,xp,need}=currentTierAndProgress();
-  $('#season-num').textContent='#'+(P.season.idx+1)+' · '+seasonDayLeft()+' дн.';
-  $('#season-tier').textContent=tier;
-  $('#season-xp').textContent=xp;
-  $('#season-xp-max').textContent=need||'-';
-  $('#season-bar').style.width=(tier>=SEASON_TIERS?100:Math.min(100,(xp/need*100)))+'%';
-  const wrap=$('#season-tiers');wrap.innerHTML='';
-  for(let i=1;i<=SEASON_TIERS;i++){
-    const reached=i<=tier;
-    const claimed=P.season.claimed.includes(i);
-    const isMilestone=i%5===0;
-    const reward=isMilestone?(200+i*20):(40+i*5);
-    const el=document.createElement('div');
-    el.className='tier'+(reached?' reached':'')+(claimed?' claimed':'');
-    let btn='';
-    if(reached&&!claimed)btn='<button class="claim">'+t('claimTier')+'</button>';
-    else if(claimed)btn='<span class="rew" style="color:var(--ok)">✓</span>';
-    el.innerHTML='<div class="num">'+i+'</div><div class="rew">💰'+reward+'</div>'+btn;
-    el.querySelector('.claim')&&(el.querySelector('.claim').onclick=()=>{
-      if(P.season.claimed.includes(i))return;
-      if(currentTierAndProgress().tier<i)return;
-      P.season.claimed.push(i);addCoins(reward);sfx('coin');toast(t('seasonReward')+' +'+reward+'💰');
-      vkSave();renderSeason();
-    });
-    wrap.appendChild(el);
-  }
-}
-
-/* ============ SHOP ============ */
-$('#btn-shop').onclick=()=>{if(tutActive)return;renderShop();showElement('ov-shop');sfx('click');};
-$('#shop-close').onclick=()=>hideElement('ov-shop');
-function renderShop(){
-  $('#shop-coins').textContent='💰 '+P.coins;
-  const wrap=$('#shop-list');wrap.innerHTML='';
-  SKINS.forEach(sk=>{
-    const owned=P.skins.owned.includes(sk.id);
-    const isActive=P.skins.active===sk.id;
-    const name=P.lang==='en'?sk.en:sk.ru;
-    const card=document.createElement('div');
-    card.className='skin-card'+(isActive?' active-skin':'');
-    card.innerHTML='<svg width="84" height="34" viewBox="0 0 130 50">'+
-      '<path d="M10 36 h110 l-14 12 H24 Z" fill="'+sk.hull+'" stroke="'+sk.edge+'" stroke-width="2"/>'+
-      '<rect x="58" y="14" width="4" height="22" fill="'+sk.edge+'"/>'+
-      '<path d="M62 14 h22 l-8 10 h-14 Z" fill="'+sk.glow+'"/></svg>'+
-      '<div class="nm">'+name+'</div>';
-    const b=document.createElement('button');
-    if(isActive){ b.className='btn small gold'; b.textContent=t('equipped'); b.disabled=true; }
-    else if(owned){ b.className='btn small'; b.textContent=t('equip'); b.onclick=()=>{
-      P.skins.active=sk.id; sfx('coin'); vkSave(); renderShop(); toast(t('skinOn'));
-      if($('#scr-setup').classList.contains('active'))buildShipPalette();
-      if($('#scr-game').classList.contains('active'))renderGame();
-    };}
-    else { b.className='btn small gold'; b.textContent=t('buy')+' · '+sk.price+'💰'; b.onclick=()=>{
-      if(P.coins<sk.price){toast(t('notEnough'));return;}
-      P.coins-=sk.price; P.skins.owned.push(sk.id); P.skins.active=sk.id;
-      sfx('coin'); vkSave(); refreshHud(); renderShop(); toast(t('bought'));
-    };}
-    card.appendChild(b);
-    wrap.appendChild(card);
-  });
-}
-
-/* ============ DAILY ============ */
-$('#btn-daily').onclick=()=>{if(tutActive)return;renderDaily();showElement('ov-daily');sfx('click');};
-$('#daily-close').onclick=()=>hideElement('ov-daily');
-function renderDaily(){
-  const can=P.lastDaily!==todayKey();
-  $('#daily-claim').disabled=!can;
-  $('#daily-streak').textContent=t('stWins')+': '+P.stats.wins+' · 🔥 '+P.streak;
-}
-$('#daily-claim').onclick=()=>{
-  if(P.lastDaily===todayKey()){toast(t('dailyGot'));return;}
-  P.streak=(P.lastDaily&&P.lastDaily!==todayKey())?P.streak+1:1;
-  P.lastDaily=todayKey();
-  const amt=50+Math.min(P.streak,7)*10;
-  addCoins(amt); toast(t('dailyOk')+' +'+amt+'💰'); renderDaily(); vkSave();
-};
-
-/* ============ AFK ============ */
-let afkTimer=null, afkStartCoins=0;
-$('#btn-afk').onclick=()=>{if(tutActive)return;afkStartCoins=P.coins;renderAfk();showElement('ov-afk');sfx('click');
-  afkTimer=setInterval(()=>{addCoins(2);renderAfk();},60000);};
-$('#afk-close').onclick=()=>{clearInterval(afkTimer);afkTimer=null;hideElement('ov-afk');vkSave();};
-function renderAfk(){$('#afk-earned').textContent=P.coins-afkStartCoins;}
-
-/* ============ SETTINGS ============ */
-$('#btn-settings').onclick=()=>{if(tutActive)return;renderSettings();showElement('ov-settings');sfx('click');};
-$('#settings-close').onclick=()=>hideElement('ov-settings');
-function renderSettings(){
-  document.querySelectorAll('#seg-music .btn').forEach(b=>b.classList.toggle('on',+b.dataset.val===P.music));
-  document.querySelectorAll('#seg-lang .btn').forEach(b=>b.classList.toggle('on',b.dataset.val===P.lang));
-}
-document.querySelectorAll('#seg-music .btn').forEach(b=>b.onclick=()=>{
-  P.music=+b.dataset.val; renderSettings(); vkSave();
-  if(P.music)musicStart(); else musicStop(); sfx('click');
+/* ============================================================
+   ЗАПУСК
+============================================================ */
+let Game;
+document.addEventListener('DOMContentLoaded', ()=>{
+    AudioManager.init();
+    Game = new BurgerGame();
+    window.Game = Game;
+    Game.init();
 });
-document.querySelectorAll('#seg-lang .btn').forEach(b=>b.onclick=()=>{
-  P.lang=b.dataset.val; applyI18n(); refreshHud(); renderSettings(); vkSave(); sfx('click');
-});
-$('#btn-promo').onclick=()=>{
-  const v=$('#promo-input').value.trim().toLowerCase();
-  if(v==='clear12'){
-    P={lang:P.lang,music:P.music,coins:0,xp:0,level:1,skillPoints:0,tutDone:0,lastDaily:'',streak:0,
-      missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0,abUsed:0,combo:0,crits:0,goldCells:0},
-      skins:{owned:['classic'],active:'classic'},
-      upgrades:{artillery:{},fleet:{},tactics:{}},
-      season:{idx:-1,xp:0,claimed:[]},
-      lastMod:'none'};
-    vkSave();refreshHud();rolloverSeason();checkMissionsRollover();
-    hideElement('ov-settings');
-    showElement('ov-tut-start');
-    toast(t('promoClear'));return;
-  }
-  if(v==='admin17'){addCoins(999999);toast(t('promoSucc')+' +999999💰');return;}
-  if(v==='skill7'){P.skillPoints+=7;vkSave();refreshHud();toast(t('promoSucc')+' +7 🎖');return;}
-  toast(t('promoBad'));
-};
-
-/* ============ INVITE ============ */
-$('#btn-invite').onclick=()=>{
-  if(vk)vk.send('VKWebAppShowInviteBox').then(()=>{}).catch(()=>{});
-  else toast('VK');
-};
-
-/* ============ LOBBY / MODES ============ */
-$('#btn-games').onclick=()=>{ if(tutActive)return; sfx('click');
-  const ov=document.createElement('div');ov.className='overlay active';
-  ov.innerHTML='<div class="modal"><h2>'+t('oppChoose')+'</h2>'+
-    '<button class="btn" id="m-bot">🤖 '+t('oppBot')+'</button>'+
-    '<button class="btn" id="m-friend">👥 '+t('oppFriend')+'</button></div>';
-  document.body.appendChild(ov);
-  const chooseMode=(opp)=>{
-    ov.remove();
-    const ov2=document.createElement('div');ov2.className='overlay active';
-    ov2.innerHTML='<div class="modal"><h2>'+t('modeChoose')+'</h2>'+
-      '<button class="btn" id="m-normal">⚔️ '+t('modeNormal')+'</button>'+
-      '<button class="btn gold" id="m-super">⚡ '+t('modeSuper')+'</button>'+
-      '<button class="btn" id="m-cancel">'+t('close')+'</button></div>';
-    document.body.appendChild(ov2);
-    ov2.querySelector('#m-normal').onclick=()=>{ov2.remove();chooseModifier(opp,'normal');};
-    ov2.querySelector('#m-super').onclick=()=>{ov2.remove();chooseModifier(opp,'super');};
-    ov2.querySelector('#m-cancel').onclick=()=>ov2.remove();
-  };
-  ov.querySelector('#m-bot').onclick=()=>chooseMode('bot');
-  ov.querySelector('#m-friend').onclick=()=>chooseMode('friend');
-};
-
-/* Выбор модификатора боя */
-function chooseModifier(opp,mode){
-  const ov=document.createElement('div');ov.className='overlay active';
-  const cards=MODIFIERS.map(m=>{
-    const on=(m.id===P.lastMod)?' on':'';
-    return '<div class="mod-card'+on+'" data-id="'+m.id+'">'+
-      '<div class="ico">'+m.ico+'</div>'+
-      '<div class="nm">'+((P.lang==='en')?m.en:m.ru)+'</div>'+
-      '<div class="ds">'+((P.lang==='en')?m.dEn:m.dRu)+'</div></div>';
-  }).join('');
-  ov.innerHTML='<div class="modal"><h2>'+t('modifier')+'</h2>'+
-    '<div class="mod-grid">'+cards+'</div>'+
-    '<button class="btn gold" id="mod-go" style="margin-top:12px">'+t('ready')+'</button>'+
-    '<button class="btn" id="mod-cancel">'+t('close')+'</button></div>';
-  document.body.appendChild(ov);
-  let chosen=P.lastMod||'none';
-  const paint=()=>{
-    ov.querySelectorAll('.mod-card').forEach(c=>c.classList.toggle('on',c.dataset.id===chosen));
-  };
-  ov.querySelectorAll('.mod-card').forEach(c=>c.onclick=()=>{chosen=c.dataset.id;paint();sfx('click');});
-  ov.querySelector('#mod-go').onclick=()=>{ov.remove();openSetup(opp,mode,chosen);};
-  ov.querySelector('#mod-cancel').onclick=()=>ov.remove();
-}
-
-/* ============ TUTORIAL ============ */
-const TUT=[
-  {ru:'Это лобби. Кнопка «Играть» запускает матч: против бота или с другом на одном устройстве.',en:'This is the lobby. "Play" starts a match: vs bot or with a friend on one device.',el:'#btn-games'},
-  {ru:'Во вкладке «Прокачка» вы тратите очки умений (даются за уровни адмирала) на усиления артиллерии, флота и тактики.',en:'In "Upgrades" spend skill points (earned per admiral level) on artillery, fleet and tactics skills.',el:'#btn-tree'},
-  {ru:'«Сезон» — это 30-дневная прогрессия с 50 тирами наград. Опыт сезона капает за каждый бой.',en:'"Season" is 30-day progression with 50 reward tiers. Season XP is earned per battle.',el:'#btn-season'},
-  {ru: 'В «Заданиях» — ежедневные миссии с наградами в монетах.',en:'In "Missions" there are daily quests with coin rewards.',el:'#btn-tasks'},
-  {ru:'В «Магазине» покупайте и устанавливайте скины флота за монеты.',en:'In the "Shop" buy and equip fleet skins with coins.',el:'#btn-shop'},
-  {ru:'Во время боя коснитесь клетки противника, чтобы выстрелить. Попадание даёт ещё один выстрел!',en:'During battle tap an enemy cell to fire. A hit grants another shot!',el:'#btn-games'},
-  {ru:'Кстати: потопленный корабль открывает мёртвую зону вокруг себя — туда стрелять бессмысленно.',en:'By the way: a sunk ship reveals a dead zone around it — shooting there is pointless.',el:'#btn-games'},
-  {ru:'В режиме «Суперспособности» вам доступны сонар, двойной залп и торпеда.',en:'In "Super abilities" mode you get sonar, double shot and torpedo.',el:'#btn-games'},
-  {ru:'Перед боем выбирайте модификатор: двойное золото, попутный ветер, шторм или золотая лихорадка.',en:'Before battle choose a modifier: double gold, lucky wind, storm or gold rush.',el:'#btn-games'},
-];
-let tutStep=-1, tutSpot=null, tutBox=null, tutActive=false;
-const LOBBY_BTNS=['#btn-games','#btn-tree','#btn-season','#btn-tasks','#btn-shop','#btn-settings','#btn-daily','#btn-afk','#btn-invite'];
-function lockLobby(locked){
-  LOBBY_BTNS.forEach(s=>{const b=$(s);if(b)b.disabled=locked;});
-}
-$('#tut-yes').onclick=()=>{hideElement('ov-tut-start');P.tutDone=1;vkSave();startTutorial();};
-$('#tut-no').onclick=()=>{hideElement('ov-tut-start');P.tutDone=1;vkSave();};
-function startTutorial(){
-  tutActive=true; tutStep=-1;
-  lockLobby(true);
-  tutNext();
-}
-function tutNext(){
-  if(tutSpot){tutSpot.remove();tutSpot=null;}
-  if(tutBox){tutBox.remove();tutBox=null;}
-  tutStep++;
-  if(tutStep>=TUT.length){
-    tutActive=false; lockLobby(false);
-    toast(t('done')); return;
-  }
-  const s=TUT[tutStep];
-  const target=document.querySelector(s.el);
-  if(target&&getComputedStyle(target).display!=='none'){
-    const r=target.getBoundingClientRect();
-    tutSpot=document.createElement('div');tutSpot.className='tut-spot';
-    tutSpot.style.top=(r.top-4)+'px';tutSpot.style.left=(r.left-4)+'px';
-    tutSpot.style.width=(r.width+8)+'px';tutSpot.style.height=(r.height+8)+'px';
-    document.body.appendChild(tutSpot);
-  }
-  tutBox=document.createElement('div');tutBox.className='tut-box';
-  tutBox.innerHTML='<div>'+((P.lang==='en')?s.en:s.ru)+'</div>'+
-    '<div class="row"><button class="btn small gold" id="tut-next">'+t('next')+'</button>'+
-    '<button class="btn small" id="tut-skip">'+t('tutNo')+'</button></div>';
-  document.body.appendChild(tutBox);
-  $('#tut-next').onclick=tutNext;
-  $('#tut-skip').onclick=()=>{tutStep=TUT.length;tutNext();};
-}
-
-/* ============ BUBBLES DECOR ============ */
-(function bubbles(){
-  const bg=document.querySelector('.sea-bg');
-  for(let i=0;i<8;i++){
-    const b=document.createElement('div');b.className='bubble';
-    b.style.left=(5+Math.random()*90)+'%';
-    b.style.animationDuration=(7+Math.random()*8)+'s';
-    b.style.animationDelay=(Math.random()*9)+'s';
-    const s=6+Math.random()*10;b.style.width=s+'px';b.style.height=s+'px';
-    bg.appendChild(b);
-  }
-})();
-
-/* ============ INIT ============ */
-window.addEventListener('resize',()=>{
-  if($('#scr-setup').classList.contains('active'))renderSetup();
-  if($('#scr-game').classList.contains('active'))renderGame();
-});
-refreshHud();applyI18n();
 </script>
 </body>
 </html>
