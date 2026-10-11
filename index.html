@@ -10,285 +10,603 @@
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
 <style>
+/* ============ BASE ============ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:'Segoe UI',Roboto,sans-serif;color:#fff;font-size:14px}
+html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:'Segoe UI',Roboto,sans-serif;color:#fff;font-size:14px}
 #game-container{position:relative;width:100%;height:100%;overflow:hidden}
-#game-canvas{position:absolute;inset:0;width:100%;height:100%;background:#16213e}
+#game-canvas{position:absolute;inset:0;width:100%;height:100%;background:#1a0f2e}
 #ui-layer{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;z-index:2}
 #ui-layer>*{pointer-events:auto}
 
-/* Верхняя панель — исправлено: relative + высокий z-index */
-#top-bar{
-    position:relative;
-    z-index:100;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:8px 12px;
-    background:linear-gradient(180deg,rgba(26,26,46,.98),rgba(26,26,46,.85));
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid rgba(255,255,255,.12);
-    height:44px;
-    flex-shrink:0;
-}
-#currency-display,#level-display{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:800;padding:4px 10px;border-radius:20px;background:rgba(0,0,0,.4)}
-#currency-display{color:#ffd166;text-shadow:0 0 8px rgba(255,209,102,.5)}
-#level-display{color:#4ecdc4}
-.icon-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:18px;cursor:pointer;padding:6px 10px;border-radius:50%;color:#fff;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
-.icon-btn:active{background:rgba(255,255,255,.2)}
+/* ============ КРАСИВЫЕ СКРОЛЛБАРЫ ============ */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:4px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#ff6b35,#ff8c42);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ff8c42,#ffa566)}
+*{scrollbar-width:thin;scrollbar-color:#ff6b35 rgba(255,255,255,.05)}
 
-/* Экраны */
-.screen{display:none;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;padding:56px 16px 16px;background:linear-gradient(180deg,rgba(26,26,46,.96),rgba(22,33,62,.98));z-index:5;overflow-y:auto}
+/* ============ ICONS ============ */
+.svg-icon{display:inline-block;vertical-align:middle;width:1em;height:1em;flex-shrink:0}
+.i-fill{fill:currentColor}
+
+/* ============ TOP BAR ============ */
+#top-bar{
+  position:relative;z-index:100;display:flex;justify-content:space-between;align-items:center;
+  padding:8px 12px;height:48px;flex-shrink:0;
+  background:linear-gradient(180deg,rgba(30,15,60,.98),rgba(20,10,45,.92));
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,200,100,.25);
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#currency-display,#level-display{
+  display:flex;align-items:center;gap:6px;font-size:16px;font-weight:800;
+  padding:5px 12px;border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,107,53,.25),rgba(255,209,102,.15));
+  border:1px solid rgba(255,200,100,.35);
+  box-shadow:0 0 12px rgba(255,150,50,.2), inset 0 1px 0 rgba(255,255,255,.1);
+}
+#currency-display{color:#ffd166;text-shadow:0 0 8px rgba(255,209,102,.6)}
+#currency-display .svg-icon{font-size:18px;filter:drop-shadow(0 0 4px rgba(255,200,80,.7))}
+#level-display{color:#4ecdc4;text-shadow:0 0 8px rgba(78,205,196,.6)}
+.icon-btn{
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.2);font-size:20px;cursor:pointer;
+  padding:6px;border-radius:50%;color:#fff;width:38px;height:38px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), 0 2px 8px rgba(0,0,0,.3);
+}
+.icon-btn:active{background:rgba(255,255,255,.25);transform:scale(.93)}
+.icon-btn .svg-icon{width:20px;height:20px;color:#ffd166}
+
+/* ============ SCREENS ============ */
+.screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  position:absolute;inset:0;padding:60px 16px 20px;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,107,53,.15),transparent 50%),
+    radial-gradient(circle at 80% 90%,rgba(78,205,196,.12),transparent 50%),
+    linear-gradient(180deg,rgba(30,15,60,.98),rgba(15,8,35,.99));
+  z-index:5;overflow-y:auto;
+}
 .screen.active{display:flex}
 
-/* ===== ЛОББИ ===== */
-#lobby{justify-content:flex-start;padding-top:60px}
+/* ============ LOBBY ============ */
+#lobby{justify-content:flex-start;padding-top:64px}
 .lobby-hero{
-    width:140px;height:140px;margin-bottom:8px;
-    filter:drop-shadow(0 8px 24px rgba(255,107,53,.4));
-    animation:float 3s ease-in-out infinite;
+  width:160px;height:160px;margin-bottom:6px;
+  filter:drop-shadow(0 10px 30px rgba(255,107,53,.55));
+  animation:float 3.5s ease-in-out infinite;
 }
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+#restaurant-title-display{
+  font-size:22px;font-weight:900;letter-spacing:1px;
+  background:linear-gradient(135deg,#ffd166,#ff6b35,#ffd166);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shine 3s linear infinite;
+  text-align:center;margin-bottom:14px;
+  filter:drop-shadow(0 2px 6px rgba(255,150,50,.4));
+}
+@keyframes shine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
 .lobby-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    width:100%;
-    max-width:400px;
-    margin-top:10px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  width:100%;max-width:400px;margin-top:10px;
 }
 .menu-card{
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    padding:14px 8px;
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:16px;
-    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
-    color:#fff;
-    cursor:pointer;
-    transition:transform .1s,background .2s,box-shadow .2s;
-    box-shadow:0 4px 12px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15);
-    font-family:inherit;
-    min-height:88px;
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:14px 8px;border:1px solid rgba(255,255,255,.15);border-radius:16px;
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));
+  color:#fff;cursor:pointer;
+  transition:transform .12s,background .2s,box-shadow .2s;
+  box-shadow:0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+  font-family:inherit;min-height:92px;
 }
-.menu-card:active{transform:scale(.95);background:rgba(255,255,255,.15)}
-.menu-icon{font-size:26px;line-height:1}
-.menu-label{font-size:11px;font-weight:700;text-align:center;letter-spacing:.3px}
+.menu-card:active{transform:scale(.95);background:rgba(255,255,255,.18);box-shadow:0 2px 8px rgba(255,107,53,.4)}
+.menu-card .svg-icon{width:30px;height:30px;color:#ffd166;filter:drop-shadow(0 2px 6px rgba(255,180,60,.5))}
+.menu-card .menu-label{font-size:11px;font-weight:700;text-align:center;letter-spacing:.3px}
 .menu-card.play-card{
-    grid-column:1 / -1;
-    flex-direction:row;
-    gap:14px;
-    min-height:70px;
-    background:linear-gradient(135deg,#ff6b35,#ff8c42);
-    border-color:rgba(255,209,102,.5);
-    box-shadow:0 8px 24px rgba(255,107,53,.5), inset 0 1px 0 rgba(255,255,255,.3);
+  grid-column:1 / -1;flex-direction:row;gap:14px;min-height:72px;
+  background:linear-gradient(135deg,#ff6b35,#ff8c42,#ffb84d);
+  border-color:rgba(255,209,102,.6);
+  box-shadow:0 8px 28px rgba(255,107,53,.55), inset 0 1px 0 rgba(255,255,255,.35);
+  animation:pulse-play 2.4s ease-in-out infinite;
 }
-.menu-card.play-card .menu-icon{font-size:32px}
-.menu-card.play-card .menu-label{font-size:20px;font-weight:800;letter-spacing:1px}
-.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 8px #ff3b30}
+@keyframes pulse-play{0%,100%{box-shadow:0 8px 28px rgba(255,107,53,.55), inset 0 1px 0 rgba(255,255,255,.35)}50%{box-shadow:0 8px 36px rgba(255,140,66,.8), inset 0 1px 0 rgba(255,255,255,.4)}}
+.menu-card.play-card .svg-icon{width:34px;height:34px;color:#fff}
+.menu-card.play-card .menu-label{font-size:20px;font-weight:900;letter-spacing:1.5px;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+.badge-dot{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 10px #ff3b30;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
-/* ===== ЭКРАН УРОВНЯ ===== */
-#level-screen{
-    padding:50px 0 0 0;
-    justify-content:flex-start;
-    overflow:hidden;
-    background:linear-gradient(180deg,rgba(26,26,46,.98),rgba(22,33,62,.98));
-}
+/* ============ LEVEL SCREEN ============ */
+#level-screen{padding:48px 0 0 0;justify-content:flex-start;overflow:hidden;background:linear-gradient(180deg,#1e0f3c,#0f0825)}
 #restaurant-scene{
-    width:100%;
-    height:32vh;
-    min-height:160px;
-    max-height:230px;
-    flex-shrink:0;
-    background:#0d0d1a;
-    position:relative;
-    overflow:hidden;
+  width:100%;height:34vh;min-height:180px;max-height:250px;flex-shrink:0;
+  background:#0a0518;position:relative;overflow:hidden;
+  border-bottom:2px solid rgba(255,200,100,.3);
+  box-shadow:0 4px 24px rgba(0,0,0,.7), inset 0 -20px 40px rgba(0,0,0,.5);
 }
 #restaurant-svg{width:100%;height:100%;display:block}
-#level-content{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:8px;
-    overflow-y:auto;
-    min-height:0;
-}
+#level-content{flex:1;display:flex;flex-direction:column;gap:8px;padding:8px;overflow-y:auto;min-height:0}
 
 #order-panel{
-    background:linear-gradient(135deg,rgba(255,107,53,.2),rgba(255,107,53,.08));
-    border:1px solid rgba(255,107,53,.4);
-    border-radius:14px;
-    padding:8px 12px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
+  background:linear-gradient(135deg,rgba(255,107,53,.22),rgba(255,140,66,.08));
+  border:1px solid rgba(255,140,66,.5);border-radius:14px;padding:10px 12px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  box-shadow:0 0 20px rgba(255,107,53,.15), inset 0 1px 0 rgba(255,255,255,.1);
 }
 #order-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:4px}
-#order-customer{font-size:13px;font-weight:700;color:#ffd166}
-#order-timer{font-size:14px;font-weight:800;color:#4ecdc4}
-#order-items{display:flex;flex-wrap:wrap;gap:4px;width:100%}
-.order-item{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,.12);border-radius:8px;font-size:20px}
+#order-customer{font-size:13px;font-weight:800;color:#ffd166;display:flex;align-items:center;gap:6px}
+#order-timer{font-size:14px;font-weight:800;color:#4ecdc4;display:flex;align-items:center;gap:4px}
+#order-timer .svg-icon{width:16px;height:16px}
+#order-items{display:flex;flex-wrap:wrap;gap:5px;width:100%}
+.order-item{
+  display:flex;align-items:center;justify-content:center;width:38px;height:38px;
+  background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.2);border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15);
+}
+.order-item .svg-icon{width:24px;height:24px}
 
 #burger-stack{
-    display:flex;
-    flex-direction:column-reverse;
-    align-items:center;
-    gap:2px;
-    min-height:80px;
-    max-height:130px;
-    overflow-y:auto;
-    padding:6px;
-    border:2px dashed rgba(255,209,102,.35);
-    border-radius:12px;
-    background:rgba(0,0,0,.35);
+  display:flex;flex-direction:column-reverse;align-items:center;gap:2px;
+  min-height:80px;max-height:130px;overflow-y:auto;padding:6px;
+  border:2px dashed rgba(255,209,102,.4);border-radius:12px;
+  background:rgba(0,0,0,.4);
+  box-shadow:inset 0 0 20px rgba(255,150,50,.08);
 }
 .burger-layer{
-    width:85%;
-    min-height:18px;
-    border-radius:5px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:11px;
-    color:#333;
-    font-weight:800;
-    padding:2px 6px;
-    box-shadow:0 2px 4px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
-    animation:layerPop .2s ease-out;
+  width:85%;min-height:20px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:#1a0f2e;font-weight:900;padding:3px 8px;
+  box-shadow:0 2px 6px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5);
+  animation:layerPop .22s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes layerPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.burger-layer .svg-icon{width:16px;height:16px;margin-right:4px}
+@keyframes layerPop{from{opacity:0;transform:scale(.7) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
-#ingredients-list{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(66px,1fr));
-    gap:6px;
-}
+#ingredients-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
 .ingredient-btn{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:2px;
-    padding:8px 4px;
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:10px;
-    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
-    color:#fff;
-    font-size:10px;
-    cursor:pointer;
-    font-family:inherit;
-    transition:transform .1s,background .15s;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.15);
+  display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;
+  border:1px solid rgba(255,255,255,.2);border-radius:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));
+  color:#fff;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:transform .1s,background .15s,box-shadow .2s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15), 0 2px 6px rgba(0,0,0,.3);
 }
-.ingredient-btn:active{background:rgba(255,255,255,.2);transform:scale(.95)}
-.ingredient-btn .emoji{font-size:24px;line-height:1}
+.ingredient-btn:active{background:rgba(255,255,255,.22);transform:scale(.93);box-shadow:0 0 14px rgba(255,180,60,.6)}
+.ingredient-btn .svg-icon{width:26px;height:26px}
 
 #level-actions{display:flex;gap:8px;margin-top:auto;padding-top:4px}
 #level-actions button{flex:1}
 
-/* Общие кнопки */
+/* ============ BUTTONS ============ */
 .main-btn{
-    padding:14px 20px;
-    font-size:16px;
-    font-weight:800;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(135deg,#ff6b35,#ff8c42);
-    color:#fff;
-    cursor:pointer;
-    box-shadow:0 4px 15px rgba(255,107,53,.4), inset 0 1px 0 rgba(255,255,255,.3);
-    font-family:inherit;
-    letter-spacing:.3px;
+  padding:14px 20px;font-size:16px;font-weight:900;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#ff6b35,#ff8c42);color:#fff;cursor:pointer;
+  box-shadow:0 4px 18px rgba(255,107,53,.5), inset 0 1px 0 rgba(255,255,255,.35);
+  font-family:inherit;letter-spacing:.3px;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
 }
 .main-btn:active{transform:scale(.97)}
-.main-btn:disabled{opacity:.5;cursor:not-allowed}
+.main-btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.main-btn .svg-icon{width:18px;height:18px}
 .secondary-btn{
-    padding:12px 18px;
-    font-size:14px;
-    font-weight:700;
-    border:1px solid rgba(255,255,255,.25);
-    border-radius:10px;
-    background:rgba(255,255,255,.08);
-    color:#fff;
-    cursor:pointer;
-    font-family:inherit;
+  padding:12px 18px;font-size:14px;font-weight:700;
+  border:1px solid rgba(255,255,255,.28);border-radius:10px;
+  background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-family:inherit;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
 }
-.secondary-btn:active{background:rgba(255,255,255,.18)}
+.secondary-btn:active{background:rgba(255,255,255,.2)}
 
-/* ===== Прочие экраны ===== */
-#lobby h2,#levels-screen h2,#tasks-screen h2,#afk-screen h2,#daily-screen h2,#shop-screen h2,#settings-screen h2,#tutorial-screen h2,#result-screen h2{
-    font-size:22px;font-weight:800;margin-bottom:14px;color:#ffd166;text-align:center;
+/* ============ HEADINGS ============ */
+#lobby h2,#levels-screen h2,#tasks-screen h2,#afk-screen h2,#daily-screen h2,
+#shop-screen h2,#settings-screen h2,#tutorial-screen h2,#result-screen h2,
+#achievements-screen h2{
+  font-size:22px;font-weight:900;margin-bottom:14px;
+  background:linear-gradient(135deg,#ffd166,#ff8c42);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  text-align:center;letter-spacing:.5px;
 }
-#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;max-height:60vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
-.level-btn{aspect-ratio:1;border:1px solid rgba(255,255,255,.2);border-radius:10px;background:rgba(255,255,255,.05);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
-.level-btn.completed{background:linear-gradient(135deg,rgba(78,205,196,.4),rgba(78,205,196,.15));border-color:#4ecdc4;color:#c8fff6}
+
+/* ============ LEVELS GRID ============ */
+#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:7px;max-height:60vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
+.level-btn{
+  aspect-ratio:1;border:1px solid rgba(255,255,255,.22);border-radius:10px;
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;
+}
+.level-btn.completed{background:linear-gradient(135deg,rgba(78,205,196,.5),rgba(78,205,196,.2));border-color:#4ecdc4;color:#d6fffb;box-shadow:0 0 12px rgba(78,205,196,.4)}
 .level-btn.locked{opacity:.3;cursor:not-allowed}
-.level-btn.current{border-color:#ffd166;box-shadow:0 0 10px rgba(255,209,102,.6)}
+.level-btn.current{border-color:#ffd166;box-shadow:0 0 14px rgba(255,209,102,.8);background:linear-gradient(135deg,rgba(255,209,102,.3),rgba(255,140,66,.15))}
 
+/* ============ TASKS ============ */
 #tasks-list{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:4px}
-.task-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.1);gap:10px}
-.task-item.completed{border-color:#4ecdc4;background:rgba(78,205,196,.15)}
+.task-item{
+  display:flex;justify-content:space-between;align-items:center;padding:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  border-radius:12px;border:1px solid rgba(255,255,255,.12);gap:10px;
+}
+.task-item.completed{border-color:#4ecdc4;background:rgba(78,205,196,.16);box-shadow:0 0 14px rgba(78,205,196,.25)}
 
-#settings-screen label{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:15px}
-#settings-screen select,#promo-input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:15px;width:100%;max-width:300px;font-family:inherit}
-.promo-section{display:flex;flex-direction:column;gap:8px;margin:16px 0;width:100%;max-width:300px}
+/* ============ ACHIEVEMENTS ============ */
+#achievements-list{width:100%;max-width:520px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:4px}
+.ach-item{display:flex;gap:12px;align-items:center;padding:12px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);border-radius:12px}
+.ach-item.unlocked{border-color:#ffd166;background:linear-gradient(160deg,rgba(255,209,102,.2),rgba(255,140,66,.08));box-shadow:0 0 16px rgba(255,180,60,.3)}
+.ach-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,rgba(255,255,255,.15),rgba(255,255,255,.03));flex-shrink:0}
+.ach-icon .svg-icon{width:26px;height:26px;color:#ffd166}
+.ach-item:not(.unlocked) .ach-icon .svg-icon{color:#666;opacity:.5}
 
-#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:60vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
-.shop-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;text-align:center}
-.shop-item .price{color:#ffd166;font-weight:800}
+/* ============ SETTINGS ============ */
+#settings-screen label{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:15px;width:100%;max-width:340px}
+#settings-screen select,#promo-input,#name-input{
+  padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.08);color:#fff;font-size:15px;
+  width:100%;max-width:340px;font-family:inherit;outline:none;
+}
+#settings-screen input[type=checkbox]{width:20px;height:20px;accent-color:#ff6b35}
+.promo-section{display:flex;flex-direction:column;gap:8px;margin:16px 0;width:100%;max-width:340px;align-items:center}
+
+/* ============ SHOP ============ */
+#shop-categories{display:flex;gap:6px;overflow-x:auto;padding:4px 4px 10px;width:100%;max-width:560px;-webkit-overflow-scrolling:touch}
+.shop-cat{
+  flex-shrink:0;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:800;
+  border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);
+  color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.shop-cat.active{background:linear-gradient(135deg,#ff6b35,#ff8c42);border-color:transparent;box-shadow:0 4px 14px rgba(255,107,53,.5)}
+.shop-cat .svg-icon{width:16px;height:16px}
+#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:55vh;overflow-y:auto;width:100%;max-width:560px;padding:4px}
+.shop-item{
+  display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.14);border-radius:14px;text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1);
+}
+.shop-item .preview{width:60px;height:60px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);overflow:hidden}
+.shop-item .preview .svg-icon{width:40px;height:40px}
+.shop-item .price{color:#ffd166;font-weight:800;font-size:13px;display:flex;align-items:center;gap:4px}
+.shop-item .price .svg-icon{width:14px;height:14px}
 .shop-item button{width:100%;padding:8px;font-size:12px}
+.shop-item .item-name{font-size:12px;font-weight:700}
 
-.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(255,107,53,.95);padding:10px 20px;border-radius:12px;color:#fff;font-weight:800;z-index:1000;animation:fadeInOut 2.2s ease-in-out;max-width:80%;text-align:center;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
-@keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(-10px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:1000;padding:20px;text-align:center}
-.modal-bg h2{font-size:18px;max-width:400px;line-height:1.4}
-.modal-bg button{min-width:180px}
+/* ============ TOAST / MODAL ============ */
+.toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(255,107,53,.98),rgba(255,140,66,.98));
+  padding:12px 22px;border-radius:14px;color:#fff;font-weight:800;z-index:1000;
+  animation:fadeInOut 2.2s ease-in-out;max-width:80%;text-align:center;font-size:13px;
+  box-shadow:0 8px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.3);
+}
+@keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(-12px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-12px)}}
+.modal-bg{
+  position:fixed;inset:0;background:rgba(5,2,15,.88);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  z-index:1000;padding:20px;text-align:center;
+}
+.modal-bg h2{font-size:18px;max-width:400px;line-height:1.4;color:#ffd166}
+.modal-bg button{min-width:200px}
 
-/* SVG-клиенты */
+/* ============ LEVEL UP FX ============ */
+.levelup-fx{
+  position:fixed;inset:0;pointer-events:none;z-index:900;display:flex;align-items:center;justify-content:center;
+}
+.levelup-fx span{
+  font-size:48px;font-weight:900;
+  background:linear-gradient(135deg,#ffd166,#ff6b35);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:levelupAnim 1.6s ease-out forwards;
+  text-shadow:0 0 40px rgba(255,180,60,.8);
+}
+@keyframes levelupAnim{0%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1.2)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.4) translateY(-40px)}}
+
+/* ============ SVG CUSTOMERS ============ */
 .customer-svg{cursor:pointer;transition:transform .2s}
-.customer-svg.selected{filter:drop-shadow(0 0 10px #ffd166)}
-.customer-svg.served{opacity:0;pointer-events:none}
+.customer-svg.selected{filter:drop-shadow(0 0 12px #ffd166)}
+.customer-svg.served{opacity:0;pointer-events:none;transition:opacity .4s}
+
+/* ============ AFK / DAILY ============ */
+.stat-row{display:flex;justify-content:space-between;width:100%;max-width:320px;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:12px;border:1px solid rgba(255,255,255,.12);margin-bottom:8px;font-size:14px;align-items:center}
+.stat-row .val{font-weight:900;color:#ffd166;display:flex;align-items:center;gap:4px}
+
+/* Streak visual */
+.streak-days{display:flex;gap:6px;margin:14px 0;flex-wrap:wrap;justify-content:center}
+.streak-day{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);font-size:12px;font-weight:800;color:#888}
+.streak-day.done{background:linear-gradient(135deg,#ff6b35,#ffd166);border-color:#ffd166;color:#fff;box-shadow:0 0 12px rgba(255,180,60,.6)}
+.streak-day.today{border-color:#4ecdc4;box-shadow:0 0 14px rgba(78,205,196,.7)}
 
 @media (max-width:480px){
-    .lobby-grid{max-width:340px;gap:8px}
-    .menu-card{min-height:78px;padding:10px 6px}
-    .menu-icon{font-size:22px}
-    .menu-label{font-size:10px}
-    .menu-card.play-card .menu-label{font-size:18px}
-    #restaurant-scene{height:28vh;min-height:140px}
+  .lobby-grid{max-width:340px;gap:8px}
+  .menu-card{min-height:80px;padding:10px 6px}
+  .menu-card .svg-icon{width:26px;height:26px}
+  .menu-card .menu-label{font-size:10px}
+  .menu-card.play-card .menu-label{font-size:18px}
+  #restaurant-scene{height:30vh;min-height:150px}
 }
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     SVG-СПРАЙТ: все иконки игры
+============================================================ -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+  <linearGradient id="g-coin" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffe89a"/><stop offset="1" stop-color="#d99a00"/>
+  </linearGradient>
+  <linearGradient id="g-bun" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#f0c78a"/><stop offset="1" stop-color="#c89566"/>
+  </linearGradient>
+  <linearGradient id="g-fire" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffd166"/><stop offset="1" stop-color="#ff3b30"/>
+  </linearGradient>
+  <linearGradient id="g-teal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#4ecdc4"/><stop offset="1" stop-color="#1a8a82"/>
+  </linearGradient>
+</defs>
+
+<symbol id="i-coin" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="10" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/>
+  <circle cx="12" cy="12" r="7.2" fill="none" stroke="#8a5a00" stroke-width=".8" opacity=".4"/>
+  <path d="M12 6.8l1.5 3.6 3.9.3-3 2.6 1 3.8-3.4-2.1-3.4 2.1 1-3.8-3-2.6 3.9-.3z" fill="#8a5a00" opacity=".9"/>
+</symbol>
+
+<symbol id="i-burger" viewBox="0 0 24 24">
+  <path d="M3 9q9-6 18 0v1.4H3z" fill="url(#g-bun)"/>
+  <rect x="3" y="10.4" width="18" height="1.6" fill="#8fd860"/>
+  <rect x="3" y="12" width="18" height="1.6" fill="#e63946"/>
+  <rect x="3" y="13.6" width="18" height="1.6" fill="#8b3d15"/>
+  <rect x="3" y="15.2" width="18" height="1.6" fill="#ffd93d"/>
+  <path d="M3 16.8h18v1.4q-9 3-18 0z" fill="url(#g-bun)"/>
+  <circle cx="8" cy="6.4" r=".9" fill="#fff" opacity=".85"/>
+  <circle cx="12" cy="5.6" r=".9" fill="#fff" opacity=".85"/>
+  <circle cx="16" cy="6.4" r=".9" fill="#fff" opacity=".85"/>
+</symbol>
+
+<symbol id="i-map" viewBox="0 0 24 24">
+  <path d="M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2z" fill="#4ecdc4" stroke="#1a8a82" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M9 3v16M15 5v16" stroke="#1a8a82" stroke-width="1.2" opacity=".5"/>
+  <circle cx="12" cy="11" r="2.2" fill="#ffd166" stroke="#8a5a00" stroke-width=".8"/>
+</symbol>
+
+<symbol id="i-cart" viewBox="0 0 24 24">
+  <path d="M2 3h3l2 12h12l2-8H7" fill="none" stroke="#ffd166" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="9" cy="20" r="1.8" fill="#ffd166"/>
+  <circle cx="18" cy="20" r="1.8" fill="#ffd166"/>
+</symbol>
+
+<symbol id="i-tasks" viewBox="0 0 24 24">
+  <rect x="5" y="4" width="14" height="17" rx="2" fill="#4ecdc4" stroke="#1a8a82" stroke-width="1.2"/>
+  <rect x="8" y="2" width="8" height="4" rx="1" fill="#1a8a82"/>
+  <path d="M8 11l2 2 4-4M8 16l2 2 4-4" stroke="#0a2a28" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-gift" viewBox="0 0 24 24">
+  <rect x="3" y="9" width="18" height="12" rx="1.5" fill="#e63946"/>
+  <rect x="2" y="6" width="20" height="4" rx="1.2" fill="#ff8c42"/>
+  <rect x="10.5" y="6" width="3" height="15" fill="#ffd166"/>
+  <path d="M12 6C10 3 7 3 7 5s3 2 5 1zM12 6c2-3 5-3 5-1s-3 2-5 1z" fill="#ffd166" stroke="#8a5a00" stroke-width=".6"/>
+</symbol>
+
+<symbol id="i-zzz" viewBox="0 0 24 24">
+  <circle cx="12" cy="14" r="8" fill="#5a4fc4" opacity=".4"/>
+  <circle cx="12" cy="14" r="8" fill="none" stroke="#a89bff" stroke-width="1.2"/>
+  <path d="M14 6h5l-5 4h5" stroke="#ffd166" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 2h3l-3 2.4h3" stroke="#ffd166" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+</symbol>
+
+<symbol id="i-users" viewBox="0 0 24 24">
+  <circle cx="8" cy="8" r="3.2" fill="#4ecdc4" stroke="#1a8a82" stroke-width="1"/>
+  <circle cx="17" cy="9" r="2.6" fill="#ff8c42" stroke="#c04a10" stroke-width="1"/>
+  <path d="M2 20c0-3.5 3-6 6-6s6 2.5 6 6z" fill="#4ecdc4" stroke="#1a8a82" stroke-width="1"/>
+  <path d="M12 20c0-3 2.2-5 5-5s5 2 5 5z" fill="#ff8c42" stroke="#c04a10" stroke-width="1"/>
+</symbol>
+
+<symbol id="i-gear" viewBox="0 0 24 24">
+  <path d="M12 2l1.8 3.2 3.6-.6.6 3.6L21 10l-1.8 3 1.8 3-3 1.8-.6 3.6-3.6-.6L12 22l-1.8-3.2-3.6.6-.6-3.6L3 14l1.8-3L3 8l3-1.8.6-3.6 3.6.6z" fill="#ffd166" stroke="#8a5a00" stroke-width="1" stroke-linejoin="round"/>
+  <circle cx="12" cy="12" r="3.2" fill="#1a0f2e" stroke="#8a5a00" stroke-width="1"/>
+</symbol>
+
+<symbol id="i-play" viewBox="0 0 24 24">
+  <path d="M6 4l14 8-14 8z" fill="currentColor"/>
+</symbol>
+
+<symbol id="i-trophy" viewBox="0 0 24 24">
+  <path d="M6 3h12v5a6 6 0 11-12 0z" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/>
+  <path d="M6 5H3v3a4 4 0 003 3.8M18 5h3v3a4 4 0 01-3 3.8" fill="none" stroke="#8a5a00" stroke-width="1.4"/>
+  <rect x="10" y="14" width="4" height="4" fill="#8a5a00"/>
+  <rect x="7" y="18" width="10" height="3" rx="1" fill="#b8860b"/>
+</symbol>
+
+<symbol id="i-fire" viewBox="0 0 24 24">
+  <path d="M12 2c0 4-5 5-5 10a5 5 0 0010 0c0-2-1-3-1-3 3 1 3 4 3 6a7 7 0 11-14 0c0-6 7-6 7-13z" fill="url(#g-fire)"/>
+</symbol>
+
+<symbol id="i-star" viewBox="0 0 24 24">
+  <path d="M12 2l3 7 7.5.6-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4L1.5 9.6 9 9z" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1"/>
+</symbol>
+
+<symbol id="i-check" viewBox="0 0 24 24">
+  <path d="M5 12l5 5 9-11" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-timer" viewBox="0 0 24 24">
+  <circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+  <path d="M12 9v4l3 2M9 2h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="i-user" viewBox="0 0 24 24">
+  <circle cx="12" cy="8" r="4" fill="currentColor"/>
+  <path d="M3 21c0-5 4-8 9-8s9 3 9 8z" fill="currentColor"/>
+</symbol>
+
+<!-- Ингредиенты (SVG) -->
+<symbol id="ing-bun_bottom" viewBox="0 0 32 32">
+  <path d="M3 18q13-5 26 0v6q-13 3-26 0z" fill="url(#g-bun)" stroke="#8b5a3c" stroke-width="1.2"/>
+  <ellipse cx="16" cy="18" rx="13" ry="3" fill="#f0c78a" opacity=".6"/>
+</symbol>
+<symbol id="ing-bun_top" viewBox="0 0 32 32">
+  <path d="M3 18q13-16 26 0z" fill="url(#g-bun)" stroke="#8b5a3c" stroke-width="1.2"/>
+  <circle cx="11" cy="11" r="1.2" fill="#fff" opacity=".8"/>
+  <circle cx="16" cy="8.5" r="1.2" fill="#fff" opacity=".8"/>
+  <circle cx="21" cy="11" r="1.2" fill="#fff" opacity=".8"/>
+</symbol>
+<symbol id="ing-patty" viewBox="0 0 32 32">
+  <rect x="3" y="11" width="26" height="10" rx="5" fill="#7a3b10" stroke="#4a2008" stroke-width="1.2"/>
+  <ellipse cx="16" cy="14" rx="11" ry="2" fill="#a0522d" opacity=".5"/>
+</symbol>
+<symbol id="ing-cheese" viewBox="0 0 32 32">
+  <path d="M4 12l24 0 0 6-4 2-4-2-4 2-4-2-4 2-4-2z" fill="#ffd93d" stroke="#c9970d" stroke-width="1.2"/>
+</symbol>
+<symbol id="ing-lettuce" viewBox="0 0 32 32">
+  <path d="M3 16q4-6 8-2 4-6 8 0 5-4 10 2-5 6-13 6T3 16z" fill="#7bc043" stroke="#4a8a20" stroke-width="1.2"/>
+</symbol>
+<symbol id="ing-tomato" viewBox="0 0 32 32">
+  <circle cx="16" cy="17" r="9" fill="#e63946" stroke="#8a1020" stroke-width="1.2"/>
+  <path d="M13 9l3-2 3 2" stroke="#4a8a20" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <circle cx="13" cy="15" r="1.4" fill="#ff8080" opacity=".7"/>
+</symbol>
+<symbol id="ing-onion" viewBox="0 0 32 32">
+  <ellipse cx="16" cy="18" rx="10" ry="8" fill="#e6d0ee" stroke="#a070b8" stroke-width="1.2"/>
+  <path d="M8 14q8 2 16 0M8 18q8 2 16 0M10 22q6 1 12 0" stroke="#b890c8" stroke-width="1" fill="none"/>
+  <path d="M16 10q-1-4 1-6M16 10q1-4-1-6" stroke="#7ab070" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+</symbol>
+<symbol id="ing-pickle" viewBox="0 0 32 32">
+  <ellipse cx="16" cy="17" rx="6" ry="11" fill="#6b8e23" stroke="#3a5010" stroke-width="1.2" transform="rotate(-20 16 17)"/>
+  <path d="M11 12l2 2M14 10l2 2M20 22l2 2M21 20l2 2" stroke="#3a5010" stroke-width="1"/>
+</symbol>
+<symbol id="ing-bacon" viewBox="0 0 32 32">
+  <path d="M4 12q6-4 12 0 6 4 12 0v4q-6 4-12 0-6-4-12 0z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.2"/>
+  <path d="M6 14q5-2 10 0M16 16q5-2 10 0" stroke="#ffe0b0" stroke-width="1.2" fill="none" opacity=".6"/>
+</symbol>
+<symbol id="ing-double_patty" viewBox="0 0 32 32">
+  <rect x="3" y="8" width="26" height="6" rx="3" fill="#7a3b10" stroke="#4a2008" stroke-width="1"/>
+  <rect x="3" y="16" width="26" height="6" rx="3" fill="#7a3b10" stroke="#4a2008" stroke-width="1"/>
+</symbol>
+<symbol id="ing-cheddar" viewBox="0 0 32 32">
+  <path d="M4 14l24 0 0 5-4 2-4-2-4 2-4-2-4 2-4-2z" fill="#ffa500" stroke="#a06000" stroke-width="1.2"/>
+  <circle cx="12" cy="17" r="1" fill="#a06000"/>
+  <circle cx="20" cy="17" r="1" fill="#a06000"/>
+</symbol>
+<symbol id="ing-avocado" viewBox="0 0 32 32">
+  <ellipse cx="16" cy="18" rx="8" ry="10" fill="#4a6030" stroke="#22300f" stroke-width="1.2"/>
+  <ellipse cx="16" cy="18" rx="5.5" ry="7.5" fill="#a8c060"/>
+  <circle cx="16" cy="18" r="3" fill="#7a5a2a"/>
+</symbol>
+<symbol id="ing-truffle" viewBox="0 0 32 32">
+  <path d="M8 20q0-9 8-10 8 1 8 10-3 4-8 4t-8-4z" fill="#3a2a1a" stroke="#1a0f05" stroke-width="1.2"/>
+  <path d="M11 16q5 1 10 0M10 20q6 1 12 0" stroke="#6a5040" stroke-width=".8" fill="none" opacity=".6"/>
+</symbol>
+<symbol id="ing-gold_leaf" viewBox="0 0 32 32">
+  <path d="M6 22q0-12 10-14 10 2 10 14-5 5-10 5t-10-5z" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/>
+  <path d="M11 12l3 3-2 3M16 10l2 4-3 3M21 12l-3 3 2 3" stroke="#fff" stroke-width="1.2" fill="none" opacity=".8"/>
+</symbol>
+
+<!-- Мебель -->
+<symbol id="f-table" viewBox="0 0 24 24">
+  <rect x="3" y="9" width="18" height="3" rx="1" fill="currentColor"/>
+  <rect x="5" y="12" width="2" height="9" fill="currentColor"/>
+  <rect x="17" y="12" width="2" height="9" fill="currentColor"/>
+</symbol>
+<symbol id="f-chair" viewBox="0 0 24 24">
+  <rect x="6" y="3" width="12" height="3" rx="1" fill="currentColor"/>
+  <rect x="6" y="6" width="12" height="9" rx="1" fill="currentColor" opacity=".8"/>
+  <rect x="7" y="15" width="2" height="6" fill="currentColor"/>
+  <rect x="15" y="15" width="2" height="6" fill="currentColor"/>
+</symbol>
+<symbol id="f-window" viewBox="0 0 24 24">
+  <rect x="3" y="3" width="18" height="18" rx="1" fill="currentColor" opacity=".3"/>
+  <rect x="3" y="3" width="18" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+  <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="1.6"/>
+</symbol>
+<symbol id="f-floor" viewBox="0 0 24 24">
+  <rect x="2" y="2" width="9" height="9" fill="currentColor"/>
+  <rect x="13" y="2" width="9" height="9" fill="currentColor" opacity=".6"/>
+  <rect x="2" y="13" width="9" height="9" fill="currentColor" opacity=".6"/>
+  <rect x="13" y="13" width="9" height="9" fill="currentColor"/>
+</symbol>
+<symbol id="f-plant" viewBox="0 0 24 24">
+  <path d="M9 21h6l1-7H8z" fill="#c0392b" stroke="#7a1a10" stroke-width="1"/>
+  <path d="M12 14V9M12 9q-4-3-6-1 1 4 6 1zM12 9q4-3 6-1-1 4-6 1zM12 11q-3-1-4 1 2 3 4-1z" fill="#4a8a20" stroke="#2a5a10" stroke-width=".6"/>
+</symbol>
+<symbol id="f-painting" viewBox="0 0 24 24">
+  <rect x="3" y="4" width="18" height="14" rx="1" fill="currentColor" stroke="#000" stroke-width="1"/>
+  <path d="M5 16l4-5 3 3 4-6 3 8z" fill="#fff" opacity=".5"/>
+  <circle cx="8" cy="8" r="1.5" fill="#ffd166"/>
+</symbol>
+<symbol id="f-lamp" viewBox="0 0 24 24">
+  <path d="M8 3h8l2 8H6z" fill="currentColor" stroke="#000" stroke-width="1"/>
+  <rect x="11" y="11" width="2" height="8" fill="#666"/>
+  <rect x="7" y="19" width="10" height="2" rx="1" fill="#666"/>
+</symbol>
+<symbol id="f-clock" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="9" fill="currentColor" stroke="#000" stroke-width="1.2"/>
+  <path d="M12 7v5l3 3" stroke="#000" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</symbol>
+<symbol id="f-flower" viewBox="0 0 24 24">
+  <path d="M12 21V13" stroke="#4a8a20" stroke-width="1.6"/>
+  <circle cx="12" cy="9" r="3" fill="#ff5c8a"/>
+  <circle cx="8" cy="11" r="2.4" fill="#ff8cae"/>
+  <circle cx="16" cy="11" r="2.4" fill="#ff8cae"/>
+  <circle cx="12" cy="13" r="2" fill="#ffd166"/>
+</symbol>
+<symbol id="f-sofa" viewBox="0 0 24 24">
+  <rect x="3" y="10" width="18" height="8" rx="2" fill="currentColor"/>
+  <rect x="3" y="6" width="4" height="6" rx="1" fill="currentColor" opacity=".8"/>
+  <rect x="17" y="6" width="4" height="6" rx="1" fill="currentColor" opacity=".8"/>
+</symbol>
+<symbol id="f-jukebox" viewBox="0 0 24 24">
+  <path d="M5 4q7-4 14 0v16H5z" fill="currentColor" stroke="#000" stroke-width="1"/>
+  <circle cx="12" cy="10" r="3" fill="#ffd166" stroke="#8a5a00"/>
+  <rect x="7" y="15" width="10" height="2" fill="#000" opacity=".5"/>
+</symbol>
+<symbol id="f-menu_board" viewBox="0 0 24 24">
+  <rect x="3" y="2" width="18" height="14" rx="2" fill="currentColor" stroke="#000" stroke-width="1"/>
+  <path d="M6 6h12M6 9h9M6 12h10" stroke="#000" stroke-width="1.2" opacity=".5"/>
+  <rect x="11" y="16" width="2" height="6" fill="#666"/>
+</symbol>
+<symbol id="f-sign" viewBox="0 0 24 24">
+  <rect x="2" y="6" width="20" height="10" rx="2" fill="currentColor" stroke="#000" stroke-width="1"/>
+  <rect x="11" y="16" width="2" height="6" fill="#666"/>
+</symbol>
+</svg>
 
 <div id="game-container">
     <canvas id="game-canvas"></canvas>
     <div id="ui-layer">
         <div id="top-bar">
             <div id="currency-display">
-                <span>🪙</span>
+                <svg class="svg-icon"><use href="#i-coin"/></svg>
                 <span id="coin-count">0</span>
             </div>
             <div id="level-display">
-                <span>Ур.</span>
+                <svg class="svg-icon" style="width:14px;height:14px;color:#4ecdc4"><use href="#i-star"/></svg>
                 <span id="level-number">1</span>
             </div>
-            <button id="settings-btn" class="icon-btn" aria-label="Настройки">⚙</button>
+            <button id="settings-btn" class="icon-btn" aria-label="Настройки">
+                <svg class="svg-icon"><use href="#i-gear"/></svg>
+            </button>
         </div>
 
         <!-- ЛОББИ -->
         <div id="lobby" class="screen active">
             <svg class="lobby-hero" viewBox="0 0 200 200">
+                <defs>
+                    <radialGradient id="glowLobby" cx="50%" cy="50%" r="50%">
+                        <stop offset="0" stop-color="#ff6b35" stop-opacity=".5"/>
+                        <stop offset="1" stop-color="#ff6b35" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <circle cx="100" cy="100" r="90" fill="url(#glowLobby)"/>
                 <ellipse cx="100" cy="50" rx="72" ry="34" fill="#e0a96d" stroke="#b8814a" stroke-width="2"/>
                 <ellipse cx="100" cy="42" rx="60" ry="20" fill="#f0c78a" opacity="0.6"/>
-                <circle cx="82" cy="34" r="2" fill="#fff" opacity="0.8"/>
-                <circle cx="102" cy="30" r="2" fill="#fff" opacity="0.8"/>
-                <circle cx="120" cy="36" r="2" fill="#fff" opacity="0.8"/>
+                <circle cx="82" cy="34" r="2.5" fill="#fff" opacity="0.9"/>
+                <circle cx="102" cy="30" r="2.5" fill="#fff" opacity="0.9"/>
+                <circle cx="120" cy="36" r="2.5" fill="#fff" opacity="0.9"/>
+                <circle cx="92" cy="38" r="1.8" fill="#fff" opacity="0.7"/>
+                <circle cx="112" cy="40" r="1.8" fill="#fff" opacity="0.7"/>
                 <path d="M32 60 Q100 42 168 60 L168 74 Q100 56 32 74 Z" fill="#8fd860"/>
                 <path d="M28 76 Q100 60 172 76 L172 96 Q100 80 28 96 Z" fill="#8b3d15"/>
                 <path d="M30 98 Q100 84 170 98 L170 112 Q100 98 30 112 Z" fill="#ffd93d"/>
@@ -296,33 +614,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
                 <ellipse cx="100" cy="150" rx="72" ry="22" fill="#d99758" stroke="#b8814a" stroke-width="2"/>
                 <ellipse cx="100" cy="144" rx="60" ry="12" fill="#f0c78a" opacity="0.5"/>
             </svg>
+            <div id="restaurant-title-display">Бургерная</div>
             <div class="lobby-grid">
                 <button id="play-btn" class="menu-card play-card">
-                    <span class="menu-icon">▶</span>
+                    <svg class="svg-icon"><use href="#i-play"/></svg>
                     <span class="menu-label">ИГРАТЬ</span>
                 </button>
                 <button id="levels-btn" class="menu-card">
-                    <span class="menu-icon">🗺️</span>
+                    <svg class="svg-icon"><use href="#i-map"/></svg>
                     <span class="menu-label">Уровни</span>
                 </button>
                 <button id="shop-btn" class="menu-card">
-                    <span class="menu-icon">🛒</span>
+                    <svg class="svg-icon"><use href="#i-cart"/></svg>
                     <span class="menu-label">Магазин</span>
                 </button>
                 <button id="tasks-btn" class="menu-card">
-                    <span class="menu-icon">📋</span>
+                    <svg class="svg-icon"><use href="#i-tasks"/></svg>
                     <span class="menu-label">Задания</span>
                 </button>
                 <button id="daily-btn" class="menu-card">
-                    <span class="menu-icon">🎁</span>
+                    <svg class="svg-icon"><use href="#i-gift"/></svg>
                     <span class="menu-label">Награда</span>
+                    <span class="badge-dot" id="daily-badge" style="display:none"></span>
                 </button>
                 <button id="afk-btn" class="menu-card">
-                    <span class="menu-icon">💤</span>
+                    <svg class="svg-icon"><use href="#i-zzz"/></svg>
                     <span class="menu-label">AFK</span>
                 </button>
+                <button id="achievements-btn" class="menu-card">
+                    <svg class="svg-icon"><use href="#i-trophy"/></svg>
+                    <span class="menu-label">Награды</span>
+                </button>
                 <button id="invite-btn" class="menu-card">
-                    <span class="menu-icon">👥</span>
+                    <svg class="svg-icon"><use href="#i-users"/></svg>
                     <span class="menu-label">Друзья</span>
                 </button>
             </div>
@@ -334,8 +658,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
                 <svg id="restaurant-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
                     <defs>
                         <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0" stop-color="#2a2a3e"/>
-                            <stop offset="1" stop-color="#1a1a2e"/>
+                            <stop offset="0" stop-color="#3d2f5e"/>
+                            <stop offset="1" stop-color="#1f1440"/>
                         </linearGradient>
                     </defs>
                     <g id="scene-bg"></g>
@@ -346,7 +670,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
                 <div id="order-panel">
                     <div id="order-header">
                         <span id="order-customer">Выберите клиента</span>
-                        <span id="order-timer">⏱ <span id="timer-value">60</span>с</span>
+                        <span id="order-timer">
+                            <svg class="svg-icon"><use href="#i-timer"/></svg>
+                            <span id="timer-value">60</span>с
+                        </span>
                     </div>
                     <div id="order-items"></div>
                 </div>
@@ -363,7 +690,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
         <div id="result-screen" class="screen">
             <h2 id="result-title">Уровень пройден!</h2>
             <div id="result-stats" style="margin:20px 0;text-align:center;line-height:1.8"></div>
-            <button id="double-reward-btn" class="main-btn" style="min-width:240px">Удвоить награду (реклама)</button>
+            <button id="double-reward-btn" class="main-btn" style="min-width:240px">Удвоить награду</button>
             <button id="next-level-btn" class="main-btn" style="margin-top:12px;min-width:240px">Следующий уровень</button>
             <button id="back-lobby-btn" class="secondary-btn" style="margin-top:12px;min-width:240px">В лобби</button>
         </div>
@@ -382,21 +709,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
             <button id="tasks-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
 
+        <!-- ДОСТИЖЕНИЯ -->
+        <div id="achievements-screen" class="screen">
+            <h2>Достижения</h2>
+            <div id="achievements-list"></div>
+            <button id="achievements-back" class="secondary-btn" style="margin-top:16px">Назад</button>
+        </div>
+
         <!-- AFK -->
         <div id="afk-screen" class="screen">
-            <h2>AFK‑комната</h2>
-            <p style="margin:20px 0;line-height:2;text-align:center;font-size:15px">
-                Доход: <span id="afk-rate">1</span> 🪙 / мин<br>
-                Заработано: <span id="afk-earned">0</span><br>
-                Всего минут: <span id="afk-total">0</span>
-            </p>
-            <button id="afk-back" class="secondary-btn">Назад</button>
+            <h2>AFK-комната</h2>
+            <div class="stat-row"><span>Доход:</span><span class="val"><svg class="svg-icon"><use href="#i-coin"/></svg><span id="afk-rate">1</span>/мин</span></div>
+            <div class="stat-row"><span>Заработано:</span><span class="val"><span id="afk-earned">0</span></span></div>
+            <div class="stat-row"><span>Всего минут:</span><span class="val"><span id="afk-total">0</span></span></div>
+            <button id="afk-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
 
         <!-- ЕЖЕДНЕВНАЯ НАГРАДА -->
         <div id="daily-screen" class="screen">
             <h2>Ежедневная награда</h2>
-            <p id="daily-status" style="margin:20px 0;text-align:center"></p>
+            <p style="color:#aaa;margin:8px 0" id="streak-info">Серия: 0 🔥</p>
+            <div class="streak-days" id="streak-days"></div>
+            <p id="daily-status" style="margin:12px 0;text-align:center;color:#ffd166;font-weight:800"></p>
             <button id="daily-claim" class="main-btn" style="min-width:200px">Получить</button>
             <button id="daily-back" class="secondary-btn" style="margin-top:12px">Назад</button>
         </div>
@@ -404,6 +738,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
         <!-- МАГАЗИН -->
         <div id="shop-screen" class="screen">
             <h2>Магазин</h2>
+            <div id="shop-categories"></div>
             <div id="shop-items"></div>
             <button id="shop-back" class="secondary-btn" style="margin-top:16px">Назад</button>
         </div>
@@ -411,7 +746,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
         <!-- НАСТРОЙКИ -->
         <div id="settings-screen" class="screen">
             <h2>Настройки</h2>
-            <label><input type="checkbox" id="music-toggle"> Музыка</label>
+            <label style="flex-direction:column;align-items:flex-start;gap:6px">
+                Название бургерной:
+                <input type="text" id="name-input" maxlength="24" placeholder="Бургерная">
+            </label>
+            <button id="save-name-btn" class="main-btn" style="margin-top:-4px;min-width:200px;padding:10px">Сохранить название</button>
+            <label style="margin-top:14px"><input type="checkbox" id="music-toggle"> Музыка</label>
             <label>
                 Язык:
                 <select id="language-select">
@@ -438,60 +778,72 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 
 <script>
 /* ============================================================
+   ИКОНКИ-ХЕЛПЕР
+============================================================ */
+function icon(name, extra=''){
+  return `<svg class="svg-icon ${extra}"><use href="#i-${name}"/></svg>`;
+}
+function ingIcon(id){
+  return `<svg class="svg-icon"><use href="#ing-${id}"/></svg>`;
+}
+
+/* ============================================================
    ЛОКАЛИЗАЦИЯ
 ============================================================ */
 const i18n = {
     ru: {
-        play:'Играть', levels:'Уровни', tasks:'Задания', afk_room:'AFK‑комната',
-        daily_reward:'Ежедневная награда', invite_friends:'Пригласить друзей',
-        shop:'Магазин', settings:'Настройки', music:'Музыка', language:'Язык',
-        promo_code:'Промокод', activate:'Активировать', back:'Назад',
-        order:'Заказ', serve:'Подать', clear:'Очистить',
-        level_complete:'Уровень пройден!', double_reward:'Удвоить награду (реклама)',
-        next_level:'Следующий уровень', back_lobby:'В лобби',
-        tutorial_title:'Обучение', tutorial_next:'Далее', tutorial_skip:'Пропустить',
+        play:'Играть', levels:'Уровни', tasks:'Задания', afk_room:'AFK', daily_reward:'Награда',
+        invite_friends:'Друзья', shop:'Магазин', settings:'Настройки', music:'Музыка',
+        language:'Язык', promo_code:'Промокод', activate:'Активировать', back:'Назад',
+        serve:'Подать', clear:'Очистить', level_complete:'Уровень пройден!',
+        double_reward:'Удвоить награду', next_level:'Следующий уровень', back_lobby:'В лобби',
+        tutorial_next:'Далее', tutorial_skip:'Пропустить',
         tutorial_welcome:'Добро пожаловать в Бургерную! Клиенты приходят в ваш ресторан и делают заказ.',
         tutorial_order:'Над головой клиента — пузырь с ингредиентами, которые он хочет в бургере.',
-        tutorial_ingredients:'Нажмите на клиента, чтобы выбрать его, затем добавляйте ингредиенты в бургер.',
+        tutorial_ingredients:'Нажмите на клиента, чтобы выбрать его, затем добавляйте ингредиенты.',
         tutorial_serve:'Соберите бургер по заказу (булка, котлета, начинки, булка) и нажмите «Подать».',
         tutorial_timer:'Успейте обслужить всех клиентов до окончания времени!',
-        daily_available:'Награда доступна!', daily_claimed:'Награда уже получена сегодня.',
-        claim:'Получить', level:'Уровень', coins:'монет', purchase:'Купить',
+        daily_available:'Награда доступна!', daily_claimed:'Уже получена сегодня.',
+        claim:'Получить', coins:'монет', purchase:'Купить',
         promo_invalid:'Неверный промокод', promo_clear:'Все данные сброшены!',
         promo_admin:'Начислено 1 000 000 монет!', not_enough_coins:'Недостаточно монет',
         purchased:'Куплено!', already_owned:'Уже куплено', apply:'Применить',
         time_out:'Время вышло!', wrong_order:'Неправильный заказ!',
         select_customer:'Выберите клиента', tutorial_prompt:'Хотите пройти обучение?',
-        tutorial_yes:'Пройти', tutorial_no:'Пропустить',
-        ingredients:'Ингредиенты', interior:'Интерьер', upgrades:'Улучшения'
+        tutorial_yes:'Пройти', tutorial_no:'Пропустить', ingredients:'Ингредиенты',
+        interior:'Интерьер', upgrades:'Улучшения', furniture:'Мебель',
+        achievements:'Достижения', unlocked:'Открыто', locked:'Закрыто',
+        name_saved:'Название сохранено!', streak:'Серия',
+        combo:'Комбо', milestone:'Награда за уровень!'
     },
     en: {
-        play:'Play', levels:'Levels', tasks:'Tasks', afk_room:'AFK Room',
-        daily_reward:'Daily Reward', invite_friends:'Invite Friends',
-        shop:'Shop', settings:'Settings', music:'Music', language:'Language',
-        promo_code:'Promo Code', activate:'Activate', back:'Back',
-        order:'Order', serve:'Serve', clear:'Clear',
-        level_complete:'Level Complete!', double_reward:'Double Reward (Ad)',
-        next_level:'Next Level', back_lobby:'Back to Lobby',
-        tutorial_title:'Tutorial', tutorial_next:'Next', tutorial_skip:'Skip',
-        tutorial_welcome:'Welcome to Burger Shop! Customers come to your restaurant and place orders.',
-        tutorial_order:'Above each customer — a bubble with ingredients they want in their burger.',
-        tutorial_ingredients:'Tap a customer to select them, then add ingredients to the burger.',
+        play:'Play', levels:'Levels', tasks:'Tasks', afk_room:'AFK', daily_reward:'Reward',
+        invite_friends:'Friends', shop:'Shop', settings:'Settings', music:'Music',
+        language:'Language', promo_code:'Promo', activate:'Activate', back:'Back',
+        serve:'Serve', clear:'Clear', level_complete:'Level Complete!',
+        double_reward:'Double Reward', next_level:'Next Level', back_lobby:'Lobby',
+        tutorial_next:'Next', tutorial_skip:'Skip',
+        tutorial_welcome:'Welcome to the Burger Shop! Customers come and place orders.',
+        tutorial_order:'Above each customer — a bubble with ingredients they want.',
+        tutorial_ingredients:'Tap a customer to select them, then add ingredients.',
         tutorial_serve:'Assemble the burger (bun, patty, fillings, bun) and press "Serve".',
         tutorial_timer:'Serve all customers before time runs out!',
-        daily_available:'Reward available!', daily_claimed:'Reward already claimed today.',
-        claim:'Claim', level:'Level', coins:'coins', purchase:'Buy',
+        daily_available:'Reward available!', daily_claimed:'Already claimed.',
+        claim:'Claim', coins:'coins', purchase:'Buy',
         promo_invalid:'Invalid promo code', promo_clear:'All data cleared!',
         promo_admin:'1,000,000 coins added!', not_enough_coins:'Not enough coins',
         purchased:'Purchased!', already_owned:'Already owned', apply:'Apply',
         time_out:'Time out!', wrong_order:'Wrong order!',
-        select_customer:'Select a customer', tutorial_prompt:'Do you want to take the tutorial?',
-        tutorial_yes:'Start', tutorial_no:'Skip',
-        ingredients:'Ingredients', interior:'Interior', upgrades:'Upgrades'
+        select_customer:'Select a customer', tutorial_prompt:'Take the tutorial?',
+        tutorial_yes:'Start', tutorial_no:'Skip', ingredients:'Ingredients',
+        interior:'Interior', upgrades:'Upgrades', furniture:'Furniture',
+        achievements:'Achievements', unlocked:'Unlocked', locked:'Locked',
+        name_saved:'Name saved!', streak:'Streak', combo:'Combo',
+        milestone:'Level milestone!'
     }
 };
 let currentLang = 'ru';
-function t(key){ return i18n[currentLang][key] || key; }
+function t(key){ return (i18n[currentLang] && i18n[currentLang][key]) || key; }
 
 /* ============================================================
    VK BRIDGE
@@ -499,7 +851,7 @@ function t(key){ return i18n[currentLang][key] || key; }
 const VKBridge = {
     available: typeof vkBridge !== 'undefined',
     init(){
-        if(!this.available){ console.warn('VK Bridge не загружен'); return; }
+        if(!this.available){ console.warn('VK Bridge not loaded'); return; }
         vkBridge.send('VKWebAppInit').catch(e=>console.warn(e));
         this.setupViewHandlers();
     },
@@ -565,8 +917,6 @@ const VKBridge = {
             if(document.hidden){ AudioManager.pauseMusic(); if(window.Game) Game.pause(); }
             else { AudioManager.resumeMusic(); if(window.Game) Game.resume(); }
         });
-        window.addEventListener('blur',()=>AudioManager.pauseMusic());
-        window.addEventListener('focus',()=>AudioManager.resumeMusic());
     }
 };
 
@@ -574,10 +924,7 @@ const VKBridge = {
    AUDIO
 ============================================================ */
 const AudioManager = {
-    musicEnabled: true,
-    musicPlaying: false,
-    audioContext: null,
-    musicTimer: null,
+    musicEnabled: true, musicPlaying: false, audioContext: null, musicTimer: null,
     notes: [262, 294, 330, 349, 392, 440, 494, 523],
     init(){
         const go = ()=>{
@@ -598,7 +945,7 @@ const AudioManager = {
         osc.type = 'sine';
         osc.frequency.value = this.notes[Math.floor(Math.random()*this.notes.length)];
         const now = this.audioContext.currentTime;
-        gain.gain.setValueAtTime(0.035, now);
+        gain.gain.setValueAtTime(0.03, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
         osc.connect(gain); gain.connect(this.audioContext.destination);
         osc.start(now); osc.stop(now + 0.6);
@@ -626,20 +973,20 @@ const AudioManager = {
         const now = this.audioContext.currentTime;
         if(type === 'click'){
             osc.frequency.value = 800;
-            gain.gain.setValueAtTime(0.07, now);
+            gain.gain.setValueAtTime(0.06, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
         } else if(type === 'correct'){
             osc.frequency.value = 523;
             osc.frequency.linearRampToValueAtTime(1046, now + 0.2);
-            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.setValueAtTime(0.09, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if(type === 'error'){
             osc.type = 'sawtooth';
             osc.frequency.value = 200;
             osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.07, now);
+            gain.gain.setValueAtTime(0.06, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if(type === 'coin'){
@@ -654,80 +1001,123 @@ const AudioManager = {
 };
 
 /* ============================================================
-   ИНГРЕДИЕНТЫ И УРОВНИ
+   ИНГРЕДИЕНТЫ
+============================================================ */
+const Ingredients = {
+    base: [
+        {id:'bun_bottom', name:'Нижняя булка', color:'#d4a574'},
+        {id:'bun_top',    name:'Верхняя булка', color:'#c89566'},
+        {id:'patty',      name:'Котлета',       color:'#8b4513'},
+        {id:'cheese',     name:'Сыр',           color:'#ffd700'},
+        {id:'lettuce',    name:'Салат',         color:'#90ee90'},
+        {id:'tomato',     name:'Помидор',       color:'#ff6347'},
+        {id:'onion',      name:'Лук',           color:'#dda0dd'},
+        {id:'pickle',     name:'Огурец',        color:'#6b8e23'},
+        {id:'bacon',      name:'Бекон',         color:'#b22222'}
+    ],
+    premium: [
+        {id:'double_patty', name:'Двойная котлета', price:500},
+        {id:'cheddar',      name:'Чеддер',          price:400},
+        {id:'avocado',      name:'Авокадо',         price:800},
+        {id:'truffle',      name:'Трюфель',         price:1500},
+        {id:'gold_leaf',    name:'Золотой лист',    price:3000}
+    ],
+    all(){ return this.base.concat(this.premium); },
+    find(id){ return this.all().find(i=>i.id===id); },
+    getColor(id){ const i=this.find(id); return i ? i.color : '#ccc'; },
+    getName(id){ const i=this.find(id); return i ? i.name : id; }
+};
+
+/* ============================================================
+   МЕБЕЛЬ
+============================================================ */
+const Furniture = {
+    catalog: {
+        table: {
+            label:'Столы', icon:'f-table',
+            items: [
+                {id:'t_basic', name:'Базовый', price:0,   color:'#8b5a3c'},
+                {id:'t_wood',  name:'Дуб',      price:1500,color:'#5a3a24'},
+                {id:'t_glass', name:'Стекло',   price:4000,color:'#8899aa'},
+                {id:'t_neon',  name:'Неон',     price:9000,color:'#ff33cc'}
+            ]
+        },
+        chair: {
+            label:'Стулья', icon:'f-chair',
+            items: [
+                {id:'c_basic', name:'Базовый', price:0,   color:'#8b5a3c'},
+                {id:'c_red',   name:'Красный', price:1000,color:'#e63946'},
+                {id:'c_teal',  name:'Бирюза',  price:2500,color:'#4ecdc4'},
+                {id:'c_gold',  name:'Золото',  price:6000,color:'#ffd700'}
+            ]
+        },
+        window: {
+            label:'Окна', icon:'f-window',
+            items: [
+                {id:'w_none',    name:'Нет',       price:0,   color:'#00000000'},
+                {id:'w_small',   name:'Маленькое', price:900, color:'#88aacc'},
+                {id:'w_wide',    name:'Панорамное',price:3500,color:'#88ccff'},
+                {id:'w_stained', name:'Витраж',    price:8000,color:'#ff66cc'}
+            ]
+        },
+        floor: {
+            label:'Плитка', icon:'f-floor',
+            items: [
+                {id:'f_wood',    name:'Дерево',   price:0,   a:'#5a3a24', b:'#3d2419'},
+                {id:'f_checker', name:'Шахматы',  price:1800,a:'#1a1a2e', b:'#e8e8f0'},
+                {id:'f_marble',  name:'Мрамор',   price:4500,a:'#dddddd', b:'#aaaaaa'},
+                {id:'f_neon',    name:'Неон',     price:9500,a:'#1a0033', b:'#ff00ff'}
+            ]
+        },
+        decor: {
+            label:'Декор', icon:'f-plant',
+            items: [
+                {id:'d_none',    name:'Пусто',     price:0,   icon:'f-star'},
+                {id:'d_plant',   name:'Растение',  price:700, icon:'f-plant'},
+                {id:'d_painting',name:'Картина',   price:1800,icon:'f-painting'},
+                {id:'d_lamp',    name:'Лампа',     price:2500,icon:'f-lamp'},
+                {id:'d_clock',   name:'Часы',      price:1500,icon:'f-clock'},
+                {id:'d_flower',  name:'Цветок',    price:1200,icon:'f-flower'},
+                {id:'d_sofa',    name:'Диван',     price:5500,icon:'f-sofa'},
+                {id:'d_jukebox', name:'Автомат',   price:7000,icon:'f-jukebox'}
+            ]
+        }
+    },
+    findItem(catId, id){
+        const cat = this.catalog[catId];
+        return cat ? cat.items.find(i=>i.id===id) : null;
+    }
+};
+
+/* ============================================================
+   УРОВНИ
 ============================================================ */
 const Levels = {
     totalLevels: 500,
-    baseIngredients: [
-        {id:'bun_bottom', name:'Нижняя булка', emoji:'🍞', color:'#d4a574'},
-        {id:'bun_top',    name:'Верхняя булка', emoji:'🍔', color:'#c89566'},
-        {id:'patty',      name:'Котлета',      emoji:'🥩', color:'#8b4513'},
-        {id:'cheese',     name:'Сыр',          emoji:'🧀', color:'#ffd700'},
-        {id:'lettuce',    name:'Салат',        emoji:'🥬', color:'#90ee90'},
-        {id:'tomato',     name:'Помидор',      emoji:'🍅', color:'#ff6347'},
-        {id:'onion',      name:'Лук',          emoji:'🧅', color:'#dda0dd'},
-        {id:'pickle',     name:'Огурец',       emoji:'🥒', color:'#6b8e23'},
-        {id:'bacon',      name:'Бекон',        emoji:'🥓', color:'#b22222'}
-    ],
-    premiumIngredients: [
-        {id:'double_patty', name:'Двойная котлета', emoji:'🍖', price:500,  color:'#654321'},
-        {id:'cheddar',      name:'Чеддер',          emoji:'🧀', price:400,  color:'#ffa500'},
-        {id:'avocado',      name:'Авокадо',         emoji:'🥑', price:800,  color:'#556b2f'},
-        {id:'truffle',      name:'Трюфель',         emoji:'🍄', price:1500, color:'#2f2f2f'},
-        {id:'gold_leaf',    name:'Золотой лист',    emoji:'✨', price:3000, color:'#ffd700'}
-    ],
-    all(){ return this.baseIngredients.concat(this.premiumIngredients); },
-    getColor(id){
-        const ing = this.all().find(i=>i.id === id);
-        return ing ? ing.color : '#ccc';
-    },
-    getName(id){
-        const ing = this.all().find(i=>i.id === id);
-        return ing ? ing.name : id;
-    },
-    getEmoji(id){
-        const ing = this.all().find(i=>i.id === id);
-        return ing ? ing.emoji : '❓';
-    },
-
-    // Генерация уровня: несколько клиентов с заказами
     getLevel(n){
         const customerCount = Math.min(2 + Math.floor(n/100), 6);
         const fillingCount = Math.min(1 + Math.floor(n/80), 4);
         const timeLimit = Math.max(90 - Math.floor(n/30)*10, 60) + customerCount * 15;
         const rewardPerCustomer = 40 + n * 5;
         const totalReward = rewardPerCustomer * customerCount;
-
-        // Доступные ингредиенты для этого уровня
-        let available = [...this.baseIngredients];
-        this.premiumIngredients.forEach(ing=>{
+        let available = [...Ingredients.base];
+        Ingredients.premium.forEach(ing=>{
             if(GameState.purchasedIngredients.includes(ing.id)) available.push(ing);
         });
-
         const fillings = available.filter(i=>i.id !== 'bun_bottom' && i.id !== 'bun_top');
-
-        // Генерируем заказ для каждого клиента
         const customers = [];
         for(let i=0; i<customerCount; i++){
             const shuffled = [...fillings].sort(()=>Math.random()-0.5);
             const chosen = shuffled.slice(0, fillingCount);
-            const order = ['bun_bottom', 'patty', ...chosen.map(c=>c.id), 'bun_top'];
-            customers.push(order);
+            customers.push(['bun_bottom','patty', ...chosen.map(c=>c.id), 'bun_top']);
         }
-
-        return {
-            level: n,
-            customers: customers,
-            timeLimit: timeLimit,
-            reward: totalReward,
-            rewardPerCustomer: rewardPerCustomer,
-            availableIngredients: available.map(i=>i.id)
-        };
+        return { level:n, customers, timeLimit, reward:totalReward, rewardPerCustomer,
+                 availableIngredients: available.map(i=>i.id) };
     }
 };
 
 /* ============================================================
-   ТЕМЫ РЕСТОРАНА
+   ТЕМЫ
 ============================================================ */
 const RestaurantThemes = {
     classic: { id:'classic', name:'Классика', price:0, wall1:'#3d2f4f', wall2:'#2a1f3a',
@@ -752,33 +1142,29 @@ const RestaurantThemes = {
 ============================================================ */
 const Tasks = {
     taskPool: [
-        {id:'serve_5',          type:'serve',           target:5,  reward:100, text:'Подайте 5 бургеров'},
-        {id:'serve_10',         type:'serve',           target:10, reward:200, text:'Подайте 10 бургеров'},
-        {id:'serve_20',         type:'serve',           target:20, reward:500, text:'Подайте 20 бургеров'},
-        {id:'perfect_3',        type:'perfect',         target:3,  reward:150, text:'Соберите 3 идеальных бургера'},
-        {id:'perfect_5',        type:'perfect',         target:5,  reward:300, text:'Соберите 5 идеальных бургеров'},
-        {id:'earn_500',         type:'earn',            target:500,reward:150, text:'Заработайте 500 монет'},
-        {id:'earn_1000',        type:'earn',            target:1000,reward:300,text:'Заработайте 1000 монет'},
-        {id:'complete_3_levels',type:'complete_levels', target:3,  reward:200, text:'Пройдите 3 уровня'},
-        {id:'complete_5_levels',type:'complete_levels', target:5,  reward:400, text:'Пройдите 5 уровней'},
-        {id:'use_ing_10',       type:'use_ingredient',  target:10, reward:100, text:'Используйте 10 ингредиентов'},
-        {id:'use_ing_25',       type:'use_ingredient',  target:25, reward:250, text:'Используйте 25 ингредиентов'},
-        {id:'invite_friend',    type:'invite',          target:1,  reward:500, text:'Пригласите друга'}
+        {id:'serve_5', type:'serve', target:5, reward:100, text:'Подайте 5 бургеров'},
+        {id:'serve_10', type:'serve', target:10, reward:200, text:'Подайте 10 бургеров'},
+        {id:'serve_20', type:'serve', target:20, reward:500, text:'Подайте 20 бургеров'},
+        {id:'perfect_3', type:'perfect', target:3, reward:150, text:'Соберите 3 идеальных бургера'},
+        {id:'perfect_5', type:'perfect', target:5, reward:300, text:'Соберите 5 идеальных бургеров'},
+        {id:'earn_500', type:'earn', target:500, reward:150, text:'Заработайте 500 монет'},
+        {id:'earn_1000', type:'earn', target:1000, reward:300, text:'Заработайте 1000 монет'},
+        {id:'complete_3', type:'complete_levels', target:3, reward:200, text:'Пройдите 3 уровня'},
+        {id:'complete_5', type:'complete_levels', target:5, reward:400, text:'Пройдите 5 уровней'},
+        {id:'use_10', type:'use_ingredient', target:10, reward:100, text:'Используйте 10 ингредиентов'},
+        {id:'use_25', type:'use_ingredient', target:25, reward:250, text:'Используйте 25 ингредиентов'},
+        {id:'invite', type:'invite', target:1, reward:500, text:'Пригласите друга'}
     ],
-    dailyTasks: [],
-    progress: {},
-    lastUpdate: null,
+    dailyTasks: [], progress: {}, lastUpdate: null,
     init(saved){
         const today = new Date().toDateString();
         if(saved && saved.lastTaskUpdate === today && saved.dailyTasks){
             this.dailyTasks = saved.dailyTasks;
             this.progress = saved.taskProgress || {};
             this.lastUpdate = today;
-        } else {
-            this.generateDailyTasks();
-        }
+        } else this.generate();
     },
-    generateDailyTasks(){
+    generate(){
         const shuffled = [...this.taskPool].sort(()=>Math.random()-0.5);
         this.dailyTasks = shuffled.slice(0,10).map(t=>({...t, completed:false, claimed:false}));
         this.progress = {};
@@ -800,36 +1186,79 @@ const Tasks = {
         if(task && task.completed && !task.claimed){
             task.claimed = true;
             GameState.coins += task.reward;
+            GameState.totalCoinsEarned += task.reward;
             GameState.save();
             AudioManager.playSound('coin');
             return task.reward;
         }
         return 0;
     },
-    getSaveData(){
-        return { lastTaskUpdate: this.lastUpdate, dailyTasks: this.dailyTasks, taskProgress: this.progress };
+    getSaveData(){ return { lastTaskUpdate:this.lastUpdate, dailyTasks:this.dailyTasks, taskProgress:this.progress }; }
+};
+
+/* ============================================================
+   ДОСТИЖЕНИЯ
+============================================================ */
+const Achievements = {
+    list: [
+        {id:'first',      name:'Первая монета', desc:'Заработайте первую монету',    icon:'i-coin',  check:s=>s.totalCoinsEarned>=1,      reward:50},
+        {id:'ten_burg',   name:'Новичок',        desc:'Обслужите 10 клиентов',       icon:'i-burger',check:s=>s.totalBurgersServed>=10,   reward:200},
+        {id:'fifty_burg', name:'Опытный',        desc:'Обслужите 50 клиентов',       icon:'i-burger',check:s=>s.totalBurgersServed>=50,   reward:1000},
+        {id:'hund_burg',  name:'Мастер',         desc:'Обслужите 100 клиентов',      icon:'i-burger',check:s=>s.totalBurgersServed>=100,  reward:3000},
+        {id:'lvl10',      name:'Уровень 10',     desc:'Достигните 10 уровня',        icon:'i-map',   check:s=>s.maxLevel>=10,             reward:500},
+        {id:'lvl25',      name:'Уровень 25',     desc:'Достигните 25 уровня',        icon:'i-map',   check:s=>s.maxLevel>=25,             reward:2000},
+        {id:'lvl50',      name:'Уровень 50',     desc:'Достигните 50 уровня',        icon:'i-map',   check:s=>s.maxLevel>=50,             reward:8000},
+        {id:'lvl100',     name:'Легенда',        desc:'Достигните 100 уровня',       icon:'i-star',  check:s=>s.maxLevel>=100,            reward:30000},
+        {id:'combo5',     name:'Комбо x5',       desc:'5 идеальных подряд',          icon:'i-fire',  check:s=>s.bestCombo>=5,             reward:800},
+        {id:'combo15',    name:'Комбо x15',      desc:'15 идеальных подряд',         icon:'i-fire',  check:s=>s.bestCombo>=15,            reward:5000},
+        {id:'streak3',    name:'Постоянный',     desc:'Заходите 3 дня подряд',       icon:'i-gift',  check:s=>s.streak>=3,                reward:600},
+        {id:'streak7',    name:'Верный',         desc:'Заходите 7 дней подряд',      icon:'i-gift',  check:s=>s.streak>=7,                reward:3000},
+        {id:'rich',       name:'Богач',          desc:'Накопите 100 000 монет',      icon:'i-coin',  check:s=>s.coins>=100000,            reward:20000},
+        {id:'furniture',  name:'Дизайнер',       desc:'Купите 5 предметов мебели',   icon:'i-cart',  check:s=>s.ownedFurniture.length>=8, reward:1500},
+        {id:'theme3',     name:'Стилист',        desc:'Откройте 3 темы ресторана',   icon:'f-painting',check:s=>s.purchasedThemes.length>=3,reward:4000}
+    ],
+    getSave(){ return { unlocked: GameState.unlockedAchievements }; },
+    check(){
+        let newUnlocked = [];
+        this.list.forEach(ach=>{
+            if(GameState.unlockedAchievements.includes(ach.id)) return;
+            try{
+                if(ach.check(GameState)){
+                    GameState.unlockedAchievements.push(ach.id);
+                    GameState.coins += ach.reward;
+                    GameState.totalCoinsEarned += ach.reward;
+                    newUnlocked.push(ach);
+                }
+            }catch(e){}
+        });
+        if(newUnlocked.length){
+            GameState.save();
+            newUnlocked.forEach(a=>{
+                if(window.Game){
+                    Game.showToast('🏆 ' + a.name + ' (+' + a.reward + ')');
+                }
+            });
+            AudioManager.playSound('coin');
+        }
+        return newUnlocked;
     }
 };
 
 /* ============================================================
-   AFK ROOM
+   AFK КОМНАТА
 ============================================================ */
 const AFKRoom = {
-    active: false,
-    interval: null,
-    accumulatedCoins: 0,
-    totalMinutes: 0,
-    rate: 1,
+    active:false, interval:null, accumulatedCoins:0, totalMinutes:0, rate:1,
     start(){
         if(this.active) return;
         this.active = true;
-        this.accumulatedCoins = 0;
         this.updateUI();
         this.interval = setInterval(()=>{
             if(!this.active) return;
             this.accumulatedCoins += this.rate;
             this.totalMinutes += 1;
             GameState.coins += this.rate;
+            GameState.totalCoinsEarned += this.rate;
             GameState.save();
             this.updateUI();
             if(window.Game) Game.updateCurrencyDisplay();
@@ -863,6 +1292,7 @@ const GameState = {
     purchasedIngredients: [],
     purchasedThemes: ['classic'],
     restaurantTheme: 'classic',
+    restaurantName: 'Бургерная',
     hasCoffeeMachine: false,
     hasLemonadeMachine: false,
     lastDailyReward: null,
@@ -870,27 +1300,29 @@ const GameState = {
     totalBurgersServed: 0,
     totalPerfectBurgers: 0,
     totalCoinsEarned: 0,
+    // Новое
+    streak: 0,
+    bestCombo: 0,
+    unlockedAchievements: [],
+    ownedFurniture: ['t_basic','c_basic','w_none','f_wood','d_none'],
+    selectedFurniture: {table:'t_basic', chair:'c_basic', window:'w_none', floor:'f_wood', decor:'d_none'},
+    // Milestone tracking
+    claimedMilestones: [],
     _saveTimeout: null,
 
     async load(){
         const saved = await VKBridge.loadData('burger_game_save');
         if(!saved) return false;
-        this.coins = saved.coins || 0;
-        this.currentLevel = saved.currentLevel || 1;
-        this.maxLevel = saved.maxLevel || 1;
-        this.completedLevels = saved.completedLevels || [];
-        this.musicEnabled = saved.musicEnabled !== false;
-        this.language = saved.language || 'ru';
-        this.purchasedIngredients = saved.purchasedIngredients || [];
-        this.purchasedThemes = saved.purchasedThemes || ['classic'];
-        this.restaurantTheme = saved.restaurantTheme || 'classic';
-        this.hasCoffeeMachine = saved.hasCoffeeMachine || false;
-        this.hasLemonadeMachine = saved.hasLemonadeMachine || false;
-        this.lastDailyReward = saved.lastDailyReward || null;
-        this.tutorialCompleted = saved.tutorialCompleted || false;
-        this.totalBurgersServed = saved.totalBurgersServed || 0;
-        this.totalPerfectBurgers = saved.totalPerfectBurgers || 0;
-        this.totalCoinsEarned = saved.totalCoinsEarned || 0;
+        Object.keys(this).forEach(k=>{
+            if(k.startsWith('_')) return;
+            if(saved[k] !== undefined) this[k] = saved[k];
+        });
+        // merge furniture defaults
+        if(!this.ownedFurniture || !Array.isArray(this.ownedFurniture)) this.ownedFurniture = ['t_basic','c_basic','w_none','f_wood','d_none'];
+        if(!this.selectedFurniture) this.selectedFurniture = {table:'t_basic', chair:'c_basic', window:'w_none', floor:'f_wood', decor:'d_none'};
+        if(!this.unlockedAchievements) this.unlockedAchievements = [];
+        if(!this.claimedMilestones) this.claimedMilestones = [];
+        if(!this.restaurantName) this.restaurantName = 'Бургерная';
         if(saved.tasks) Tasks.init(saved.tasks); else Tasks.init(null);
         if(saved.afk){
             AFKRoom.totalMinutes = saved.afk.totalMinutes || 0;
@@ -907,10 +1339,16 @@ const GameState = {
                 completedLevels: this.completedLevels, musicEnabled: this.musicEnabled,
                 language: this.language, purchasedIngredients: this.purchasedIngredients,
                 purchasedThemes: this.purchasedThemes, restaurantTheme: this.restaurantTheme,
+                restaurantName: this.restaurantName,
                 hasCoffeeMachine: this.hasCoffeeMachine, hasLemonadeMachine: this.hasLemonadeMachine,
                 lastDailyReward: this.lastDailyReward, tutorialCompleted: this.tutorialCompleted,
                 totalBurgersServed: this.totalBurgersServed, totalPerfectBurgers: this.totalPerfectBurgers,
                 totalCoinsEarned: this.totalCoinsEarned,
+                streak: this.streak, bestCombo: this.bestCombo,
+                unlockedAchievements: this.unlockedAchievements,
+                ownedFurniture: this.ownedFurniture,
+                selectedFurniture: this.selectedFurniture,
+                claimedMilestones: this.claimedMilestones,
                 tasks: Tasks.getSaveData(),
                 afk: { totalMinutes: AFKRoom.totalMinutes, rate: AFKRoom.rate }
             };
@@ -920,7 +1358,7 @@ const GameState = {
 };
 
 /* ============================================================
-   ИМЕНА КЛИЕНТОВ
+   КОНСТАНТЫ
 ============================================================ */
 const CUSTOMER_NAMES = ['Аня','Иван','Маша','Петя','Оля','Сергей','Катя','Дима','Лена','Ваня','Даша','Миша'];
 const CUSTOMER_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#34495e'];
@@ -949,7 +1387,10 @@ class BurgerGame {
         this.customersServed = 0;
         this.customersTotal = 0;
         this.availableIngredients = [];
+        this.combo = 0;
         this.tutorialStep = 0;
+        this.shopCategory = 'table';
+        this.particles = [];
     }
 
     async init(){
@@ -961,13 +1402,17 @@ class BurgerGame {
         AudioManager.toggleMusic(GameState.musicEnabled);
         document.getElementById('music-toggle').checked = GameState.musicEnabled;
         document.getElementById('language-select').value = GameState.language;
+        document.getElementById('name-input').value = GameState.restaurantName;
         currentLang = GameState.language;
+
         this.applyLanguage();
+        this.updateRestaurantTitle();
 
         if(!hasSave) Tasks.init(null);
 
         this.setupEventListeners();
         this.updateCurrencyDisplay();
+        this.checkDailyBadge();
         VKBridge.showBanner();
 
         if(!GameState.tutorialCompleted){
@@ -981,31 +1426,31 @@ class BurgerGame {
     }
 
     applyLanguage(){
-        document.getElementById('play-btn').querySelector('.menu-label').textContent = t('play');
-        const buttons = {
-            'levels-btn': 'levels', 'shop-btn': 'shop', 'tasks-btn': 'tasks',
-            'daily-btn': 'daily_reward', 'afk-btn': 'afk_room', 'invite-btn': 'invite_friends'
+        document.querySelector('#play-btn .menu-label').textContent = t('play');
+        const map = {
+            'levels-btn':'levels', 'shop-btn':'shop', 'tasks-btn':'tasks',
+            'daily-btn':'daily_reward', 'afk-btn':'afk_room', 'achievements-btn':'achievements',
+            'invite-btn':'invite_friends'
         };
-        for(const [id, key] of Object.entries(buttons)){
+        for(const [id, key] of Object.entries(map)){
             const el = document.getElementById(id);
-            if(el) el.querySelector('.menu-label').textContent = t(key);
+            if(el){ const l = el.querySelector('.menu-label'); if(l) l.textContent = t(key); }
         }
-        document.getElementById('serve-btn').textContent = t('serve');
-        document.getElementById('clear-btn').textContent = t('clear');
-        document.getElementById('double-reward-btn').textContent = t('double_reward');
-        document.getElementById('next-level-btn').textContent = t('next_level');
-        document.getElementById('back-lobby-btn').textContent = t('back_lobby');
-        document.getElementById('tutorial-next').textContent = t('tutorial_next');
-        document.getElementById('tutorial-skip').textContent = t('tutorial_skip');
-        document.getElementById('daily-claim').textContent = t('claim');
-        document.getElementById('levels-back').textContent = t('back');
-        document.getElementById('tasks-back').textContent = t('back');
-        document.getElementById('afk-back').textContent = t('back');
-        document.getElementById('daily-back').textContent = t('back');
-        document.getElementById('shop-back').textContent = t('back');
-        document.getElementById('settings-back').textContent = t('back');
-        document.getElementById('promo-btn').textContent = t('activate');
-        document.getElementById('promo-input').placeholder = t('promo_code');
+        const set = (id, key)=>{ const el = document.getElementById(id); if(el) el.textContent = t(key); };
+        set('serve-btn','serve'); set('clear-btn','clear');
+        set('double-reward-btn','double_reward');
+        set('next-level-btn','next_level'); set('back-lobby-btn','back_lobby');
+        set('tutorial-next','tutorial_next'); set('tutorial-skip','tutorial_skip');
+        set('daily-claim','claim');
+        set('levels-back','back'); set('tasks-back','back'); set('afk-back','back');
+        set('daily-back','back'); set('shop-back','back'); set('settings-back','back');
+        set('achievements-back','back');
+        set('promo-btn','activate');
+    }
+
+    updateRestaurantTitle(){
+        const el = document.getElementById('restaurant-title-display');
+        if(el) el.textContent = GameState.restaurantName;
     }
 
     resizeCanvas(){
@@ -1030,28 +1475,74 @@ class BurgerGame {
         }
         this.animationFrame = requestAnimationFrame(t=>this.gameLoop(t));
     }
-    update(dt){ this.backgroundOffset = (this.backgroundOffset + dt * 20) % 40; }
+
+    update(dt){
+        this.backgroundOffset = (this.backgroundOffset + dt * 20) % 40;
+        // particles
+        this.particles = this.particles.filter(p=>{
+            p.life -= dt;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vy += 500 * dt;
+            return p.life > 0;
+        });
+    }
+
     render(){
-        const w = this.canvas._w || 300;
-        const h = this.canvas._h || 300;
+        const w = this.canvas._w || 300, h = this.canvas._h || 300;
         const grad = this.ctx.createLinearGradient(0, 0, 0, h);
-        grad.addColorStop(0, '#1a1a2e');
-        grad.addColorStop(1, '#16213e');
+        grad.addColorStop(0, '#1a0f2e');
+        grad.addColorStop(1, '#0f0820');
         this.ctx.fillStyle = grad;
         this.ctx.fillRect(0, 0, w, h);
-        this.ctx.fillStyle = 'rgba(255,255,255,0.02)';
+
+        // animated glow
+        const time = performance.now() / 1000;
+        const glow = this.ctx.createRadialGradient(
+            w/2 + Math.sin(time*.3)*w*.3, h/2 + Math.cos(time*.2)*h*.3,
+            0, w/2, h/2, Math.max(w,h)
+        );
+        glow.addColorStop(0, 'rgba(255,107,53,0.10)');
+        glow.addColorStop(1, 'rgba(255,107,53,0)');
+        this.ctx.fillStyle = glow;
+        this.ctx.fillRect(0, 0, w, h);
+
+        // tiles
+        this.ctx.fillStyle = 'rgba(255,255,255,0.025)';
         const tile = 40;
         for(let x = -tile; x < w + tile; x += tile){
             for(let y = -tile; y < h + tile; y += tile){
                 this.ctx.fillRect(x + this.backgroundOffset, y, tile - 2, tile - 2);
             }
         }
+
+        // particles
+        this.particles.forEach(p=>{
+            this.ctx.globalAlpha = Math.min(1, p.life);
+            this.ctx.fillStyle = p.color;
+            this.ctx.fillRect(p.x, p.y, 4, 4);
+        });
+        this.ctx.globalAlpha = 1;
+    }
+
+    spawnParticle(x, y, color){
+        this.particles.push({
+            x, y, vx:(Math.random()-.5)*200, vy:-150 - Math.random()*150,
+            life: 1.2, color
+        });
     }
 
     showScreen(id){
         document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
         const el = document.getElementById(id);
         if(el) el.classList.add('active');
+        if(id === 'lobby'){ this.updateRestaurantTitle(); this.checkDailyBadge(); }
+    }
+
+    checkDailyBadge(){
+        const today = new Date().toDateString();
+        const badge = document.getElementById('daily-badge');
+        if(badge) badge.style.display = (GameState.lastDailyReward !== today) ? 'block' : 'none';
     }
 
     setupEventListeners(){
@@ -1063,9 +1554,10 @@ class BurgerGame {
         bind('play-btn', ()=>this.startLevel(GameState.currentLevel));
         bind('levels-btn', ()=>{ this.renderLevelsGrid(); this.showScreen('levels-screen'); });
         bind('tasks-btn', ()=>{ this.renderTasks(); this.showScreen('tasks-screen'); });
-        bind('afk-btn', ()=>{ this.showScreen('afk-screen'); AFKRoom.start(); AFKRoom.updateUI(); });
+        bind('afk-btn', ()=>{ AFKRoom.start(); AFKRoom.updateUI(); this.showScreen('afk-screen'); });
         bind('daily-btn', ()=>{ this.checkDailyReward(); this.showScreen('daily-screen'); });
         bind('shop-btn', ()=>{ this.renderShop(); this.showScreen('shop-screen'); });
+        bind('achievements-btn', ()=>{ this.renderAchievements(); this.showScreen('achievements-screen'); });
         bind('invite-btn', ()=>{ VKBridge.inviteFriends(); Tasks.updateProgress('invite', 1); });
         bind('settings-btn', ()=>this.showScreen('settings-screen'));
         bind('settings-back', ()=>this.showScreen('lobby'));
@@ -1074,14 +1566,16 @@ class BurgerGame {
         bind('afk-back', ()=>{ AFKRoom.stop(); this.showScreen('lobby'); });
         bind('daily-back', ()=>this.showScreen('lobby'));
         bind('shop-back', ()=>this.showScreen('lobby'));
+        bind('achievements-back', ()=>this.showScreen('lobby'));
         bind('serve-btn', ()=>this.serveBurger());
         bind('clear-btn', ()=>this.clearBurger());
         bind('daily-claim', ()=>this.claimDailyReward());
         bind('promo-btn', ()=>this.handlePromoCode());
         bind('tutorial-next', ()=>this.nextTutorialStep());
         bind('tutorial-skip', ()=>this.skipTutorial());
-        bind('next-level-btn', ()=>{ this.startLevel(Math.min(GameState.currentLevel + 1, 500)); });
+        bind('next-level-btn', ()=>this.startLevel(Math.min(GameState.currentLevel + 1, 500)));
         bind('back-lobby-btn', ()=>this.showScreen('lobby'));
+        bind('save-name-btn', ()=>this.saveName());
 
         document.getElementById('music-toggle').addEventListener('change', e=>{
             GameState.musicEnabled = e.target.checked;
@@ -1100,16 +1594,26 @@ class BurgerGame {
             AudioManager.resumeMusic();
             if(ok){
                 GameState.coins += this.currentReward;
+                GameState.totalCoinsEarned += this.currentReward;
                 GameState.save();
                 this.updateCurrencyDisplay();
                 const btn = document.getElementById('double-reward-btn');
                 btn.disabled = true;
-                btn.textContent = '✓ +' + this.currentReward + ' 🪙';
+                btn.textContent = '✓ +' + this.currentReward;
             }
         });
     }
 
-    /* ===== ЗАПУСК УРОВНЯ ===== */
+    saveName(){
+        const input = document.getElementById('name-input');
+        const val = (input.value || '').trim().slice(0,24) || 'Бургерная';
+        GameState.restaurantName = val;
+        GameState.save();
+        this.updateRestaurantTitle();
+        this.showToast(t('name_saved'));
+    }
+
+    /* ===== УРОВЕНЬ ===== */
     async startLevel(levelNum){
         this.paused = true;
         AudioManager.pauseMusic();
@@ -1126,17 +1630,15 @@ class BurgerGame {
         this.rewardPerCustomer = data.rewardPerCustomer;
         this.timeLeft = data.timeLimit;
         this.availableIngredients = data.availableIngredients;
+        this.combo = 0;
 
-        // Создаём клиентов
         const positions = this.getCustomerPositions(this.customersTotal);
         this.customers = data.customers.map((order, i)=>({
-            x: positions[i],
-            y: 250,
+            x: positions[i], y: 250,
             color: CUSTOMER_COLORS[Math.floor(Math.random()*CUSTOMER_COLORS.length)],
             skin: SKIN_COLORS[Math.floor(Math.random()*SKIN_COLORS.length)],
             hair: HAIR_COLORS[Math.floor(Math.random()*HAIR_COLORS.length)],
-            order: order,
-            served: false,
+            order: order, served: false,
             name: CUSTOMER_NAMES[Math.floor(Math.random()*CUSTOMER_NAMES.length)]
         }));
 
@@ -1170,43 +1672,212 @@ class BurgerGame {
         return positions;
     }
 
-    /* ===== SVG РЕСТОРАН ===== */
+    /* ===== СЦЕНА ===== */
     renderScene(){
         const theme = RestaurantThemes[GameState.restaurantTheme] || RestaurantThemes.classic;
+        const sel = GameState.selectedFurniture;
+        const floorItem = Furniture.findItem('floor', sel.floor) || {a:theme.floor, b:theme.floorLine};
+        const tableItem = Furniture.findItem('table', sel.table) || {color:'#8b5a3c'};
+        const chairItem = Furniture.findItem('chair', sel.chair) || {color:'#8b5a3c'};
+        const windowItem = Furniture.findItem('window', sel.window) || {id:'w_none'};
+        const decorItem = Furniture.findItem('decor', sel.decor) || {id:'d_none'};
+
         const bg = document.getElementById('scene-bg');
         if(!bg) return;
         bg.innerHTML = `
             <defs>
                 <pattern id="floorTiles" x="0" y="0" width="60" height="40" patternUnits="userSpaceOnUse">
-                    <rect width="60" height="40" fill="${theme.floor}"/>
-                    <line x1="0" y1="0" x2="0" y2="40" stroke="${theme.floorLine}" stroke-width="1.5"/>
-                    <line x1="0" y1="0" x2="60" y2="0" stroke="${theme.floorLine}" stroke-width="1.5"/>
+                    <rect width="60" height="40" fill="${floorItem.a}"/>
+                    <rect width="60" height="40" fill="none" stroke="${floorItem.b}" stroke-width="1.6"/>
                 </pattern>
                 <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="${theme.wall1}"/>
                     <stop offset="1" stop-color="${theme.wall2}"/>
                 </linearGradient>
+                <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0" stop-color="${theme.accent}" stop-opacity=".5"/>
+                    <stop offset="1" stop-color="${theme.accent}" stop-opacity="0"/>
+                </radialGradient>
             </defs>
+
             <!-- Стена -->
             <rect x="0" y="0" width="800" height="205" fill="url(#wallGrad)"/>
+            ${this.renderWallDecor(windowItem, decorItem, theme)}
+
             <!-- Меню-борд -->
-            <rect x="260" y="15" width="280" height="85" rx="8" fill="${theme.menuBg}" stroke="${theme.accent}" stroke-width="3"/>
-            <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="800" fill="${theme.menuText}" font-family="sans-serif">🍔 БУРГЕРНАЯ</text>
-            <text x="400" y="70" text-anchor="middle" font-size="13" fill="${theme.menuText}" font-family="sans-serif" opacity="0.85">★ СВЕЖИЕ БУРГЕРЫ КАЖДЫЙ ДЕНЬ ★</text>
-            <text x="400" y="88" text-anchor="middle" font-size="11" fill="${theme.menuText}" font-family="sans-serif" opacity="0.7">— ОТКРЫТО —</text>
+            <rect x="250" y="14" width="300" height="88" rx="10" fill="${theme.menuBg}" stroke="${theme.accent}" stroke-width="3" filter="url(#softShadow)"/>
+            <text x="400" y="44" text-anchor="middle" font-size="22" font-weight="900" fill="${theme.menuText}" font-family="sans-serif" letter-spacing="1">🍔 ${this.escapeXml(GameState.restaurantName.slice(0,18))}</text>
+            <text x="400" y="68" text-anchor="middle" font-size="12" fill="${theme.menuText}" font-family="sans-serif" opacity="0.85">★ СВЕЖИЕ БУРГЕРЫ КАЖДЫЙ ДЕНЬ ★</text>
+            <text x="400" y="86" text-anchor="middle" font-size="11" fill="${theme.menuText}" font-family="sans-serif" opacity="0.7">— ОТКРЫТО —</text>
+
             <!-- Лампы -->
-            <circle cx="100" cy="30" r="6" fill="${theme.accent}" opacity="0.7"/>
-            <line x1="100" y1="0" x2="100" y2="24" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
-            <circle cx="700" cy="30" r="6" fill="${theme.accent}" opacity="0.7"/>
-            <line x1="700" y1="0" x2="700" y2="24" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="100" cy="30" r="26" fill="url(#lampGlow)"/>
+            <circle cx="100" cy="30" r="7" fill="${theme.accent}" opacity="0.85"/>
+            <line x1="100" y1="0" x2="100" y2="23" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
+
+            <circle cx="700" cy="30" r="26" fill="url(#lampGlow)"/>
+            <circle cx="700" cy="30" r="7" fill="${theme.accent}" opacity="0.85"/>
+            <line x1="700" y1="0" x2="700" y2="23" stroke="${theme.accent}" stroke-width="1.5" opacity="0.5"/>
+
             <!-- Плинтус -->
             <rect x="0" y="198" width="800" height="8" fill="${theme.counterTop}"/>
+
             <!-- Пол -->
-            <rect x="0" y="205" width="800" height="95" fill="url(#floorTiles)"/>
-            <!-- Прилавок (передний план) -->
+            <rect x="0" y="206" width="800" height="94" fill="url(#floorTiles)"/>
+            <rect x="0" y="206" width="800" height="8" fill="rgba(0,0,0,0.35)"/>
+
+            <!-- Столы и стулья -->
+            ${this.renderTables(tableItem, chairItem)}
+
+            <!-- Прилавок -->
             <rect x="0" y="272" width="800" height="28" fill="${theme.counter}"/>
             <rect x="0" y="272" width="800" height="5" fill="${theme.counterTop}"/>
+            <rect x="0" y="295" width="800" height="5" fill="rgba(0,0,0,0.35)"/>
         `;
+    }
+
+    renderWallDecor(windowItem, decorItem, theme){
+        let out = '';
+        // Окна
+        if(windowItem.id === 'w_small'){
+            out += `
+                <rect x="60" y="60" width="80" height="70" rx="4" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="100" y1="60" x2="100" y2="130" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="60" y1="95" x2="140" y2="95" stroke="#1a0f2e" stroke-width="2"/>
+            `;
+            out += `
+                <rect x="660" y="60" width="80" height="70" rx="4" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="700" y1="60" x2="700" y2="130" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="660" y1="95" x2="740" y2="95" stroke="#1a0f2e" stroke-width="2"/>
+            `;
+        } else if(windowItem.id === 'w_wide'){
+            out += `
+                <rect x="40" y="50" width="140" height="95" rx="6" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="110" y1="50" x2="110" y2="145" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="40" y1="97" x2="180" y2="97" stroke="#1a0f2e" stroke-width="2"/>
+                <rect x="620" y="50" width="140" height="95" rx="6" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="690" y1="50" x2="690" y2="145" stroke="#1a0f2e" stroke-width="2"/>
+                <line x1="620" y1="97" x2="760" y2="97" stroke="#1a0f2e" stroke-width="2"/>
+            `;
+        } else if(windowItem.id === 'w_stained'){
+            out += `
+                <rect x="55" y="55" width="90" height="80" rx="6" fill="${windowItem.color}" opacity=".9" stroke="#1a0f2e" stroke-width="2"/>
+                <circle cx="100" cy="95" r="22" fill="#ffd166" opacity=".7"/>
+                <circle cx="100" cy="95" r="12" fill="#e63946" opacity=".8"/>
+                <rect x="655" y="55" width="90" height="80" rx="6" fill="${windowItem.color}" opacity=".9" stroke="#1a0f2e" stroke-width="2"/>
+                <circle cx="700" cy="95" r="22" fill="#4ecdc4" opacity=".7"/>
+                <circle cx="700" cy="95" r="12" fill="#e63946" opacity=".8"/>
+            `;
+        }
+        // Декор
+        if(decorItem.id === 'd_plant'){
+            out += `
+                <g transform="translate(180,130)">
+                    <path d="M-15 30 h30 l-4 -22 h-22 z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.5"/>
+                    <path d="M0 8 V-6 M0 -6 q-12 -12 -18 -4 q4 12 18 4 M0 -6 q12 -12 18 -4 q-4 12 -18 4 M0 0 q-9 -3 -12 3 q6 9 12 -3" fill="#4a8a20" stroke="#2a5a10" stroke-width=".8"/>
+                </g>
+                <g transform="translate(620,130)">
+                    <path d="M-15 30 h30 l-4 -22 h-22 z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.5"/>
+                    <path d="M0 8 V-6 M0 -6 q-12 -12 -18 -4 q4 12 18 4 M0 -6 q12 -12 18 -4 q-4 12 -18 4 M0 0 q-9 -3 -12 3 q6 9 12 -3" fill="#4a8a20" stroke="#2a5a10" stroke-width=".8"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_painting'){
+            out += `
+                <g transform="translate(155,60)">
+                    <rect width="70" height="50" rx="3" fill="#8b6914" stroke="#5a3a24" stroke-width="3"/>
+                    <rect x="4" y="4" width="62" height="42" fill="#2a1f3a"/>
+                    <path d="M8 42 L22 26 L34 34 L50 18 L62 30 L62 42 Z" fill="#4ecdc4" opacity=".7"/>
+                    <circle cx="56" cy="12" r="4" fill="#ffd166"/>
+                </g>
+                <g transform="translate(575,60)">
+                    <rect width="70" height="50" rx="3" fill="#8b6914" stroke="#5a3a24" stroke-width="3"/>
+                    <rect x="4" y="4" width="62" height="42" fill="#2a1f3a"/>
+                    <path d="M8 42 L22 26 L34 34 L50 18 L62 30 L62 42 Z" fill="#ff6b35" opacity=".7"/>
+                    <circle cx="56" cy="12" r="4" fill="#4ecdc4"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_lamp'){
+            out += `
+                <g transform="translate(130,50)">
+                    <path d="M-18 -14 h36 l-6 18 h-24 z" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/>
+                    <line x1="0" y1="4" x2="0" y2="60" stroke="#666" stroke-width="2"/>
+                </g>
+                <g transform="translate(670,50)">
+                    <path d="M-18 -14 h36 l-6 18 h-24 z" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/>
+                    <line x1="0" y1="4" x2="0" y2="60" stroke="#666" stroke-width="2"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_clock'){
+            out += `
+                <g transform="translate(140,80)">
+                    <circle cx="0" cy="0" r="20" fill="#f5e6c8" stroke="#8a5a00" stroke-width="3"/>
+                    <line x1="0" y1="0" x2="0" y2="-12" stroke="#1a0f2e" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="0" y1="0" x2="8" y2="4" stroke="#1a0f2e" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="2" fill="#1a0f2e"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_flower'){
+            out += `
+                <g transform="translate(155,130)">
+                    <path d="M0 30 V10" stroke="#4a8a20" stroke-width="2"/>
+                    <circle cx="0" cy="6" r="6" fill="#ff5c8a"/>
+                    <circle cx="-6" cy="10" r="4.5" fill="#ff8cae"/>
+                    <circle cx="6" cy="10" r="4.5" fill="#ff8cae"/>
+                    <circle cx="0" cy="12" r="3.5" fill="#ffd166"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_sofa'){
+            out += `
+                <g transform="translate(190,160)">
+                    <rect x="-40" y="-14" width="80" height="24" rx="5" fill="#8b3d5c"/>
+                    <rect x="-44" y="-22" width="10" height="32" rx="4" fill="#a04868"/>
+                    <rect x="34" y="-22" width="10" height="32" rx="4" fill="#a04868"/>
+                </g>
+            `;
+        } else if(decorItem.id === 'd_jukebox'){
+            out += `
+                <g transform="translate(180,120)">
+                    <path d="M-18 -34 q18 -12 36 0 v60 h-36 z" fill="#e63946" stroke="#7a1a10" stroke-width="2"/>
+                    <circle cx="0" cy="-14" r="9" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/>
+                    <circle cx="0" cy="-14" r="3" fill="#8a5a00"/>
+                    <rect x="-14" y="10" width="28" height="4" fill="#1a0f2e"/>
+                </g>
+            `;
+        }
+        return out;
+    }
+
+    renderTables(tableItem, chairItem){
+        // столы и стулья между полом и прилавком
+        let out = '';
+        const tablePositions = [150, 400, 650];
+        tablePositions.forEach(tx=>{
+            // стол
+            out += `
+                <g transform="translate(${tx},245)">
+                    <ellipse cx="0" cy="18" rx="42" ry="6" fill="rgba(0,0,0,0.4)"/>
+                    <rect x="-42" y="-2" width="84" height="10" rx="4" fill="${tableItem.color}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+                    <rect x="-6" y="8" width="12" height="12" fill="${tableItem.color}"/>
+                    <ellipse cx="0" cy="-2" rx="42" ry="6" fill="${tableItem.color}" opacity=".8"/>
+                </g>
+            `;
+            // стулья
+            out += `
+                <g transform="translate(${tx-60},252)">
+                    <rect x="-8" y="0" width="16" height="6" fill="${chairItem.color}"/>
+                    <rect x="-8" y="-16" width="16" height="14" rx="2" fill="${chairItem.color}"/>
+                </g>
+                <g transform="translate(${tx+60},252)">
+                    <rect x="-8" y="0" width="16" height="6" fill="${chairItem.color}"/>
+                    <rect x="-8" y="-16" width="16" height="14" rx="2" fill="${chairItem.color}"/>
+                </g>
+            `;
+        });
+        return out;
+    }
+
+    escapeXml(s){
+        return s.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c]));
     }
 
     renderCustomers(){
@@ -1221,38 +1892,38 @@ class BurgerGame {
             g.setAttribute('transform', `translate(${c.x}, ${c.y})`);
             g.style.cursor = 'pointer';
 
-            // Пузырь с заказом
-            const emojis = c.order.map(id => Levels.getEmoji(id)).join('');
-            const bubbleWidth = Math.max(56, c.order.length * 22 + 16);
+            const bubbleWidth = Math.max(60, c.order.length * 24 + 16);
             const bubbleX = -bubbleWidth / 2;
 
+            // Инлайн svg-иконки внутри текста заказа — используем foreignObject? нет, используем emoji через отдельные svg
+            // Проще: строим как набор мини-иконок
+            let orderIcons = '';
+            c.order.forEach((id, idx)=>{
+                const ix = bubbleX + 10 + idx * 24;
+                orderIcons += `
+                    <svg x="${ix}" y="-11" width="20" height="20" viewBox="0 0 32 32">
+                        <use href="#ing-${id}"/>
+                    </svg>
+                `;
+            });
+
             let inner = `
-                <!-- тень -->
-                <ellipse cx="0" cy="4" rx="24" ry="5" fill="rgba(0,0,0,0.35)"/>
-                <!-- тело -->
-                <path d="M -20 0 Q -20 -52 0 -56 Q 20 -52 20 0 Z" fill="${c.color}" stroke="rgba(0,0,0,0.25)" stroke-width="1.2"/>
-                <!-- руки -->
+                <ellipse cx="0" cy="4" rx="24" ry="5" fill="rgba(0,0,0,0.4)"/>
+                <path d="M -20 0 Q -20 -52 0 -56 Q 20 -52 20 0 Z" fill="${c.color}" stroke="rgba(0,0,0,0.3)" stroke-width="1.2"/>
                 <path d="M -17 -34 Q -28 -22 -25 -8" stroke="${c.color}" stroke-width="6" fill="none" stroke-linecap="round"/>
                 <path d="M 17 -34 Q 28 -22 25 -8" stroke="${c.color}" stroke-width="6" fill="none" stroke-linecap="round"/>
-                <!-- шея -->
                 <rect x="-5" y="-60" width="10" height="6" fill="${c.skin}"/>
-                <!-- голова -->
                 <circle cx="0" cy="-76" r="15" fill="${c.skin}" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
-                <!-- волосы -->
                 <path d="M -15 -78 Q -15 -94 0 -94 Q 15 -94 15 -78 Q 10 -85 0 -85 Q -10 -85 -15 -78 Z" fill="${c.hair}"/>
-                <!-- глаза -->
                 <circle cx="-5" cy="-77" r="1.8" fill="#222"/>
                 <circle cx="5" cy="-77" r="1.8" fill="#222"/>
-                <!-- румянец -->
                 <circle cx="-9" cy="-71" r="2.5" fill="rgba(255,120,120,0.4)"/>
                 <circle cx="9" cy="-71" r="2.5" fill="rgba(255,120,120,0.4)"/>
-                <!-- улыбка -->
                 <path d="M -5 -70 Q 0 -66 5 -70" stroke="#222" fill="none" stroke-width="1.3" stroke-linecap="round"/>
-                <!-- пузырь с заказом -->
                 <g transform="translate(0, -118)">
-                    <rect x="${bubbleX}" y="-16" width="${bubbleWidth}" height="24" rx="10" fill="white" stroke="${c.color}" stroke-width="2"/>
-                    <polygon points="-5,7 5,7 0,13" fill="white" stroke="${c.color}" stroke-width="2" stroke-linejoin="round"/>
-                    <text x="0" y="2" text-anchor="middle" font-size="13" fill="#222" font-family="sans-serif">${emojis}</text>
+                    <rect x="${bubbleX}" y="-16" width="${bubbleWidth}" height="26" rx="11" fill="white" stroke="${c.color}" stroke-width="2"/>
+                    <polygon points="-5,8 5,8 0,14" fill="white" stroke="${c.color}" stroke-width="2" stroke-linejoin="round"/>
+                    ${orderIcons}
                 </g>
             `;
 
@@ -1278,20 +1949,19 @@ class BurgerGame {
     renderOrderPanel(){
         const nameEl = document.getElementById('order-customer');
         const itemsEl = document.getElementById('order-items');
-
         if(this.selectedCustomer === null || !this.customers[this.selectedCustomer] || this.customers[this.selectedCustomer].served){
-            nameEl.textContent = t('select_customer');
+            nameEl.innerHTML = icon('user') + ' ' + t('select_customer');
             itemsEl.innerHTML = '';
             return;
         }
         const c = this.customers[this.selectedCustomer];
-        nameEl.textContent = '👤 ' + c.name;
+        nameEl.innerHTML = icon('user') + ' ' + c.name;
         itemsEl.innerHTML = '';
         c.order.forEach(id=>{
             const el = document.createElement('div');
             el.className = 'order-item';
-            el.textContent = Levels.getEmoji(id);
-            el.title = Levels.getName(id);
+            el.innerHTML = ingIcon(id);
+            el.title = Ingredients.getName(id);
             itemsEl.appendChild(el);
         });
     }
@@ -1300,11 +1970,11 @@ class BurgerGame {
         const c = document.getElementById('ingredients-list');
         c.innerHTML = '';
         this.availableIngredients.forEach(id=>{
-            const ing = Levels.all().find(i=>i.id === id);
+            const ing = Ingredients.find(id);
             if(!ing) return;
             const btn = document.createElement('button');
             btn.className = 'ingredient-btn';
-            btn.innerHTML = `<span class="emoji">${ing.emoji}</span><span>${ing.name}</span>`;
+            btn.innerHTML = ingIcon(id) + `<span>${ing.name}</span>`;
             btn.addEventListener('click', ()=>this.addIngredient(id));
             c.appendChild(btn);
         });
@@ -1312,7 +1982,7 @@ class BurgerGame {
 
     addIngredient(id){
         if(!this.gameActive) return;
-        if(this.selectedCustomer === null) {
+        if(this.selectedCustomer === null){
             this.showToast(t('select_customer'));
             return;
         }
@@ -1328,8 +1998,8 @@ class BurgerGame {
         this.currentBurger.forEach(id=>{
             const layer = document.createElement('div');
             layer.className = 'burger-layer';
-            layer.style.background = Levels.getColor(id);
-            layer.textContent = Levels.getEmoji(id) + ' ' + Levels.getName(id);
+            layer.style.background = Ingredients.getColor(id);
+            layer.innerHTML = ingIcon(id) + '<span>' + Ingredients.getName(id) + '</span>';
             c.appendChild(layer);
         });
     }
@@ -1348,16 +2018,28 @@ class BurgerGame {
             c.served = true;
             this.customersServed++;
 
-            // Награда за клиента
-            GameState.coins += this.rewardPerCustomer;
-            GameState.totalCoinsEarned += this.rewardPerCustomer;
+            // combo
+            this.combo++;
+            if(this.combo > GameState.bestCombo) GameState.bestCombo = this.combo;
+            const comboMult = 1 + Math.min(0.5, (this.combo - 1) * 0.1);
+            const reward = Math.round(this.rewardPerCustomer * comboMult);
+
+            GameState.coins += reward;
+            GameState.totalCoinsEarned += reward;
             GameState.totalBurgersServed++;
             GameState.totalPerfectBurgers++;
             this.updateCurrencyDisplay();
 
             Tasks.updateProgress('serve', 1);
-            Tasks.updateProgress('earn', this.rewardPerCustomer);
+            Tasks.updateProgress('earn', reward);
             Tasks.updateProgress('perfect', 1);
+            Achievements.check();
+
+            // particle burst
+            const rect = document.getElementById('restaurant-scene').getBoundingClientRect();
+            const px = rect.left + (c.x/800) * rect.width;
+            const py = rect.top + (c.y/300) * rect.height - 40;
+            for(let i=0; i<12; i++) this.spawnParticle(px, py, '#ffd166');
 
             this.currentBurger = [];
             this.renderBurgerStack();
@@ -1375,6 +2057,7 @@ class BurgerGame {
         } else {
             AudioManager.playSound('error');
             this.showToast(t('wrong_order'));
+            this.combo = 0;
             this.currentBurger = [];
             this.renderBurgerStack();
         }
@@ -1382,15 +2065,11 @@ class BurgerGame {
 
     arraysEqualSet(a, b){
         if(a.length !== b.length) return false;
-        const sa = [...a].sort();
-        const sb = [...b].sort();
+        const sa = [...a].sort(), sb = [...b].sort();
         return sa.every((v, i)=>v === sb[i]);
     }
 
-    clearBurger(){
-        this.currentBurger = [];
-        this.renderBurgerStack();
-    }
+    clearBurger(){ this.currentBurger = []; this.renderBurgerStack(); }
 
     completeLevel(){
         this.gameActive = false;
@@ -1407,10 +2086,28 @@ class BurgerGame {
         }
         Tasks.updateProgress('earn', this.currentReward);
         Tasks.updateProgress('complete_levels', 1);
+        Achievements.check();
+
+        // milestone every 10 levels
+        let milestoneBonus = 0;
+        if(GameState.currentLevel % 10 === 0 && !GameState.claimedMilestones.includes(GameState.currentLevel)){
+            GameState.claimedMilestones.push(GameState.currentLevel);
+            milestoneBonus = GameState.currentLevel * 500;
+            GameState.coins += milestoneBonus;
+            this.showLevelUpFx('MILESTONE +' + milestoneBonus);
+        }
 
         GameState.save();
         this.updateCurrencyDisplay();
-        this.showLevelResult();
+        this.showLevelResult(milestoneBonus);
+    }
+
+    showLevelUpFx(text){
+        const fx = document.createElement('div');
+        fx.className = 'levelup-fx';
+        fx.innerHTML = `<span>${text}</span>`;
+        document.body.appendChild(fx);
+        setTimeout(()=>fx.remove(), 1700);
     }
 
     failLevel(){
@@ -1420,22 +2117,29 @@ class BurgerGame {
         setTimeout(()=>this.showScreen('lobby'), 1400);
     }
 
-    showLevelResult(){
+    showLevelResult(milestoneBonus=0){
         const stats = document.getElementById('result-stats');
         stats.innerHTML = `
             <p style="font-size:18px;color:#4ecdc4;font-weight:800">Уровень ${GameState.currentLevel}</p>
-            <p style="color:#aaa;margin-top:6px">Обслужено клиентов: ${this.customersServed}/${this.customersTotal}</p>
-            <p style="color:#ffd166;font-weight:800;margin-top:10px;font-size:20px">+${this.currentReward} 🪙</p>
+            <p style="color:#aaa;margin-top:6px">Обслужено: ${this.customersServed}/${this.customersTotal}</p>
+            <p style="color:#aaa;margin-top:4px">Лучшее комбо: x${this.combo}</p>
+            <p style="color:#ffd166;font-weight:900;margin-top:10px;font-size:22px;display:flex;align-items:center;justify-content:center;gap:6px">
+                +${this.currentReward} ${icon('coin')}
+            </p>
+            ${milestoneBonus ? `<p style="color:#ff8c42;font-weight:800;margin-top:6px">🏆 Бонус за 10 уровней: +${milestoneBonus}</p>` : ''}
         `;
         const btn = document.getElementById('double-reward-btn');
         btn.disabled = false;
-        btn.textContent = t('double_reward');
+        btn.innerHTML = t('double_reward');
         this.showScreen('result-screen');
     }
 
     updateTimerDisplay(){
         const el = document.getElementById('timer-value');
-        if(el) el.textContent = Math.max(0, this.timeLeft);
+        if(el){
+            el.textContent = Math.max(0, this.timeLeft);
+            el.parentElement.style.color = this.timeLeft <= 10 ? '#ff3b30' : '#4ecdc4';
+        }
     }
 
     renderLevelsGrid(){
@@ -1467,7 +2171,7 @@ class BurgerGame {
                     <small style="color:#aaa">${progText}</small>
                 </div>
                 <div style="text-align:right">
-                    <div style="color:#ffd166;font-weight:800">${task.reward} 🪙</div>
+                    <div style="color:#ffd166;font-weight:800;display:flex;align-items:center;gap:4px;justify-content:flex-end">${task.reward} ${icon('coin')}</div>
                     ${task.completed && !task.claimed ? `<button class="main-btn" data-tid="${task.id}" style="margin-top:4px;padding:6px 12px;font-size:11px">${t('claim')}</button>` : ''}
                     ${task.claimed ? '<div style="margin-top:4px">✅</div>' : ''}
                 </div>
@@ -1483,171 +2187,276 @@ class BurgerGame {
         });
     }
 
+    renderAchievements(){
+        const c = document.getElementById('achievements-list');
+        c.innerHTML = '';
+        Achievements.list.forEach(ach=>{
+            const unlocked = GameState.unlockedAchievements.includes(ach.id);
+            const el = document.createElement('div');
+            el.className = 'ach-item' + (unlocked ? ' unlocked' : '');
+            el.innerHTML = `
+                <div class="ach-icon"><svg class="svg-icon"><use href="#${ach.icon}"/></svg></div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:800;font-size:13px">${ach.name}</div>
+                    <div style="font-size:11px;color:#aaa">${ach.desc}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                    <div style="color:#ffd166;font-weight:800;display:flex;align-items:center;gap:4px;font-size:12px">${ach.reward} ${icon('coin')}</div>
+                    ${unlocked ? '<div style="font-size:10px;color:#4ecdc4;margin-top:2px">✓</div>' : ''}
+                </div>
+            `;
+            c.appendChild(el);
+        });
+    }
+
     checkDailyReward(){
         const today = new Date().toDateString();
         const status = document.getElementById('daily-status');
         const btn = document.getElementById('daily-claim');
+
+        // Reset streak if missed more than a day
+        if(GameState.lastDailyReward){
+            const last = new Date(GameState.lastDailyReward);
+            const now = new Date(today);
+            const diffDays = Math.round((now - last) / (1000*60*60*24));
+            if(diffDays > 1) GameState.streak = 0;
+        }
+
+        // streak view
+        const streakEl = document.getElementById('streak-info');
+        if(streakEl) streakEl.textContent = t('streak') + ': ' + GameState.streak + ' 🔥';
+        const daysEl = document.getElementById('streak-days');
+        if(daysEl){
+            daysEl.innerHTML = '';
+            for(let i=1; i<=7; i++){
+                const d = document.createElement('div');
+                d.className = 'streak-day' + (i <= GameState.streak ? ' done' : '');
+                if(i === GameState.streak + 1) d.classList.add('today');
+                d.textContent = i;
+                daysEl.appendChild(d);
+            }
+        }
+
         if(GameState.lastDailyReward === today){
             status.textContent = t('daily_claimed');
             btn.disabled = true;
         } else {
-            status.textContent = t('daily_available');
+            const reward = this.getStreakReward(GameState.streak + 1);
+            status.innerHTML = `День ${Math.min(GameState.streak+1, 7)}: +${reward} ${icon('coin')}`;
             btn.disabled = false;
         }
+    }
+
+    getStreakReward(day){
+        const rewards = [100, 200, 400, 800, 1600, 3200, 6400];
+        return rewards[Math.min(day-1, rewards.length-1)];
     }
 
     claimDailyReward(){
         const today = new Date().toDateString();
         if(GameState.lastDailyReward === today) return;
+        const newStreak = GameState.streak + 1;
+        GameState.streak = newStreak;
         GameState.lastDailyReward = today;
-        GameState.coins += 500;
+        const reward = this.getStreakReward(newStreak);
+        GameState.coins += reward;
+        GameState.totalCoinsEarned += reward;
         GameState.save();
         this.updateCurrencyDisplay();
-        document.getElementById('daily-status').textContent = t('daily_claimed');
-        document.getElementById('daily-claim').disabled = true;
+        Achievements.check();
+        this.checkDailyReward();
+        this.checkDailyBadge();
         AudioManager.playSound('coin');
-        this.showToast('+500 🪙');
+        this.showToast('+' + reward);
     }
 
     renderShop(){
-        const c = document.getElementById('shop-items');
-        c.innerHTML = '';
+        const catsEl = document.getElementById('shop-categories');
+        const itemsEl = document.getElementById('shop-items');
 
-        // === ИНГРЕДИЕНТЫ ===
-        const header1 = document.createElement('div');
-        header1.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:6px';
-        header1.textContent = '🥩 ' + t('ingredients');
-        c.appendChild(header1);
-
-        Levels.premiumIngredients.forEach(ing=>{
-            const owned = GameState.purchasedIngredients.includes(ing.id);
-            const el = document.createElement('div');
-            el.className = 'shop-item';
-            el.innerHTML = `
-                <div style="font-size:32px">${ing.emoji}</div>
-                <div style="font-size:12px">${ing.name}</div>
-                <div class="price">${ing.price} 🪙</div>
-                <button class="main-btn" ${owned ? 'disabled' : ''}>
-                    ${owned ? t('already_owned') : t('purchase')}
-                </button>
-            `;
-            if(!owned) el.querySelector('button').addEventListener('click', ()=>{
-                if(GameState.coins >= ing.price){
-                    GameState.coins -= ing.price;
-                    GameState.purchasedIngredients.push(ing.id);
-                    GameState.save();
-                    this.updateCurrencyDisplay();
-                    this.renderShop();
-                    AudioManager.playSound('coin');
-                } else this.showToast(t('not_enough_coins'));
-            });
-            c.appendChild(el);
+        // categories tabs
+        const cats = [
+            {id:'ingredients', label:t('ingredients'), icon:'i-burger'},
+            {id:'theme',       label:t('interior'),    icon:'f-painting'},
+            {id:'table',       label:'Столы',          icon:'f-table'},
+            {id:'chair',       label:'Стулья',         icon:'f-chair'},
+            {id:'window',      label:'Окна',           icon:'f-window'},
+            {id:'floor',       label:'Плитка',         icon:'f-floor'},
+            {id:'decor',       label:t('furniture'),   icon:'f-plant'},
+            {id:'upgrades',    label:t('upgrades'),    icon:'i-star'}
+        ];
+        catsEl.innerHTML = '';
+        cats.forEach(cat=>{
+            const btn = document.createElement('button');
+            btn.className = 'shop-cat' + (this.shopCategory === cat.id ? ' active' : '');
+            btn.innerHTML = `<svg class="svg-icon"><use href="#${cat.icon}"/></svg>${cat.label}`;
+            btn.addEventListener('click', ()=>{ this.shopCategory = cat.id; this.renderShop(); });
+            catsEl.appendChild(btn);
         });
 
-        // === ИНТЕРЬЕР ===
-        const header2 = document.createElement('div');
-        header2.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:12px';
-        header2.textContent = '🎨 ' + t('interior');
-        c.appendChild(header2);
+        itemsEl.innerHTML = '';
 
-        Object.values(RestaurantThemes).forEach(theme=>{
-            const owned = GameState.purchasedThemes.includes(theme.id);
-            const active = GameState.restaurantTheme === theme.id;
-            const el = document.createElement('div');
-            el.className = 'shop-item';
-            el.innerHTML = `
-                <div style="width:100%;height:40px;border-radius:8px;background:linear-gradient(135deg,${theme.wall1},${theme.accent});position:relative;overflow:hidden">
-                    <div style="position:absolute;bottom:0;left:0;right:0;height:12px;background:${theme.floor}"></div>
-                </div>
-                <div style="font-size:12px;font-weight:700">${theme.name}</div>
-                <div class="price">${owned ? (active ? '✓ Активна' : '—') : theme.price + ' 🪙'}</div>
-                <button class="main-btn" ${active ? 'disabled' : ''}>
-                    ${owned ? (active ? '✓' : t('apply')) : t('purchase')}
-                </button>
-            `;
-            if(!active) el.querySelector('button').addEventListener('click', ()=>{
-                if(owned){
-                    GameState.restaurantTheme = theme.id;
-                    GameState.save();
-                    this.renderShop();
-                } else if(GameState.coins >= theme.price){
-                    GameState.coins -= theme.price;
-                    GameState.purchasedThemes.push(theme.id);
-                    GameState.restaurantTheme = theme.id;
-                    GameState.save();
-                    this.updateCurrencyDisplay();
-                    this.renderShop();
-                    AudioManager.playSound('coin');
-                } else this.showToast(t('not_enough_coins'));
+        if(this.shopCategory === 'ingredients'){
+            Ingredients.premium.forEach(ing=>{
+                const owned = GameState.purchasedIngredients.includes(ing.id);
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+                el.innerHTML = `
+                    <div class="preview"><svg class="svg-icon" style="width:40px;height:40px"><use href="#ing-${ing.id}"/></svg></div>
+                    <div class="item-name">${ing.name}</div>
+                    <div class="price">${ing.price} ${icon('coin')}</div>
+                    <button class="main-btn" ${owned ? 'disabled' : ''}>${owned ? t('already_owned') : t('purchase')}</button>
+                `;
+                if(!owned) el.querySelector('button').addEventListener('click', ()=>{
+                    if(GameState.coins >= ing.price){
+                        GameState.coins -= ing.price;
+                        GameState.purchasedIngredients.push(ing.id);
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                        AudioManager.playSound('coin');
+                    } else this.showToast(t('not_enough_coins'));
+                });
+                itemsEl.appendChild(el);
             });
-            c.appendChild(el);
-        });
-
-        // === УЛУЧШЕНИЯ ===
-        const header3 = document.createElement('div');
-        header3.style.cssText = 'grid-column:1/-1;font-size:16px;font-weight:800;color:#ffd166;margin-top:12px';
-        header3.textContent = '⚡ ' + t('upgrades');
-        c.appendChild(header3);
-
-        if(!GameState.hasCoffeeMachine){
+        }
+        else if(this.shopCategory === 'theme'){
+            Object.values(RestaurantThemes).forEach(theme=>{
+                const owned = GameState.purchasedThemes.includes(theme.id);
+                const active = GameState.restaurantTheme === theme.id;
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+                el.innerHTML = `
+                    <div class="preview" style="background:linear-gradient(135deg,${theme.wall1},${theme.accent})">
+                        <div style="position:absolute;bottom:0;left:0;right:0;height:16px;background:${theme.floor}"></div>
+                    </div>
+                    <div class="item-name">${theme.name}</div>
+                    <div class="price">${owned ? (active ? '✓ Активна' : '—') : theme.price + ' ' + icon('coin')}</div>
+                    <button class="main-btn" ${active ? 'disabled' : ''}>${owned ? (active ? '✓' : t('apply')) : t('purchase')}</button>
+                `;
+                if(!active) el.querySelector('button').addEventListener('click', ()=>{
+                    if(owned){
+                        GameState.restaurantTheme = theme.id;
+                        GameState.save();
+                        this.renderShop();
+                    } else if(GameState.coins >= theme.price){
+                        GameState.coins -= theme.price;
+                        GameState.purchasedThemes.push(theme.id);
+                        GameState.restaurantTheme = theme.id;
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                        AudioManager.playSound('coin');
+                    } else this.showToast(t('not_enough_coins'));
+                });
+                itemsEl.appendChild(el);
+            });
+        }
+        else if(this.shopCategory === 'upgrades'){
+            // кофемашина
+            if(!GameState.hasCoffeeMachine){
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+                el.innerHTML = `
+                    <div class="preview"><svg class="svg-icon"><use href="#f-flower"/></svg></div>
+                    <div class="item-name">Кофемашина</div>
+                    <div class="price">5000 ${icon('coin')}</div>
+                    <button class="main-btn">${t('purchase')}</button>
+                `;
+                el.querySelector('button').addEventListener('click', ()=>{
+                    if(GameState.coins >= 5000){
+                        GameState.coins -= 5000;
+                        GameState.hasCoffeeMachine = true;
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                    } else this.showToast(t('not_enough_coins'));
+                });
+                itemsEl.appendChild(el);
+            }
+            if(!GameState.hasLemonadeMachine){
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+                el.innerHTML = `
+                    <div class="preview"><svg class="svg-icon"><use href="#f-flower"/></svg></div>
+                    <div class="item-name">Лимонад</div>
+                    <div class="price">4000 ${icon('coin')}</div>
+                    <button class="main-btn">${t('purchase')}</button>
+                `;
+                el.querySelector('button').addEventListener('click', ()=>{
+                    if(GameState.coins >= 4000){
+                        GameState.coins -= 4000;
+                        GameState.hasLemonadeMachine = true;
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                    } else this.showToast(t('not_enough_coins'));
+                });
+                itemsEl.appendChild(el);
+            }
+            const cost = AFKRoom.rate * 1000;
             const el = document.createElement('div');
             el.className = 'shop-item';
             el.innerHTML = `
-                <div style="font-size:32px">☕</div>
-                <div style="font-size:12px">Кофемашина</div>
-                <div class="price">5000 🪙</div>
+                <div class="preview"><svg class="svg-icon"><use href="#i-zzz"/></svg></div>
+                <div class="item-name">+1 в AFK/мин</div>
+                <div class="price">${cost} ${icon('coin')}</div>
                 <button class="main-btn">${t('purchase')}</button>
             `;
             el.querySelector('button').addEventListener('click', ()=>{
-                if(GameState.coins >= 5000){
-                    GameState.coins -= 5000;
-                    GameState.hasCoffeeMachine = true;
+                if(GameState.coins >= cost){
+                    GameState.coins -= cost;
+                    AFKRoom.upgradeRate();
                     GameState.save();
                     this.updateCurrencyDisplay();
                     this.renderShop();
                 } else this.showToast(t('not_enough_coins'));
             });
-            c.appendChild(el);
+            itemsEl.appendChild(el);
         }
-        if(!GameState.hasLemonadeMachine){
-            const el = document.createElement('div');
-            el.className = 'shop-item';
-            el.innerHTML = `
-                <div style="font-size:32px">🍋</div>
-                <div style="font-size:12px">Машина для лимонада</div>
-                <div class="price">4000 🪙</div>
-                <button class="main-btn">${t('purchase')}</button>
-            `;
-            el.querySelector('button').addEventListener('click', ()=>{
-                if(GameState.coins >= 4000){
-                    GameState.coins -= 4000;
-                    GameState.hasLemonadeMachine = true;
-                    GameState.save();
-                    this.updateCurrencyDisplay();
-                    this.renderShop();
-                } else this.showToast(t('not_enough_coins'));
+        else {
+            // furniture category
+            const cat = Furniture.catalog[this.shopCategory];
+            if(!cat) return;
+            cat.items.forEach(item=>{
+                const owned = GameState.ownedFurniture.includes(item.id);
+                const active = GameState.selectedFurniture[this.shopCategory] === item.id;
+                const el = document.createElement('div');
+                el.className = 'shop-item';
+
+                let previewBg = '';
+                if(item.color) previewBg = item.color;
+                else if(item.a && item.b) previewBg = `linear-gradient(135deg,${item.a} 50%,${item.b} 50%)`;
+                else previewBg = 'rgba(255,255,255,.1)';
+
+                const iconName = item.icon || cat.icon;
+                el.innerHTML = `
+                    <div class="preview" style="background:${previewBg};color:#fff">
+                        <svg class="svg-icon" style="width:40px;height:40px"><use href="#${iconName}"/></svg>
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="price">${owned ? (active ? '✓ Активна' : '—') : item.price + ' ' + icon('coin')}</div>
+                    <button class="main-btn" ${active ? 'disabled' : ''}>${owned ? (active ? '✓' : t('apply')) : t('purchase')}</button>
+                `;
+                if(!active) el.querySelector('button').addEventListener('click', ()=>{
+                    if(owned){
+                        GameState.selectedFurniture[this.shopCategory] = item.id;
+                        GameState.save();
+                        this.renderShop();
+                    } else if(GameState.coins >= item.price){
+                        GameState.coins -= item.price;
+                        GameState.ownedFurniture.push(item.id);
+                        GameState.selectedFurniture[this.shopCategory] = item.id;
+                        GameState.save();
+                        this.updateCurrencyDisplay();
+                        this.renderShop();
+                        Achievements.check();
+                        AudioManager.playSound('coin');
+                    } else this.showToast(t('not_enough_coins'));
+                });
+                itemsEl.appendChild(el);
             });
-            c.appendChild(el);
         }
-        const cost = AFKRoom.rate * 1000;
-        const el = document.createElement('div');
-        el.className = 'shop-item';
-        el.innerHTML = `
-            <div style="font-size:32px">💤</div>
-            <div style="font-size:12px">+1 🪙 / мин в AFK</div>
-            <div class="price">${cost} 🪙</div>
-            <button class="main-btn">${t('purchase')}</button>
-        `;
-        el.querySelector('button').addEventListener('click', ()=>{
-            if(GameState.coins >= cost){
-                GameState.coins -= cost;
-                AFKRoom.upgradeRate();
-                GameState.save();
-                this.updateCurrencyDisplay();
-                this.renderShop();
-            } else this.showToast(t('not_enough_coins'));
-        });
-        c.appendChild(el);
     }
 
     async handlePromoCode(){
@@ -1659,9 +2468,15 @@ class BurgerGame {
             setTimeout(()=>location.reload(), 1200);
         } else if(code === 'admin17'){
             GameState.coins += 1000000;
+            GameState.totalCoinsEarned += 1000000;
             GameState.save();
             this.updateCurrencyDisplay();
             this.showToast(t('promo_admin'));
+        } else if(code === 'burger2024'){
+            GameState.coins += 50000;
+            GameState.save();
+            this.updateCurrencyDisplay();
+            this.showToast('+50 000');
         } else {
             this.showToast(t('promo_invalid'));
         }
@@ -1699,7 +2514,7 @@ class BurgerGame {
             this.showScreen('lobby');
             return;
         }
-        document.getElementById('tutorial-title').textContent = t('tutorial_title');
+        document.getElementById('tutorial-title').textContent = 'Обучение';
         document.getElementById('tutorial-text').textContent = steps[this.tutorialStep];
         this.tutorialStep++;
     }
@@ -1713,7 +2528,7 @@ class BurgerGame {
     showToast(text){
         const el = document.createElement('div');
         el.className = 'toast';
-        el.textContent = text;
+        el.innerHTML = text;
         document.body.appendChild(el);
         setTimeout(()=>el.remove(), 2200);
     }
