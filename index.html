@@ -162,6 +162,20 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
 .points-badge{display:inline-block;background:linear-gradient(90deg,#5ad18a,#2fae6d);color:#062a12;font-weight:800;
   padding:3px 10px;border-radius:20px;font-size:12px;margin-left:6px;}
 
+/* === ИЗМЕНЕНО: стили блокирующего экрана загрузки боя === */
+#ov-adload{z-index:200;} /* выше всех прочих оверлеев */
+#ov-adload .modal{text-align:center;}
+#ov-adload .spinner{
+  width:52px;height:52px;margin:18px auto;
+  border:4px solid rgba(159,220,255,.2);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  animation:adloadSpin .9s linear infinite;
+}
+@keyframes adloadSpin{to{transform:rotate(360deg);}}
+#ov-adload .pulse{display:inline-block;animation:adloadPulse 1.4s ease-in-out infinite;}
+@keyframes adloadPulse{0%,100%{opacity:.55;}50%{opacity:1;}}
+
 @media (max-width:480px){
   .topbar .logo span.name{display:none;}
   .board-wrap{gap:6px;}
@@ -355,6 +369,15 @@ input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid rgb
     <button class="btn" id="tut-no" data-i18n="tutNo">Пропустить</button>
   </div></div>
 
+  <!-- === ИЗМЕНЕНО: блокирующий экран перед боем === -->
+  <div class="overlay opaque" id="ov-adload"><div class="modal">
+    <h2>⚓ <span data-i18n="loadingBattle">Загрузка боя…</span></h2>
+    <div class="spinner"></div>
+    <p class="muted pulse" data-i18n="loadingHint">
+      Пожалуйста, подождите. Не нажимайте на экран — сейчас начнётся реклама.
+    </p>
+  </div></div>
+
   <div id="toast"></div>
 </div>
 
@@ -391,7 +414,10 @@ const I18N = {
     seasonHint:'Играйте бои — за каждый начисляется сезонный опыт. Собирайте награды тира!',
     rank:'Звание', lvlUp:'Новый уровень!', skillUp:'Навык улучшен!', noPoints:'Нет очков умений',
     maxLvl:'Максимум', modifier:'Модификатор боя', modNone:'Без модификатора',
-    tier:'Тир', claimTier:'Забрать', tierClaimed:'Получено', seasonReward:'Награда сезона'},
+    tier:'Тир', claimTier:'Забрать', tierClaimed:'Получено', seasonReward:'Награда сезона',
+    /* === ИЗМЕНЕНО === */
+    loadingBattle:'Загрузка боя…',
+    loadingHint:'Пожалуйста, подождите. Не нажимайте на экран — сейчас начнётся реклама.'},
   en:{title:'Battleship',play:'Play',missions:'Missions',settings:'Settings',daily:'Daily reward',
     afk:'AFK Room',invite:'Invite friends',music:'Music',language:'Language',promo:'Promo code',apply:'Apply',close:'Close',on:'On',off:'Off',placeTitle:'Place your fleet',rotate:'Rotate',
     random:'Random',clear:'Clear',ready:'Battle!',placeHint:'Pick a ship, tap the field. Double tap to rotate.',
@@ -413,7 +439,10 @@ const I18N = {
     seasonHint:'Play battles — each grants season XP. Claim tier rewards!',
     rank:'Rank', lvlUp:'Level up!', skillUp:'Skill upgraded!', noPoints:'No skill points',
     maxLvl:'MAX', modifier:'Battle modifier', modNone:'No modifier',
-    tier:'Tier', claimTier:'Claim', tierClaimed:'Claimed', seasonReward:'Season reward'}
+    tier:'Tier', claimTier:'Claim', tierClaimed:'Claimed', seasonReward:'Season reward',
+    /* === ИЗМЕНЕНО === */
+    loadingBattle:'Loading battle…',
+    loadingHint:'Please wait. Do not tap the screen — an ad is about to start.'}
 };
 function t(k){return (I18N[P.lang]||I18N.ru)[k]||k;}
 function applyI18n(){document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));}
@@ -634,15 +663,29 @@ function addSeasonXP(n){
 }
 
 /* ============ ADS ============ */
+/* === ИЗМЕНЕНО: более надёжная функция показа рекламы === */
 function interstitialAd(onDone){
-  musicStop(); paused=true; updateTurnLabel();
-  let done=false;
-  const finish=()=>{if(done)return;done=true;resumeAfterAd(onDone);};
+  musicStop();
+  paused = true;
+
+  let done = false;
+  const finish = (reason)=>{
+    if(done) return; done = true;
+    resumeAfterAd(onDone);
+  };
+
   if(vk){
-    vk.send('VKWebAppShowNativeAds',{ad_format:'interstitial'})
-      .then(finish).catch(finish);
-    setTimeout(finish,3500);
-  } else { setTimeout(finish,600); }
+    vk.send('VKWebAppShowNativeAds', {ad_format:'interstitial'})
+      .then(()=>finish('ok'))
+      .catch(()=>finish('fail'));
+
+    // Резервный таймаут: если VK молчит (нет сети / баннер недоступен),
+    // всё равно отпускаем игрока в бой через 8 секунд.
+    setTimeout(()=>finish('timeout'), 8000);
+  } else {
+    // Не VK-платформа — просто короткая пауза, чтобы оверлей мелькнул.
+    setTimeout(()=>finish('offvk'), 700);
+  }
 }
 function resumeAfterAd(onDone){ paused=false; if(P.music)musicStart(); onDone&&onDone(); }
 function rewardAd(onReward,onFail){
@@ -1074,18 +1117,44 @@ $('#btn-ready').onclick=()=>{
 };
 
 /* ============ BATTLE ============ */
+/* === ИЗМЕНЕНО: теперь показываем блокирующий оверлей перед рекламой === */
 function startBattle(){
-  interstitialAd(()=>{
-    if(!hotseat){ aiReset(); randomFleet(boards[1]); spawnGold(boards[1],startingGoldCells()); }
-    cur=0; myTurn=true; gameOver=false; pendingAbil=null;
-    extraShots=0; combo=0; comboMax=0; shipsLost=0;
-    const abInit=gameMode==='super'?abilityStart():{sonar:0,double:0,torpedo:0};
-    ABILS=[Object.assign({},abInit),Object.assign({},abInit)];
-    buildAbilities(); show('scr-game'); renderGame();
-    let modeTxt=(hotseat?'👥 ':'')+(gameMode==='super'?'⚡':('⚔️ '+t('modeNormal')));
-    const modObj=MODIFIERS.find(m=>m.id===activeMod);
-    if(modObj&&activeMod!=='none')modeTxt+=' '+modObj.ico;
-    $('#mode-chip').textContent=modeTxt;
+  // 1) Сразу блокируем экран оверлеем
+  showElement('ov-adload');
+
+  // 2) Даём браузеру отрисовать оверлей, потом запускаем рекламу
+  const minShow = 700;                 // минимум, сколько оверлей должен провисеть
+  const t0 = Date.now();
+
+  requestAnimationFrame(()=>{
+    // Запускаем интерстишиал. Колбэк вызовется, когда рекламу
+    // показали и закрыли (или когда она не смогла загрузиться).
+    interstitialAd(()=>{
+      const elapsed = Date.now() - t0;
+      const wait = Math.max(0, minShow - elapsed);
+
+      setTimeout(()=>{
+        // 3) Инициализация боя (то, что было в оригинале)
+        if(!hotseat){ aiReset(); randomFleet(boards[1]); spawnGold(boards[1],startingGoldCells()); }
+        cur=0; myTurn=true; gameOver=false; pendingAbil=null;
+        extraShots=0; combo=0; comboMax=0; shipsLost=0;
+
+        const abInit = gameMode==='super' ? abilityStart() : {sonar:0,double:0,torpedo:0};
+        ABILS=[Object.assign({},abInit), Object.assign({},abInit)];
+
+        buildAbilities();
+        show('scr-game');
+        renderGame();
+
+        let modeTxt = (hotseat?'👥 ':'') + (gameMode==='super'?'⚡':('⚔️ '+t('modeNormal')));
+        const modObj = MODIFIERS.find(m=>m.id===activeMod);
+        if(modObj && activeMod!=='none') modeTxt += ' '+modObj.ico;
+        $('#mode-chip').textContent = modeTxt;
+
+        // 4) Снимаем блокировку ТОЛЬКО когда бой уже готов
+        hideElement('ov-adload');
+      }, wait);
+    });
   });
 }
 function buildAbilities(){
