@@ -2510,12 +2510,12 @@ function onCellClick(gx, gy){
     const avail = state.warehouse[placeMode.pid] || 0;
     if(avail <= 0){ toast(t('nothing')); return; }
     const added = addToShelf(c, placeMode.pid, avail);
-    if(added > 0){
+        if(added > 0){
       state.warehouse[placeMode.pid] -= added;
       if(state.warehouse[placeMode.pid] <= 0) delete state.warehouse[placeMode.pid];
       state.ds.stock += added;
       scheduleSave(); updateHUD();
-      if(tutorialStep === 3){ tutorialStep = 4; updateTutorialBlock(); showTutorialHint(); }
+      checkTutorialStock();   // ← теперь через общую функцию
     } else { toast(t('shelfFull')); return; }
     if(!state.warehouse[placeMode.pid]){ placeMode = null; updatePlaceBar(); }
     return;
@@ -3044,11 +3044,13 @@ function autoStock(){
       }
     }
   }
-  if(moved > 0){
+    if(moved > 0){
     state.ds.stock += moved;
     toast(t('stocked') + ': ' + moved, '#7fd07f');
     updateHUD(); scheduleSave();
+    checkTutorialStock();   // ← добавлено: обучение тоже продвинется
   } else toast(t('noSlots'));
+}
 }
 function openShelfInfo(gx, gy){
   const c = cellAt(gx, gy);
@@ -3409,6 +3411,14 @@ function updateTutorialBlock(){
   if(!isTutorialBlocking()) return;
   if(tutorialStep === 2){ document.getElementById('btnShop').classList.add('tutorial-active'); }
   else if(tutorialStep === 3){ document.getElementById('btnStock').classList.add('tutorial-active'); }
+}
+  function checkTutorialStock(){
+  // Если игрок на 3-м шаге обучения и уже что-то разложил — идём дальше
+  if(tutorialStep === 3 && state.ds.stock > 0){
+    tutorialStep = 4;
+    updateTutorialBlock();
+    showTutorialHint();
+  }
 }
 function showTutorialHint(){
   const hint = $('#hint');
