@@ -64,6 +64,13 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
   box-shadow:0 0 8px rgba(255,80,90,.9);display:none;animation:dotPulse 1.4s ease-in-out infinite}
 @keyframes dotPulse{50%{transform:scale(1.3)}}
 
+/* --- Кнопки зума --- */
+#zoomCtrl{position:absolute;right:10px;bottom:78px;z-index:25;display:flex;flex-direction:column;gap:6px}
+.zoomb{width:38px;height:38px;border-radius:12px;border:1px solid #2b3648;background:rgba(27,35,48,.92);
+  color:#cfe0f5;font-size:22px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:0;transition:.15s;line-height:1}
+.zoomb:active{transform:scale(.93);background:#243044}
+
 body.tutorial-on .botbtn,body.tutorial-on .iconbtn{pointer-events:none;opacity:.35;filter:grayscale(.4)}
 body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-active{
   pointer-events:auto;opacity:1;filter:none;
@@ -196,9 +203,7 @@ input[type=text]:focus{border-color:#4a89ff}
       <div class="ln"><span data-i18n="lvlShort">Ур.</span><b id="lvlVal">1</b></div>
       <div class="lvlXP"><i id="lvlBar" style="width:0%"></i></div>
     </div>
-    <div class="stat" id="prestigeChip">
-      <span>★</span><b id="prestigeVal">0</b>
-    </div>
+    <div class="stat" id="prestigeChip"><span>★</span><b id="prestigeVal">0</b></div>
     <div class="stat" id="bonusChip">
       <svg viewBox="0 0 24 24" width="16" height="16"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="#ffd257" stroke="#8a6a10" stroke-width="1.2" stroke-linejoin="round"/></svg>
       <span id="bonusTime">x2</span>
@@ -226,6 +231,11 @@ input[type=text]:focus{border-color:#4a89ff}
 
   <div id="hint"></div>
   <div class="place-bar" id="placeBar"></div>
+
+  <div id="zoomCtrl">
+    <button class="zoomb" id="zoomIn" title="+">+</button>
+    <button class="zoomb" id="zoomOut" title="−">−</button>
+  </div>
 
   <div id="bottombar">
     <button class="botbtn primary" id="btnShop">
@@ -261,7 +271,7 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН v7
+   МАГАЗИН v8 — с пинч-зумом и пузырями поверх всего
    ========================================================================= */
 'use strict';
 
@@ -291,114 +301,60 @@ const CATS = {
 };
 
 const P_RAW = [
-['Молоко','Milk','dairy','carton',20],
-['Кефир','Kefir','dairy','bottle',25],
-['Йогурт','Yogurt','dairy','tub',30],
-['Сметана','Sour cream','dairy','tub',35],
-['Творог','Cottage cheese','dairy','box',45],
-['Сыр','Cheese','dairy','wedge',90],
-['Масло сливочное','Butter','dairy','box',80],
-['Ряженка','Ryazhenka','dairy','bottle',28],
-['Хлеб белый','White bread','bakery','bag',25],
-['Хлеб чёрный','Black bread','bakery','bag',28],
-['Батон','Baguette','bakery','bag',22],
-['Булочка','Bun','bakery','round',18],
-['Круассан','Croissant','bakery','wrap',40],
-['Пирожное','Pastry','bakery','box',55],
-['Торт','Cake','bakery','box',250],
-['Печенье','Cookies','bakery','packet',60],
-['Курица','Chicken','meat','tray',150],
-['Говядина','Beef','meat','tray',320],
-['Свинина','Pork','meat','tray',260],
-['Фарш','Minced meat','meat','tray',180],
-['Колбаса','Sausage','meat','wrap',190],
-['Сосиски','Hot dogs','meat','wrap',140],
-['Ветчина','Ham','meat','wrap',210],
-['Бекон','Bacon','meat','tray',230],
-['Лосось','Salmon','fish','tray',400],
-['Тунец','Tuna','fish','can',200],
-['Сельдь','Herring','fish','tray',120],
-['Креветки','Shrimp','fish','tray',350],
-['Икра','Caviar','fish','jar',900],
-['Минтай','Pollock','fish','tray',130],
-['Скумбрия','Mackerel','fish','tray',140],
-['Кальмар','Squid','fish','tray',160],
-['Яблоко','Apple','fruits','apple',15],
-['Банан','Banana','fruits','banana',20],
-['Апельсин','Orange','fruits','orange',25],
-['Груша','Pear','fruits','pear',22],
-['Виноград','Grapes','fruits','grapes',60],
-['Киви','Kiwi','fruits','kiwi',30],
-['Персик','Peach','fruits','peach',35],
-['Ананас','Pineapple','fruits','pineapple',120],
-['Картофель','Potato','veg','potato',10],
-['Морковь','Carrot','veg','carrot',12],
-['Лук','Onion','veg','onion',9],
-['Помидор','Tomato','veg','tomato',18],
-['Огурец','Cucumber','veg','cucumber',16],
-['Капуста','Cabbage','veg','cabbage',14],
-['Перец','Pepper','veg','pepper',24],
-['Брокколи','Broccoli','veg','broccoli',40],
-['Вода','Water','drinks','bottle',15],
-['Сок','Juice','drinks','tetra',45],
-['Кола','Cola','drinks','can',55],
-['Лимонад','Lemonade','drinks','bottle',50],
-['Чай','Tea','drinks','box',70],
-['Кофе','Coffee','drinks','packet',120],
-['Квас','Kvass','drinks','bottle',40],
-['Минералка','Mineral water','drinks','bottle',20],
-['Шоколад','Chocolate','sweets','bar',80],
-['Конфеты','Candy','sweets','pouch',65],
-['Мармелад','Marmalade','sweets','pouch',55],
-['Зефир','Marshmallow','sweets','pouch',70],
-['Вафли','Waffles','sweets','packet',45],
-['Мороженое','Ice cream','sweets','tub',60],
-['Карамель','Caramel','sweets','pouch',30],
-['Пряники','Gingerbread','sweets','packet',40],
-['Чипсы','Chips','snacks','packet',70],
-['Сухарики','Croutons','snacks','packet',35],
-['Орешки','Nuts','snacks','packet',150],
-['Попкорн','Popcorn','snacks','packet',50],
-['Семечки','Sunflower seeds','snacks','packet',30],
-['Халва','Halva','snacks','box',90],
-['Сушёные кальмары','Dried squid','snacks','packet',110],
-['Жвачка','Gum','snacks','pouch',25],
-['Макароны','Pasta','grocery','packet',40],
-['Рис','Rice','grocery','bag',60],
-['Гречка','Buckwheat','grocery','bag',70],
-['Мука','Flour','grocery','bag',35],
-['Сахар','Sugar','grocery','bag',50],
-['Соль','Salt','grocery','cylinder',15],
-['Масло растительное','Vegetable oil','grocery','bottle',90],
-['Овсянка','Oatmeal','grocery','box',45],
-['Кукуруза','Corn','canned','can',55],
-['Горошек','Peas','canned','can',50],
-['Огурцы консерв.','Pickles','canned','jar',65],
-['Томаты консерв.','Canned tomatoes','canned','jar',60],
-['Оливки','Olives','canned','jar',120],
-['Сгущёнка','Condensed milk','canned','can',80],
-['Шпроты','Smoked sprats','canned','can',95],
-['Джем','Jam','canned','jar',85],
-['Пельмени','Dumplings','frozen','box',180],
-['Вареники','Vareniki','frozen','box',140],
-['Пицца заморож.','Frozen pizza','frozen','box',200],
-['Наггетсы','Nuggets','frozen','box',160],
-['Блинчики','Pancakes','frozen','box',130],
-['Овощная смесь','Veggie mix','frozen','bag',90],
-['Котлеты','Cutlets','frozen','box',170],
-['Манты','Manti','frozen','box',190],
-['Мыло','Soap','household','bar',25],
-['Шампунь','Shampoo','household','bottle',130],
-['Зубная паста','Toothpaste','household','tube',90],
-['Порошок','Detergent','household','box',200]
+['Молоко','Milk','dairy','carton',20],['Кефир','Kefir','dairy','bottle',25],
+['Йогурт','Yogurt','dairy','tub',30],['Сметана','Sour cream','dairy','tub',35],
+['Творог','Cottage cheese','dairy','box',45],['Сыр','Cheese','dairy','wedge',90],
+['Масло сливочное','Butter','dairy','box',80],['Ряженка','Ryazhenka','dairy','bottle',28],
+['Хлеб белый','White bread','bakery','bag',25],['Хлеб чёрный','Black bread','bakery','bag',28],
+['Батон','Baguette','bakery','bag',22],['Булочка','Bun','bakery','round',18],
+['Круассан','Croissant','bakery','wrap',40],['Пирожное','Pastry','bakery','box',55],
+['Торт','Cake','bakery','box',250],['Печенье','Cookies','bakery','packet',60],
+['Курица','Chicken','meat','tray',150],['Говядина','Beef','meat','tray',320],
+['Свинина','Pork','meat','tray',260],['Фарш','Minced meat','meat','tray',180],
+['Колбаса','Sausage','meat','wrap',190],['Сосиски','Hot dogs','meat','wrap',140],
+['Ветчина','Ham','meat','wrap',210],['Бекон','Bacon','meat','tray',230],
+['Лосось','Salmon','fish','tray',400],['Тунец','Tuna','fish','can',200],
+['Сельдь','Herring','fish','tray',120],['Креветки','Shrimp','fish','tray',350],
+['Икра','Caviar','fish','jar',900],['Минтай','Pollock','fish','tray',130],
+['Скумбрия','Mackerel','fish','tray',140],['Кальмар','Squid','fish','tray',160],
+['Яблоко','Apple','fruits','apple',15],['Банан','Banana','fruits','banana',20],
+['Апельсин','Orange','fruits','orange',25],['Груша','Pear','fruits','pear',22],
+['Виноград','Grapes','fruits','grapes',60],['Киви','Kiwi','fruits','kiwi',30],
+['Персик','Peach','fruits','peach',35],['Ананас','Pineapple','fruits','pineapple',120],
+['Картофель','Potato','veg','potato',10],['Морковь','Carrot','veg','carrot',12],
+['Лук','Onion','veg','onion',9],['Помидор','Tomato','veg','tomato',18],
+['Огурец','Cucumber','veg','cucumber',16],['Капуста','Cabbage','veg','cabbage',14],
+['Перец','Pepper','veg','pepper',24],['Брокколи','Broccoli','veg','broccoli',40],
+['Вода','Water','drinks','bottle',15],['Сок','Juice','drinks','tetra',45],
+['Кола','Cola','drinks','can',55],['Лимонад','Lemonade','drinks','bottle',50],
+['Чай','Tea','drinks','box',70],['Кофе','Coffee','drinks','packet',120],
+['Квас','Kvass','drinks','bottle',40],['Минералка','Mineral water','drinks','bottle',20],
+['Шоколад','Chocolate','sweets','bar',80],['Конфеты','Candy','sweets','pouch',65],
+['Мармелад','Marmalade','sweets','pouch',55],['Зефир','Marshmallow','sweets','pouch',70],
+['Вафли','Waffles','sweets','packet',45],['Мороженое','Ice cream','sweets','tub',60],
+['Карамель','Caramel','sweets','pouch',30],['Пряники','Gingerbread','sweets','packet',40],
+['Чипсы','Chips','snacks','packet',70],['Сухарики','Croutons','snacks','packet',35],
+['Орешки','Nuts','snacks','packet',150],['Попкорн','Popcorn','snacks','packet',50],
+['Семечки','Sunflower seeds','snacks','packet',30],['Халва','Halva','snacks','box',90],
+['Сушёные кальмары','Dried squid','snacks','packet',110],['Жвачка','Gum','snacks','pouch',25],
+['Макароны','Pasta','grocery','packet',40],['Рис','Rice','grocery','bag',60],
+['Гречка','Buckwheat','grocery','bag',70],['Мука','Flour','grocery','bag',35],
+['Сахар','Sugar','grocery','bag',50],['Соль','Salt','grocery','cylinder',15],
+['Масло растительное','Vegetable oil','grocery','bottle',90],['Овсянка','Oatmeal','grocery','box',45],
+['Кукуруза','Corn','canned','can',55],['Горошек','Peas','canned','can',50],
+['Огурцы консерв.','Pickles','canned','jar',65],['Томаты консерв.','Canned tomatoes','canned','jar',60],
+['Оливки','Olives','canned','jar',120],['Сгущёнка','Condensed milk','canned','can',80],
+['Шпроты','Smoked sprats','canned','can',95],['Джем','Jam','canned','jar',85],
+['Пельмени','Dumplings','frozen','box',180],['Вареники','Vareniki','frozen','box',140],
+['Пицца заморож.','Frozen pizza','frozen','box',200],['Наггетсы','Nuggets','frozen','box',160],
+['Блинчики','Pancakes','frozen','box',130],['Овощная смесь','Veggie mix','frozen','bag',90],
+['Котлеты','Cutlets','frozen','box',170],['Манты','Manti','frozen','box',190],
+['Мыло','Soap','household','bar',25],['Шампунь','Shampoo','household','bottle',130],
+['Зубная паста','Toothpaste','household','tube',90],['Порошок','Detergent','household','box',200]
 ];
 
 const PRODUCTS = P_RAW.map((p, i) => ({
-  id: i + 1,
-  ru: p[0], en: p[1],
-  cat: p[2],
-  shape: p[3],
-  cost: p[4],
+  id: i + 1, ru: p[0], en: p[1], cat: p[2], shape: p[3], cost: p[4],
   sell: Math.max(p[4] + 1, Math.round(p[4] * MARKUP)),
   color: CATS[p[2]].c
 }));
@@ -412,7 +368,6 @@ const FURNITURE = {
   fridge:{ru:'Холодильник',en:'Fridge',cost:520,cap:8,accepts:['dairy','meat','fish','frozen','drinks']},
   counter:{ru:'Касса',en:'Cashier',cost:280,cap:0,accepts:[]}
 };
-
 const WALLS = [
   {ru:'Классика',en:'Classic',cost:0,floor:'#e9e2d3',line:'#d2c8b4'},
   {ru:'Металл',en:'Metal',cost:1500,floor:'#cfd8e0',line:'#b2bfcb'},
@@ -425,7 +380,6 @@ const WINDOWS = [
   {ru:'Панорамное',en:'Panoramic',cost:2000},
   {ru:'Витраж',en:'Stained',cost:4500}
 ];
-
 const TASK_DEFS = [
   {id:'sell',ru:'Продать {n} товаров',en:'Sell {n} items',min:20,max:60,rew:n=>Math.round(n*4)},
   {id:'earn',ru:'Заработать {n} монет',en:'Earn {n} coins',min:800,max:2500,rew:n=>Math.round(n*0.28)},
@@ -435,52 +389,22 @@ const TASK_DEFS = [
   {id:'stock',ru:'Разложить {n} товаров',en:'Stock {n} items',min:20,max:55,rew:n=>Math.round(n*4)},
   {id:'expand',ru:'Расширить на {n} клеток',en:'Expand by {n} cells',min:2,max:6,rew:n=>Math.round(n*80)}
 ];
-
 const TIME_REWARDS = [
-  {min:5,amount:120},
-  {min:10,amount:200},
-  {min:20,amount:380},
-  {min:35,amount:650},
-  {min:50,amount:950},
-  {min:70,amount:1400},
-  {min:100,amount:2000}
+  {min:5,amount:120},{min:10,amount:200},{min:20,amount:380},{min:35,amount:650},
+  {min:50,amount:950},{min:70,amount:1400},{min:100,amount:2000}
 ];
-
-/* Прокачки */
 const UPGRADES = {
-  spawn: {
-    name:{ru:'Скорость клиентов',en:'Customer rate'},
-    desc:{ru:'+10% к частоте появления',en:'+10% spawn rate'},
-    costs:[500,1500,4000,10000,25000], max:5
-  },
-  income: {
-    name:{ru:'Прибыль',en:'Profit'},
-    desc:{ru:'+2% к доходу',en:'+2% income'},
-    costs:[1000,2500,6000,15000,35000,80000,180000,400000,900000,2000000], max:10
-  },
-  speed: {
-    name:{ru:'Проворство',en:'Agility'},
-    desc:{ru:'+15% к скорости ходьбы',en:'+15% walk speed'},
-    costs:[800,2500,8000], max:3
-  },
-  xp: {
-    name:{ru:'Опыт',en:'XP gain'},
-    desc:{ru:'+10% опыта за продажи',en:'+10% XP from sales'},
-    costs:[1200,3500,9000,22000,50000], max:5
-  },
-  cap: {
-    name:{ru:'Вместимость',en:'Capacity'},
-    desc:{ru:'+1 место на полке',en:'+1 shelf slot'},
-    costs:[2000,6000,15000,40000], max:4
-  }
+  spawn:{name:{ru:'Скорость клиентов',en:'Customer rate'},desc:{ru:'+10% к частоте появления',en:'+10% spawn rate'},costs:[500,1500,4000,10000,25000],max:5},
+  income:{name:{ru:'Прибыль',en:'Profit'},desc:{ru:'+2% к доходу',en:'+2% income'},costs:[1000,2500,6000,15000,35000,80000,180000,400000,900000,2000000],max:10},
+  speed:{name:{ru:'Проворство',en:'Agility'},desc:{ru:'+15% к скорости ходьбы',en:'+15% walk speed'},costs:[800,2500,8000],max:3},
+  xp:{name:{ru:'Опыт',en:'XP gain'},desc:{ru:'+10% опыта за продажи',en:'+10% XP from sales'},costs:[1200,3500,9000,22000,50000],max:5},
+  cap:{name:{ru:'Вместимость',en:'Capacity'},desc:{ru:'+1 место на полке',en:'+1 shelf slot'},costs:[2000,6000,15000,40000],max:4}
 };
-
 const PRESTIGE_LEVEL = 10;
 const PRESTIGE_BONUS = 0.05;
 
 const STR = {
-  ru:{
-    shop:'Магазин',warehouse:'Склад',friends:'Друзья',settings:'Настройки',rewards:'Награды',
+  ru:{shop:'Магазин',warehouse:'Склад',friends:'Друзья',settings:'Настройки',rewards:'Награды',
     tasks:'Задания',daily:'Ежедневная награда',close:'Закрыть',buy:'Купить',
     cancel:'Отмена',place:'Разместить',money:'Монеты',music:'Музыка',language:'Язык',
     promo:'Промокод',apply:'Применить',tutorialQ:'Хотите пройти обучение?',
@@ -492,8 +416,8 @@ const STR = {
     promoOk:'Промокод активирован!',promoBad:'Неверный промокод',
     noMoney:'Недостаточно монет',placed:'Установлено',
     bought:'Куплено',expandHint:'Нажмите на тёмную клетку рядом',
-    streak:'Серия дней',dailyTaken:'Уже получено сегодня',stockEmpty:'Склад пуст — купите товар в магазине',
-    tapShelf:'Нажмите на полку, чтобы разложить товар',adDone:'Награда за рекламу получена!',
+    streak:'Серия дней',dailyTaken:'Уже получено сегодня',stockEmpty:'Склад пуст — купите товар',
+    tapShelf:'Нажмите на полку, чтобы разложить товар',adDone:'Награда получена!',
     shelfInfo:'Информация о полке',total:'Всего',slots:'мест',onMap:'На карте',
     tutorial1:'Добро пожаловать! Это ваш магазин. Нажмите «Далее».',
     tutorial2:'Откройте «Магазин» и купите хотя бы один товар.',
@@ -504,67 +428,35 @@ const STR = {
     locked:'Заблокировано',requires:'Требуется',level:'Ур.',
     levelUp:'НОВЫЙ УРОВЕНЬ!',levelUpSub:'Открыты новые товары и клетки!',
     maxCells:'Достигнут лимит клеток',
-    truckTitle:'🚚 Грузовик с акцией!',
-    truckDesc:'Смотрите рекламу и получите x2 доход на 2 минуты!',
-    truckAccept:'Смотреть рекламу',
-    truckDecline:'Прогнать',
-    dirtClean:'+опыт за уборку!',
-    bonusActive:'x2 доход!',
+    truckTitle:'🚚 Грузовик с акцией!',truckDesc:'Смотрите рекламу и получите x2 доход на 2 минуты!',
+    truckAccept:'Смотреть рекламу',truckDecline:'Прогнать',
+    dirtClean:'+опыт за уборку!',bonusActive:'x2 доход!',
     returnedGoods:'Товар возвращён на склад',
-    occupied:'Занято',
-    tooFar:'Слишком далеко',
-    adNotAvailable:'Реклама недоступна',
-    noCashierReturn:'Нет кассы — товар возвращён',
-    truckArrived:'🚚 Грузовик с акцией! Нажмите!',
-    truckLeft:'🚚 Грузовик уехал',
-    tapEmptyCell:'Нажмите на свободную клетку',
-    tutorialComplete:'Обучение завершено!',
-    cellAdded:'+1 клетка',
-    stocked:'Разложено',
-    noSlots:'Нет свободных мест',
-    shelfFull:'Полка заполнена',
-    inviteSent:'Приглашение отправлено!',
-    inviteUnavailable:'Приглашение недоступно',
+    occupied:'Занято',tooFar:'Слишком далеко',
+    adNotAvailable:'Реклама недоступна',noCashierReturn:'Нет кассы — товар возвращён',
+    truckArrived:'🚚 Грузовик с акцией! Нажмите!',truckLeft:'🚚 Грузовик уехал',
+    tapEmptyCell:'Нажмите на свободную клетку',tutorialComplete:'Обучение завершено!',
+    cellAdded:'+1 клетка',stocked:'Разложено',noSlots:'Нет свободных мест',shelfFull:'Полка заполнена',
+    inviteSent:'Приглашение отправлено!',inviteUnavailable:'Приглашение недоступно',
     confirmReset:'Вы точно хотите сбросить весь прогресс? Это действие нельзя отменить!',
-    yesReset:'Да, сбросить',
-    progressReset:'Прогресс сброшен',
-    timeRewards:'Награды за время',
-    timeRewardsDesc:'Играйте и получайте награды. Прогресс сбрасывается при новом заходе.',
-    timePlayed:'Вы играете',
-    minShort:'мин',secShort:'сек',
-    rewardAvailable:'Доступна награда за игру!',
-    needMore:'Нужно ещё',
-    sellAt:'Продажа за',
-    // Прокачки
-    upgrades:'Улучшения',
-    buyUpgrade:'Купить',
-    maxed:'Максимум',
-    upgradeLevel:'Ур.',
+    yesReset:'Да, сбросить',progressReset:'Прогресс сброшен',
+    timeRewards:'Награды за время',timeRewardsDesc:'Играйте и получайте награды. Прогресс сбрасывается при новом заходе.',
+    timePlayed:'Вы играете',minShort:'мин',secShort:'сек',
+    rewardAvailable:'Доступна награда за игру!',needMore:'Нужно ещё',sellAt:'Продажа за',
+    upgrades:'Улучшения',buyUpgrade:'Купить',maxed:'Максимум',upgradeLevel:'Ур.',
     noUpgrades:'Нет доступных улучшений',
-    // Перерождение
-    prestige:'Перерождение',
-    prestigeChip:'★',
-    prestigeBonus:'+{n}% к доходу навсегда',
-    prestigeCurrent:'Текущий бонус перерождений: +{n}%',
-    prestigeReady:'Готово к перерождению!',
-    prestigeRequires:'Требуется уровень {n}',
-    prestigeBtn:'Переродиться',
+    prestige:'Перерождение',prestigeChip:'★',prestigeBonus:'+{n}% к доходу навсегда',
+    prestigeCurrent:'Текущий бонус перерождений: +{n}%',prestigeReady:'Готово к перерождению!',
+    prestigeRequires:'Требуется уровень {n}',prestigeBtn:'Переродиться',
     prestigeConfirmTitle:'Перерождение',
     prestigeConfirm:'Переродиться? Уровень, опыт, деньги и магазин сбросятся, но вы навсегда получите +5% к доходу.',
-    prestigeYes:'Переродиться',
-    prestigeDone:'Перерождение совершено!',
-    prestigeTotal:'Перерождений: {n}',
-    prestigeBonusTotal:'Общий бонус: +{n}%',
-    settingsTabMain:'Основные',
-    settingsTabUpgrades:'Улучшения',
-    settingsTabPrestige:'Перерождение',
-    // Реклама
-    adModalTitle:'Подождите',
-    // Задания: точное совпадение
-    taskRefresh:'Обновление'
+    prestigeYes:'Переродиться',prestigeDone:'Перерождение совершено!',
+    prestigeTotal:'Перерождений: {n}',prestigeBonusTotal:'Общий бонус: +{n}%',
+    settingsTabMain:'Основные',settingsTabUpgrades:'Улучшения',settingsTabPrestige:'Перерождение',
+    adModalTitle:'Подождите',taskRefresh:'Обновление',
+    zoomIn:'Приблизить',zoomOut:'Отдалить'
   },
-  en:{
-    shop:'Shop',warehouse:'Storage',friends:'Friends',settings:'Settings',rewards:'Rewards',
+  en:{shop:'Shop',warehouse:'Storage',friends:'Friends',settings:'Settings',rewards:'Rewards',
     tasks:'Tasks',daily:'Daily reward',close:'Close',buy:'Buy',
     cancel:'Cancel',place:'Place',money:'Coins',music:'Music',language:'Language',
     promo:'Promo code',apply:'Apply',tutorialQ:'Would you like a tutorial?',
@@ -588,63 +480,35 @@ const STR = {
     locked:'Locked',requires:'Requires',level:'Lv.',
     levelUp:'NEW LEVEL!',levelUpSub:'New products and cells unlocked!',
     maxCells:'Cell limit reached',
-    truckTitle:'🚚 Sale truck!',
-    truckDesc:'Watch an ad and get x2 income for 2 minutes!',
-    truckAccept:'Watch ad',
-    truckDecline:'Drive away',
-    dirtClean:'+XP for cleaning!',
-    bonusActive:'x2 income!',
+    truckTitle:'🚚 Sale truck!',truckDesc:'Watch an ad and get x2 income for 2 minutes!',
+    truckAccept:'Watch ad',truckDecline:'Drive away',
+    dirtClean:'+XP for cleaning!',bonusActive:'x2 income!',
     returnedGoods:'Goods returned to storage',
-    occupied:'Occupied',
-    tooFar:'Too far',
-    adNotAvailable:'Ad not available',
-    noCashierReturn:'No cashier — goods returned',
-    truckArrived:'🚚 Sale truck! Tap it!',
-    truckLeft:'🚚 Truck left',
-    tapEmptyCell:'Tap an empty cell',
-    tutorialComplete:'Tutorial complete!',
-    cellAdded:'+1 cell',
-    stocked:'Stocked',
-    noSlots:'No free slots',
-    shelfFull:'Shelf full',
-    inviteSent:'Invite sent!',
-    inviteUnavailable:'Invite unavailable',
+    occupied:'Occupied',tooFar:'Too far',
+    adNotAvailable:'Ad not available',noCashierReturn:'No cashier — goods returned',
+    truckArrived:'🚚 Sale truck! Tap it!',truckLeft:'🚚 Truck left',
+    tapEmptyCell:'Tap an empty cell',tutorialComplete:'Tutorial complete!',
+    cellAdded:'+1 cell',stocked:'Stocked',noSlots:'No free slots',shelfFull:'Shelf full',
+    inviteSent:'Invite sent!',inviteUnavailable:'Invite unavailable',
     confirmReset:'Are you sure you want to reset all progress? This cannot be undone!',
-    yesReset:'Yes, reset',
-    progressReset:'Progress reset',
-    timeRewards:'Time rewards',
-    timeRewardsDesc:'Play and earn rewards. Progress resets on re-entry.',
-    timePlayed:'You have played',
-    minShort:'min',secShort:'sec',
-    rewardAvailable:'Time reward available!',
-    needMore:'Need more',
-    sellAt:'Sells for',
-    upgrades:'Upgrades',
-    buyUpgrade:'Buy',
-    maxed:'Maxed',
-    upgradeLevel:'Lv.',
+    yesReset:'Yes, reset',progressReset:'Progress reset',
+    timeRewards:'Time rewards',timeRewardsDesc:'Play and earn rewards. Progress resets on re-entry.',
+    timePlayed:'You have played',minShort:'min',secShort:'sec',
+    rewardAvailable:'Time reward available!',needMore:'Need more',sellAt:'Sells for',
+    upgrades:'Upgrades',buyUpgrade:'Buy',maxed:'Maxed',upgradeLevel:'Lv.',
     noUpgrades:'No upgrades available',
-    prestige:'Prestige',
-    prestigeChip:'★',
-    prestigeBonus:'+{n}% income forever',
-    prestigeCurrent:'Current prestige bonus: +{n}%',
-    prestigeReady:'Ready to prestige!',
-    prestigeRequires:'Level {n} required',
-    prestigeBtn:'Prestige',
+    prestige:'Prestige',prestigeChip:'★',prestigeBonus:'+{n}% income forever',
+    prestigeCurrent:'Current prestige bonus: +{n}%',prestigeReady:'Ready to prestige!',
+    prestigeRequires:'Level {n} required',prestigeBtn:'Prestige',
     prestigeConfirmTitle:'Prestige',
     prestigeConfirm:'Prestige? Your level, XP, money and shop will reset, but you permanently gain +5% income.',
-    prestigeYes:'Prestige',
-    prestigeDone:'Prestige complete!',
-    prestigeTotal:'Prestiges: {n}',
-    prestigeBonusTotal:'Total bonus: +{n}%',
-    settingsTabMain:'Main',
-    settingsTabUpgrades:'Upgrades',
-    settingsTabPrestige:'Prestige',
-    adModalTitle:'Please wait',
-    taskRefresh:'Refresh'
+    prestigeYes:'Prestige',prestigeDone:'Prestige complete!',
+    prestigeTotal:'Prestiges: {n}',prestigeBonusTotal:'Total bonus: +{n}%',
+    settingsTabMain:'Main',settingsTabUpgrades:'Upgrades',settingsTabPrestige:'Prestige',
+    adModalTitle:'Please wait',taskRefresh:'Refresh',
+    zoomIn:'Zoom in',zoomOut:'Zoom out'
   }
 };
-
 function t(k){ const L = STR[state.lang] || STR.ru; return L[k] !== undefined ? L[k] : (STR.ru[k] || k); }
 function pname(p){ return state.lang === 'en' ? p.en : p.ru; }
 function catName(c){ return state.lang === 'en' ? CATS[c].en : CATS[c].ru; }
@@ -656,7 +520,6 @@ function udesc(k){ const u = UPGRADES[k]; if(!u) return ''; return state.lang ==
 const $ = s => document.querySelector(s);
 const canvas = $('#game');
 const ctx = canvas.getContext('2d');
-
 function rnd(a,b){ return a + Math.random() * (b - a); }
 function randInt(a,b){ return Math.floor(rnd(a,b+1)); }
 function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
@@ -669,10 +532,7 @@ function hexToRgb(h){
 function rgbToHex(r,g,b){
   return '#' + [r,g,b].map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
 }
-function shade(hex,amt){
-  const [r,g,b] = hexToRgb(hex);
-  return rgbToHex(r+amt,g+amt,b+amt);
-}
+function shade(hex,amt){ const [r,g,b] = hexToRgb(hex); return rgbToHex(r+amt,g+amt,b+amt); }
 function todayStr(){
   const d = new Date();
   return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
@@ -711,12 +571,7 @@ function xpProgress(){
 }
 function maxCellsForLevel(lvl){ return Math.min(36 + (lvl - 1) * 6, GW * GH); }
 function hasIncomeBonus(){ return state.bonusUntil > Date.now(); }
-
 function upgradeLevel(key){ return (state.upgrades && state.upgrades[key]) || 0; }
-function upgradeMul(key, step){
-  return 1 + step * upgradeLevel(key);
-}
-
 function incomeMultiplier(){
   let m = 1;
   m *= (1 + 0.02 * upgradeLevel('income'));
@@ -785,44 +640,35 @@ function furnitureSVG(type){
   return '';
 }
 
-/* Улучшенные SVG товаров с правильными цветами для фруктов */
 function productSVG(shape, color){
   const dark = shade(color, -65);
   const light = shade(color, 55);
   let inner = '';
   switch(shape){
-    /* ---------- ФРУКТЫ (свои цвета) ---------- */
     case 'apple':
-      inner = `<path d="M50 26 Q32 22 26 44 Q20 68 32 84 Q44 96 50 88 Q56 96 68 84 Q80 68 74 44 Q68 22 50 26 Z"
-        fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 26 Q32 22 26 44 Q20 68 32 84 Q44 96 50 88 Q56 96 68 84 Q80 68 74 44 Q68 22 50 26 Z" fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 26 Q50 14 56 8" fill="none" stroke="#5a4a1a" stroke-width="3.5" stroke-linecap="round"/>
         <ellipse cx="64" cy="14" rx="11" ry="6" fill="#3d7a42" stroke="#2a5a2e" stroke-width="2" transform="rotate(25 64 14)"/>
-        <ellipse cx="38" cy="48" rx="5" ry="8" fill="#fff" opacity=".45"/>
-        <path d="M50 30 Q46 45 50 60" fill="none" stroke="#a01a1a" stroke-width="1.5" opacity=".5"/>`;
+        <ellipse cx="38" cy="48" rx="5" ry="8" fill="#fff" opacity=".45"/>`;
       break;
     case 'banana':
-      inner = `<path d="M14 26 Q10 68 46 88 Q86 92 90 54 Q84 74 60 76 Q30 72 30 42 Q26 26 14 26 Z"
-        fill="#f6d24c" stroke="#9a7c0d" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M14 26 Q10 68 46 88 Q86 92 90 54 Q84 74 60 76 Q30 72 30 42 Q26 26 14 26 Z" fill="#f6d24c" stroke="#9a7c0d" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M18 30 Q30 48 38 60 Q48 72 64 74" fill="none" stroke="#d4b018" stroke-width="2" opacity=".7"/>
         <circle cx="14" cy="26" r="3" fill="#7a5a08"/>
-        <path d="M88 54 Q92 58 92 64" fill="none" stroke="#7a5a08" stroke-width="3" stroke-linecap="round"/>
-        <path d="M78 82 Q84 82 90 54" fill="none" stroke="#b89a1a" stroke-width="1.5" opacity=".5"/>`;
+        <path d="M88 54 Q92 58 92 64" fill="none" stroke="#7a5a08" stroke-width="3" stroke-linecap="round"/>`;
       break;
     case 'orange':
       inner = `<circle cx="50" cy="58" r="34" fill="#f68a1c" stroke="#a04a08" stroke-width="3.5"/>
         <path d="M50 24 L50 8" stroke="#7a5a1a" stroke-width="3" stroke-linecap="round"/>
         <ellipse cx="58" cy="18" rx="10" ry="5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(20 58 18)"/>
-        <path d="M28 42 Q50 34 72 42 M26 58 Q50 50 74 58 M28 74 Q50 66 72 74 M34 88 Q50 84 66 88" fill="none" stroke="#c05a08" stroke-width="1.2" opacity=".55"/>
+        <path d="M28 42 Q50 34 72 42 M26 58 Q50 50 74 58 M28 74 Q50 66 72 74" fill="none" stroke="#c05a08" stroke-width="1.2" opacity=".55"/>
         <ellipse cx="38" cy="46" rx="7" ry="9" fill="#fff" opacity=".35"/>`;
       break;
     case 'pear':
-      inner = `<path d="M50 20 Q42 20 42 34 Q42 42 34 52 Q22 68 30 82 Q42 96 50 88 Q58 96 70 82 Q78 68 66 52 Q58 42 58 34 Q58 20 50 20 Z"
-        fill="#c8d84c" stroke="#6a7a10" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 20 Q42 20 42 34 Q42 42 34 52 Q22 68 30 82 Q42 96 50 88 Q58 96 70 82 Q78 68 66 52 Q58 42 58 34 Q58 20 50 20 Z" fill="#c8d84c" stroke="#6a7a10" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 20 Q50 12 54 6" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
         <ellipse cx="60" cy="14" rx="8" ry="4.5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(30 60 14)"/>
-        <ellipse cx="40" cy="60" rx="5" ry="9" fill="#fff" opacity=".35"/>
-        <circle cx="58" cy="52" r="2" fill="#8a9a30" opacity=".6"/>
-        <circle cx="42" cy="68" r="2" fill="#8a9a30" opacity=".6"/>`;
+        <ellipse cx="40" cy="60" rx="5" ry="9" fill="#fff" opacity=".35"/>`;
       break;
     case 'grapes':
       inner = `<path d="M50 12 Q50 18 44 22" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
@@ -834,32 +680,27 @@ function productSVG(shape, color){
         <circle cx="36" cy="66" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
         <circle cx="64" cy="66" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
         <circle cx="50" cy="78" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
-        <circle cx="46" cy="32" r="2.5" fill="#fff" opacity=".7"/>
-        <circle cx="32" cy="42" r="2" fill="#fff" opacity=".6"/>
-        <circle cx="46" cy="54" r="2" fill="#fff" opacity=".6"/>`;
+        <circle cx="46" cy="32" r="2.5" fill="#fff" opacity=".7"/>`;
       break;
     case 'kiwi':
       inner = `<ellipse cx="50" cy="58" rx="32" ry="34" fill="#8a6a3a" stroke="#4a3a1a" stroke-width="3.5"/>
         <ellipse cx="50" cy="58" rx="24" ry="26" fill="#8ac04c"/>
         <ellipse cx="50" cy="58" rx="10" ry="12" fill="#f0f0e0"/>
         <circle cx="50" cy="58" r="2" fill="#8a6a3a"/>
-        <path d="M50 32 L50 44 M50 72 L50 84 M26 58 L38 58 M62 58 L74 58 M32 40 L42 48 M58 68 L68 76 M32 76 L42 68 M58 48 L68 40" stroke="#1a2a10" stroke-width="1" opacity=".8"/>
-        <ellipse cx="38" cy="40" rx="4" ry="6" fill="#fff" opacity=".15"/>`;
+        <path d="M50 32 L50 44 M50 72 L50 84 M26 58 L38 58 M62 58 L74 58 M32 40 L42 48 M58 68 L68 76 M32 76 L42 68 M58 48 L68 40" stroke="#1a2a10" stroke-width="1" opacity=".8"/>`;
       break;
     case 'peach':
-      inner = `<path d="M50 24 Q32 22 24 44 Q20 68 34 84 Q44 94 50 88 Q56 94 66 84 Q80 68 76 44 Q68 22 50 24 Z"
-        fill="#f5a47c" stroke="#b05530" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 24 Q32 22 24 44 Q20 68 34 84 Q44 94 50 88 Q56 94 66 84 Q80 68 76 44 Q68 22 50 24 Z" fill="#f5a47c" stroke="#b05530" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 24 Q50 24 50 88" fill="none" stroke="#c06a40" stroke-width="1.5" opacity=".7"/>
         <path d="M50 24 Q50 12 56 6" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
         <ellipse cx="64" cy="14" rx="11" ry="5.5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(25 64 14)"/>
         <ellipse cx="38" cy="48" rx="5" ry="8" fill="#fff" opacity=".4"/>`;
       break;
     case 'pineapple':
-      inner = `<path d="M28 40 Q28 22 50 22 Q72 22 72 40 L76 82 Q76 94 50 94 Q24 94 24 82 Z"
-        fill="#f0b820" stroke="#7a5a10" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M28 40 Q28 22 50 22 Q72 22 72 40 L76 82 Q76 94 50 94 Q24 94 24 82 Z" fill="#f0b820" stroke="#7a5a10" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 22 L40 4 M50 22 L48 2 M50 22 L58 4 M50 22 L32 12 M50 22 L68 12" stroke="#3d7a42" stroke-width="4.5" stroke-linecap="round" fill="none"/>
         <path d="M36 44 L36 86 M50 40 L50 92 M64 44 L64 86" stroke="#a07a10" stroke-width="1.8" fill="none" opacity=".6"/>
-        <path d="M28 58 L72 58 M28 72 L72 72 M28 84 L72 84" stroke="#a07a10" stroke-width="1.8" fill="none" opacity=".6"/>`;
+        <path d="M28 58 L72 58 M28 72 L72 72" stroke="#a07a10" stroke-width="1.8" fill="none" opacity=".6"/>`;
       break;
     case 'potato':
       inner = `<ellipse cx="50" cy="58" rx="34" ry="26" fill="#c09060" stroke="#7a5530" stroke-width="3.5" transform="rotate(-15 50 58)"/>
@@ -870,15 +711,13 @@ function productSVG(shape, color){
         <ellipse cx="36" cy="46" rx="7" ry="5" fill="#fff" opacity=".3"/>`;
       break;
     case 'carrot':
-      inner = `<path d="M50 92 L32 40 Q32 28 50 28 Q68 28 68 40 Z"
-        fill="#f08030" stroke="#a04a10" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 92 L32 40 Q32 28 50 28 Q68 28 68 40 Z" fill="#f08030" stroke="#a04a10" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M40 50 L34 46 M44 60 L36 58 M46 70 L40 68 M56 50 L62 46 M56 60 L64 58 M54 70 L60 68" stroke="#a04a10" stroke-width="1.6" fill="none"/>
         <path d="M50 28 Q48 18 42 12 M50 28 Q50 16 50 8 M50 28 Q54 18 60 14" stroke="#3d7a42" stroke-width="4" stroke-linecap="round" fill="none"/>
         <ellipse cx="44" cy="38" rx="3" ry="6" fill="#fff" opacity=".3"/>`;
       break;
     case 'onion':
-      inner = `<path d="M50 30 Q30 34 26 56 Q26 82 50 88 Q74 82 74 56 Q70 34 50 30 Z"
-        fill="#c08a4a" stroke="#7a5010" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 30 Q30 34 26 56 Q26 82 50 88 Q74 82 74 56 Q70 34 50 30 Z" fill="#c08a4a" stroke="#7a5010" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 30 Q50 14 44 8 M50 30 Q50 16 50 6 M50 30 Q54 16 60 10" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
         <path d="M40 40 Q36 60 40 82 M50 36 Q50 60 50 86 M60 40 Q64 60 60 82" fill="none" stroke="#8a6010" stroke-width="1.4" opacity=".6"/>
         <ellipse cx="40" cy="52" rx="4" ry="7" fill="#fff" opacity=".3"/>`;
@@ -886,8 +725,7 @@ function productSVG(shape, color){
     case 'tomato':
       inner = `<circle cx="50" cy="60" r="32" fill="#e03c2c" stroke="#7a1a10" stroke-width="3.5"/>
         <path d="M50 30 L50 22 M50 30 Q42 22 36 20 M50 30 Q58 22 64 20 M50 30 Q46 22 42 16 M50 30 Q54 22 58 16" stroke="#3d7a42" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-        <ellipse cx="38" cy="50" rx="6" ry="8" fill="#fff" opacity=".35"/>
-        <path d="M30 78 Q50 82 70 78" fill="none" stroke="#a01a10" stroke-width="1.5" opacity=".4"/>`;
+        <ellipse cx="38" cy="50" rx="6" ry="8" fill="#fff" opacity=".35"/>`;
       break;
     case 'cucumber':
       inner = `<rect x="34" y="14" width="32" height="74" rx="16" fill="#5ca030" stroke="#2a5a10" stroke-width="3.5"/>
@@ -895,7 +733,6 @@ function productSVG(shape, color){
         <circle cx="56" cy="42" r="1.5" fill="#3a7a20" opacity=".7"/>
         <circle cx="44" cy="56" r="1.5" fill="#3a7a20" opacity=".7"/>
         <circle cx="56" cy="70" r="1.5" fill="#3a7a20" opacity=".7"/>
-        <circle cx="50" cy="82" r="1.5" fill="#3a7a20" opacity=".7"/>
         <rect x="40" y="20" width="3" height="60" rx="1.5" fill="#fff" opacity=".35"/>
         <path d="M40 16 L44 12 M56 16 L60 12" stroke="#2a5a10" stroke-width="2" stroke-linecap="round"/>`;
       break;
@@ -906,8 +743,7 @@ function productSVG(shape, color){
         <ellipse cx="38" cy="46" rx="6" ry="8" fill="#fff" opacity=".28"/>`;
       break;
     case 'pepper':
-      inner = `<path d="M50 26 Q30 30 26 54 Q26 82 50 90 Q74 82 74 54 Q70 30 50 26 Z"
-        fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+      inner = `<path d="M50 26 Q30 30 26 54 Q26 82 50 90 Q74 82 74 54 Q70 30 50 26 Z" fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
         <path d="M50 26 Q50 16 50 12" stroke="#3d7a42" stroke-width="4" stroke-linecap="round"/>
         <path d="M50 26 Q42 20 38 14 M50 26 Q58 20 62 14" stroke="#3d7a42" stroke-width="3" stroke-linecap="round" fill="none"/>
         <path d="M38 42 Q34 60 38 80 M62 42 Q66 60 62 80" fill="none" stroke="#a01a1a" stroke-width="1.5" opacity=".5"/>
@@ -921,17 +757,14 @@ function productSVG(shape, color){
         <circle cx="50" cy="34" r="17" fill="#4a8c4e" stroke="#1a4a1a" stroke-width="3"/>
         <circle cx="50" cy="52" r="14" fill="#3d7a42" stroke="#1a4a1a" stroke-width="3"/>
         <circle cx="42" cy="30" r="3" fill="#7ac05a" opacity=".6"/>
-        <circle cx="60" cy="36" r="3" fill="#7ac05a" opacity=".6"/>
-        <circle cx="34" cy="48" r="2.5" fill="#7ac05a" opacity=".6"/>`;
+        <circle cx="60" cy="36" r="3" fill="#7ac05a" opacity=".6"/>`;
       break;
-    /* ---------- Стандартные формы ---------- */
     case 'bottle':
       inner = `<rect x="42" y="4" width="16" height="12" rx="3" fill="${dark}"/>
         <rect x="38" y="14" width="24" height="8" rx="3" fill="${dark}"/>
         <path d="M30 24 Q30 20 34 20 L66 20 Q70 20 70 24 L70 84 Q70 92 60 92 L40 92 Q30 92 30 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <rect x="34" y="42" width="32" height="22" rx="3" fill="#fff" opacity=".82"/>
-        <rect x="38" y="46" width="24" height="3" rx="1" fill="${dark}" opacity=".4"/>
-        <rect x="38" y="53" width="18" height="3" rx="1" fill="${dark}" opacity=".3"/>`;
+        <rect x="38" y="46" width="24" height="3" rx="1" fill="${dark}" opacity=".4"/>`;
       break;
     case 'can':
       inner = `<ellipse cx="50" cy="18" rx="26" ry="8" fill="#dfe6ee" stroke="${dark}" stroke-width="3"/>
@@ -971,55 +804,39 @@ function productSVG(shape, color){
       break;
     case 'round':
       inner = `<circle cx="50" cy="58" r="32" fill="${color}" stroke="${dark}" stroke-width="4"/>
-        <ellipse cx="42" cy="46" rx="7" ry="9" fill="#fff" opacity=".35"/>
-        <path d="M50 26 q6 -12 16 -14" fill="none" stroke="#4a7a3a" stroke-width="7" stroke-linecap="round"/>`;
-      break;
-    case 'bunch':
-      inner = `<path d="M50 20 Q50 30 46 40 Q42 50 38 60 Q34 70 36 78" fill="none" stroke="#5d8a3d" stroke-width="4" stroke-linecap="round"/>
-        <path d="M50 20 Q54 32 58 42 Q62 52 64 62" fill="none" stroke="#5d8a3d" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="38" cy="72" r="10" fill="${color}" stroke="${dark}" stroke-width="3"/>
-        <circle cx="52" cy="78" r="10" fill="${color}" stroke="${dark}" stroke-width="3"/>
-        <circle cx="62" cy="66" r="9" fill="${color}" stroke="${dark}" stroke-width="3"/>
-        <circle cx="44" cy="86" r="10" fill="${color}" stroke="${dark}" stroke-width="3"/>
-        <circle cx="60" cy="84" r="9" fill="${color}" stroke="${dark}" stroke-width="3"/>`;
+        <ellipse cx="42" cy="46" rx="7" ry="9" fill="#fff" opacity=".35"/>`;
       break;
     case 'tree':
       inner = `<rect x="46" y="60" width="8" height="30" fill="#7a4a22"/>
         <circle cx="50" cy="42" r="20" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <circle cx="36" cy="52" r="14" fill="${color}" stroke="${dark}" stroke-width="4"/>
-        <circle cx="64" cy="52" r="14" fill="${color}" stroke="${dark}" stroke-width="4"/>
-        <circle cx="50" cy="34" r="3" fill="${light}" opacity=".7"/>`;
+        <circle cx="64" cy="52" r="14" fill="${color}" stroke="${dark}" stroke-width="4"/>`;
       break;
     case 'cylinder':
       inner = `<path d="M32 22 L32 84 Q32 92 50 92 Q68 92 68 84 L68 22" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <ellipse cx="50" cy="22" rx="18" ry="6" fill="${light}" stroke="${dark}" stroke-width="4"/>
-        <ellipse cx="50" cy="22" rx="12" ry="3.5" fill="${dark}" opacity=".4"/>
         <rect x="40" y="46" width="20" height="20" rx="3" fill="#fff" opacity=".6"/>`;
       break;
     case 'jar':
       inner = `<rect x="30" y="14" width="40" height="12" rx="3" fill="#8a8f9a" stroke="${dark}" stroke-width="3"/>
         <path d="M28 26 L72 26 L72 84 Q72 92 64 92 L36 92 Q28 92 28 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-        <rect x="34" y="46" width="32" height="22" rx="3" fill="#fff" opacity=".85"/>
-        <circle cx="44" cy="78" r="3" fill="#fff" opacity=".5"/>`;
+        <rect x="34" y="46" width="32" height="22" rx="3" fill="#fff" opacity=".85"/>`;
       break;
     case 'tube':
       inner = `<rect x="30" y="10" width="40" height="12" rx="3" fill="${dark}"/>
         <path d="M36 22 L64 22 L68 86 Q68 92 62 92 L38 92 Q32 92 32 86 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-        <rect x="40" y="42" width="20" height="26" rx="3" fill="#fff" opacity=".85"/>
-        <path d="M44 50 L56 50 M44 56 L56 56 M44 62 L52 62" stroke="${dark}" stroke-width="2.2" stroke-linecap="round" fill="none"/>`;
+        <rect x="40" y="42" width="20" height="26" rx="3" fill="#fff" opacity=".85"/>`;
       break;
     case 'bar':
       inner = `<rect x="14" y="24" width="72" height="52" rx="6" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <rect x="22" y="32" width="56" height="36" rx="3" fill="#5b3a1a"/>
         <rect x="22" y="32" width="56" height="36" rx="3" fill="none" stroke="${dark}" stroke-width="2"/>
-        <path d="M30 50 L70 50" stroke="#8a5a2b" stroke-width="3"/>
-        <circle cx="38" cy="42" r="3" fill="#fff" opacity=".35"/>`;
+        <path d="M30 50 L70 50" stroke="#8a5a2b" stroke-width="3"/>`;
       break;
     case 'wedge':
       inner = `<path d="M18 76 L82 76 L82 60 Q82 30 50 26 L18 40 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <circle cx="46" cy="52" r="4" fill="${light}" opacity=".7"/>
-        <circle cx="58" cy="60" r="3" fill="${light}" opacity=".7"/>
-        <circle cx="38" cy="62" r="2.5" fill="${light}" opacity=".7"/>`;
+        <circle cx="58" cy="60" r="3" fill="${light}" opacity=".7"/>`;
       break;
     case 'pouch':
       inner = `<path d="M28 24 Q50 12 72 24 L76 84 Q76 92 68 92 L32 92 Q24 92 24 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
@@ -1036,7 +853,6 @@ function productSVG(shape, color){
     case 'wrap':
       inner = `<path d="M22 34 Q30 22 50 22 Q70 22 78 34 L78 78 Q78 86 68 86 L32 86 Q22 86 22 78 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <path d="M22 46 Q50 56 78 46" fill="none" stroke="${dark}" stroke-width="3" opacity=".7"/>
-        <path d="M30 42 L30 80 M50 42 L50 82 M70 42 L70 80" stroke="${dark}" stroke-width="2" opacity=".35" fill="none"/>
         <rect x="38" y="60" width="24" height="12" rx="3" fill="#fff" opacity=".75"/>`;
       break;
     case 'tray':
@@ -1050,13 +866,11 @@ function productSVG(shape, color){
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${inner}</svg>`;
 }
-
 function prodSprite(p){ return makeSprite('p' + p.id, productSVG(p.shape, p.color)); }
 function furnSprite(type){ return makeSprite('f' + type, furnitureSVG(type)); }
 
 /* ------------------------------ 4. СОСТОЯНИЕ ------------------------------ */
 let state = null;
-
 function newState(){
   return {
     money: 600, lang: 'ru', music: true, tutorialDone: false,
@@ -1067,18 +881,12 @@ function newState(){
     lastDaily: 0, streak: 0,
     tasks: [], tasksDate: '',
     ds: {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0},
-    playtime: 0,
-    claimedTimeRewards: [],
-    notifiedTimeRewards: [],
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 7,
+    playtime: 0, claimedTimeRewards: [], notifiedTimeRewards: [],
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 8,
     dirt: [],
-    truckTimer: TRUCK_CYCLE,
-    truckState: 'away',
-    truckOfferTimer: 0,
-    bonusUntil: 0
+    truckTimer: TRUCK_CYCLE, truckState: 'away', truckOfferTimer: 0, bonusUntil: 0
   };
 }
-
 function initGrid(){
   state.grid = [];
   for(let y = 0; y < GH; y++){
@@ -1093,7 +901,6 @@ function initGrid(){
   state.grid[1][3].t = 'shelf';
   state.grid[5][5].t = 'counter';
 }
-
 function cellAt(x, y){
   if(x < 0 || y < 0 || x >= GW || y >= GH) return null;
   return state.grid[y][x];
@@ -1165,8 +972,6 @@ function warehouseTotal(){
   for(const k in state.warehouse) n += state.warehouse[k];
   return n;
 }
-
-/* ------------------------------ 4b. ГРЯЗЬ -------------------------------- */
 function dropDirt(x, y){
   const cx = Math.floor(x), cy = Math.floor(y);
   const c = cellAt(cx, cy);
@@ -1214,7 +1019,6 @@ async function storageGet(keys){
   keys.forEach(k => out[k] = memStore[k] || '');
   return out;
 }
-
 function serialize(){
   let g = '';
   for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -1231,13 +1035,10 @@ function serialize(){
   const wh = Object.keys(state.warehouse).filter(k => state.warehouse[k] > 0)
     .map(k => k + '-' + state.warehouse[k]).join(',');
   const drt = state.dirt.map(d => d.x + ',' + d.y + ',' + d.type).join('|');
-
   return {
     m: Math.floor(state.money), l: state.lang, mu: state.music ? 1 : 0,
-    td: state.tutorialDone ? 1 : 0, xp: Math.floor(state.xp),
-    pr: state.prestige,
-    up: state.upgrades,
-    g, st: stocks.join('|'), wh, drt,
+    td: state.tutorialDone ? 1 : 0, xp: Math.floor(state.xp), pr: state.prestige,
+    up: state.upgrades, g, st: stocks.join('|'), wh, drt,
     dw: state.decor.wall, dn: state.decor.window,
     ow: state.owned.wall, on: state.owned.window,
     ld: state.lastDaily, sk: state.streak,
@@ -1247,7 +1048,6 @@ function serialize(){
     bu: state.bonusUntil
   };
 }
-
 function deserialize(o){
   state.money = o.m || 600;
   state.lang = o.l || 'ru';
@@ -1256,7 +1056,6 @@ function deserialize(o){
   state.xp = o.xp || 0;
   state.prestige = o.pr || 0;
   state.upgrades = o.up || {spawn:0, income:0, speed:0, xp:0, cap:0};
-  // гарантируем все ключи
   Object.keys(UPGRADES).forEach(k => { if(typeof state.upgrades[k] !== 'number') state.upgrades[k] = 0; });
   state.decor.wall = o.dw || 0;
   state.decor.window = o.dn || 0;
@@ -1276,13 +1075,10 @@ function deserialize(o){
   state.bonusUntil = o.bu || 0;
   state.warehouse = {};
   state.dirt = [];
-  // ВАЖНО: сбрасываем прогресс времени при перезаходе
   state.playtime = 0;
   state.claimedTimeRewards = [];
   state.notifiedTimeRewards = [];
-
   initGrid();
-
   if(o.g && o.g.length === GW * GH){
     for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
       const ch = o.g[y * GW + x];
@@ -1321,7 +1117,6 @@ function deserialize(o){
   }
   state.grid[DOOR.y][DOOR.x].door = true;
 }
-
 let saveTimer = null;
 function scheduleSave(){
   if(saveTimer) return;
@@ -1366,40 +1161,28 @@ const HAIR  = ['#2b1d13','#4a2f1c','#7a4a22','#b07a35','#1a1a1a','#8b8b8b'];
 
 class Customer {
   constructor(){
-    this.x = DOOR.x + 0.5;
-    this.y = DOOR.y + 0.5;
+    this.x = DOOR.x + 0.5; this.y = DOOR.y + 0.5;
     this.alpha = 0;
     this.baseSpeed = rnd(0.6, 0.95);
     this.speed = this.baseSpeed * speedMul();
-    this.shirt = pick(SHIRT);
-    this.skin = pick(SKIN);
-    this.hair = pick(HAIR);
+    this.shirt = pick(SHIRT); this.skin = pick(SKIN); this.hair = pick(HAIR);
     this.state = 'idle';
-    this.path = [];
-    this.cart = [];
-    this.timer = 0;
-    this.walk = 0;
-    this.dir = Math.PI / 2;
-    this.targetDir = Math.PI / 2;
-    this.bob = 0;
-    this.visited = [];
+    this.path = []; this.cart = [];
+    this.timer = 0; this.walk = 0;
+    this.dir = Math.PI / 2; this.targetDir = Math.PI / 2;
+    this.bob = 0; this.visited = [];
     this.wants = randInt(2, 4);
-    this.bubble = null;
-    this.bubbleT = 0;
-    this.spot = null;
-    this.dead = false;
+    this.bubble = null; this.bubbleT = 0;
+    this.spot = null; this.dead = false;
     this.patience = 60;
     this.dirtDropped = false;
     this.willDropDirt = Math.random() < 0.2;
     this.returnNotified = false;
     this.emptyAttempts = 0;
   }
-
   returnCart(){
     if(!this.cart.length) return false;
-    for(const it of this.cart){
-      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
-    }
+    for(const it of this.cart) state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
     this.cart = [];
     if(!this.returnNotified){
       this.returnNotified = true;
@@ -1408,20 +1191,15 @@ class Customer {
     scheduleSave();
     return true;
   }
-
   moveTo(gx, gy){
     const path = findPath(Math.floor(this.x), Math.floor(this.y), gx, gy);
     if(path && path.length){ this.path = path; return true; }
     if(Math.floor(this.x) === gx && Math.floor(this.y) === gy){ this.path = []; return true; }
     return false;
   }
-
   update(dt){
     if(this.alpha < 1 && this.state !== 'gone') this.alpha = Math.min(1, this.alpha + dt * 2.5);
-    if(this.bubbleT > 0){
-      this.bubbleT -= dt;
-      if(this.bubbleT <= 0) this.bubble = null;
-    }
+    if(this.bubbleT > 0){ this.bubbleT -= dt; if(this.bubbleT <= 0) this.bubble = null; }
     if(this.state === 'gone'){
       this.returnCart();
       this.alpha -= dt * 1.3;
@@ -1443,8 +1221,7 @@ class Customer {
       return;
     }
     if(this.state === 'waiting'){
-      this.timer -= dt;
-      this.patience -= dt;
+      this.timer -= dt; this.patience -= dt;
       if(this.patience <= 0){ this.leave(); return; }
       if(this.timer <= 0) this.tryCashier();
       return;
@@ -1455,13 +1232,8 @@ class Customer {
       const dx = tx - this.x, dy = ty - this.y;
       const d = Math.hypot(dx, dy);
       const step = this.speed * dt;
-      if(d <= step){
-        this.x = tx; this.y = ty;
-        this.path.shift();
-      } else {
-        this.x += dx / d * step;
-        this.y += dy / d * step;
-      }
+      if(d <= step){ this.x = tx; this.y = ty; this.path.shift(); }
+      else { this.x += dx / d * step; this.y += dy / d * step; }
       if(d > 0.01) this.targetDir = Math.atan2(dy, dx);
       this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 10));
       this.walk += dt * 8;
@@ -1472,11 +1244,9 @@ class Customer {
       this.arrive();
     }
   }
-
   arrive(){
     if(this.state === 'toShelf'){
       const cell = this.targetCell;
-      // Если полка пуста — не стоим, идём искать другую или на кассу
       if(!cell || !cell.stock.length){
         this.emptyAttempts++;
         this.state = 'idle';
@@ -1490,15 +1260,13 @@ class Customer {
       this.bubble = s.id;
       this.bubbleT = this.timer + 0.3;
     } else if(this.state === 'toCashier'){
-      this.state = 'paying';
-      this.timer = rnd(1.1, 1.8);
+      this.state = 'paying'; this.timer = rnd(1.1, 1.8);
     } else if(this.state === 'leaving'){
       this.state = 'gone';
     } else if(this.state === 'idle'){
       this.planShopping();
     }
   }
-
   finishAction(){
     if(this.state === 'picking'){
       const cell = this.targetCell;
@@ -1514,18 +1282,14 @@ class Customer {
       if(this.targetX !== undefined) this.visited.push(this.targetX + ',' + this.targetY);
       if(!gotSomething){
         this.emptyAttempts++;
-        // Если полка оказалась пуста — сразу на кассу (или уходим)
         if(this.emptyAttempts > 2){ this.goToCashierOrLeave(); return; }
         this.state = 'idle';
         this.planShopping();
         return;
       }
       this.state = 'idle';
-      if(this.cart.length >= this.wants || this.visited.length > 4){
-        this.goToCashier();
-      } else {
-        this.planShopping();
-      }
+      if(this.cart.length >= this.wants || this.visited.length > 4) this.goToCashier();
+      else this.planShopping();
     } else if(this.state === 'paying'){
       let sum = 0;
       for(const it of this.cart) sum += it.price;
@@ -1539,24 +1303,17 @@ class Customer {
       state.totalServed += 1;
       addXP(Math.max(1, Math.round(total * 0.5 * xpMul())));
       if(this.spot) busySpots.delete(this.spot);
-      this.spot = null;
-      this.cart = [];
-      toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x' + mult.toFixed(2) : ''), mult > 1.05 ? '#ffd257' : '#7fd07f');
-      updateHUD();
-      scheduleSave();
+      this.spot = null; this.cart = [];
+      toast('+' + fmt(total) + ' \u20BF' + (mult > 1.05 ? ' x' + mult.toFixed(2) : ''), mult > 1.05 ? '#ffd257' : '#7fd07f');
+      updateHUD(); scheduleSave();
       this.leave();
     }
   }
-
   planShopping(){
     const shelves = shelfCells().filter(s => s.c.stock.length > 0);
     if(!shelves.length){ this.goToCashierOrLeave(); return; }
     const fresh = shelves.filter(s => this.visited.indexOf(s.x + ',' + s.y) < 0);
-    if(!fresh.length){
-      // Все полки обошли — идём на кассу
-      this.goToCashierOrLeave();
-      return;
-    }
+    if(!fresh.length){ this.goToCashierOrLeave(); return; }
     const target = pick(fresh);
     const spots = adjacentWalkable(target.x, target.y);
     if(!spots.length){
@@ -1567,35 +1324,26 @@ class Customer {
     }
     const spot = pick(spots);
     this.targetCell = target.c;
-    this.targetX = target.x;
-    this.targetY = target.y;
+    this.targetX = target.x; this.targetY = target.y;
     this.state = 'toShelf';
     if(!this.moveTo(spot.x, spot.y)){ this.goToCashierOrLeave(); }
   }
-
   goToCashierOrLeave(){
     if(this.cart.length > 0) this.goToCashier();
     else this.leave();
   }
-
   goToCashier(){
     if(!this.cart.length){ this.leave(); return; }
     if(!counterCells().length){
       toast(t('noCashierReturn'), '#e0575b');
-      this.returnCart();
-      this.leave();
+      this.returnCart(); this.leave();
       return;
     }
     this.tryCashier();
   }
-
   tryCashier(){
     const spots = serviceSpots().filter(s => !busySpots.has(s.x + ',' + s.y));
-    if(!spots.length){
-      this.state = 'waiting';
-      this.timer = rnd(0.8, 1.6);
-      return;
-    }
+    if(!spots.length){ this.state = 'waiting'; this.timer = rnd(0.8, 1.6); return; }
     let best = null, bd = 1e9;
     for(const s of spots){
       const d = Math.abs(s.x - this.x) + Math.abs(s.y - this.y);
@@ -1607,11 +1355,9 @@ class Customer {
     if(!this.moveTo(best.x, best.y)){
       busySpots.delete(best.x + ',' + best.y);
       this.spot = null;
-      this.returnCart();
-      this.leave();
+      this.returnCart(); this.leave();
     }
   }
-
   leave(){
     if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
     this.returnCart();
@@ -1619,9 +1365,7 @@ class Customer {
     if(!this.moveTo(DOOR.x, DOOR.y)){ this.state = 'gone'; }
   }
 }
-
 const busySpots = new Set();
-
 function serviceSpots(){
   const out = [];
   for(const c of counterCells()){
@@ -1639,7 +1383,6 @@ function adjacentWalkable(x, y){
   }
   return out;
 }
-
 function findPath(sx, sy, gx, gy){
   if(sx === gx && sy === gy) return [];
   if(!walkable(gx, gy)) return null;
@@ -1660,9 +1403,7 @@ function findPath(sx, sy, gx, gy){
       const k = key(nx, ny);
       if(seen[k]) continue;
       if(!walkable(nx, ny)) continue;
-      seen[k] = 1;
-      prev[k] = cur;
-      q.push(k);
+      seen[k] = 1; prev[k] = cur; q.push(k);
     }
   }
   if(!found) return null;
@@ -1677,12 +1418,11 @@ function findPath(sx, sy, gx, gy){
   return path;
 }
 
-/* ------------------------ 6b. КАССИР ------------------------------- */
+/* Кассир */
 const cashier = {
   x: 5.5, y: 5.15,
   skin: '#e0aa7a', hair: '#4a2f1c', shirt: '#2b5fae',
-  bob: 0, walk: 0,
-  anchorX: -1, anchorY: -1,
+  bob: 0, walk: 0, anchorX: -1, anchorY: -1,
   update(dt){
     const counters = counterCells();
     if(!counters.length) return;
@@ -1692,29 +1432,23 @@ const cashier = {
       if(d < bd){ bd = d; best = c; }
     }
     if(best.x !== this.anchorX || best.y !== this.anchorY){
-      this.anchorX = best.x;
-      this.anchorY = best.y;
-      this.x = best.x + 0.5;
-      this.y = best.y + 0.30;
+      this.anchorX = best.x; this.anchorY = best.y;
+      this.x = best.x + 0.5; this.y = best.y + 0.30;
     }
     this.walk += dt * 2.5;
     this.bob = Math.sin(this.walk) * 0.02;
   }
 };
 
-/* --------------------------- 6c. ГРУЗОВИК -------------------------------- */
+/* Грузовик */
 const truck = {
-  x: -12, targetX: 0, baseY: GH + 0.6,
-  arrived: false, wheels: 0,
+  x: -12, targetX: 0, baseY: GH + 0.6, arrived: false, wheels: 0,
   update(dt){
     if(state.truckState === 'offering'){
       const dx = this.targetX - this.x;
       if(Math.abs(dx) > 0.1){ this.x += Math.sign(dx) * dt * 3; this.wheels += dt * 12; }
       else { this.x = this.targetX; this.arrived = true; }
-    } else if(state.truckState === 'away'){
-      if(this.x > -12) this.x = -12;
-      this.arrived = false;
-    }
+    } else if(state.truckState === 'away'){ if(this.x > -12) this.x = -12; this.arrived = false; }
   },
   draw(){
     if(state.truckState !== 'offering') return;
@@ -1756,7 +1490,6 @@ const truck = {
     return true;
   }
 };
-
 function startTruckCycle(){
   state.truckState = 'offering';
   state.truckOfferTimer = TRUCK_OFFER;
@@ -1782,8 +1515,7 @@ function checkDailyReset(){ if(state.tasksDate !== todayStr() || !state.tasks.le
 function taskText(task){
   const def = TASK_DEFS.find(d => d.id === task.t);
   if(!def) return '';
-  const tmpl = state.lang === 'en' ? def.en : def.ru;
-  return tmpl.replace('{n}', task.target);
+  return (state.lang === 'en' ? def.en : def.ru).replace('{n}', task.target);
 }
 function taskProgress(task){ return Math.min(task.target, state.ds[task.t] || 0); }
 function tasksReadyCount(){
@@ -1843,11 +1575,19 @@ const Music = {
 };
 
 /* ------------------------------ 9. РЕНДЕР --------------------------------- */
-let CS = 40;
+let CS = 40;         // текущая клетка в пикселях (с учётом зума)
+let baseCS = 40;     // базовая клетка без зума
+let zoom = 1;        // коэффициент зума
+const ZOOM_MIN = 0.5, ZOOM_MAX = 3;
 let baseOX = 0, baseOY = 0;
 let camX = 0, camY = 0;
 let dragging = false, dragMoved = false;
 let dragStartX = 0, dragStartY = 0, dragBaseCamX = 0, dragBaseCamY = 0;
+
+/* Мульти-тач для пинч-зума */
+const activePointers = new Map();
+let pinchStartDist = 0;
+let pinchStartZoom = 1;
 
 function resize(){
   const w = canvas.clientWidth || window.innerWidth;
@@ -1856,17 +1596,25 @@ function resize(){
   canvas.width = Math.floor(w * dpr);
   canvas.height = Math.floor(h * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
   const topbarH = $('#topbar').offsetHeight || 52;
   const bottombarH = $('#bottombar').offsetHeight || 70;
   const availTop = topbarH + 6;
   const availBottom = h - bottombarH - 6;
   const availH = availBottom - availTop;
   const availW = w - 12;
-  CS = Math.min((availW - 2 * 20) / GW, (availH - 2 * 20) / GH);
-  CS = Math.max(12, CS);
+
+  baseCS = Math.min((availW - 2 * 20) / GW, (availH - 2 * 20) / GH);
+  baseCS = Math.max(12, baseCS);
+  CS = baseCS * zoom;
+
   baseOX = (w - GW * CS) / 2;
   baseOY = availTop + (availH - GH * CS) / 2;
   clampCamera();
+}
+function setZoom(z){
+  zoom = clamp(z, ZOOM_MIN, ZOOM_MAX);
+  resize();
 }
 function clampCamera(){
   const maxPan = CS * 4;
@@ -1897,16 +1645,13 @@ function draw(){
   ctx.save();
   ctx.scale(CS, CS);
   ctx.lineJoin = 'round';
-
   drawCashier();
-
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
       const c = state.grid[y][x];
       if(c.u && c.t) drawFurniture(x, y, c);
     }
   }
-
   if(placeMode){
     ctx.lineWidth = 0.06;
     for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -1922,33 +1667,34 @@ function draw(){
       }
     }
   }
-
   // Тела клиентов
   for(const c of customers) drawCustomerBody(c);
-  // Пузыри рисуем ПОСЛЕ всех тел — чтобы всегда были сверху
-  for(const c of customers) drawCustomerBubble(c);
-
-  ctx.restore();
   ctx.restore();
 
+  // Рамка магазина
   ctx.strokeStyle = '#2b3648';
   ctx.lineWidth = 2;
-  ctx.strokeRect(getOX() - 1, getOY() - 1, GW * CS + 2, GH * CS + 2);
+  ctx.strokeRect(-1, -1, GW * CS + 2, GH * CS + 2);
+
+  ctx.restore(); // конец translate
+
+  // ===== ПУЗЫРИ ТОВАРОВ РИСУЕМ ПОСЛЕ ВСЕГО — В ЭКРАННЫХ КООРДИНАТАХ =====
+  for(const c of customers) drawCustomerBubbleScreen(c);
 }
 
 /* --------- 9a. ГОРОДОК --------- */
 function drawOutside(){
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
-  const sidewalkW = 34;
-  const roadW = 46;
-  const sidewalkOuter = MB;
-  const buildingGap = 12;
+  const sidewalkW = 34 * zoom;
+  const roadW = 46 * zoom;
+  const sidewalkOuter = MB * zoom;
+  const buildingGap = 12 * zoom;
   const ring1 = sidewalkW;
   const ring2 = sidewalkW + roadW;
   const ring3 = ring2 + sidewalkOuter;
   const buildingStart = ring3 + buildingGap;
-  const bgPad = buildingStart + 120;
+  const bgPad = buildingStart + 120 * zoom;
 
   ctx.fillStyle = '#171d26';
   ctx.fillRect(-bgPad, -bgPad, totalW + bgPad * 2, totalH + bgPad * 2);
@@ -1958,14 +1704,12 @@ function drawOutside(){
   drawSideBg(-bgPad, 0, bgPad, totalH);
   drawSideBg(totalW + ring3, 0, bgPad, totalH);
 
-  // Единый слой дороги
   ctx.fillStyle = '#2b2f37';
   ctx.fillRect(-ring2, -ring2, totalW + ring2 * 2, totalH + ring2 * 2);
 
-  // Разметка
   ctx.strokeStyle = 'rgba(255,240,150,.7)';
   ctx.lineWidth = 2.5;
-  ctx.setLineDash([18, 16]);
+  ctx.setLineDash([18 * zoom, 16 * zoom]);
   const midTopY = -(sidewalkW + roadW / 2);
   const midBotY = totalH + sidewalkW + roadW / 2;
   const midLeftX = -(sidewalkW + roadW / 2);
@@ -1976,21 +1720,18 @@ function drawOutside(){
   ctx.beginPath(); ctx.moveTo(midRightX, -ring2); ctx.lineTo(midRightX, totalH + ring2); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Внутренний тротуар
   ctx.fillStyle = '#5a6470';
   ctx.fillRect(-ring1, -ring1, totalW + ring1 * 2, totalH + ring1 * 2);
 
-  // Внешний тротуар
   ctx.fillStyle = '#4f5864';
   ctx.fillRect(-ring3, -ring3, totalW + ring3 * 2, ring3 - ring2);
   ctx.fillRect(-ring3, totalH + ring2, totalW + ring3 * 2, ring3 - ring2);
   ctx.fillRect(-ring3, -ring2, ring3 - ring2, totalH + ring2 * 2);
   ctx.fillRect(totalW + ring2, -ring2, ring3 - ring2, totalH + ring2 * 2);
 
-  // Плитка
   ctx.strokeStyle = 'rgba(0,0,0,.2)';
   ctx.lineWidth = 1;
-  const tile = 16;
+  const tile = 16 * zoom;
   for(let x = -ring1; x <= totalW + ring1; x += tile){
     ctx.beginPath(); ctx.moveTo(x, -ring1); ctx.lineTo(x, 0); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + ring1); ctx.stroke();
@@ -2008,7 +1749,6 @@ function drawOutside(){
     ctx.beginPath(); ctx.moveTo(totalW + ring2, y); ctx.lineTo(totalW + ring3, y); ctx.stroke();
   }
 
-  // Дорожка ко входу
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
@@ -2023,143 +1763,152 @@ function drawOutside(){
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Дома
-  drawBuildingRow(-bgPad, -buildingStart - 70, totalW + bgPad * 2, 70, true);
-  drawBuildingRow(-bgPad, totalH + buildingStart, totalW + bgPad * 2, 70, false);
-  drawBuildingColumn(-buildingStart - 70, -bgPad, 70, totalH + bgPad * 2, true);
-  drawBuildingColumn(totalW + buildingStart, -bgPad, 70, totalH + bgPad * 2, false);
+  const bh = 70 * zoom;
+  const bw = 70 * zoom;
+  drawBuildingRow(-bgPad, -buildingStart - bh, totalW + bgPad * 2, bh, true);
+  drawBuildingRow(-bgPad, totalH + buildingStart, totalW + bgPad * 2, bh, false);
+  drawBuildingColumn(-buildingStart - bw, -bgPad, bw, totalH + bgPad * 2, true);
+  drawBuildingColumn(totalW + buildingStart, -bgPad, bw, totalH + bgPad * 2, false);
 
-  drawBench(totalW + ring1 - 8, totalH / 2);
-  drawBench(-ring1 + 8, totalH / 2);
-  drawLamp(-ring1 + 10, doorY + ring1 / 2);
-  drawTreeCtx(-ring1 + 14, -ring1 + 14);
-  drawTreeCtx(totalW - 14, -ring1 + 14);
-  drawTreeCtx(totalW / 2, -ring1 + 12);
-  drawTreeCtx(-ring1 + 22, totalH + ring1 - 14);
-  drawTreeCtx(totalW - 22, totalH + ring1 - 14);
-  drawBush(-ring1 - 4, totalH - ring1 / 2);
-  drawBush(totalW + ring1 + 4, -ring1 / 2);
+  drawBench(totalW + ring1 - 8 * zoom, totalH / 2);
+  drawBench(-ring1 + 8 * zoom, totalH / 2);
+  drawLamp(-ring1 + 10 * zoom, doorY + ring1 / 2);
+  drawTreeCtx(-ring1 + 14 * zoom, -ring1 + 14 * zoom);
+  drawTreeCtx(totalW - 14 * zoom, -ring1 + 14 * zoom);
+  drawTreeCtx(totalW / 2, -ring1 + 12 * zoom);
+  drawTreeCtx(-ring1 + 22 * zoom, totalH + ring1 - 14 * zoom);
+  drawTreeCtx(totalW - 22 * zoom, totalH + ring1 - 14 * zoom);
+  drawBush(-ring1 - 4 * zoom, totalH - ring1 / 2);
+  drawBush(totalW + ring1 + 4 * zoom, -ring1 / 2);
 }
 
 function drawBuildingRow(x, y, w, h, isTop){
   const colors = ['#2a3a4d','#3a4a5d','#2f4050','#354a5c','#28425c'];
   const roofColors = ['#4a2f2f','#3d3d55','#4a3d2f','#2f4a3d'];
   let cx = x, idx = 0;
+  const zf = zoom;
   while(cx < x + w){
-    const bw = 55 + ((idx * 17) % 35);
-    const bh = h + ((idx * 13) % 25);
+    const bw = (55 + ((idx * 17) % 35)) * zf;
+    const bh = h + ((idx * 13) % 25) * zf;
     const col = colors[idx % colors.length];
     const roofCol = roofColors[idx % roofColors.length];
     const yBase = isTop ? (y + (h - bh)) : y;
     ctx.fillStyle = col;
     ctx.fillRect(cx, yBase, bw, bh);
     ctx.fillStyle = roofCol;
-    if(isTop) ctx.fillRect(cx - 3, yBase - 6, bw + 6, 7);
-    else ctx.fillRect(cx - 3, yBase + bh - 1, bw + 6, 6);
+    if(isTop) ctx.fillRect(cx - 3, yBase - 6 * zf, bw + 6, 7 * zf);
+    else ctx.fillRect(cx - 3, yBase + bh - 1, bw + 6, 6 * zf);
     ctx.fillStyle = 'rgba(255,225,130,.6)';
-    const cols = Math.max(2, Math.floor(bw / 18));
+    const cols = Math.max(2, Math.floor(bw / (18 * zf)));
     for(let i = 0; i < cols; i++){
       for(let j = 0; j < 2; j++){
-        const wx = cx + 6 + i * 16;
-        const wy = yBase + 10 + j * 20;
-        if(wx + 9 < cx + bw - 4 && wy + 12 < yBase + bh - 4){
-          ctx.fillRect(wx, wy, 9, 12);
+        const wx = cx + 6 * zf + i * 16 * zf;
+        const wy = yBase + 10 * zf + j * 20 * zf;
+        if(wx + 9 * zf < cx + bw - 4 && wy + 12 * zf < yBase + bh - 4){
+          ctx.fillRect(wx, wy, 9 * zf, 12 * zf);
         }
       }
     }
-    cx += bw + 8; idx++;
+    cx += bw + 8 * zf; idx++;
   }
 }
 function drawBuildingColumn(x, y, w, h, isLeft){
   const colors = ['#2a3a4d','#3a4a5d','#354a5c'];
   const roofColors = ['#4a2f2f','#3d3d55','#4a3d2f'];
   let cy = y, idx = 0;
+  const zf = zoom;
   while(cy < y + h){
-    const bh = 60 + ((idx * 21) % 40);
-    const bw = w + ((idx * 11) % 20);
+    const bh = (60 + ((idx * 21) % 40)) * zf;
+    const bw = w + ((idx * 11) % 20) * zf;
     const col = colors[idx % colors.length];
     const xBase = isLeft ? (x + (w - bw)) : x;
     ctx.fillStyle = col;
     ctx.fillRect(xBase, cy, bw, bh);
     ctx.fillStyle = roofColors[idx % roofColors.length];
-    if(isLeft) ctx.fillRect(xBase - 6, cy - 3, 7, bh + 6);
-    else ctx.fillRect(xBase + bw - 1, cy - 3, 6, bh + 6);
+    if(isLeft) ctx.fillRect(xBase - 6 * zf, cy - 3, 7 * zf, bh + 6);
+    else ctx.fillRect(xBase + bw - 1, cy - 3, 6 * zf, bh + 6);
     ctx.fillStyle = 'rgba(255,225,130,.55)';
     for(let i = 0; i < 2; i++){
       for(let j = 0; j < 3; j++){
-        const wx = xBase + 8 + i * 20;
-        const wy = cy + 12 + j * 22;
-        if(wx + 10 < xBase + bw - 4 && wy + 12 < cy + bh - 4){
-          ctx.fillRect(wx, wy, 10, 12);
+        const wx = xBase + 8 * zf + i * 20 * zf;
+        const wy = cy + 12 * zf + j * 22 * zf;
+        if(wx + 10 * zf < xBase + bw - 4 && wy + 12 * zf < cy + bh - 4){
+          ctx.fillRect(wx, wy, 10 * zf, 12 * zf);
         }
       }
     }
-    cy += bh + 10; idx++;
+    cy += bh + 10 * zf; idx++;
   }
 }
 function drawBgSkyline(x, y, w, h, isTop){
   ctx.fillStyle = '#20262f';
   let cx = x, idx = 0;
+  const zf = zoom;
   while(cx < x + w){
-    const bw = 40 + ((idx * 19) % 45);
-    const bh = h - 10 - ((idx * 11) % 25);
+    const bw = (40 + ((idx * 19) % 45)) * zf;
+    const bh = h - 10 * zf - ((idx * 11) % 25) * zf;
     const yBase = isTop ? (y + h - bh) : y;
     ctx.fillRect(cx, yBase, bw, bh);
     ctx.fillStyle = 'rgba(255,220,120,.25)';
-    for(let i = 0; i < Math.floor(bw / 20); i++){
-      ctx.fillRect(cx + 6 + i * 20, yBase + 8 + (idx % 3) * 10, 6, 8);
+    for(let i = 0; i < Math.floor(bw / (20 * zf)); i++){
+      ctx.fillRect(cx + 6 * zf + i * 20 * zf, yBase + 8 * zf + (idx % 3) * 10 * zf, 6 * zf, 8 * zf);
     }
     ctx.fillStyle = '#20262f';
-    cx += bw + 6; idx++;
+    cx += bw + 6 * zf; idx++;
   }
 }
 function drawSideBg(x, y, w, h){
   ctx.fillStyle = '#20262f';
   let cy = y, idx = 0;
+  const zf = zoom;
   while(cy < y + h){
-    const bh = 60 + ((idx * 17) % 40);
-    ctx.fillRect(x, cy, w - 10, bh);
+    const bh = (60 + ((idx * 17) % 40)) * zf;
+    ctx.fillRect(x, cy, w - 10 * zf, bh);
     ctx.fillStyle = 'rgba(255,220,120,.2)';
-    for(let j = 0; j < Math.floor(bh / 24); j++){
-      ctx.fillRect(x + 6, cy + 8 + j * 22, 8, 10);
+    for(let j = 0; j < Math.floor(bh / (24 * zf)); j++){
+      ctx.fillRect(x + 6 * zf, cy + 8 * zf + j * 22 * zf, 8 * zf, 10 * zf);
     }
     ctx.fillStyle = '#20262f';
-    cy += bh + 8; idx++;
+    cy += bh + 8 * zf; idx++;
   }
 }
 function drawTreeCtx(x, y){
+  const zf = zoom;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#4a2f1c'; ctx.fillRect(-2, 2, 4, 8);
-  ctx.fillStyle = '#3b7a3f'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#4a8c4e'; ctx.beginPath(); ctx.arc(-3, -2, 7, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(4, -1, 6, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#5da063'; ctx.beginPath(); ctx.arc(-1, -4, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#4a2f1c'; ctx.fillRect(-2 * zf, 2 * zf, 4 * zf, 8 * zf);
+  ctx.fillStyle = '#3b7a3f'; ctx.beginPath(); ctx.arc(0, 0, 9 * zf, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#4a8c4e'; ctx.beginPath(); ctx.arc(-3 * zf, -2 * zf, 7 * zf, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4 * zf, -1 * zf, 6 * zf, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5da063'; ctx.beginPath(); ctx.arc(-1 * zf, -4 * zf, 3.5 * zf, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 }
 function drawLamp(x, y){
+  const zf = zoom;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#3a4149'; ctx.fillRect(-1, -4, 2, 16);
-  ctx.beginPath(); ctx.arc(0, -6, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#3a4149'; ctx.fillRect(-1 * zf, -4 * zf, 2 * zf, 16 * zf);
+  ctx.beginPath(); ctx.arc(0, -6 * zf, 5 * zf, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,235,150,.35)'; ctx.fill();
-  ctx.beginPath(); ctx.arc(0, -6, 3, 0, Math.PI * 2);
+  ctx.beginPath(); ctx.arc(0, -6 * zf, 3 * zf, 0, Math.PI * 2);
   ctx.fillStyle = '#fff1a8'; ctx.fill();
   ctx.restore();
 }
 function drawBench(x, y){
+  const zf = zoom;
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#7a4a22'; ctx.fillRect(-10, -3, 20, 3); ctx.fillRect(-10, 1, 20, 2);
-  ctx.fillStyle = '#5d381a'; ctx.fillRect(-9, -6, 2, 9); ctx.fillRect(7, -6, 2, 9);
+  ctx.fillStyle = '#7a4a22'; ctx.fillRect(-10 * zf, -3 * zf, 20 * zf, 3 * zf); ctx.fillRect(-10 * zf, 1 * zf, 20 * zf, 2 * zf);
+  ctx.fillStyle = '#5d381a'; ctx.fillRect(-9 * zf, -6 * zf, 2 * zf, 9 * zf); ctx.fillRect(7 * zf, -6 * zf, 2 * zf, 9 * zf);
   ctx.restore();
 }
 function drawBush(x, y){
+  const zf = zoom;
   ctx.save();
-  ctx.fillStyle = '#2f6334'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#2f6334'; ctx.beginPath(); ctx.arc(x, y, 6 * zf, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#3d7a42';
-  ctx.beginPath(); ctx.arc(x - 3, y - 1, 4, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + 3, y - 1, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x - 3 * zf, y - 1 * zf, 4 * zf, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 3 * zf, y - 1 * zf, 3.5 * zf, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 }
 function drawWalls(){
@@ -2218,25 +1967,20 @@ function drawFloor(){
 function drawDirt(){
   for(const d of state.dirt){
     const px = d.x * CS, py = d.y * CS;
-    const seed = (d.x * 31 + d.y * 17) % 100;
     if(d.type === 0){
       ctx.fillStyle = 'rgba(90,60,30,.55)';
       ctx.beginPath(); ctx.ellipse(px + CS * 0.35, py + CS * 0.55, CS * 0.22, CS * 0.16, 0.4, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = 'rgba(60,40,20,.5)';
       ctx.beginPath(); ctx.ellipse(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(px + CS * 0.25, py + CS * 0.45, CS * 0.06, 0, Math.PI * 2); ctx.fill();
     } else if(d.type === 1){
       ctx.fillStyle = 'rgba(50,40,30,.5)';
       ctx.beginPath(); ctx.ellipse(px + CS * 0.3, py + CS * 0.4, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2); ctx.fill();
       ctx.beginPath(); ctx.ellipse(px + CS * 0.55, py + CS * 0.55, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(px + CS * 0.4, py + CS * 0.7, CS * 0.08, CS * 0.11, -0.4, 0, Math.PI * 2); ctx.fill();
     } else {
       ctx.fillStyle = 'rgba(230,220,180,.85)';
       ctx.fillRect(px + CS * 0.3, py + CS * 0.4, CS * 0.16, CS * 0.12);
       ctx.fillStyle = 'rgba(180,150,100,.7)';
       ctx.fillRect(px + CS * 0.35, py + CS * 0.42, CS * 0.06, CS * 0.06);
-      ctx.fillStyle = 'rgba(200,180,140,.75)';
-      ctx.fillRect(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09);
     }
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 350);
     ctx.strokeStyle = `rgba(143,211,255,${0.3 + pulse * 0.5})`;
@@ -2361,7 +2105,6 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   }
   ctx.restore();
 }
-
 function drawCustomerBody(c){
   ctx.save();
   ctx.globalAlpha = clamp(c.alpha, 0, 1);
@@ -2378,44 +2121,72 @@ function drawCustomerBody(c){
   ctx.restore();
 }
 
-/* Отдельная функция — рисуется после всех тел */
-function drawCustomerBubble(c){
+/* === ПУЗЫРИ В ЭКРАННЫХ КООРДИНАТАХ — ВСЕГДА ПОВЕРХ === */
+function drawCustomerBubbleScreen(c){
   if(!c.bubble || c.bubbleT <= 0) return;
   const p = PROD_BY_ID[c.bubble];
   if(!p) return;
+  const topbarH = $('#topbar').offsetHeight || 52;
+  const size = Math.max(30, CS * 0.44);
+
+  let sx = getOX() + c.x * CS;
+  let sy = getOY() + (c.y - 0.5) * CS - CS * 0.35;
+
+  // Если пузырь уходит выше топбара — переносим под покупателя
+  let tailUp = true;
+  if(sy - size / 2 < topbarH + 4){
+    sy = getOY() + (c.y + 0.5) * CS + CS * 0.6;
+    tailUp = false;
+  }
+
   ctx.save();
   ctx.globalAlpha = clamp(c.alpha, 0, 1);
-  const bx = c.x, by = c.y - 0.62;
-  // тень пузыря
-  ctx.fillStyle = 'rgba(0,0,0,.35)';
+
+  // тень
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
   if(ctx.roundRect){
-    ctx.beginPath(); ctx.roundRect(bx - 0.18, by - 0.16, 0.4, 0.42, 0.1); ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(sx - size/2 + 3, sy - size/2 + 4, size, size, size*0.22);
+    ctx.fill();
   }
-  // сам пузырь
-  ctx.fillStyle = 'rgba(255,255,255,.97)';
+
+  // пузырь
+  ctx.fillStyle = 'rgba(255,255,255,.98)';
   if(ctx.roundRect){
-    ctx.beginPath(); ctx.roundRect(bx - 0.2, by - 0.2, 0.4, 0.4, 0.1); ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(sx - size/2, sy - size/2, size, size, size*0.22);
+    ctx.fill();
   } else {
-    ctx.fillRect(bx - 0.2, by - 0.2, 0.4, 0.4);
+    ctx.fillRect(sx - size/2, sy - size/2, size, size);
   }
   ctx.strokeStyle = '#4a89ff';
-  ctx.lineWidth = 0.03;
+  ctx.lineWidth = Math.max(2, CS * 0.04);
   ctx.stroke();
+
   // хвостик
+  const tw = size * 0.18;
+  const th = size * 0.24;
   ctx.beginPath();
-  ctx.moveTo(bx - 0.06, by + 0.2);
-  ctx.lineTo(bx, by + 0.28);
-  ctx.lineTo(bx + 0.06, by + 0.2);
+  if(tailUp){
+    ctx.moveTo(sx - tw, sy + size/2 - 1);
+    ctx.lineTo(sx, sy + size/2 + th);
+    ctx.lineTo(sx + tw, sy + size/2 - 1);
+  } else {
+    ctx.moveTo(sx - tw, sy - size/2 + 1);
+    ctx.lineTo(sx, sy - size/2 - th);
+    ctx.lineTo(sx + tw, sy - size/2 + 1);
+  }
   ctx.closePath();
-  ctx.fillStyle = 'rgba(255,255,255,.97)';
+  ctx.fillStyle = 'rgba(255,255,255,.98)';
   ctx.fill();
-  ctx.strokeStyle = '#4a89ff';
   ctx.stroke();
+
   // иконка товара
   const spr = prodSprite(p);
   if(spr && spr.complete && spr.naturalWidth){
-    ctx.drawImage(spr, bx - 0.15, by - 0.15, 0.3, 0.3);
+    ctx.drawImage(spr, sx - size*0.36, sy - size*0.36, size*0.72, size*0.72);
   }
+
   ctx.restore();
 }
 
@@ -2432,7 +2203,6 @@ function drawCashier(){
 /* ------------------------------ 10. ЛОГИКА -------------------------------- */
 const customers = [];
 let spawnTimer = 8;
-
 function updateWorld(dt){
   cashier.update(dt);
   truck.update(dt);
@@ -2458,8 +2228,6 @@ function updateWorld(dt){
     if(state.truckOfferTimer <= 0){ endTruckCycle(); toast(t('truckLeft')); }
   }
 }
-
-/* -------------------- 10b. ОПЫТ / LEVEL UP -------------------------------- */
 function addXP(amount){
   if(amount <= 0) return;
   const before = getLevel();
@@ -2493,7 +2261,7 @@ function showLevelUp(newLevel){
   setTimeout(() => { if(state.music) Music.note(783.99, 0.7, 0.16, 'triangle'); }, 280);
 }
 
-/* -------------------- 10c. ГРУЗОВИК ------------------------------- */
+/* Грузовик */
 function openTruckModal(){
   if(state.truckState !== 'offering') return;
   openModal(t('truckTitle'), el => {
@@ -2510,8 +2278,7 @@ function openTruckModal(){
     accept.className = 'btn'; accept.style.cssText = 'flex:1;padding:13px;font-size:14px';
     accept.textContent = t('truckAccept');
     accept.onclick = async () => {
-      closeModal();
-      showAdOverlay(t('adLoading'));
+      closeModal(); showAdOverlay(t('adLoading'));
       try {
         const res = await vkSend('VKWebAppShowNativeAds', {ad_format: 'reward'});
         hideAdOverlay();
@@ -2520,7 +2287,7 @@ function openTruckModal(){
           endTruckCycle(); updateHUD(); scheduleSave();
           toast(t('bonusActive') + ' +2\u00D7 (' + TRUCK_BONUS + 's)', '#ffd257');
           if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
-        } else { toast(t('adNotAvailable')); }
+        } else toast(t('adNotAvailable'));
       } catch(e){ hideAdOverlay(); toast(t('adNotAvailable')); }
     };
     const decline = document.createElement('button');
@@ -2532,7 +2299,7 @@ function openTruckModal(){
   });
 }
 
-/* -------------------- 10d. НАГРАДЫ ЗА ВРЕМЯ ------------------------------- */
+/* Награды за время */
 function checkTimeRewards(){
   const mins = state.playtime / 60;
   for(let i = 0; i < TIME_REWARDS.length; i++){
@@ -2593,14 +2360,8 @@ function openTimeRewards(){
       row.appendChild(ic); row.appendChild(nm); row.appendChild(b);
       el.appendChild(row);
     });
-    const foot = document.createElement('div');
-    foot.style.cssText = 'margin-top:12px;color:#8798ad;font-size:11.5px;text-align:center';
-    foot.textContent = state.lang === 'en' ? 'New rewards unlock as you play' : 'Новые награды открываются со временем игры';
-    el.appendChild(foot);
   });
 }
-
-/* -------------------- 10e. ПРОКАЧКИ ------------------------------- */
 function openUpgrades(){
   openModal(t('upgrades'), el => {
     const top = document.createElement('div');
@@ -2622,8 +2383,7 @@ function openUpgrades(){
       nm.className = 'nm';
       nm.innerHTML = `<b>${uname(key)} <span style="color:#8798ad;font-size:11px">${lvl}/${u.max}</span></b><span>${udesc(key)}</span>`;
       const pr = document.createElement('div');
-      pr.className = 'pr';
-      pr.textContent = maxed ? t('maxed') : fmt(cost);
+      pr.className = 'pr'; pr.textContent = maxed ? t('maxed') : fmt(cost);
       const b = document.createElement('button');
       b.className = 'btn' + (canBuy ? '' : ' ghost');
       b.textContent = maxed ? '\u2713' : t('buyUpgrade');
@@ -2641,13 +2401,28 @@ function openUpgrades(){
     });
   });
 }
-
-/* -------------------- 10f. ПЕРЕРОЖДЕНИЕ ------------------------------- */
+function doPrestige(){
+  const savedLang = state.lang;
+  const savedMusic = state.music;
+  const savedTutorial = state.tutorialDone;
+  const savedUpgrades = JSON.parse(JSON.stringify(state.upgrades));
+  const newPrestige = state.prestige + 1;
+  state = newState();
+  state.lang = savedLang;
+  state.music = savedMusic;
+  state.tutorialDone = savedTutorial;
+  state.upgrades = savedUpgrades;
+  state.prestige = newPrestige;
+  initGrid();
+  checkDailyReset();
+  updateHUD(); scheduleSave();
+  toast(t('prestigeDone') + ' +5%', '#ffd257');
+  if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
+}
 function openPrestige(){
   openModal(t('prestige'), el => {
     const lvl = getLevel();
     const bonusPct = Math.round(PRESTIGE_BONUS * state.prestige * 100);
-    const nextBonusPct = Math.round(PRESTIGE_BONUS * (state.prestige + 1) * 100);
     const info = document.createElement('div');
     info.style.cssText = 'text-align:center;padding:8px';
     info.innerHTML = `
@@ -2655,10 +2430,8 @@ function openPrestige(){
       <div style="font-size:16px;font-weight:800;color:#ffd257;margin-top:6px">+${bonusPct}%</div>
       <div style="font-size:12px;color:#8798ad;margin-top:4px">${fmtStr(t('prestigeBonusTotal'), {n: bonusPct})}</div>
       <div style="margin-top:10px" class="chip">${fmtStr(t('prestigeTotal'), {n: state.prestige})}</div>
-      <div style="margin-top:8px" class="chip">${t('level')} ${lvl} / ${PRESTIGE_LEVEL}</div>
-    `;
+      <div style="margin-top:8px" class="chip">${t('level')} ${lvl} / ${PRESTIGE_LEVEL}</div>`;
     el.appendChild(info);
-
     if(!canPrestige()){
       const w = document.createElement('div');
       w.style.cssText = 'margin-top:14px;color:#8798ad;font-size:13px;text-align:center;padding:10px';
@@ -2694,27 +2467,6 @@ function openPrestige(){
       el.appendChild(b);
     }
   });
-}
-
-function doPrestige(){
-  const savedLang = state.lang;
-  const savedMusic = state.music;
-  const savedTutorial = state.tutorialDone;
-  const savedUpgrades = JSON.parse(JSON.stringify(state.upgrades));
-  const newPrestige = state.prestige + 1;
-
-  state = newState();
-  state.lang = savedLang;
-  state.music = savedMusic;
-  state.tutorialDone = savedTutorial;
-  state.upgrades = savedUpgrades;
-  state.prestige = newPrestige;
-  initGrid();
-  checkDailyReset();
-  updateHUD();
-  scheduleSave();
-  toast(t('prestigeDone') + ' +5%', '#ffd257');
-  if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
 }
 
 /* ------------------------------- 11. ВВОД ---------------------------------- */
@@ -2763,10 +2515,7 @@ function onCellClick(gx, gy){
       if(state.warehouse[placeMode.pid] <= 0) delete state.warehouse[placeMode.pid];
       state.ds.stock += added;
       scheduleSave(); updateHUD();
-      if(tutorialStep === 3){
-        tutorialStep = 4;
-        updateTutorialBlock(); showTutorialHint();
-      }
+      if(tutorialStep === 3){ tutorialStep = 4; updateTutorialBlock(); showTutorialHint(); }
     } else { toast(t('shelfFull')); return; }
     if(!state.warehouse[placeMode.pid]){ placeMode = null; updatePlaceBar(); }
     return;
@@ -2786,15 +2535,45 @@ function onCellClick(gx, gy){
   if(c.t && c.t !== 'counter'){ openShelfInfo(gx, gy); }
 }
 
+/* === Pointer events с поддержкой пинч-зума === */
 canvas.addEventListener('pointerdown', e => {
   if($('#modalRoot').style.display === 'block') return;
-  dragging = true; dragMoved = false;
-  dragStartX = e.clientX; dragStartY = e.clientY;
-  dragBaseCamX = camX; dragBaseCamY = camY;
-  canvas.classList.add('dragging');
+  activePointers.set(e.pointerId, {x: e.clientX, y: e.clientY});
+
+  if(activePointers.size === 2){
+    // Начинаем пинч
+    dragging = false;
+    dragMoved = false;
+    canvas.classList.remove('dragging');
+    const pts = [...activePointers.values()];
+    pinchStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    pinchStartZoom = zoom;
+  } else if(activePointers.size === 1){
+    // Обычное перетаскивание
+    dragging = true;
+    dragMoved = false;
+    dragStartX = e.clientX; dragStartY = e.clientY;
+    dragBaseCamX = camX; dragBaseCamY = camY;
+    canvas.classList.add('dragging');
+  }
   try { canvas.setPointerCapture(e.pointerId); } catch(_){}
 });
+
 canvas.addEventListener('pointermove', e => {
+  if(activePointers.has(e.pointerId)){
+    activePointers.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  }
+  // Пинч-зум
+  if(activePointers.size === 2){
+    const pts = [...activePointers.values()];
+    const d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    if(pinchStartDist > 0){
+      const newZoom = pinchStartZoom * (d / pinchStartDist);
+      setZoom(newZoom);
+    }
+    return;
+  }
+  // Панорамирование
   if(!dragging) return;
   const dx = e.clientX - dragStartX;
   const dy = e.clientY - dragStartY;
@@ -2805,22 +2584,47 @@ canvas.addEventListener('pointermove', e => {
     clampCamera();
   }
 });
-function endDrag(e){
-  if(!dragging) return;
-  const wasMoved = dragMoved;
-  dragging = false; dragMoved = false;
-  canvas.classList.remove('dragging');
-  try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
-  if(!wasMoved){
-    const wld = screenToWorld(e.clientX, e.clientY);
-    if(truck.hitTest(wld.x, wld.y)){ openTruckModal(); return; }
-    const cell = screenToCell(e.clientX, e.clientY);
-    if(cell) onCellClick(cell.x, cell.y);
+
+function pointerUpHandler(e){
+  activePointers.delete(e.pointerId);
+  if(activePointers.size < 2) pinchStartDist = 0;
+
+  if(activePointers.size === 0){
+    if(dragging){
+      const wasMoved = dragMoved;
+      dragging = false; dragMoved = false;
+      canvas.classList.remove('dragging');
+      try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
+      if(!wasMoved){
+        const wld = screenToWorld(e.clientX, e.clientY);
+        if(truck.hitTest(wld.x, wld.y)){ openTruckModal(); return; }
+        const cell = screenToCell(e.clientX, e.clientY);
+        if(cell) onCellClick(cell.x, cell.y);
+      }
+    }
   }
 }
-canvas.addEventListener('pointerup', endDrag);
-canvas.addEventListener('pointercancel', () => { dragging = false; dragMoved = false; canvas.classList.remove('dragging'); });
+canvas.addEventListener('pointerup', pointerUpHandler);
+canvas.addEventListener('pointercancel', e => {
+  activePointers.delete(e.pointerId);
+  if(activePointers.size < 2) pinchStartDist = 0;
+  if(activePointers.size === 0){
+    dragging = false; dragMoved = false;
+    canvas.classList.remove('dragging');
+  }
+});
 canvas.addEventListener('dblclick', () => { camX = 0; camY = 0; clampCamera(); });
+
+/* Зум колесом мыши (в т.ч. Ctrl+wheel на тачпадах) */
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const k = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+  setZoom(zoom * k);
+}, {passive: false});
+
+/* Кнопки зума */
+$('#zoomIn').onclick = () => setZoom(zoom * 1.25);
+$('#zoomOut').onclick = () => setZoom(zoom / 1.25);
 
 /* ------------------------------- 12. UI ----------------------------------- */
 function toast(msg, color){
@@ -2837,7 +2641,6 @@ function toast(msg, color){
     setTimeout(() => d.remove(), 320);
   }, 1500);
 }
-
 function updateHUD(){
   $('#moneyVal').textContent = fmt(state.money);
   $('#cellsVal').textContent = unlockedCount();
@@ -2853,31 +2656,21 @@ function updateHUD(){
   const canDaily = state.lastDaily !== todayStr();
   $('#dailyBadge').style.display = canDaily ? 'block' : 'none';
 
-  // Престиж
   const pc = $('#prestigeChip');
-  if(state.prestige > 0){
-    pc.style.display = 'flex';
-    $('#prestigeVal').textContent = state.prestige;
-  } else {
-    pc.style.display = 'none';
-  }
+  if(state.prestige > 0){ pc.style.display = 'flex'; $('#prestigeVal').textContent = state.prestige; }
+  else pc.style.display = 'none';
 
-  // Бонус x2
   const bonusChip = $('#bonusChip');
   if(hasIncomeBonus()){
     const left = Math.ceil((state.bonusUntil - Date.now()) / 1000);
     bonusChip.style.display = 'flex';
     $('#bonusTime').textContent = 'x2 ' + left + (state.lang === 'en' ? 's' : 'с');
-  } else {
-    bonusChip.style.display = 'none';
-  }
+  } else bonusChip.style.display = 'none';
 
-  // Точка на наградах
   const dot = $('#timeRewardDot');
   if(hasClaimableTimeReward()) dot.style.display = 'block';
   else dot.style.display = 'none';
 }
-
 function updatePlaceBar(){
   const bar = $('#placeBar');
   if(!placeMode){ bar.style.display = 'none'; bar.innerHTML = ''; return; }
@@ -2895,7 +2688,6 @@ function updatePlaceBar(){
   btn.onclick = () => { placeMode = null; updatePlaceBar(); };
   bar.appendChild(btn);
 }
-
 function openModal(titleText, builder){
   const root = $('#modalRoot');
   root.style.display = 'block';
@@ -2925,9 +2717,7 @@ function closeModal(){
   $('#modalRoot').innerHTML = '';
   $('#modalRoot').style.display = 'none';
 }
-
 let shopCurCat = 'all';
-
 function openShop(){
   openModal(t('shop'), el => {
     let curTab = 'items';
@@ -2943,7 +2733,6 @@ function openShop(){
     catSel.className = 'cat-sel';
     catSel.style.cssText = 'display:flex;gap:5px;overflow-x:auto;padding:8px 2px;';
     const content = document.createElement('div');
-
     function renderContent(){
       content.innerHTML = '';
       if(curTab === 'items') renderItems();
@@ -2951,7 +2740,6 @@ function openShop(){
       else if(curTab === 'decor') renderDecor();
       else renderExpand();
     }
-
     function renderItems(){
       content.innerHTML = '';
       catSel.style.display = 'flex';
@@ -2960,8 +2748,7 @@ function openShop(){
       cats.forEach(ck => {
         const chip = document.createElement('div');
         chip.className = 'tab' + (shopCurCat === ck ? ' active' : '');
-        chip.style.padding = '6px 11px';
-        chip.style.fontSize = '12px';
+        chip.style.padding = '6px 11px'; chip.style.fontSize = '12px';
         chip.textContent = ck === 'all' ? (state.lang === 'en' ? 'All' : 'Все') : catName(ck);
         chip.onclick = () => { shopCurCat = ck; renderItems(); };
         catSel.appendChild(chip);
@@ -2976,8 +2763,7 @@ function openShop(){
           const arr = byCat[ck];
           if(!arr.length) return;
           const hdr = document.createElement('div');
-          hdr.className = 'cat-header';
-          hdr.textContent = catName(ck);
+          hdr.className = 'cat-header'; hdr.textContent = catName(ck);
           content.appendChild(hdr);
           const grid = document.createElement('div');
           grid.className = 'grid2';
@@ -2991,7 +2777,6 @@ function openShop(){
         content.appendChild(grid);
       }
     }
-
     function makeProductRow(p, lvl){
       const unlocked = lvl >= productLevel(p);
       const row = document.createElement('div');
@@ -3033,7 +2818,6 @@ function openShop(){
       }
       return row;
     }
-
     function buyProduct(pid, count){
       const p = PROD_BY_ID[pid];
       if(getLevel() < productLevel(p)){ toast(t('locked'), '#e0575b'); return; }
@@ -3050,10 +2834,8 @@ function openShop(){
       toast(t('bought') + ': ' + pname(p) + ' \u00D7' + bought, '#7fd07f');
       if(tutorialStep === 2){ tutorialStep = 3; updateTutorialBlock(); showTutorialHint(); }
     }
-
     function renderFurniture(){
-      content.innerHTML = '';
-      catSel.style.display = 'none';
+      content.innerHTML = ''; catSel.style.display = 'none';
       Object.keys(FURNITURE).forEach(k => {
         const f = FURNITURE[k];
         const row = document.createElement('div');
@@ -3085,10 +2867,8 @@ function openShop(){
         content.appendChild(row);
       });
     }
-
     function renderDecor(){
-      content.innerHTML = '';
-      catSel.style.display = 'none';
+      content.innerHTML = ''; catSel.style.display = 'none';
       const tw = document.createElement('div');
       tw.className = 'sec-title'; tw.textContent = t('walls');
       content.appendChild(tw);
@@ -3155,10 +2935,8 @@ function openShop(){
         content.appendChild(row);
       });
     }
-
     function renderExpand(){
-      content.innerHTML = '';
-      catSel.style.display = 'none';
+      content.innerHTML = ''; catSel.style.display = 'none';
       const lvl = getLevel();
       const maxCells = maxCellsForLevel(lvl);
       const cur = unlockedCount();
@@ -3181,7 +2959,6 @@ function openShop(){
       btn.onclick = closeModal;
       content.appendChild(btn);
     }
-
     tabsData.forEach(td => {
       const el = document.createElement('div');
       el.className = 'tab' + (curTab === td.id ? ' active' : '');
@@ -3194,14 +2971,12 @@ function openShop(){
       };
       tabs.appendChild(el);
     });
-
     el.appendChild(tabs);
     el.appendChild(catSel);
     el.appendChild(content);
     renderContent();
   });
 }
-
 function countFurniture(k){
   let n = 0;
   for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -3210,7 +2985,6 @@ function countFurniture(k){
   }
   return n;
 }
-
 function openWarehouse(){
   openModal(t('warehouse'), el => {
     const total = warehouseTotal();
@@ -3245,8 +3019,7 @@ function openWarehouse(){
       b.className = 'btn'; b.textContent = t('place');
       b.onclick = () => {
         placeMode = {kind: 'stock', pid};
-        updatePlaceBar();
-        closeModal();
+        updatePlaceBar(); closeModal();
         toast(t('tapShelf'));
       };
       row.appendChild(ic); row.appendChild(nm); row.appendChild(b);
@@ -3254,7 +3027,6 @@ function openWarehouse(){
     });
   });
 }
-
 function autoStock(){
   const shelves = shelfCells();
   let moved = 0;
@@ -3276,9 +3048,8 @@ function autoStock(){
     state.ds.stock += moved;
     toast(t('stocked') + ': ' + moved, '#7fd07f');
     updateHUD(); scheduleSave();
-  } else { toast(t('noSlots')); }
+  } else toast(t('noSlots'));
 }
-
 function openShelfInfo(gx, gy){
   const c = cellAt(gx, gy);
   if(!c || !c.t) return;
@@ -3287,8 +3058,7 @@ function openShelfInfo(gx, gy){
     info.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
     info.innerHTML = `<div class="chip">${t('total')}: ${shelfQty(c)} / ${shelfCapacity(c)}</div>`;
     const bar = document.createElement('div');
-    bar.className = 'progressbar';
-    bar.style.flex = '1';
+    bar.className = 'progressbar'; bar.style.flex = '1';
     const ratio = shelfCapacity(c) > 0 ? shelfQty(c) / shelfCapacity(c) : 0;
     bar.innerHTML = `<i style="width:${(ratio*100).toFixed(0)}%"></i>`;
     info.appendChild(bar);
@@ -3338,10 +3108,8 @@ function openShelfInfo(gx, gy){
     el.appendChild(del);
   });
 }
-
 function openSettings(){
   openModal(t('settings'), el => {
-    // Табы внутри настроек
     const tabs = document.createElement('div');
     tabs.className = 'tabs';
     tabs.style.marginBottom = '8px';
@@ -3352,14 +3120,12 @@ function openSettings(){
     ];
     let curTab = 'main';
     const content = document.createElement('div');
-
     function renderContent(){
       content.innerHTML = '';
       if(curTab === 'main') renderMain();
       else if(curTab === 'upgrades') renderUpgradesTab();
       else renderPrestigeTab();
     }
-
     function renderMain(){
       const r1 = document.createElement('div');
       r1.className = 'row';
@@ -3387,10 +3153,8 @@ function openSettings(){
         b.textContent = code.toUpperCase();
         b.onclick = () => {
           state.lang = code;
-          scheduleSave();
-          applyLang();
-          closeModal();
-          openSettings();
+          scheduleSave(); applyLang();
+          closeModal(); openSettings();
         };
         lg.appendChild(b);
       });
@@ -3400,14 +3164,12 @@ function openSettings(){
       const tt = document.createElement('div');
       tt.className = 'sec-title'; tt.textContent = t('promo');
       content.appendChild(tt);
-
       const box = document.createElement('div');
       box.style.cssText = 'display:flex;gap:7px';
       const inp = document.createElement('input');
       inp.type = 'text'; inp.placeholder = '...'; inp.maxLength = 20;
       const ab = document.createElement('button');
-      ab.className = 'btn';
-      ab.textContent = t('apply');
+      ab.className = 'btn'; ab.textContent = t('apply');
       ab.onclick = async () => {
         const code = inp.value.trim().toLowerCase();
         if(code === 'clear12'){
@@ -3420,11 +3182,10 @@ function openSettings(){
           updateHUD(); scheduleSave();
           inp.value = '';
           toast(t('promoOk') + ' +1 000 000 \u20BF', '#ffd257');
-        } else { toast(t('promoBad'), '#e0575b'); }
+        } else toast(t('promoBad'), '#e0575b');
       };
       box.appendChild(inp); box.appendChild(ab);
       content.appendChild(box);
-
       const rb = document.createElement('button');
       rb.className = 'btn r';
       rb.style.cssText = 'width:100%;padding:11px;margin-top:16px';
@@ -3432,7 +3193,6 @@ function openSettings(){
       rb.onclick = () => renderConfirm();
       content.appendChild(rb);
     }
-
     function renderConfirm(){
       content.innerHTML = '';
       const icon = document.createElement('div');
@@ -3449,11 +3209,7 @@ function openSettings(){
       yes.className = 'btn r';
       yes.style.cssText = 'flex:1;padding:13px;font-size:14px';
       yes.textContent = t('yesReset');
-      yes.onclick = async () => {
-        await wipeSave(); closeModal();
-        toast(t('progressReset'), '#e0575b');
-        updateHUD();
-      };
+      yes.onclick = async () => { await wipeSave(); closeModal(); toast(t('progressReset'), '#e0575b'); updateHUD(); };
       const no = document.createElement('button');
       no.className = 'btn ghost';
       no.style.cssText = 'flex:1;padding:13px;font-size:14px';
@@ -3462,7 +3218,6 @@ function openSettings(){
       row.appendChild(yes); row.appendChild(no);
       content.appendChild(row);
     }
-
     function renderUpgradesTab(){
       const top = document.createElement('div');
       top.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
@@ -3483,8 +3238,7 @@ function openSettings(){
         nm.className = 'nm';
         nm.innerHTML = `<b>${uname(key)} <span style="color:#8798ad;font-size:11px">${lvl}/${u.max}</span></b><span>${udesc(key)}</span>`;
         const pr = document.createElement('div');
-        pr.className = 'pr';
-        pr.textContent = maxed ? t('maxed') : fmt(cost);
+        pr.className = 'pr'; pr.textContent = maxed ? t('maxed') : fmt(cost);
         const b = document.createElement('button');
         b.className = 'btn' + (canBuy ? '' : ' ghost');
         b.textContent = maxed ? '\u2713' : t('buyUpgrade');
@@ -3501,7 +3255,6 @@ function openSettings(){
         content.appendChild(row);
       });
     }
-
     function renderPrestigeTab(){
       const lvl = getLevel();
       const bonusPct = Math.round(PRESTIGE_BONUS * state.prestige * 100);
@@ -3525,8 +3278,8 @@ function openSettings(){
         b.style.cssText = 'width:100%;padding:14px;font-size:15px;margin-top:14px';
         b.textContent = t('prestigeBtn') + ' (+5%)';
         b.onclick = () => {
-          const q = document.createElement('div');
           content.innerHTML = '';
+          const q = document.createElement('div');
           q.style.cssText = 'text-align:center;padding:20px 10px;font-size:14.5px;font-weight:600;line-height:1.5';
           q.textContent = t('prestigeConfirm');
           content.appendChild(q);
@@ -3548,7 +3301,6 @@ function openSettings(){
         content.appendChild(b);
       }
     }
-
     tabList.forEach(td => {
       const el = document.createElement('div');
       el.className = 'tab' + (curTab === td.id ? ' active' : '');
@@ -3561,13 +3313,11 @@ function openSettings(){
       };
       tabs.appendChild(el);
     });
-
     el.appendChild(tabs);
     el.appendChild(content);
     renderContent();
   });
 }
-
 function openTasks(){
   checkDailyReset();
   openModal(t('tasks'), el => {
@@ -3581,8 +3331,7 @@ function openTasks(){
       const row = document.createElement('div');
       row.className = 'row';
       const nm = document.createElement('div');
-      nm.className = 'nm';
-      nm.style.flex = '1';
+      nm.className = 'nm'; nm.style.flex = '1';
       nm.innerHTML = `<b>${taskText(tk)}</b>
         <span>${prog} / ${tk.target} \u00B7 ${t('reward')}: ${tk.reward} \u20BF</span>
         <div class="progressbar"><i style="width:${(prog / tk.target * 100).toFixed(0)}%"></i></div>`;
@@ -3604,7 +3353,6 @@ function openTasks(){
     });
   });
 }
-
 function openDaily(){
   openModal(t('daily'), el => {
     const today = todayStr();
@@ -3636,8 +3384,7 @@ function openDaily(){
       if(!canTake) return;
       state.money += amounts[dayIdx];
       addXP(Math.max(1, Math.round(amounts[dayIdx] * 0.5 * xpMul())));
-      state.lastDaily = today;
-      state.streak++;
+      state.lastDaily = today; state.streak++;
       updateHUD(); scheduleSave();
       toast('+' + fmt(amounts[dayIdx]) + ' \u20BF', '#ffd257');
       closeModal();
@@ -3645,7 +3392,6 @@ function openDaily(){
     el.appendChild(btn);
   });
 }
-
 function showAdOverlay(text){
   $('#overlayText').textContent = text || t('adLoading');
   $('#overlay').style.display = 'flex';
@@ -3655,19 +3401,14 @@ function hideAdOverlay(){
   $('#overlay').style.display = 'none';
   if(state.music) Music.start();
 }
-
-/* ---- обучение ---- */
 let tutorialStep = 0;
 function isTutorialBlocking(){ return tutorialStep > 0 && !state.tutorialDone; }
 function updateTutorialBlock(){
   document.body.classList.toggle('tutorial-on', isTutorialBlocking());
   document.querySelectorAll('.botbtn, .iconbtn').forEach(b => b.classList.remove('tutorial-active'));
   if(!isTutorialBlocking()) return;
-  if(tutorialStep === 2){
-    document.getElementById('btnShop').classList.add('tutorial-active');
-  } else if(tutorialStep === 3){
-    document.getElementById('btnStock').classList.add('tutorial-active');
-  }
+  if(tutorialStep === 2){ document.getElementById('btnShop').classList.add('tutorial-active'); }
+  else if(tutorialStep === 3){ document.getElementById('btnStock').classList.add('tutorial-active'); }
 }
 function showTutorialHint(){
   const hint = $('#hint');
@@ -3683,23 +3424,20 @@ function showTutorialHint(){
     const b = document.createElement('button');
     b.className = 'btn'; b.textContent = t('next');
     b.onclick = () => { tutorialStep = 2; updateTutorialBlock(); showTutorialHint(); };
-    row.appendChild(b);
-    hint.appendChild(row);
+    row.appendChild(b); hint.appendChild(row);
   } else if(tutorialStep === 4){
     const row = document.createElement('div');
     row.className = 'hintrow';
     const b = document.createElement('button');
     b.className = 'btn'; b.textContent = t('finish');
     b.onclick = () => {
-      state.tutorialDone = true;
-      tutorialStep = 0;
+      state.tutorialDone = true; tutorialStep = 0;
       updateTutorialBlock();
       hint.style.display = 'none';
       scheduleSave();
       toast(t('tutorialComplete'), '#7fd07f');
     };
-    row.appendChild(b);
-    hint.appendChild(row);
+    row.appendChild(b); hint.appendChild(row);
   }
 }
 function startTutorial(){
@@ -3823,16 +3561,8 @@ async function boot(){
 }
 
 /* ------------------------------ 16. СОБЫТИЯ ------------------------------- */
-$('#btnShop').onclick = () => {
-  if(paused) return;
-  if(isTutorialBlocking() && tutorialStep !== 2) return;
-  openShop();
-};
-$('#btnStock').onclick = () => {
-  if(paused) return;
-  if(isTutorialBlocking() && tutorialStep !== 3) return;
-  openWarehouse();
-};
+$('#btnShop').onclick = () => { if(paused) return; if(isTutorialBlocking() && tutorialStep !== 2) return; openShop(); };
+$('#btnStock').onclick = () => { if(paused) return; if(isTutorialBlocking() && tutorialStep !== 3) return; openWarehouse(); };
 $('#btnTimeRewards').onclick = () => { if(!paused && !isTutorialBlocking()) openTimeRewards(); };
 $('#btnUpgrades').onclick = () => { if(!paused && !isTutorialBlocking()) openUpgrades(); };
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
@@ -3840,9 +3570,8 @@ $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(
 $('#btnSettings').onclick = () => { if(!paused && !isTutorialBlocking()) openSettings(); };
 $('#btnInvite').onclick = () => {
   if(paused || isTutorialBlocking()) return;
-  vkSend('VKWebAppShowInviteBox').then(() => {
-    toast(t('inviteSent'), '#7fd07f');
-  }).catch(() => { toast(t('inviteUnavailable')); });
+  vkSend('VKWebAppShowInviteBox').then(() => { toast(t('inviteSent'), '#7fd07f'); })
+    .catch(() => { toast(t('inviteUnavailable')); });
 };
 window.addEventListener('resize', () => { if(state) resize(); });
 window.addEventListener('orientationchange', () => setTimeout(() => { if(state) resize(); }, 250));
