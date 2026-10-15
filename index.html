@@ -23,9 +23,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 .tabs::-webkit-scrollbar-thumb,
 .cat-sel::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#3b4d66,#2a3648);border-radius:8px;
   border:1px solid #1b2330}
-.modal-body::-webkit-scrollbar-thumb:hover,
-.tabs::-webkit-scrollbar-thumb:hover,
-.cat-sel::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4a89ff,#2d6cdf)}
 .modal-body,.tabs,.cat-sel{scrollbar-width:thin;scrollbar-color:#3b4d66 #0f151d}
 
 #topbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;gap:6px;
@@ -41,6 +38,8 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 #lvlChip .lvlXP{height:4px;border-radius:2px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:2px}
 #lvlChip .lvlXP i{display:block;height:100%;background:linear-gradient(90deg,#ffd257,#ff9500);
   border-radius:2px;transition:width .3s}
+#prestigeChip{background:linear-gradient(180deg,#c9a227,#8a6a10);border-color:#ffd257;color:#fff;
+  font-size:11px;font-weight:800;display:none;gap:3px}
 #bonusChip{background:linear-gradient(180deg,#e06b1c,#a8420c);border-color:#ffb070;color:#fff;
   font-size:12px;font-weight:800;display:none;gap:4px;animation:bonusPulse 1s ease-in-out infinite}
 @keyframes bonusPulse{50%{box-shadow:0 0 14px rgba(255,150,60,.85)}}
@@ -139,6 +138,7 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
 .btn.g{background:#2e8b57}
 .btn.r{background:#c0392b}
 .btn.y{background:#b8860b}
+.btn.gold{background:linear-gradient(180deg,#c9a227,#8a6a10);color:#fff}
 .btn.ghost{background:#26313f;color:#cfe0f5}
 .btn.locked{background:#2b3648;color:#8798ad}
 .btn:disabled{opacity:.45;pointer-events:none}
@@ -196,6 +196,9 @@ input[type=text]:focus{border-color:#4a89ff}
       <div class="ln"><span data-i18n="lvlShort">Ур.</span><b id="lvlVal">1</b></div>
       <div class="lvlXP"><i id="lvlBar" style="width:0%"></i></div>
     </div>
+    <div class="stat" id="prestigeChip">
+      <span>★</span><b id="prestigeVal">0</b>
+    </div>
     <div class="stat" id="bonusChip">
       <svg viewBox="0 0 24 24" width="16" height="16"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="#ffd257" stroke="#8a6a10" stroke-width="1.2" stroke-linejoin="round"/></svg>
       <span id="bonusTime">x2</span>
@@ -205,6 +208,9 @@ input[type=text]:focus{border-color:#4a89ff}
       <span id="cellsVal">0</span>
     </div>
     <div class="spacer"></div>
+    <button class="iconbtn" id="btnUpgrades" title="Улучшения">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/></svg>
+    </button>
     <button class="iconbtn" id="btnTasks" title="Задания">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>
       <span class="badge" id="taskBadge" style="display:none">0</span>
@@ -255,35 +261,33 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН v6
+   МАГАЗИН v7
    ========================================================================= */
 'use strict';
 
-/* ------------------------- 1. КОНСТАНТЫ И ДАННЫЕ ------------------------- */
+/* ------------------------- 1. КОНСТАНТЫ ------------------------- */
 const GW = 11, GH = 10;
 const DOOR = {x: 0, y: 5};
 const OUT_MARGIN = 100;
 const TRUCK_CYCLE = 180;
 const TRUCK_OFFER = 120;
 const TRUCK_BONUS = 120;
-// Наценка. Чем меньше — тем дольше игра. Раньше было 10%, теперь 4%.
 const MARKUP = 1.04;
-const MIN_MARKUP = 1; // минимум +1 монета
 
 const CATS = {
-  dairy:    {ru:'Молочное',   en:'Dairy',      c:'#8fd3ff'},
-  bakery:   {ru:'Выпечка',    en:'Bakery',     c:'#e8c07d'},
-  meat:     {ru:'Мясо',       en:'Meat',       c:'#e07a7a'},
-  fish:     {ru:'Рыба',       en:'Fish',       c:'#7ac7e0'},
-  fruits:   {ru:'Фрукты',     en:'Fruits',     c:'#f6a23c'},
-  veg:      {ru:'Овощи',      en:'Vegetables', c:'#7fd07f'},
-  drinks:   {ru:'Напитки',    en:'Drinks',     c:'#7a9ee0'},
-  sweets:   {ru:'Сладкое',    en:'Sweets',     c:'#e08fc0'},
-  snacks:   {ru:'Снеки',      en:'Snacks',     c:'#d9b25c'},
-  grocery:  {ru:'Бакалея',    en:'Grocery',    c:'#c2a37a'},
-  canned:   {ru:'Консервы',   en:'Canned',     c:'#a0a0b0'},
-  frozen:   {ru:'Заморозка',  en:'Frozen',     c:'#9fd8e8'},
-  household:{ru:'Бытовая химия', en:'Household', c:'#b0b8c0'}
+  dairy:{ru:'Молочное',en:'Dairy',c:'#8fd3ff'},
+  bakery:{ru:'Выпечка',en:'Bakery',c:'#e8c07d'},
+  meat:{ru:'Мясо',en:'Meat',c:'#e07a7a'},
+  fish:{ru:'Рыба',en:'Fish',c:'#7ac7e0'},
+  fruits:{ru:'Фрукты',en:'Fruits',c:'#f6a23c'},
+  veg:{ru:'Овощи',en:'Vegetables',c:'#7fd07f'},
+  drinks:{ru:'Напитки',en:'Drinks',c:'#7a9ee0'},
+  sweets:{ru:'Сладкое',en:'Sweets',c:'#e08fc0'},
+  snacks:{ru:'Снеки',en:'Snacks',c:'#d9b25c'},
+  grocery:{ru:'Бакалея',en:'Grocery',c:'#c2a37a'},
+  canned:{ru:'Консервы',en:'Canned',c:'#a0a0b0'},
+  frozen:{ru:'Заморозка',en:'Frozen',c:'#9fd8e8'},
+  household:{ru:'Бытовая химия',en:'Household',c:'#b0b8c0'}
 };
 
 const P_RAW = [
@@ -319,22 +323,22 @@ const P_RAW = [
 ['Минтай','Pollock','fish','tray',130],
 ['Скумбрия','Mackerel','fish','tray',140],
 ['Кальмар','Squid','fish','tray',160],
-['Яблоко','Apple','fruits','round',15],
-['Банан','Banana','fruits','round',20],
-['Апельсин','Orange','fruits','round',25],
-['Груша','Pear','fruits','round',22],
-['Виноград','Grapes','fruits','bunch',60],
-['Киви','Kiwi','fruits','round',30],
-['Персик','Peach','fruits','round',35],
+['Яблоко','Apple','fruits','apple',15],
+['Банан','Banana','fruits','banana',20],
+['Апельсин','Orange','fruits','orange',25],
+['Груша','Pear','fruits','pear',22],
+['Виноград','Grapes','fruits','grapes',60],
+['Киви','Kiwi','fruits','kiwi',30],
+['Персик','Peach','fruits','peach',35],
 ['Ананас','Pineapple','fruits','pineapple',120],
-['Картофель','Potato','veg','bag',10],
-['Морковь','Carrot','veg','bunch',12],
-['Лук','Onion','veg','round',9],
-['Помидор','Tomato','veg','round',18],
-['Огурец','Cucumber','veg','cylinder',16],
-['Капуста','Cabbage','veg','round',14],
-['Перец','Pepper','veg','round',24],
-['Брокколи','Broccoli','veg','tree',40],
+['Картофель','Potato','veg','potato',10],
+['Морковь','Carrot','veg','carrot',12],
+['Лук','Onion','veg','onion',9],
+['Помидор','Tomato','veg','tomato',18],
+['Огурец','Cucumber','veg','cucumber',16],
+['Капуста','Cabbage','veg','cabbage',14],
+['Перец','Pepper','veg','pepper',24],
+['Брокколи','Broccoli','veg','broccoli',40],
 ['Вода','Water','drinks','bottle',15],
 ['Сок','Juice','drinks','tetra',45],
 ['Кола','Cola','drinks','can',55],
@@ -389,90 +393,119 @@ const P_RAW = [
 ['Порошок','Detergent','household','box',200]
 ];
 
-// Наценка 4% (минимум +1 монета)
 const PRODUCTS = P_RAW.map((p, i) => ({
   id: i + 1,
   ru: p[0], en: p[1],
   cat: p[2],
   shape: p[3],
   cost: p[4],
-  sell: Math.max(p[4] + MIN_MARKUP, Math.round(p[4] * MARKUP)),
+  sell: Math.max(p[4] + 1, Math.round(p[4] * MARKUP)),
   color: CATS[p[2]].c
 }));
 const PROD_BY_ID = {};
 PRODUCTS.forEach(p => PROD_BY_ID[p.id] = p);
-
 function productLevel(p){ return Math.floor((p.id - 1) / 10) + 1; }
 
 const FURNITURE = {
-  shelf:   {ru:'Полка',        en:'Shelf',    cost:120, cap:6,  accepts:null},
-  rack:    {ru:'Стеллаж',      en:'Rack',     cost:320, cap:12, accepts:null},
-  fridge:  {ru:'Холодильник',  en:'Fridge',   cost:520, cap:8,  accepts:['dairy','meat','fish','frozen','drinks']},
-  counter: {ru:'Касса',        en:'Cashier',  cost:280, cap:0,  accepts:[]}
+  shelf:{ru:'Полка',en:'Shelf',cost:120,cap:6,accepts:null},
+  rack:{ru:'Стеллаж',en:'Rack',cost:320,cap:12,accepts:null},
+  fridge:{ru:'Холодильник',en:'Fridge',cost:520,cap:8,accepts:['dairy','meat','fish','frozen','drinks']},
+  counter:{ru:'Касса',en:'Cashier',cost:280,cap:0,accepts:[]}
 };
 
 const WALLS = [
-  {ru:'Классика', en:'Classic', cost:0,    floor:'#e9e2d3', line:'#d2c8b4'},
-  {ru:'Металл',   en:'Metal',   cost:1500, floor:'#cfd8e0', line:'#b2bfcb'},
-  {ru:'Дерево',   en:'Wood',    cost:2600, floor:'#dcb98d', line:'#c5a071'},
-  {ru:'Мрамор',   en:'Marble',  cost:5200, floor:'#f2f2f6', line:'#dcdce6'},
-  {ru:'Неон',     en:'Neon',    cost:9000, floor:'#1d2a3a', line:'#2f4a68'}
+  {ru:'Классика',en:'Classic',cost:0,floor:'#e9e2d3',line:'#d2c8b4'},
+  {ru:'Металл',en:'Metal',cost:1500,floor:'#cfd8e0',line:'#b2bfcb'},
+  {ru:'Дерево',en:'Wood',cost:2600,floor:'#dcb98d',line:'#c5a071'},
+  {ru:'Мрамор',en:'Marble',cost:5200,floor:'#f2f2f6',line:'#dcdce6'},
+  {ru:'Неон',en:'Neon',cost:9000,floor:'#1d2a3a',line:'#2f4a68'}
 ];
-
 const WINDOWS = [
-  {ru:'Обычное',    en:'Plain',     cost:0},
-  {ru:'Панорамное', en:'Panoramic', cost:2000},
-  {ru:'Витраж',     en:'Stained',   cost:4500}
+  {ru:'Обычное',en:'Plain',cost:0},
+  {ru:'Панорамное',en:'Panoramic',cost:2000},
+  {ru:'Витраж',en:'Stained',cost:4500}
 ];
 
 const TASK_DEFS = [
-  {id:'sell',   ru:'Продать {n} товаров',           en:'Sell {n} items',        min:20, max:60,  rew:n=>Math.round(n*4)},
-  {id:'earn',   ru:'Заработать {n} монет',          en:'Earn {n} coins',        min:800,max:2500,rew:n=>Math.round(n*0.28)},
-  {id:'serve',  ru:'Обслужить {n} покупателей',     en:'Serve {n} customers',   min:6,  max:18,  rew:n=>Math.round(n*22)},
-  {id:'buy',    ru:'Купить {n} товаров',            en:'Buy {n} products',      min:25, max:70,  rew:n=>Math.round(n*4)},
-  {id:'place',  ru:'Установить {n} мебели',         en:'Place {n} furniture',   min:2,  max:6,   rew:n=>Math.round(n*70)},
-  {id:'stock',  ru:'Разложить {n} товаров на полки',en:'Stock {n} items',       min:20, max:55,  rew:n=>Math.round(n*4)},
-  {id:'expand', ru:'Расширить магазин на {n} клеток',en:'Expand by {n} cells',  min:2,  max:6,   rew:n=>Math.round(n*80)}
+  {id:'sell',ru:'Продать {n} товаров',en:'Sell {n} items',min:20,max:60,rew:n=>Math.round(n*4)},
+  {id:'earn',ru:'Заработать {n} монет',en:'Earn {n} coins',min:800,max:2500,rew:n=>Math.round(n*0.28)},
+  {id:'serve',ru:'Обслужить {n} покупателей',en:'Serve {n} customers',min:6,max:18,rew:n=>Math.round(n*22)},
+  {id:'buy',ru:'Купить {n} товаров',en:'Buy {n} products',min:25,max:70,rew:n=>Math.round(n*4)},
+  {id:'place',ru:'Установить {n} мебели',en:'Place {n} furniture',min:2,max:6,rew:n=>Math.round(n*70)},
+  {id:'stock',ru:'Разложить {n} товаров',en:'Stock {n} items',min:20,max:55,rew:n=>Math.round(n*4)},
+  {id:'expand',ru:'Расширить на {n} клеток',en:'Expand by {n} cells',min:2,max:6,rew:n=>Math.round(n*80)}
 ];
 
 const TIME_REWARDS = [
-  {min:5,   amount:120},
-  {min:10,  amount:200},
-  {min:20,  amount:380},
-  {min:35,  amount:650},
-  {min:50,  amount:950},
-  {min:70,  amount:1400},
-  {min:100, amount:2000}
+  {min:5,amount:120},
+  {min:10,amount:200},
+  {min:20,amount:380},
+  {min:35,amount:650},
+  {min:50,amount:950},
+  {min:70,amount:1400},
+  {min:100,amount:2000}
 ];
+
+/* Прокачки */
+const UPGRADES = {
+  spawn: {
+    name:{ru:'Скорость клиентов',en:'Customer rate'},
+    desc:{ru:'+10% к частоте появления',en:'+10% spawn rate'},
+    costs:[500,1500,4000,10000,25000], max:5
+  },
+  income: {
+    name:{ru:'Прибыль',en:'Profit'},
+    desc:{ru:'+2% к доходу',en:'+2% income'},
+    costs:[1000,2500,6000,15000,35000,80000,180000,400000,900000,2000000], max:10
+  },
+  speed: {
+    name:{ru:'Проворство',en:'Agility'},
+    desc:{ru:'+15% к скорости ходьбы',en:'+15% walk speed'},
+    costs:[800,2500,8000], max:3
+  },
+  xp: {
+    name:{ru:'Опыт',en:'XP gain'},
+    desc:{ru:'+10% опыта за продажи',en:'+10% XP from sales'},
+    costs:[1200,3500,9000,22000,50000], max:5
+  },
+  cap: {
+    name:{ru:'Вместимость',en:'Capacity'},
+    desc:{ru:'+1 место на полке',en:'+1 shelf slot'},
+    costs:[2000,6000,15000,40000], max:4
+  }
+};
+
+const PRESTIGE_LEVEL = 10;
+const PRESTIGE_BONUS = 0.05;
 
 const STR = {
   ru:{
-    shop:'Магазин', warehouse:'Склад', friends:'Друзья', settings:'Настройки', rewards:'Награды',
-    tasks:'Задания', daily:'Ежедневная награда', close:'Закрыть', buy:'Купить',
-    cancel:'Отмена', place:'Разместить', money:'Монеты', music:'Музыка', language:'Язык',
-    promo:'Промокод', apply:'Применить', tutorialQ:'Хотите пройти обучение?',
-    tutorialYes:'Пройти обучение', tutorialSkip:'Пропустить', items:'Товары', furniture:'Мебель',
-    decor:'Оформление', autoStock:'Разложить всё',
-    nothing:'Пусто', reward:'Награда', claim:'Забрать', claimed:'Получено', take:'Получить',
-    remove:'Убрать', done:'Готово', adLoading:'Загрузка рекламы...', onlineReward:'Награда за игру',
-    walls:'Стены', windows:'Окна', lvlShort:'Ур.', apply2:'Применить',
-    promoOk:'Промокод активирован!', promoBad:'Неверный промокод',
-    noMoney:'Недостаточно монет', placed:'Установлено',
-    bought:'Куплено', expandHint:'Нажмите на тёмную клетку рядом',
-    streak:'Серия дней', dailyTaken:'Уже получено сегодня', stockEmpty:'Склад пуст — купите товар в магазине',
-    tapShelf:'Нажмите на полку, чтобы разложить товар', adDone:'Награда за рекламу получена!',
-    shelfInfo:'Информация о полке', total:'Всего', slots:'мест', onMap:'На карте',
+    shop:'Магазин',warehouse:'Склад',friends:'Друзья',settings:'Настройки',rewards:'Награды',
+    tasks:'Задания',daily:'Ежедневная награда',close:'Закрыть',buy:'Купить',
+    cancel:'Отмена',place:'Разместить',money:'Монеты',music:'Музыка',language:'Язык',
+    promo:'Промокод',apply:'Применить',tutorialQ:'Хотите пройти обучение?',
+    tutorialYes:'Пройти обучение',tutorialSkip:'Пропустить',items:'Товары',furniture:'Мебель',
+    decor:'Оформление',expand:'Расширение',autoStock:'Разложить всё',
+    nothing:'Пусто',reward:'Награда',claim:'Забрать',claimed:'Получено',take:'Получить',
+    remove:'Убрать',done:'Готово',adLoading:'Загрузка рекламы...',onlineReward:'Награда за игру',
+    walls:'Стены',windows:'Окна',lvlShort:'Ур.',apply2:'Применить',
+    promoOk:'Промокод активирован!',promoBad:'Неверный промокод',
+    noMoney:'Недостаточно монет',placed:'Установлено',
+    bought:'Куплено',expandHint:'Нажмите на тёмную клетку рядом',
+    streak:'Серия дней',dailyTaken:'Уже получено сегодня',stockEmpty:'Склад пуст — купите товар в магазине',
+    tapShelf:'Нажмите на полку, чтобы разложить товар',adDone:'Награда за рекламу получена!',
+    shelfInfo:'Информация о полке',total:'Всего',slots:'мест',onMap:'На карте',
     tutorial1:'Добро пожаловать! Это ваш магазин. Нажмите «Далее».',
     tutorial2:'Откройте «Магазин» и купите хотя бы один товар.',
     tutorial3:'Откройте «Склад», выберите товар и разместите на полку.',
     tutorial4:'Отлично! Теперь ждите покупателей и зарабатывайте.',
     tutorial5:'Готово! Ваш магазин работает. Удачи!',
-    next:'Далее', finish:'Завершить', emptyShelf:'Пусто',
-    locked:'Заблокировано', requires:'Требуется', level:'Ур.',
-    levelUp:'НОВЫЙ УРОВЕНЬ!', levelUpSub:'Открыты новые товары и клетки!',
-    maxCells:'Достигнут лимит клеток для этого уровня',
+    next:'Далее',finish:'Завершить',emptyShelf:'Пусто',
+    locked:'Заблокировано',requires:'Требуется',level:'Ур.',
+    levelUp:'НОВЫЙ УРОВЕНЬ!',levelUpSub:'Открыты новые товары и клетки!',
+    maxCells:'Достигнут лимит клеток',
     truckTitle:'🚚 Грузовик с акцией!',
-    truckDesc:'Смотрите рекламу и получите x2 доход с продаж на 2 минуты!',
+    truckDesc:'Смотрите рекламу и получите x2 доход на 2 минуты!',
     truckAccept:'Смотреть рекламу',
     truckDecline:'Прогнать',
     dirtClean:'+опыт за уборку!',
@@ -482,7 +515,7 @@ const STR = {
     tooFar:'Слишком далеко',
     adNotAvailable:'Реклама недоступна',
     noCashierReturn:'Нет кассы — товар возвращён',
-    truckArrived:'🚚 Приехал грузовик с акцией! Нажмите!',
+    truckArrived:'🚚 Грузовик с акцией! Нажмите!',
     truckLeft:'🚚 Грузовик уехал',
     tapEmptyCell:'Нажмите на свободную клетку',
     tutorialComplete:'Обучение завершено!',
@@ -495,43 +528,66 @@ const STR = {
     confirmReset:'Вы точно хотите сбросить весь прогресс? Это действие нельзя отменить!',
     yesReset:'Да, сбросить',
     progressReset:'Прогресс сброшен',
-    // Награды за время
     timeRewards:'Награды за время',
-    timeRewardsDesc:'Играйте и получайте награды за проведённое время',
+    timeRewardsDesc:'Играйте и получайте награды. Прогресс сбрасывается при новом заходе.',
     timePlayed:'Вы играете',
-    minShort:'мин',
-    secShort:'сек',
+    minShort:'мин',secShort:'сек',
     rewardAvailable:'Доступна награда за игру!',
-    notYet:'Ещё не достигнуто',
     needMore:'Нужно ещё',
-    x2BonusLeft:'x2 осталось',
-    sellAt:'Продажа за'
+    sellAt:'Продажа за',
+    // Прокачки
+    upgrades:'Улучшения',
+    buyUpgrade:'Купить',
+    maxed:'Максимум',
+    upgradeLevel:'Ур.',
+    noUpgrades:'Нет доступных улучшений',
+    // Перерождение
+    prestige:'Перерождение',
+    prestigeChip:'★',
+    prestigeBonus:'+{n}% к доходу навсегда',
+    prestigeCurrent:'Текущий бонус перерождений: +{n}%',
+    prestigeReady:'Готово к перерождению!',
+    prestigeRequires:'Требуется уровень {n}',
+    prestigeBtn:'Переродиться',
+    prestigeConfirmTitle:'Перерождение',
+    prestigeConfirm:'Переродиться? Уровень, опыт, деньги и магазин сбросятся, но вы навсегда получите +5% к доходу.',
+    prestigeYes:'Переродиться',
+    prestigeDone:'Перерождение совершено!',
+    prestigeTotal:'Перерождений: {n}',
+    prestigeBonusTotal:'Общий бонус: +{n}%',
+    settingsTabMain:'Основные',
+    settingsTabUpgrades:'Улучшения',
+    settingsTabPrestige:'Перерождение',
+    // Реклама
+    adModalTitle:'Подождите',
+    // Задания: точное совпадение
+    taskRefresh:'Обновление'
   },
   en:{
-    shop:'Shop', warehouse:'Storage', friends:'Friends', settings:'Settings', rewards:'Rewards',
-    tasks:'Tasks', daily:'Daily reward', close:'Close', buy:'Buy',
-    cancel:'Cancel', place:'Place', money:'Coins', music:'Music', language:'Language',
-    promo:'Promo code', apply:'Apply', tutorialQ:'Would you like a tutorial?',
-    tutorialYes:'Start tutorial', tutorialSkip:'Skip', items:'Products', furniture:'Furniture',
-    decor:'Decor', autoStock:'Auto-stock',
-    nothing:'Empty', reward:'Reward', claim:'Claim', claimed:'Claimed', take:'Get',
-    remove:'Remove', done:'Done', adLoading:'Loading ad...', onlineReward:'Playtime reward',
-    walls:'Walls', windows:'Windows', lvlShort:'Lv.', apply2:'Apply',
-    promoOk:'Promo code activated!', promoBad:'Invalid promo code',
-    noMoney:'Not enough coins', placed:'Placed',
-    bought:'Purchased', expandHint:'Tap a dark cell nearby',
-    streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty — buy goods in the Shop',
-    tapShelf:'Tap a shelf to place goods', adDone:'Ad reward received!',
-    shelfInfo:'Shelf info', total:'Total', slots:'slots', onMap:'On map',
+    shop:'Shop',warehouse:'Storage',friends:'Friends',settings:'Settings',rewards:'Rewards',
+    tasks:'Tasks',daily:'Daily reward',close:'Close',buy:'Buy',
+    cancel:'Cancel',place:'Place',money:'Coins',music:'Music',language:'Language',
+    promo:'Promo code',apply:'Apply',tutorialQ:'Would you like a tutorial?',
+    tutorialYes:'Start tutorial',tutorialSkip:'Skip',items:'Products',furniture:'Furniture',
+    decor:'Decor',expand:'Expansion',autoStock:'Auto-stock',
+    nothing:'Empty',reward:'Reward',claim:'Claim',claimed:'Claimed',take:'Get',
+    remove:'Remove',done:'Done',adLoading:'Loading ad...',onlineReward:'Playtime reward',
+    walls:'Walls',windows:'Windows',lvlShort:'Lv.',apply2:'Apply',
+    promoOk:'Promo code activated!',promoBad:'Invalid promo code',
+    noMoney:'Not enough coins',placed:'Placed',
+    bought:'Purchased',expandHint:'Tap a dark cell nearby',
+    streak:'Day streak',dailyTaken:'Already claimed today',stockEmpty:'Storage is empty',
+    tapShelf:'Tap a shelf to place goods',adDone:'Ad reward received!',
+    shelfInfo:'Shelf info',total:'Total',slots:'slots',onMap:'On map',
     tutorial1:'Welcome! This is your shop. Tap Next to continue.',
     tutorial2:'Open the Shop and buy at least one item.',
     tutorial3:'Open Storage, pick an item and place it on a shelf.',
     tutorial4:'Great! Now wait for customers and earn money.',
     tutorial5:'Done! Your shop is running. Good luck!',
-    next:'Next', finish:'Finish', emptyShelf:'Empty',
-    locked:'Locked', requires:'Requires', level:'Lv.',
-    levelUp:'NEW LEVEL!', levelUpSub:'New products and cells unlocked!',
-    maxCells:'Cell limit reached for this level',
+    next:'Next',finish:'Finish',emptyShelf:'Empty',
+    locked:'Locked',requires:'Requires',level:'Lv.',
+    levelUp:'NEW LEVEL!',levelUpSub:'New products and cells unlocked!',
+    maxCells:'Cell limit reached',
     truckTitle:'🚚 Sale truck!',
     truckDesc:'Watch an ad and get x2 income for 2 minutes!',
     truckAccept:'Watch ad',
@@ -543,7 +599,7 @@ const STR = {
     tooFar:'Too far',
     adNotAvailable:'Ad not available',
     noCashierReturn:'No cashier — goods returned',
-    truckArrived:'🚚 Sale truck arrived! Tap it!',
+    truckArrived:'🚚 Sale truck! Tap it!',
     truckLeft:'🚚 Truck left',
     tapEmptyCell:'Tap an empty cell',
     tutorialComplete:'Tutorial complete!',
@@ -556,17 +612,36 @@ const STR = {
     confirmReset:'Are you sure you want to reset all progress? This cannot be undone!',
     yesReset:'Yes, reset',
     progressReset:'Progress reset',
-    // Time rewards
     timeRewards:'Time rewards',
-    timeRewardsDesc:'Play and earn rewards for the time spent',
+    timeRewardsDesc:'Play and earn rewards. Progress resets on re-entry.',
     timePlayed:'You have played',
-    minShort:'min',
-    secShort:'sec',
+    minShort:'min',secShort:'sec',
     rewardAvailable:'Time reward available!',
-    notYet:'Not reached yet',
     needMore:'Need more',
-    x2BonusLeft:'x2 left',
-    sellAt:'Sells for'
+    sellAt:'Sells for',
+    upgrades:'Upgrades',
+    buyUpgrade:'Buy',
+    maxed:'Maxed',
+    upgradeLevel:'Lv.',
+    noUpgrades:'No upgrades available',
+    prestige:'Prestige',
+    prestigeChip:'★',
+    prestigeBonus:'+{n}% income forever',
+    prestigeCurrent:'Current prestige bonus: +{n}%',
+    prestigeReady:'Ready to prestige!',
+    prestigeRequires:'Level {n} required',
+    prestigeBtn:'Prestige',
+    prestigeConfirmTitle:'Prestige',
+    prestigeConfirm:'Prestige? Your level, XP, money and shop will reset, but you permanently gain +5% income.',
+    prestigeYes:'Prestige',
+    prestigeDone:'Prestige complete!',
+    prestigeTotal:'Prestiges: {n}',
+    prestigeBonusTotal:'Total bonus: +{n}%',
+    settingsTabMain:'Main',
+    settingsTabUpgrades:'Upgrades',
+    settingsTabPrestige:'Prestige',
+    adModalTitle:'Please wait',
+    taskRefresh:'Refresh'
   }
 };
 
@@ -574,27 +649,29 @@ function t(k){ const L = STR[state.lang] || STR.ru; return L[k] !== undefined ? 
 function pname(p){ return state.lang === 'en' ? p.en : p.ru; }
 function catName(c){ return state.lang === 'en' ? CATS[c].en : CATS[c].ru; }
 function fname(k){ return state.lang === 'en' ? FURNITURE[k].en : FURNITURE[k].ru; }
+function uname(k){ const u = UPGRADES[k]; if(!u) return ''; return state.lang === 'en' ? u.name.en : u.name.ru; }
+function udesc(k){ const u = UPGRADES[k]; if(!u) return ''; return state.lang === 'en' ? u.desc.en : u.desc.ru; }
 
 /* ------------------------------- 2. УТИЛИТЫ ------------------------------- */
 const $ = s => document.querySelector(s);
 const canvas = $('#game');
 const ctx = canvas.getContext('2d');
 
-function rnd(a, b){ return a + Math.random() * (b - a); }
-function randInt(a, b){ return Math.floor(rnd(a, b + 1)); }
+function rnd(a,b){ return a + Math.random() * (b - a); }
+function randInt(a,b){ return Math.floor(rnd(a,b+1)); }
 function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-function clamp(v, a, b){ return v < a ? a : (v > b ? b : v); }
+function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 function hexToRgb(h){
-  h = h.replace('#', '');
+  h = h.replace('#','');
   if(h.length === 3) h = h.split('').map(c => c + c).join('');
-  return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
+  return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];
 }
-function rgbToHex(r, g, b){
+function rgbToHex(r,g,b){
   return '#' + [r,g,b].map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join('');
 }
-function shade(hex, amt){
+function shade(hex,amt){
   const [r,g,b] = hexToRgb(hex);
-  return rgbToHex(r+amt, g+amt, b+amt);
+  return rgbToHex(r+amt,g+amt,b+amt);
 }
 function todayStr(){
   const d = new Date();
@@ -605,7 +682,7 @@ function fmt(n){
   if(n >= 1e4) return (n/1e3).toFixed(1) + 'K';
   return String(Math.floor(n));
 }
-function lerpAngle(a, b, k){
+function lerpAngle(a,b,k){
   let d = ((b - a + Math.PI) % (Math.PI*2)) - Math.PI;
   if(d < -Math.PI) d += Math.PI*2;
   return a + d * k;
@@ -615,8 +692,11 @@ function fmtTime(sec){
   const s = Math.floor(sec % 60);
   return m + ' ' + t('minShort') + ' ' + s + ' ' + t('secShort');
 }
+function fmtStr(str, obj){
+  return str.replace(/\{(\w+)\}/g, (m,k) => obj[k] !== undefined ? obj[k] : m);
+}
 
-/* --------------------- 2b. УРОВНИ И БОНУСЫ -------------------------------- */
+/* --------------------- 2b. УРОВНИ/БОНУСЫ/ПРОКАЧКИ ------------------------ */
 function cumulativeXP(level){ return 250 * level * (level - 1); }
 function getLevel(){
   let lvl = 1;
@@ -631,7 +711,24 @@ function xpProgress(){
 }
 function maxCellsForLevel(lvl){ return Math.min(36 + (lvl - 1) * 6, GW * GH); }
 function hasIncomeBonus(){ return state.bonusUntil > Date.now(); }
-function incomeMultiplier(){ return hasIncomeBonus() ? 2 : 1; }
+
+function upgradeLevel(key){ return (state.upgrades && state.upgrades[key]) || 0; }
+function upgradeMul(key, step){
+  return 1 + step * upgradeLevel(key);
+}
+
+function incomeMultiplier(){
+  let m = 1;
+  m *= (1 + 0.02 * upgradeLevel('income'));
+  m *= (1 + PRESTIGE_BONUS * state.prestige);
+  if(hasIncomeBonus()) m *= 2;
+  return m;
+}
+function spawnRateMul(){ return 1 + 0.10 * upgradeLevel('spawn'); }
+function speedMul(){ return 1 + 0.15 * upgradeLevel('speed'); }
+function xpMul(){ return 1 + 0.10 * upgradeLevel('xp'); }
+function extraCapacity(){ return upgradeLevel('cap'); }
+function canPrestige(){ return getLevel() >= PRESTIGE_LEVEL; }
 
 /* --------------------------- 3. SVG-СПРАЙТЫ ------------------------------- */
 const SPRITES = {};
@@ -688,11 +785,146 @@ function furnitureSVG(type){
   return '';
 }
 
+/* Улучшенные SVG товаров с правильными цветами для фруктов */
 function productSVG(shape, color){
   const dark = shade(color, -65);
   const light = shade(color, 55);
   let inner = '';
   switch(shape){
+    /* ---------- ФРУКТЫ (свои цвета) ---------- */
+    case 'apple':
+      inner = `<path d="M50 26 Q32 22 26 44 Q20 68 32 84 Q44 96 50 88 Q56 96 68 84 Q80 68 74 44 Q68 22 50 26 Z"
+        fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 26 Q50 14 56 8" fill="none" stroke="#5a4a1a" stroke-width="3.5" stroke-linecap="round"/>
+        <ellipse cx="64" cy="14" rx="11" ry="6" fill="#3d7a42" stroke="#2a5a2e" stroke-width="2" transform="rotate(25 64 14)"/>
+        <ellipse cx="38" cy="48" rx="5" ry="8" fill="#fff" opacity=".45"/>
+        <path d="M50 30 Q46 45 50 60" fill="none" stroke="#a01a1a" stroke-width="1.5" opacity=".5"/>`;
+      break;
+    case 'banana':
+      inner = `<path d="M14 26 Q10 68 46 88 Q86 92 90 54 Q84 74 60 76 Q30 72 30 42 Q26 26 14 26 Z"
+        fill="#f6d24c" stroke="#9a7c0d" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M18 30 Q30 48 38 60 Q48 72 64 74" fill="none" stroke="#d4b018" stroke-width="2" opacity=".7"/>
+        <circle cx="14" cy="26" r="3" fill="#7a5a08"/>
+        <path d="M88 54 Q92 58 92 64" fill="none" stroke="#7a5a08" stroke-width="3" stroke-linecap="round"/>
+        <path d="M78 82 Q84 82 90 54" fill="none" stroke="#b89a1a" stroke-width="1.5" opacity=".5"/>`;
+      break;
+    case 'orange':
+      inner = `<circle cx="50" cy="58" r="34" fill="#f68a1c" stroke="#a04a08" stroke-width="3.5"/>
+        <path d="M50 24 L50 8" stroke="#7a5a1a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="58" cy="18" rx="10" ry="5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(20 58 18)"/>
+        <path d="M28 42 Q50 34 72 42 M26 58 Q50 50 74 58 M28 74 Q50 66 72 74 M34 88 Q50 84 66 88" fill="none" stroke="#c05a08" stroke-width="1.2" opacity=".55"/>
+        <ellipse cx="38" cy="46" rx="7" ry="9" fill="#fff" opacity=".35"/>`;
+      break;
+    case 'pear':
+      inner = `<path d="M50 20 Q42 20 42 34 Q42 42 34 52 Q22 68 30 82 Q42 96 50 88 Q58 96 70 82 Q78 68 66 52 Q58 42 58 34 Q58 20 50 20 Z"
+        fill="#c8d84c" stroke="#6a7a10" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 20 Q50 12 54 6" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="60" cy="14" rx="8" ry="4.5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(30 60 14)"/>
+        <ellipse cx="40" cy="60" rx="5" ry="9" fill="#fff" opacity=".35"/>
+        <circle cx="58" cy="52" r="2" fill="#8a9a30" opacity=".6"/>
+        <circle cx="42" cy="68" r="2" fill="#8a9a30" opacity=".6"/>`;
+      break;
+    case 'grapes':
+      inner = `<path d="M50 12 Q50 18 44 22" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="58" cy="14" rx="10" ry="5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(-20 58 14)"/>
+        <circle cx="50" cy="34" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="36" cy="44" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="64" cy="44" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="50" cy="56" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="36" cy="66" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="64" cy="66" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="50" cy="78" r="11" fill="#8b5fbf" stroke="#4a2a70" stroke-width="2.2"/>
+        <circle cx="46" cy="32" r="2.5" fill="#fff" opacity=".7"/>
+        <circle cx="32" cy="42" r="2" fill="#fff" opacity=".6"/>
+        <circle cx="46" cy="54" r="2" fill="#fff" opacity=".6"/>`;
+      break;
+    case 'kiwi':
+      inner = `<ellipse cx="50" cy="58" rx="32" ry="34" fill="#8a6a3a" stroke="#4a3a1a" stroke-width="3.5"/>
+        <ellipse cx="50" cy="58" rx="24" ry="26" fill="#8ac04c"/>
+        <ellipse cx="50" cy="58" rx="10" ry="12" fill="#f0f0e0"/>
+        <circle cx="50" cy="58" r="2" fill="#8a6a3a"/>
+        <path d="M50 32 L50 44 M50 72 L50 84 M26 58 L38 58 M62 58 L74 58 M32 40 L42 48 M58 68 L68 76 M32 76 L42 68 M58 48 L68 40" stroke="#1a2a10" stroke-width="1" opacity=".8"/>
+        <ellipse cx="38" cy="40" rx="4" ry="6" fill="#fff" opacity=".15"/>`;
+      break;
+    case 'peach':
+      inner = `<path d="M50 24 Q32 22 24 44 Q20 68 34 84 Q44 94 50 88 Q56 94 66 84 Q80 68 76 44 Q68 22 50 24 Z"
+        fill="#f5a47c" stroke="#b05530" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 24 Q50 24 50 88" fill="none" stroke="#c06a40" stroke-width="1.5" opacity=".7"/>
+        <path d="M50 24 Q50 12 56 6" fill="none" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round"/>
+        <ellipse cx="64" cy="14" rx="11" ry="5.5" fill="#3d7a42" stroke="#2a5a2e" stroke-width="1.8" transform="rotate(25 64 14)"/>
+        <ellipse cx="38" cy="48" rx="5" ry="8" fill="#fff" opacity=".4"/>`;
+      break;
+    case 'pineapple':
+      inner = `<path d="M28 40 Q28 22 50 22 Q72 22 72 40 L76 82 Q76 94 50 94 Q24 94 24 82 Z"
+        fill="#f0b820" stroke="#7a5a10" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 22 L40 4 M50 22 L48 2 M50 22 L58 4 M50 22 L32 12 M50 22 L68 12" stroke="#3d7a42" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <path d="M36 44 L36 86 M50 40 L50 92 M64 44 L64 86" stroke="#a07a10" stroke-width="1.8" fill="none" opacity=".6"/>
+        <path d="M28 58 L72 58 M28 72 L72 72 M28 84 L72 84" stroke="#a07a10" stroke-width="1.8" fill="none" opacity=".6"/>`;
+      break;
+    case 'potato':
+      inner = `<ellipse cx="50" cy="58" rx="34" ry="26" fill="#c09060" stroke="#7a5530" stroke-width="3.5" transform="rotate(-15 50 58)"/>
+        <circle cx="38" cy="50" r="3" fill="#5a3a1a" opacity=".6"/>
+        <circle cx="62" cy="58" r="2.5" fill="#5a3a1a" opacity=".6"/>
+        <circle cx="48" cy="70" r="2" fill="#5a3a1a" opacity=".6"/>
+        <circle cx="58" cy="44" r="1.8" fill="#5a3a1a" opacity=".6"/>
+        <ellipse cx="36" cy="46" rx="7" ry="5" fill="#fff" opacity=".3"/>`;
+      break;
+    case 'carrot':
+      inner = `<path d="M50 92 L32 40 Q32 28 50 28 Q68 28 68 40 Z"
+        fill="#f08030" stroke="#a04a10" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M40 50 L34 46 M44 60 L36 58 M46 70 L40 68 M56 50 L62 46 M56 60 L64 58 M54 70 L60 68" stroke="#a04a10" stroke-width="1.6" fill="none"/>
+        <path d="M50 28 Q48 18 42 12 M50 28 Q50 16 50 8 M50 28 Q54 18 60 14" stroke="#3d7a42" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <ellipse cx="44" cy="38" rx="3" ry="6" fill="#fff" opacity=".3"/>`;
+      break;
+    case 'onion':
+      inner = `<path d="M50 30 Q30 34 26 56 Q26 82 50 88 Q74 82 74 56 Q70 34 50 30 Z"
+        fill="#c08a4a" stroke="#7a5010" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 30 Q50 14 44 8 M50 30 Q50 16 50 6 M50 30 Q54 16 60 10" stroke="#5a4a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M40 40 Q36 60 40 82 M50 36 Q50 60 50 86 M60 40 Q64 60 60 82" fill="none" stroke="#8a6010" stroke-width="1.4" opacity=".6"/>
+        <ellipse cx="40" cy="52" rx="4" ry="7" fill="#fff" opacity=".3"/>`;
+      break;
+    case 'tomato':
+      inner = `<circle cx="50" cy="60" r="32" fill="#e03c2c" stroke="#7a1a10" stroke-width="3.5"/>
+        <path d="M50 30 L50 22 M50 30 Q42 22 36 20 M50 30 Q58 22 64 20 M50 30 Q46 22 42 16 M50 30 Q54 22 58 16" stroke="#3d7a42" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="38" cy="50" rx="6" ry="8" fill="#fff" opacity=".35"/>
+        <path d="M30 78 Q50 82 70 78" fill="none" stroke="#a01a10" stroke-width="1.5" opacity=".4"/>`;
+      break;
+    case 'cucumber':
+      inner = `<rect x="34" y="14" width="32" height="74" rx="16" fill="#5ca030" stroke="#2a5a10" stroke-width="3.5"/>
+        <circle cx="44" cy="30" r="1.5" fill="#3a7a20" opacity=".7"/>
+        <circle cx="56" cy="42" r="1.5" fill="#3a7a20" opacity=".7"/>
+        <circle cx="44" cy="56" r="1.5" fill="#3a7a20" opacity=".7"/>
+        <circle cx="56" cy="70" r="1.5" fill="#3a7a20" opacity=".7"/>
+        <circle cx="50" cy="82" r="1.5" fill="#3a7a20" opacity=".7"/>
+        <rect x="40" y="20" width="3" height="60" rx="1.5" fill="#fff" opacity=".35"/>
+        <path d="M40 16 L44 12 M56 16 L60 12" stroke="#2a5a10" stroke-width="2" stroke-linecap="round"/>`;
+      break;
+    case 'cabbage':
+      inner = `<circle cx="50" cy="58" r="34" fill="#a8d060" stroke="#5a8020" stroke-width="3.5"/>
+        <path d="M50 24 Q50 58 50 92 M22 42 Q46 54 78 44 M22 72 Q46 60 78 74" fill="none" stroke="#7aa840" stroke-width="2.2"/>
+        <path d="M50 24 Q34 34 24 44 M50 24 Q66 34 76 44" fill="none" stroke="#7aa840" stroke-width="2.2"/>
+        <ellipse cx="38" cy="46" rx="6" ry="8" fill="#fff" opacity=".28"/>`;
+      break;
+    case 'pepper':
+      inner = `<path d="M50 26 Q30 30 26 54 Q26 82 50 90 Q74 82 74 54 Q70 30 50 26 Z"
+        fill="#e63c3c" stroke="#7a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M50 26 Q50 16 50 12" stroke="#3d7a42" stroke-width="4" stroke-linecap="round"/>
+        <path d="M50 26 Q42 20 38 14 M50 26 Q58 20 62 14" stroke="#3d7a42" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M38 42 Q34 60 38 80 M62 42 Q66 60 62 80" fill="none" stroke="#a01a1a" stroke-width="1.5" opacity=".5"/>
+        <ellipse cx="38" cy="48" rx="4" ry="7" fill="#fff" opacity=".4"/>`;
+      break;
+    case 'broccoli':
+      inner = `<rect x="42" y="60" width="16" height="32" rx="3" fill="#a8d060" stroke="#5a8020" stroke-width="3"/>
+        <path d="M42 68 Q28 66 24 80 M58 68 Q72 66 76 80" fill="none" stroke="#5a8020" stroke-width="3"/>
+        <circle cx="34" cy="42" r="16" fill="#3d7a42" stroke="#1a4a1a" stroke-width="3"/>
+        <circle cx="66" cy="42" r="16" fill="#3d7a42" stroke="#1a4a1a" stroke-width="3"/>
+        <circle cx="50" cy="34" r="17" fill="#4a8c4e" stroke="#1a4a1a" stroke-width="3"/>
+        <circle cx="50" cy="52" r="14" fill="#3d7a42" stroke="#1a4a1a" stroke-width="3"/>
+        <circle cx="42" cy="30" r="3" fill="#7ac05a" opacity=".6"/>
+        <circle cx="60" cy="36" r="3" fill="#7ac05a" opacity=".6"/>
+        <circle cx="34" cy="48" r="2.5" fill="#7ac05a" opacity=".6"/>`;
+      break;
+    /* ---------- Стандартные формы ---------- */
     case 'bottle':
       inner = `<rect x="42" y="4" width="16" height="12" rx="3" fill="${dark}"/>
         <rect x="38" y="14" width="24" height="8" rx="3" fill="${dark}"/>
@@ -740,8 +972,7 @@ function productSVG(shape, color){
     case 'round':
       inner = `<circle cx="50" cy="58" r="32" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <ellipse cx="42" cy="46" rx="7" ry="9" fill="#fff" opacity=".35"/>
-        <path d="M50 26 q6 -12 16 -14" fill="none" stroke="#4a7a3a" stroke-width="7" stroke-linecap="round"/>
-        <path d="M50 26 q-4 -8 -10 -12" fill="none" stroke="#5d8a3d" stroke-width="6" stroke-linecap="round"/>`;
+        <path d="M50 26 q6 -12 16 -14" fill="none" stroke="#4a7a3a" stroke-width="7" stroke-linecap="round"/>`;
       break;
     case 'bunch':
       inner = `<path d="M50 20 Q50 30 46 40 Q42 50 38 60 Q34 70 36 78" fill="none" stroke="#5d8a3d" stroke-width="4" stroke-linecap="round"/>
@@ -752,20 +983,12 @@ function productSVG(shape, color){
         <circle cx="44" cy="86" r="10" fill="${color}" stroke="${dark}" stroke-width="3"/>
         <circle cx="60" cy="84" r="9" fill="${color}" stroke="${dark}" stroke-width="3"/>`;
       break;
-    case 'pineapple':
-      inner = `<path d="M30 40 Q30 20 50 20 Q70 20 70 40 L74 80 Q74 92 50 92 Q26 92 26 80 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M50 20 L42 6 M50 20 L50 4 M50 20 L58 6 M50 20 L36 12 M50 20 L64 12" stroke="#4a7a3a" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <path d="M36 44 L36 82 M50 40 L50 88 M64 44 L64 82" stroke="${dark}" stroke-width="2" opacity=".4" fill="none"/>
-        <path d="M30 60 L70 60 M30 72 L70 72" stroke="${dark}" stroke-width="2" opacity=".4" fill="none"/>`;
-      break;
     case 'tree':
       inner = `<rect x="46" y="60" width="8" height="30" fill="#7a4a22"/>
         <circle cx="50" cy="42" r="20" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <circle cx="36" cy="52" r="14" fill="${color}" stroke="${dark}" stroke-width="4"/>
         <circle cx="64" cy="52" r="14" fill="${color}" stroke="${dark}" stroke-width="4"/>
-        <circle cx="50" cy="34" r="3" fill="${light}" opacity=".7"/>
-        <circle cx="38" cy="46" r="3" fill="${light}" opacity=".7"/>
-        <circle cx="62" cy="46" r="3" fill="${light}" opacity=".7"/>`;
+        <circle cx="50" cy="34" r="3" fill="${light}" opacity=".7"/>`;
       break;
     case 'cylinder':
       inner = `<path d="M32 22 L32 84 Q32 92 50 92 Q68 92 68 84 L68 22" fill="${color}" stroke="${dark}" stroke-width="4"/>
@@ -777,8 +1000,7 @@ function productSVG(shape, color){
       inner = `<rect x="30" y="14" width="40" height="12" rx="3" fill="#8a8f9a" stroke="${dark}" stroke-width="3"/>
         <path d="M28 26 L72 26 L72 84 Q72 92 64 92 L36 92 Q28 92 28 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <rect x="34" y="46" width="32" height="22" rx="3" fill="#fff" opacity=".85"/>
-        <circle cx="44" cy="78" r="3" fill="#fff" opacity=".5"/>
-        <circle cx="56" cy="80" r="2.5" fill="#fff" opacity=".5"/>`;
+        <circle cx="44" cy="78" r="3" fill="#fff" opacity=".5"/>`;
       break;
     case 'tube':
       inner = `<rect x="30" y="10" width="40" height="12" rx="3" fill="${dark}"/>
@@ -791,22 +1013,19 @@ function productSVG(shape, color){
         <rect x="22" y="32" width="56" height="36" rx="3" fill="#5b3a1a"/>
         <rect x="22" y="32" width="56" height="36" rx="3" fill="none" stroke="${dark}" stroke-width="2"/>
         <path d="M30 50 L70 50" stroke="#8a5a2b" stroke-width="3"/>
-        <circle cx="38" cy="42" r="3" fill="#fff" opacity=".35"/>
-        <circle cx="62" cy="58" r="3" fill="#fff" opacity=".35"/>`;
+        <circle cx="38" cy="42" r="3" fill="#fff" opacity=".35"/>`;
       break;
     case 'wedge':
       inner = `<path d="M18 76 L82 76 L82 60 Q82 30 50 26 L18 40 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <circle cx="46" cy="52" r="4" fill="${light}" opacity=".7"/>
         <circle cx="58" cy="60" r="3" fill="${light}" opacity=".7"/>
-        <circle cx="38" cy="62" r="2.5" fill="${light}" opacity=".7"/>
-        <circle cx="66" cy="50" r="2" fill="${light}" opacity=".7"/>`;
+        <circle cx="38" cy="62" r="2.5" fill="${light}" opacity=".7"/>`;
       break;
     case 'pouch':
       inner = `<path d="M28 24 Q50 12 72 24 L76 84 Q76 92 68 92 L32 92 Q24 92 24 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
         <path d="M28 24 Q50 34 72 24" fill="none" stroke="${dark}" stroke-width="3"/>
         <circle cx="50" cy="58" r="16" fill="#fff" opacity=".85"/>
-        <circle cx="50" cy="58" r="8" fill="${color}" opacity=".8"/>
-        <circle cx="50" cy="58" r="3" fill="${dark}" opacity=".6"/>`;
+        <circle cx="50" cy="58" r="8" fill="${color}" opacity=".8"/>`;
       break;
     case 'tub':
       inner = `<path d="M22 30 L78 30 L74 84 Q74 92 66 92 L34 92 Q26 92 26 84 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
@@ -824,8 +1043,7 @@ function productSVG(shape, color){
       inner = `<rect x="16" y="34" width="68" height="52" rx="6" fill="#f0f2f5" stroke="#9aa3b0" stroke-width="4"/>
         <rect x="22" y="40" width="56" height="40" rx="3" fill="${color}" stroke="${dark}" stroke-width="3"/>
         <ellipse cx="36" cy="60" rx="8" ry="12" fill="${light}" opacity=".5"/>
-        <ellipse cx="56" cy="60" rx="8" ry="12" fill="${light}" opacity=".5"/>
-        <ellipse cx="46" cy="60" rx="6" ry="10" fill="#fff" opacity=".35"/>`;
+        <ellipse cx="56" cy="60" rx="8" ry="12" fill="${light}" opacity=".5"/>`;
       break;
     default:
       inner = `<rect x="22" y="26" width="56" height="64" rx="8" fill="${color}" stroke="${dark}" stroke-width="4"/>`;
@@ -842,7 +1060,8 @@ let state = null;
 function newState(){
   return {
     money: 600, lang: 'ru', music: true, tutorialDone: false,
-    xp: 0,
+    xp: 0, prestige: 0,
+    upgrades: {spawn:0, income:0, speed:0, xp:0, cap:0},
     grid: [], warehouse: {}, decor: {wall: 0, window: 0},
     owned: {wall: [0], window: [0]},
     lastDaily: 0, streak: 0,
@@ -851,7 +1070,7 @@ function newState(){
     playtime: 0,
     claimedTimeRewards: [],
     notifiedTimeRewards: [],
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 6,
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 7,
     dirt: [],
     truckTimer: TRUCK_CYCLE,
     truckState: 'away',
@@ -916,7 +1135,7 @@ function counterCells(){
   return out;
 }
 function shelfQty(c){ let n = 0; for(const s of c.stock) n += s.n; return n; }
-function shelfCapacity(c){ return FURNITURE[c.t].cap; }
+function shelfCapacity(c){ return FURNITURE[c.t].cap + extraCapacity(); }
 function canAccept(c, pid){
   const prod = PROD_BY_ID[pid];
   const acc = FURNITURE[c.t].accepts;
@@ -953,19 +1172,15 @@ function dropDirt(x, y){
   const c = cellAt(cx, cy);
   if(!c || !c.u) return;
   if(state.dirt.find(d => d.x === cx && d.y === cy)) return;
-  const type = randInt(0, 2);
-  state.dirt.push({x: cx, y: cy, type, t: Date.now()});
+  state.dirt.push({x: cx, y: cy, type: randInt(0, 2), t: Date.now()});
 }
-function dirtAtCell(x, y){
-  return state.dirt.find(d => d.x === x && d.y === y);
-}
+function dirtAtCell(x, y){ return state.dirt.find(d => d.x === x && d.y === y); }
 function cleanDirtAt(x, y){
   const idx = state.dirt.findIndex(d => d.x === x && d.y === y);
   if(idx < 0) return false;
   state.dirt.splice(idx, 1);
   addXP(8);
   toast(t('dirtClean') + ' +8 XP', '#8fd3ff');
-  updateHUD();
   scheduleSave();
   return true;
 }
@@ -1020,14 +1235,13 @@ function serialize(){
   return {
     m: Math.floor(state.money), l: state.lang, mu: state.music ? 1 : 0,
     td: state.tutorialDone ? 1 : 0, xp: Math.floor(state.xp),
+    pr: state.prestige,
+    up: state.upgrades,
     g, st: stocks.join('|'), wh, drt,
     dw: state.decor.wall, dn: state.decor.window,
     ow: state.owned.wall, on: state.owned.window,
     ld: state.lastDaily, sk: state.streak,
     tk: state.tasks, tkd: state.tasksDate, ds: state.ds,
-    pt: Math.floor(state.playtime),
-    ctr: state.claimedTimeRewards.join(','),
-    ntr: state.notifiedTimeRewards.join(','),
     ts: state.totalServed, te: Math.floor(state.totalEarned), ac: state.adCount,
     tt: state.truckTimer, ts2: state.truckState, tot: state.truckOfferTimer,
     bu: state.bonusUntil
@@ -1040,6 +1254,10 @@ function deserialize(o){
   state.music = o.mu === 1;
   state.tutorialDone = !!o.td;
   state.xp = o.xp || 0;
+  state.prestige = o.pr || 0;
+  state.upgrades = o.up || {spawn:0, income:0, speed:0, xp:0, cap:0};
+  // гарантируем все ключи
+  Object.keys(UPGRADES).forEach(k => { if(typeof state.upgrades[k] !== 'number') state.upgrades[k] = 0; });
   state.decor.wall = o.dw || 0;
   state.decor.window = o.dn || 0;
   state.owned.wall = o.ow || [0];
@@ -1049,9 +1267,6 @@ function deserialize(o){
   state.tasks = o.tk || [];
   state.tasksDate = o.tkd || '';
   state.ds = o.ds || {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0};
-  state.playtime = o.pt || 0;
-  state.claimedTimeRewards = o.ctr ? o.ctr.split(',').filter(s=>s!=='').map(Number) : [];
-  state.notifiedTimeRewards = o.ntr ? o.ntr.split(',').filter(s=>s!=='').map(Number) : [];
   state.totalServed = o.ts || 0;
   state.totalEarned = o.te || 0;
   state.adCount = o.ac || 0;
@@ -1061,6 +1276,10 @@ function deserialize(o){
   state.bonusUntil = o.bu || 0;
   state.warehouse = {};
   state.dirt = [];
+  // ВАЖНО: сбрасываем прогресс времени при перезаходе
+  state.playtime = 0;
+  state.claimedTimeRewards = [];
+  state.notifiedTimeRewards = [];
 
   initGrid();
 
@@ -1150,7 +1369,8 @@ class Customer {
     this.x = DOOR.x + 0.5;
     this.y = DOOR.y + 0.5;
     this.alpha = 0;
-    this.speed = rnd(0.65, 1.0);
+    this.baseSpeed = rnd(0.6, 0.95);
+    this.speed = this.baseSpeed * speedMul();
     this.shirt = pick(SHIRT);
     this.skin = pick(SKIN);
     this.hair = pick(HAIR);
@@ -1172,6 +1392,7 @@ class Customer {
     this.dirtDropped = false;
     this.willDropDirt = Math.random() < 0.2;
     this.returnNotified = false;
+    this.emptyAttempts = 0;
   }
 
   returnCart(){
@@ -1201,7 +1422,6 @@ class Customer {
       this.bubbleT -= dt;
       if(this.bubbleT <= 0) this.bubble = null;
     }
-
     if(this.state === 'gone'){
       this.returnCart();
       this.alpha -= dt * 1.3;
@@ -1217,7 +1437,6 @@ class Customer {
       if(this.alpha <= 0) this.dead = true;
       return;
     }
-
     if(this.state === 'picking' || this.state === 'paying'){
       this.timer -= dt;
       if(this.timer <= 0) this.finishAction();
@@ -1230,7 +1449,6 @@ class Customer {
       if(this.timer <= 0) this.tryCashier();
       return;
     }
-
     if(this.path.length){
       const tgt = this.path[0];
       const tx = tgt.x + 0.5, ty = tgt.y + 0.5;
@@ -1257,14 +1475,20 @@ class Customer {
 
   arrive(){
     if(this.state === 'toShelf'){
+      const cell = this.targetCell;
+      // Если полка пуста — не стоим, идём искать другую или на кассу
+      if(!cell || !cell.stock.length){
+        this.emptyAttempts++;
+        this.state = 'idle';
+        if(this.emptyAttempts > 3){ this.goToCashierOrLeave(); return; }
+        this.planShopping();
+        return;
+      }
       this.state = 'picking';
       this.timer = rnd(1.3, 2.6);
-      const cell = this.targetCell;
-      if(cell && cell.stock.length){
-        const s = pick(cell.stock);
-        this.bubble = s.id;
-        this.bubbleT = this.timer + 0.3;
-      }
+      const s = pick(cell.stock);
+      this.bubble = s.id;
+      this.bubbleT = this.timer + 0.3;
     } else if(this.state === 'toCashier'){
       this.state = 'paying';
       this.timer = rnd(1.1, 1.8);
@@ -1278,14 +1502,24 @@ class Customer {
   finishAction(){
     if(this.state === 'picking'){
       const cell = this.targetCell;
+      let gotSomething = false;
       if(cell && cell.stock.length){
         const s = pick(cell.stock);
         if(takeFromShelf(cell, s.id, 1)){
           const p = PROD_BY_ID[s.id];
           this.cart.push({id: s.id, price: p.sell});
+          gotSomething = true;
         }
       }
       if(this.targetX !== undefined) this.visited.push(this.targetX + ',' + this.targetY);
+      if(!gotSomething){
+        this.emptyAttempts++;
+        // Если полка оказалась пуста — сразу на кассу (или уходим)
+        if(this.emptyAttempts > 2){ this.goToCashierOrLeave(); return; }
+        this.state = 'idle';
+        this.planShopping();
+        return;
+      }
       this.state = 'idle';
       if(this.cart.length >= this.wants || this.visited.length > 4){
         this.goToCashier();
@@ -1303,11 +1537,11 @@ class Customer {
       state.ds.serve += 1;
       state.ds.sell += this.cart.length;
       state.totalServed += 1;
-      addXP(Math.max(1, Math.round(total * 0.5)));
+      addXP(Math.max(1, Math.round(total * 0.5 * xpMul())));
       if(this.spot) busySpots.delete(this.spot);
       this.spot = null;
       this.cart = [];
-      toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x2!' : ''), mult > 1 ? '#ffd257' : '#7fd07f');
+      toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x' + mult.toFixed(2) : ''), mult > 1.05 ? '#ffd257' : '#7fd07f');
       updateHUD();
       scheduleSave();
       this.leave();
@@ -1316,15 +1550,18 @@ class Customer {
 
   planShopping(){
     const shelves = shelfCells().filter(s => s.c.stock.length > 0);
-    if(!shelves.length){ this.returnCart(); this.leave(); return; }
+    if(!shelves.length){ this.goToCashierOrLeave(); return; }
     const fresh = shelves.filter(s => this.visited.indexOf(s.x + ',' + s.y) < 0);
-    const pool = fresh.length ? fresh : shelves;
-    const target = pick(pool);
+    if(!fresh.length){
+      // Все полки обошли — идём на кассу
+      this.goToCashierOrLeave();
+      return;
+    }
+    const target = pick(fresh);
     const spots = adjacentWalkable(target.x, target.y);
     if(!spots.length){
-      const key = target.x + ',' + target.y;
-      if(this.visited.indexOf(key) < 0) this.visited.push(key);
-      if(this.visited.length > shelves.length + 3){ this.returnCart(); this.leave(); return; }
+      this.visited.push(target.x + ',' + target.y);
+      if(this.visited.length > shelves.length + 3){ this.goToCashierOrLeave(); return; }
       this.planShopping();
       return;
     }
@@ -1333,7 +1570,12 @@ class Customer {
     this.targetX = target.x;
     this.targetY = target.y;
     this.state = 'toShelf';
-    if(!this.moveTo(spot.x, spot.y)){ this.returnCart(); this.leave(); }
+    if(!this.moveTo(spot.x, spot.y)){ this.goToCashierOrLeave(); }
+  }
+
+  goToCashierOrLeave(){
+    if(this.cart.length > 0) this.goToCashier();
+    else this.leave();
   }
 
   goToCashier(){
@@ -1462,69 +1704,40 @@ const cashier = {
 
 /* --------------------------- 6c. ГРУЗОВИК -------------------------------- */
 const truck = {
-  x: -12,
-  targetX: 0,
-  baseY: GH + 0.6,
-  arrived: false,
-  wheels: 0,
-
+  x: -12, targetX: 0, baseY: GH + 0.6,
+  arrived: false, wheels: 0,
   update(dt){
     if(state.truckState === 'offering'){
       const dx = this.targetX - this.x;
-      if(Math.abs(dx) > 0.1){
-        this.x += Math.sign(dx) * dt * 3;
-        this.wheels += dt * 12;
-      } else {
-        this.x = this.targetX;
-        this.arrived = true;
-      }
+      if(Math.abs(dx) > 0.1){ this.x += Math.sign(dx) * dt * 3; this.wheels += dt * 12; }
+      else { this.x = this.targetX; this.arrived = true; }
     } else if(state.truckState === 'away'){
       if(this.x > -12) this.x = -12;
       this.arrived = false;
     }
   },
-
   draw(){
     if(state.truckState !== 'offering') return;
-    const px = this.x;
-    const py = this.baseY;
-
+    const px = this.x, py = this.baseY;
     ctx.fillStyle = 'rgba(0,0,0,.3)';
-    ctx.beginPath();
-    ctx.ellipse(px, py + 0.55, 1.7, 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(px, py + 0.55, 1.7, 0.22, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#1b1b1b';
     ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#3a3a3a';
     ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
-
-    ctx.fillStyle = '#e63c3c';
-    ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.55);
-    ctx.fillStyle = '#8fd3ff';
-    ctx.fillRect(px + 0.75, py + 0.05, 0.5, 0.3);
-    ctx.fillStyle = '#c92a2a';
-    ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.06);
-
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(px - 1.3, py - 0.15, 1.8, 0.65);
-    ctx.fillStyle = '#dcdcdc';
-    ctx.fillRect(px - 1.3, py + 0.3, 1.8, 0.2);
-
+    ctx.fillStyle = '#e63c3c'; ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.55);
+    ctx.fillStyle = '#8fd3ff'; ctx.fillRect(px + 0.75, py + 0.05, 0.5, 0.3);
+    ctx.fillStyle = '#c92a2a'; ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.06);
+    ctx.fillStyle = '#f0f0f0'; ctx.fillRect(px - 1.3, py - 0.15, 1.8, 0.65);
+    ctx.fillStyle = '#dcdcdc'; ctx.fillRect(px - 1.3, py + 0.3, 1.8, 0.2);
     ctx.save();
     ctx.translate(px - 0.4, py + 0.15);
-    ctx.fillStyle = '#e63c3c';
-    ctx.font = 'bold 0.32px system-ui';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#e63c3c'; ctx.font = 'bold 0.32px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('SALE', 0, 0);
-    ctx.fillStyle = '#ffd257';
-    ctx.font = 'bold 0.22px system-ui';
-    ctx.fillText('x2', 0, 0.34);
+    ctx.fillStyle = '#ffd257'; ctx.font = 'bold 0.22px system-ui'; ctx.fillText('x2', 0, 0.34);
     ctx.restore();
-
     const blink = Math.sin(Date.now() / 200) > 0;
     if(blink){
       ctx.fillStyle = '#ffd257';
@@ -1532,15 +1745,10 @@ const truck = {
       ctx.fillStyle = 'rgba(255,210,87,.4)';
       ctx.beginPath(); ctx.arc(px + 1.3, py - 0.05, 0.22, 0, Math.PI * 2); ctx.fill();
     }
-
     const bob = Math.sin(Date.now() / 300) * 0.05;
-    ctx.fillStyle = '#ffd257';
-    ctx.font = 'bold 0.7px system-ui';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffd257'; ctx.font = 'bold 0.7px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('!', px - 0.3, py - 0.55 + bob);
   },
-
   hitTest(worldX, worldY){
     if(state.truckState !== 'offering') return false;
     if(worldX < this.x - 1.5 || worldX > this.x + 1.5) return false;
@@ -1552,15 +1760,10 @@ const truck = {
 function startTruckCycle(){
   state.truckState = 'offering';
   state.truckOfferTimer = TRUCK_OFFER;
-  truck.x = -12;
-  truck.arrived = false;
-  truck.targetX = (DOOR.x - 1.2);
+  truck.x = -12; truck.arrived = false; truck.targetX = (DOOR.x - 1.2);
   toast(t('truckArrived'), '#ffb070');
 }
-function endTruckCycle(){
-  state.truckState = 'away';
-  state.truckTimer = TRUCK_CYCLE;
-}
+function endTruckCycle(){ state.truckState = 'away'; state.truckTimer = TRUCK_CYCLE; }
 
 /* ------------------------------ 7. ЗАДАНИЯ -------------------------------- */
 function genTasks(){
@@ -1575,9 +1778,7 @@ function genTasks(){
   state.ds = {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0};
   state.tasksDate = todayStr();
 }
-function checkDailyReset(){
-  if(state.tasksDate !== todayStr() || !state.tasks.length) genTasks();
-}
+function checkDailyReset(){ if(state.tasksDate !== todayStr() || !state.tasks.length) genTasks(); }
 function taskText(task){
   const def = TASK_DEFS.find(d => d.id === task.t);
   if(!def) return '';
@@ -1594,8 +1795,8 @@ function tasksReadyCount(){
 /* ------------------------------ 8. МУЗЫКА --------------------------------- */
 const Music = {
   ctx: null, gain: null, timer: null, playing: false, enabled: true, step: 0,
-  scale: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 587.33, 659.25],
-  bass: [65.41, 73.42, 82.41, 98.00],
+  scale: [261.63,293.66,329.63,349.23,392.00,440.00,493.88,523.25,587.33,659.25],
+  bass: [65.41,73.42,82.41,98.00],
   init(){
     if(this.ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -1609,30 +1810,23 @@ const Music = {
     this.init();
     if(!this.ctx || this.playing || !this.enabled) return;
     if(this.ctx.state === 'suspended') this.ctx.resume();
-    this.playing = true;
-    this.step = 0;
+    this.playing = true; this.step = 0;
     this.tick();
     this.timer = setInterval(() => this.tick(), 420);
   },
-  stop(){
-    this.playing = false;
-    if(this.timer){ clearInterval(this.timer); this.timer = null; }
-  },
+  stop(){ this.playing = false; if(this.timer){ clearInterval(this.timer); this.timer = null; } },
   setEnabled(v){ this.enabled = v; if(v) this.start(); else this.stop(); },
   note(freq, dur, vol, type){
     if(!this.ctx || !this.playing) return;
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const g = this.ctx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.value = freq;
+    osc.type = type || 'sine'; osc.frequency.value = freq;
     g.gain.setValueAtTime(0, now);
     g.gain.linearRampToValueAtTime(vol, now + 0.03);
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-    osc.connect(g);
-    g.connect(this.gain);
-    osc.start(now);
-    osc.stop(now + dur + 0.05);
+    osc.connect(g); g.connect(this.gain);
+    osc.start(now); osc.stop(now + dur + 0.05);
   },
   tick(){
     if(!this.playing) return;
@@ -1662,19 +1856,16 @@ function resize(){
   canvas.width = Math.floor(w * dpr);
   canvas.height = Math.floor(h * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
   const topbarH = $('#topbar').offsetHeight || 52;
   const bottombarH = $('#bottombar').offsetHeight || 70;
   const availTop = topbarH + 6;
   const availBottom = h - bottombarH - 6;
   const availH = availBottom - availTop;
   const availW = w - 12;
-
   CS = Math.min((availW - 2 * 20) / GW, (availH - 2 * 20) / GH);
   CS = Math.max(12, CS);
   baseOX = (w - GW * CS) / 2;
   baseOY = availTop + (availH - GH * CS) / 2;
-
   clampCamera();
 }
 function clampCamera(){
@@ -1689,10 +1880,8 @@ function draw(){
   const w = canvas.clientWidth, h = canvas.clientHeight;
   ctx.clearRect(0, 0, w, h);
   const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
-  skyGrad.addColorStop(0, '#0d1219');
-  skyGrad.addColorStop(1, '#1a2330');
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, w, h);
+  skyGrad.addColorStop(0, '#0d1219'); skyGrad.addColorStop(1, '#1a2330');
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, w, h);
 
   ctx.save();
   ctx.translate(getOX(), getOY());
@@ -1703,10 +1892,7 @@ function draw(){
   drawDirt();
   drawWindows();
 
-  ctx.save();
-  ctx.scale(CS, CS);
-  truck.draw();
-  ctx.restore();
+  ctx.save(); ctx.scale(CS, CS); truck.draw(); ctx.restore();
 
   ctx.save();
   ctx.scale(CS, CS);
@@ -1737,7 +1923,10 @@ function draw(){
     }
   }
 
-  for(const c of customers) drawCustomer(c);
+  // Тела клиентов
+  for(const c of customers) drawCustomerBody(c);
+  // Пузыри рисуем ПОСЛЕ всех тел — чтобы всегда были сверху
+  for(const c of customers) drawCustomerBubble(c);
 
   ctx.restore();
   ctx.restore();
@@ -1747,37 +1936,33 @@ function draw(){
   ctx.strokeRect(getOX() - 1, getOY() - 1, GW * CS + 2, GH * CS + 2);
 }
 
-/* --------- 9a. ГОРОДОК ЗА МАГАЗИНОМ --------- */
+/* --------- 9a. ГОРОДОК --------- */
 function drawOutside(){
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
-  // Ключевые размеры колец
-  const sidewalkW = 34;   // тротуар вокруг магазина
-  const roadW = 46;       // проезжая часть
-  const sidewalkOuter = MB; // внешний тротуар
+  const sidewalkW = 34;
+  const roadW = 46;
+  const sidewalkOuter = MB;
   const buildingGap = 12;
-
-  const ring1 = sidewalkW;                  // тротуар вокруг магазина
-  const ring2 = sidewalkW + roadW;          // внешний край дороги
-  const ring3 = ring2 + sidewalkOuter;      // внешний тротуар
+  const ring1 = sidewalkW;
+  const ring2 = sidewalkW + roadW;
+  const ring3 = ring2 + sidewalkOuter;
   const buildingStart = ring3 + buildingGap;
   const bgPad = buildingStart + 120;
 
-  // 1) Фон
   ctx.fillStyle = '#171d26';
   ctx.fillRect(-bgPad, -bgPad, totalW + bgPad * 2, totalH + bgPad * 2);
 
-  // 2) Дальний силуэт (совсем фон)
   drawBgSkyline(-bgPad, -bgPad, totalW + bgPad * 2, bgPad, true);
   drawBgSkyline(-bgPad, totalH + ring3, totalW + bgPad * 2, bgPad, false);
   drawSideBg(-bgPad, 0, bgPad, totalH);
   drawSideBg(totalW + ring3, 0, bgPad, totalH);
 
-  // 3) ЕДИНЫЙ СЛОЙ ДОРОГИ (единый цвет, кольцо)
+  // Единый слой дороги
   ctx.fillStyle = '#2b2f37';
   ctx.fillRect(-ring2, -ring2, totalW + ring2 * 2, totalH + ring2 * 2);
 
-  // 4) Разметка дороги (единый слой, рисуется ПОВЕРХ дороги)
+  // Разметка
   ctx.strokeStyle = 'rgba(255,240,150,.7)';
   ctx.lineWidth = 2.5;
   ctx.setLineDash([18, 16]);
@@ -1791,22 +1976,21 @@ function drawOutside(){
   ctx.beginPath(); ctx.moveTo(midRightX, -ring2); ctx.lineTo(midRightX, totalH + ring2); ctx.stroke();
   ctx.setLineDash([]);
 
-  // 5) ВНУТРЕННИЙ ТРОТУАР (вокруг магазина)
+  // Внутренний тротуар
   ctx.fillStyle = '#5a6470';
   ctx.fillRect(-ring1, -ring1, totalW + ring1 * 2, totalH + ring1 * 2);
 
-  // 6) ВНЕШНИЙ ТРОТУАР (вокруг дороги)
+  // Внешний тротуар
   ctx.fillStyle = '#4f5864';
-  ctx.fillRect(-ring3, -ring3, totalW + ring3 * 2, ring3 - ring2); // сверху
-  ctx.fillRect(-ring3, totalH + ring2, totalW + ring3 * 2, ring3 - ring2); // снизу
-  ctx.fillRect(-ring3, -ring2, ring3 - ring2, totalH + ring2 * 2); // слева
-  ctx.fillRect(totalW + ring2, -ring2, ring3 - ring2, totalH + ring2 * 2); // справа
+  ctx.fillRect(-ring3, -ring3, totalW + ring3 * 2, ring3 - ring2);
+  ctx.fillRect(-ring3, totalH + ring2, totalW + ring3 * 2, ring3 - ring2);
+  ctx.fillRect(-ring3, -ring2, ring3 - ring2, totalH + ring2 * 2);
+  ctx.fillRect(totalW + ring2, -ring2, ring3 - ring2, totalH + ring2 * 2);
 
-  // Плитка на тротуарах
+  // Плитка
   ctx.strokeStyle = 'rgba(0,0,0,.2)';
   ctx.lineWidth = 1;
   const tile = 16;
-  // Внутренний
   for(let x = -ring1; x <= totalW + ring1; x += tile){
     ctx.beginPath(); ctx.moveTo(x, -ring1); ctx.lineTo(x, 0); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + ring1); ctx.stroke();
@@ -1815,7 +1999,6 @@ function drawOutside(){
     ctx.beginPath(); ctx.moveTo(-ring1, y); ctx.lineTo(0, y); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + ring1, y); ctx.stroke();
   }
-  // Внешний
   for(let x = -ring3; x <= totalW + ring3; x += tile){
     ctx.beginPath(); ctx.moveTo(x, -ring3); ctx.lineTo(x, -ring2); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(x, totalH + ring2); ctx.lineTo(x, totalH + ring3); ctx.stroke();
@@ -1825,7 +2008,7 @@ function drawOutside(){
     ctx.beginPath(); ctx.moveTo(totalW + ring2, y); ctx.lineTo(totalW + ring3, y); ctx.stroke();
   }
 
-  // 7) Дорожка ко входу
+  // Дорожка ко входу
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
@@ -1840,13 +2023,12 @@ function drawOutside(){
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // 8) ДОМА — за внешним тротуаром
+  // Дома
   drawBuildingRow(-bgPad, -buildingStart - 70, totalW + bgPad * 2, 70, true);
   drawBuildingRow(-bgPad, totalH + buildingStart, totalW + bgPad * 2, 70, false);
   drawBuildingColumn(-buildingStart - 70, -bgPad, 70, totalH + bgPad * 2, true);
   drawBuildingColumn(totalW + buildingStart, -bgPad, 70, totalH + bgPad * 2, false);
 
-  // 9) Детали на тротуарах
   drawBench(totalW + ring1 - 8, totalH / 2);
   drawBench(-ring1 + 8, totalH / 2);
   drawLamp(-ring1 + 10, doorY + ring1 / 2);
@@ -1860,10 +2042,9 @@ function drawOutside(){
 }
 
 function drawBuildingRow(x, y, w, h, isTop){
-  const colors = ['#2a3a4d', '#3a4a5d', '#2f4050', '#354a5c', '#28425c'];
-  const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f', '#2f4a3d'];
-  let cx = x;
-  let idx = 0;
+  const colors = ['#2a3a4d','#3a4a5d','#2f4050','#354a5c','#28425c'];
+  const roofColors = ['#4a2f2f','#3d3d55','#4a3d2f','#2f4a3d'];
+  let cx = x, idx = 0;
   while(cx < x + w){
     const bw = 55 + ((idx * 17) % 35);
     const bh = h + ((idx * 13) % 25);
@@ -1886,16 +2067,13 @@ function drawBuildingRow(x, y, w, h, isTop){
         }
       }
     }
-    cx += bw + 8;
-    idx++;
+    cx += bw + 8; idx++;
   }
 }
-
 function drawBuildingColumn(x, y, w, h, isLeft){
-  const colors = ['#2a3a4d', '#3a4a5d', '#354a5c'];
-  const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f'];
-  let cy = y;
-  let idx = 0;
+  const colors = ['#2a3a4d','#3a4a5d','#354a5c'];
+  const roofColors = ['#4a2f2f','#3d3d55','#4a3d2f'];
+  let cy = y, idx = 0;
   while(cy < y + h){
     const bh = 60 + ((idx * 21) % 40);
     const bw = w + ((idx * 11) % 20);
@@ -1916,15 +2094,12 @@ function drawBuildingColumn(x, y, w, h, isLeft){
         }
       }
     }
-    cy += bh + 10;
-    idx++;
+    cy += bh + 10; idx++;
   }
 }
-
 function drawBgSkyline(x, y, w, h, isTop){
   ctx.fillStyle = '#20262f';
-  let cx = x;
-  let idx = 0;
+  let cx = x, idx = 0;
   while(cx < x + w){
     const bw = 40 + ((idx * 19) % 45);
     const bh = h - 10 - ((idx * 11) % 25);
@@ -1935,14 +2110,12 @@ function drawBgSkyline(x, y, w, h, isTop){
       ctx.fillRect(cx + 6 + i * 20, yBase + 8 + (idx % 3) * 10, 6, 8);
     }
     ctx.fillStyle = '#20262f';
-    cx += bw + 6;
-    idx++;
+    cx += bw + 6; idx++;
   }
 }
 function drawSideBg(x, y, w, h){
   ctx.fillStyle = '#20262f';
-  let cy = y;
-  let idx = 0;
+  let cy = y, idx = 0;
   while(cy < y + h){
     const bh = 60 + ((idx * 17) % 40);
     ctx.fillRect(x, cy, w - 10, bh);
@@ -1951,30 +2124,23 @@ function drawSideBg(x, y, w, h){
       ctx.fillRect(x + 6, cy + 8 + j * 22, 8, 10);
     }
     ctx.fillStyle = '#20262f';
-    cy += bh + 8;
-    idx++;
+    cy += bh + 8; idx++;
   }
 }
-
 function drawTreeCtx(x, y){
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#4a2f1c';
-  ctx.fillRect(-2, 2, 4, 8);
-  ctx.fillStyle = '#3b7a3f';
-  ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#4a8c4e';
-  ctx.beginPath(); ctx.arc(-3, -2, 7, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(4, -1, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#5da063';
-  ctx.beginPath(); ctx.arc(-1, -4, 3.5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#4a2f1c'; ctx.fillRect(-2, 2, 4, 8);
+  ctx.fillStyle = '#3b7a3f'; ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#4a8c4e'; ctx.beginPath(); ctx.arc(-3, -2, 7, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4, -1, 6, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#5da063'; ctx.beginPath(); ctx.arc(-1, -4, 3.5, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 }
 function drawLamp(x, y){
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#3a4149';
-  ctx.fillRect(-1, -4, 2, 16);
+  ctx.fillStyle = '#3a4149'; ctx.fillRect(-1, -4, 2, 16);
   ctx.beginPath(); ctx.arc(0, -6, 5, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,235,150,.35)'; ctx.fill();
   ctx.beginPath(); ctx.arc(0, -6, 3, 0, Math.PI * 2);
@@ -1984,36 +2150,28 @@ function drawLamp(x, y){
 function drawBench(x, y){
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#7a4a22';
-  ctx.fillRect(-10, -3, 20, 3);
-  ctx.fillRect(-10, 1, 20, 2);
-  ctx.fillStyle = '#5d381a';
-  ctx.fillRect(-9, -6, 2, 9);
-  ctx.fillRect(7, -6, 2, 9);
+  ctx.fillStyle = '#7a4a22'; ctx.fillRect(-10, -3, 20, 3); ctx.fillRect(-10, 1, 20, 2);
+  ctx.fillStyle = '#5d381a'; ctx.fillRect(-9, -6, 2, 9); ctx.fillRect(7, -6, 2, 9);
   ctx.restore();
 }
 function drawBush(x, y){
   ctx.save();
-  ctx.fillStyle = '#2f6334';
-  ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#2f6334'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#3d7a42';
-  ctx.beginPath(); ctx.arc(x - 3, y - 1, 4, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(x + 3, y - 1, 3.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x - 3, y - 1, 4, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 3, y - 1, 3.5, 0, Math.PI*2); ctx.fill();
   ctx.restore();
 }
-
 function drawWalls(){
   const wall = WALLS[state.decor.wall] || WALLS[0];
   ctx.fillStyle = wall.floor;
   ctx.fillRect(0, 0, GW * CS, GH * CS);
 }
-
 function drawFloor(){
   const wall = WALLS[state.decor.wall] || WALLS[0];
   const isNeon = state.decor.wall === 4;
   const lvl = getLevel();
   const maxCells = maxCellsForLevel(lvl);
-
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
       const c = state.grid[y][x];
@@ -2021,18 +2179,14 @@ function drawFloor(){
       if(c.u){
         ctx.fillStyle = (x + y) % 2 === 0 ? wall.floor : shade(wall.floor, -8);
         ctx.fillRect(px, py, CS, CS);
-        ctx.strokeStyle = wall.line;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = wall.line; ctx.lineWidth = 1;
         ctx.strokeRect(px + 0.5, py + 0.5, CS - 1, CS - 1);
         if(c.door){
           ctx.fillStyle = isNeon ? 'rgba(74,137,255,.3)' : 'rgba(74,137,255,.2)';
           ctx.fillRect(px + 1, py + 1, CS - 2, CS - 2);
           ctx.fillStyle = '#4a89ff';
-          ctx.beginPath();
-          ctx.arc(px + CS * 0.5, py + CS * 0.5, CS * 0.16, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(px + CS * 0.5, py + CS * 0.5, CS * 0.16, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(px + CS * 0.5 + 6, py + CS * 0.5);
           ctx.lineTo(px + CS * 0.5 - 6, py + CS * 0.5);
@@ -2049,48 +2203,33 @@ function drawFloor(){
           const atCap = unlockedCount() >= maxCells;
           const pr = expandPrice();
           ctx.strokeStyle = atCap ? 'rgba(255,90,90,.35)' : 'rgba(74,137,255,.35)';
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4, 4]);
+          ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
           ctx.strokeRect(px + 2, py + 2, CS - 4, CS - 4);
           ctx.setLineDash([]);
           ctx.fillStyle = atCap ? 'rgba(255,120,120,.55)' : 'rgba(200,220,255,.4)';
           ctx.font = 'bold ' + Math.max(8, CS * 0.22) + 'px system-ui';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillText(atCap ? '\uD83D\uDD12' : fmt(pr), px + CS / 2, py + CS / 2);
         }
       }
     }
   }
 }
-
 function drawDirt(){
   for(const d of state.dirt){
     const px = d.x * CS, py = d.y * CS;
     const seed = (d.x * 31 + d.y * 17) % 100;
     if(d.type === 0){
       ctx.fillStyle = 'rgba(90,60,30,.55)';
-      ctx.beginPath();
-      ctx.ellipse(px + CS * 0.35, py + CS * 0.55, CS * 0.22, CS * 0.16, 0.4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.ellipse(px + CS * 0.35, py + CS * 0.55, CS * 0.22, CS * 0.16, 0.4, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = 'rgba(60,40,20,.5)';
-      ctx.beginPath();
-      ctx.ellipse(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(px + CS * 0.25, py + CS * 0.45, CS * 0.06, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.ellipse(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(px + CS * 0.25, py + CS * 0.45, CS * 0.06, 0, Math.PI * 2); ctx.fill();
     } else if(d.type === 1){
       ctx.fillStyle = 'rgba(50,40,30,.5)';
-      ctx.beginPath();
-      ctx.ellipse(px + CS * 0.3, py + CS * 0.4, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(px + CS * 0.55, py + CS * 0.55, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(px + CS * 0.4, py + CS * 0.7, CS * 0.08, CS * 0.11, -0.4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.ellipse(px + CS * 0.3, py + CS * 0.4, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(px + CS * 0.55, py + CS * 0.55, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(px + CS * 0.4, py + CS * 0.7, CS * 0.08, CS * 0.11, -0.4, 0, Math.PI * 2); ctx.fill();
     } else {
       ctx.fillStyle = 'rgba(230,220,180,.85)';
       ctx.fillRect(px + CS * 0.3, py + CS * 0.4, CS * 0.16, CS * 0.12);
@@ -2098,22 +2237,14 @@ function drawDirt(){
       ctx.fillRect(px + CS * 0.35, py + CS * 0.42, CS * 0.06, CS * 0.06);
       ctx.fillStyle = 'rgba(200,180,140,.75)';
       ctx.fillRect(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09);
-      ctx.fillStyle = 'rgba(120,90,50,.6)';
-      for(let i = 0; i < 4; i++){
-        const rx = px + CS * (0.3 + (i * 13 + seed) % 40 / 100);
-        const ry = py + CS * (0.5 + (i * 7 + seed) % 40 / 100);
-        ctx.beginPath(); ctx.arc(rx, ry, 1.2, 0, Math.PI * 2); ctx.fill();
-      }
     }
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 350);
     ctx.strokeStyle = `rgba(143,211,255,${0.3 + pulse * 0.5})`;
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
     ctx.strokeRect(px + 2, py + 2, CS - 4, CS - 4);
     ctx.setLineDash([]);
   }
 }
-
 function drawWindows(){
   const w = state.decor.window;
   const topY = -CS * 0.16;
@@ -2132,7 +2263,7 @@ function drawWindows(){
       ctx.strokeStyle = '#5b8fb0'; ctx.lineWidth = 1.5; ctx.strokeRect(px, py, pw, ph * 1.3);
       ctx.beginPath(); ctx.moveTo(px + pw / 2, py); ctx.lineTo(px + pw / 2, py + ph * 1.3); ctx.stroke();
     } else {
-      const cols = ['#ff6b6b', '#ffd93d', '#6bcB77', '#4d96ff'];
+      const cols = ['#ff6b6b','#ffd93d','#6bcB77','#4d96ff'];
       for(let j = 0; j < 4; j++){
         ctx.fillStyle = cols[(i + j) % 4];
         ctx.fillRect(px + (j % 2) * pw / 2, py + Math.floor(j / 2) * ph * 0.65, pw / 2, ph * 0.65);
@@ -2141,7 +2272,6 @@ function drawWindows(){
     }
   }
 }
-
 function drawFurniture(gx, gy, c){
   const x = gx, y = gy;
   const img = furnSprite(c.t);
@@ -2151,7 +2281,6 @@ function drawFurniture(gx, gy, c){
     ctx.fillStyle = '#8a5a2b';
     ctx.fillRect(x + 0.08, y + 0.08, 0.84, 0.84);
   }
-
   if(c.t !== 'counter' && c.stock && c.stock.length){
     const total = shelfQty(c);
     const cap = shelfCapacity(c);
@@ -2178,9 +2307,7 @@ function drawFurniture(gx, gy, c){
     const ratio = total / cap;
     if(ratio < 0.35){
       ctx.fillStyle = 'rgba(255,90,90,.9)';
-      ctx.beginPath();
-      ctx.arc(x + 0.86, y + 0.14, 0.06, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(x + 0.86, y + 0.14, 0.06, 0, Math.PI * 2); ctx.fill();
     }
   }
 }
@@ -2192,62 +2319,33 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   ctx.translate(px, py + bob);
   ctx.rotate(dir - Math.PI / 2);
   ctx.scale(scale, scale);
-
   if(walking){
     const legPhase = Math.sin(walkPhase);
     ctx.fillStyle = '#2b3546';
-    ctx.beginPath();
-    ctx.ellipse(-0.12, 0.18 + legPhase * 0.05, 0.09, 0.13, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(0.12, 0.18 - legPhase * 0.05, 0.09, 0.13, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-0.12, 0.18 + legPhase * 0.05, 0.09, 0.13, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0.12, 0.18 - legPhase * 0.05, 0.09, 0.13, 0, 0, Math.PI * 2); ctx.fill();
   } else {
     ctx.fillStyle = '#2b3546';
-    ctx.beginPath();
-    ctx.ellipse(-0.1, 0.18, 0.08, 0.12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(0.1, 0.18, 0.08, 0.12, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-0.1, 0.18, 0.08, 0.12, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0.1, 0.18, 0.08, 0.12, 0, 0, Math.PI * 2); ctx.fill();
   }
-
   ctx.fillStyle = shirt;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 0.28, 0.24, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = shade(shirt, -50);
-  ctx.lineWidth = 0.025;
-  ctx.stroke();
-
+  ctx.beginPath(); ctx.ellipse(0, 0, 0.28, 0.24, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = shade(shirt, -50); ctx.lineWidth = 0.025; ctx.stroke();
   ctx.fillStyle = skin;
   const swing = walking ? Math.sin(walkPhase) * 0.03 : 0;
   ctx.beginPath(); ctx.arc(-0.27, swing, 0.075, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(0.27, -swing, 0.075, 0, Math.PI * 2); ctx.fill();
-
   if(opts.badge){
-    ctx.fillStyle = '#ffd257';
-    ctx.fillRect(-0.06, 0.02, 0.12, 0.06);
-    ctx.fillStyle = '#8a6a10';
-    ctx.fillRect(-0.05, 0.04, 0.1, 0.02);
+    ctx.fillStyle = '#ffd257'; ctx.fillRect(-0.06, 0.02, 0.12, 0.06);
+    ctx.fillStyle = '#8a6a10'; ctx.fillRect(-0.05, 0.04, 0.1, 0.02);
   }
-
   ctx.fillStyle = skin;
-  ctx.beginPath();
-  ctx.arc(0, -0.13, 0.17, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = shade(skin, -45);
-  ctx.lineWidth = 0.02;
-  ctx.stroke();
-
+  ctx.beginPath(); ctx.arc(0, -0.13, 0.17, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = shade(skin, -45); ctx.lineWidth = 0.02; ctx.stroke();
   ctx.fillStyle = hair;
-  ctx.beginPath();
-  ctx.arc(0, -0.17, 0.165, Math.PI, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(0, -0.2, 0.16, 0.09, 0, 0, Math.PI * 2);
-  ctx.fill();
-
+  ctx.beginPath(); ctx.arc(0, -0.17, 0.165, Math.PI, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, -0.2, 0.16, 0.09, 0, 0, Math.PI * 2); ctx.fill();
   const faceY = -0.09;
   ctx.fillStyle = '#1b2330';
   ctx.beginPath(); ctx.arc(-0.06, faceY, 0.026, 0, Math.PI * 2); ctx.fill();
@@ -2255,64 +2353,69 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   ctx.fillStyle = 'rgba(255,255,255,.9)';
   ctx.beginPath(); ctx.arc(-0.052, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(0.068, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
-
-  ctx.strokeStyle = '#5a3a20';
-  ctx.lineWidth = 0.018;
-  ctx.beginPath();
-  ctx.arc(0, -0.035, 0.045, 0.15, Math.PI - 0.15);
-  ctx.stroke();
-
+  ctx.strokeStyle = '#5a3a20'; ctx.lineWidth = 0.018;
+  ctx.beginPath(); ctx.arc(0, -0.035, 0.045, 0.15, Math.PI - 0.15); ctx.stroke();
   if(opts.cart){
-    ctx.fillStyle = '#c9a227';
-    ctx.fillRect(-0.1, -0.36, 0.2, 0.16);
-    ctx.strokeStyle = '#8a6a10';
-    ctx.lineWidth = 0.02;
-    ctx.strokeRect(-0.1, -0.36, 0.2, 0.16);
+    ctx.fillStyle = '#c9a227'; ctx.fillRect(-0.1, -0.36, 0.2, 0.16);
+    ctx.strokeStyle = '#8a6a10'; ctx.lineWidth = 0.02; ctx.strokeRect(-0.1, -0.36, 0.2, 0.16);
   }
-
   ctx.restore();
 }
 
-function drawCustomer(c){
+function drawCustomerBody(c){
   ctx.save();
   ctx.globalAlpha = clamp(c.alpha, 0, 1);
   ctx.fillStyle = 'rgba(0,0,0,.22)';
-  ctx.beginPath();
-  ctx.ellipse(c.x, c.y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2);
-  ctx.fill();
-
+  ctx.beginPath(); ctx.ellipse(c.x, c.y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2); ctx.fill();
   const walking = c.path.length > 0 || c.state === 'gone';
   const hasCart = c.cart.length && (c.state === 'toCashier' || c.state === 'paying' || c.state === 'waiting');
-
   drawPerson(c.x, c.y, c.dir, c.bob, walking, c.walk, c.skin, c.hair, c.shirt, {cart: hasCart});
-
-  if(c.bubble && c.bubbleT > 0){
-    const p = PROD_BY_ID[c.bubble];
-    if(p){
-      const bx = c.x, by = c.y - 0.62;
-      ctx.fillStyle = 'rgba(255,255,255,.95)';
-      if(ctx.roundRect){
-        ctx.beginPath(); ctx.roundRect(bx - 0.2, by - 0.2, 0.4, 0.4, 0.1); ctx.fill();
-      } else {
-        ctx.fillRect(bx - 0.2, by - 0.2, 0.4, 0.4);
-      }
-      ctx.strokeStyle = '#4a89ff';
-      ctx.lineWidth = 0.025;
-      ctx.stroke();
-      const spr = prodSprite(p);
-      if(spr && spr.complete && spr.naturalWidth){
-        ctx.drawImage(spr, bx - 0.15, by - 0.15, 0.3, 0.3);
-      }
-    }
-  }
-
   if(c.state === 'waiting'){
     ctx.fillStyle = 'rgba(255,210,87,.95)';
-    ctx.font = 'bold 0.3px system-ui';
-    ctx.textAlign = 'center';
+    ctx.font = 'bold 0.3px system-ui'; ctx.textAlign = 'center';
     ctx.fillText('!', c.x, c.y - 0.5);
   }
+  ctx.restore();
+}
 
+/* Отдельная функция — рисуется после всех тел */
+function drawCustomerBubble(c){
+  if(!c.bubble || c.bubbleT <= 0) return;
+  const p = PROD_BY_ID[c.bubble];
+  if(!p) return;
+  ctx.save();
+  ctx.globalAlpha = clamp(c.alpha, 0, 1);
+  const bx = c.x, by = c.y - 0.62;
+  // тень пузыря
+  ctx.fillStyle = 'rgba(0,0,0,.35)';
+  if(ctx.roundRect){
+    ctx.beginPath(); ctx.roundRect(bx - 0.18, by - 0.16, 0.4, 0.42, 0.1); ctx.fill();
+  }
+  // сам пузырь
+  ctx.fillStyle = 'rgba(255,255,255,.97)';
+  if(ctx.roundRect){
+    ctx.beginPath(); ctx.roundRect(bx - 0.2, by - 0.2, 0.4, 0.4, 0.1); ctx.fill();
+  } else {
+    ctx.fillRect(bx - 0.2, by - 0.2, 0.4, 0.4);
+  }
+  ctx.strokeStyle = '#4a89ff';
+  ctx.lineWidth = 0.03;
+  ctx.stroke();
+  // хвостик
+  ctx.beginPath();
+  ctx.moveTo(bx - 0.06, by + 0.2);
+  ctx.lineTo(bx, by + 0.28);
+  ctx.lineTo(bx + 0.06, by + 0.2);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,.97)';
+  ctx.fill();
+  ctx.strokeStyle = '#4a89ff';
+  ctx.stroke();
+  // иконка товара
+  const spr = prodSprite(p);
+  if(spr && spr.complete && spr.naturalWidth){
+    ctx.drawImage(spr, bx - 0.15, by - 0.15, 0.3, 0.3);
+  }
   ctx.restore();
 }
 
@@ -2321,9 +2424,7 @@ function drawCashier(){
   if(!c) return;
   ctx.save();
   ctx.fillStyle = 'rgba(0,0,0,.22)';
-  ctx.beginPath();
-  ctx.ellipse(c.x, c.y + 0.28, 0.26, 0.1, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(c.x, c.y + 0.28, 0.26, 0.1, 0, 0, Math.PI * 2); ctx.fill();
   drawPerson(c.x, c.y, Math.PI / 2, c.bob, false, 0, c.skin, c.hair, c.shirt, {badge: true, scale: 0.85});
   ctx.restore();
 }
@@ -2339,28 +2440,22 @@ function updateWorld(dt){
   for(let i = customers.length - 1; i >= 0; i--){
     if(customers[i].dead) customers.splice(i, 1);
   }
-
   const shelves = shelfCells().filter(s => s.c.stock.length > 0);
   const counters = counterCells();
   const maxCust = Math.min(8, 2 + Math.floor(shelves.length / 3));
-
   spawnTimer -= dt;
   if(spawnTimer <= 0){
-    spawnTimer = Math.max(5, 18 - shelves.length * 0.6);
+    spawnTimer = Math.max(3, (18 - shelves.length * 0.6) / spawnRateMul());
     if(customers.length < maxCust && shelves.length > 0 && counters.length > 0){
       customers.push(new Customer());
     }
   }
-
   if(state.truckState === 'away'){
     state.truckTimer -= dt;
     if(state.truckTimer <= 0) startTruckCycle();
   } else if(state.truckState === 'offering'){
     state.truckOfferTimer -= dt;
-    if(state.truckOfferTimer <= 0){
-      endTruckCycle();
-      toast(t('truckLeft'));
-    }
+    if(state.truckOfferTimer <= 0){ endTruckCycle(); toast(t('truckLeft')); }
   }
 }
 
@@ -2373,7 +2468,6 @@ function addXP(amount){
   if(after > before) showLevelUp(after);
   updateHUD();
 }
-
 function showLevelUp(newLevel){
   const overlay = document.createElement('div');
   overlay.className = 'levelup-overlay';
@@ -2399,7 +2493,7 @@ function showLevelUp(newLevel){
   setTimeout(() => { if(state.music) Music.note(783.99, 0.7, 0.16, 'triangle'); }, 280);
 }
 
-/* -------------------- 10c. ДИАЛОГ ГРУЗОВИКА ------------------------------- */
+/* -------------------- 10c. ГРУЗОВИК ------------------------------- */
 function openTruckModal(){
   if(state.truckState !== 'offering') return;
   openModal(t('truckTitle'), el => {
@@ -2408,16 +2502,12 @@ function openTruckModal(){
     p.innerHTML = `
       <div style="font-size:60px;margin-bottom:6px">🚚</div>
       <div style="font-size:15px;font-weight:600;line-height:1.4">${t('truckDesc')}</div>
-      <div style="font-size:13px;color:#ffd257;margin-top:10px;font-weight:800">SALE  x2</div>
-    `;
+      <div style="font-size:13px;color:#ffd257;margin-top:10px;font-weight:800">SALE  x2</div>`;
     el.appendChild(p);
-
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:8px;margin-top:14px';
-
     const accept = document.createElement('button');
-    accept.className = 'btn';
-    accept.style.cssText = 'flex:1;padding:13px;font-size:14px';
+    accept.className = 'btn'; accept.style.cssText = 'flex:1;padding:13px;font-size:14px';
     accept.textContent = t('truckAccept');
     accept.onclick = async () => {
       closeModal();
@@ -2427,32 +2517,17 @@ function openTruckModal(){
         hideAdOverlay();
         if(res && res.result){
           state.bonusUntil = Date.now() + TRUCK_BONUS * 1000;
-          endTruckCycle();
-          updateHUD();
-          scheduleSave();
+          endTruckCycle(); updateHUD(); scheduleSave();
           toast(t('bonusActive') + ' +2\u00D7 (' + TRUCK_BONUS + 's)', '#ffd257');
           if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
-        } else {
-          toast(t('adNotAvailable'));
-        }
-      } catch(e){
-        hideAdOverlay();
-        toast(t('adNotAvailable'));
-      }
+        } else { toast(t('adNotAvailable')); }
+      } catch(e){ hideAdOverlay(); toast(t('adNotAvailable')); }
     };
-
     const decline = document.createElement('button');
-    decline.className = 'btn ghost';
-    decline.style.cssText = 'flex:1;padding:13px;font-size:14px';
+    decline.className = 'btn ghost'; decline.style.cssText = 'flex:1;padding:13px;font-size:14px';
     decline.textContent = t('truckDecline');
-    decline.onclick = () => {
-      closeModal();
-      endTruckCycle();
-      toast(t('truckLeft'));
-    };
-
-    row.appendChild(accept);
-    row.appendChild(decline);
+    decline.onclick = () => { closeModal(); endTruckCycle(); toast(t('truckLeft')); };
+    row.appendChild(accept); row.appendChild(decline);
     el.appendChild(row);
   });
 }
@@ -2481,30 +2556,23 @@ function hasClaimableTimeReward(){
 function claimTimeReward(idx){
   if(state.claimedTimeRewards.indexOf(idx) >= 0) return;
   const r = TIME_REWARDS[idx];
-  const mins = state.playtime / 60;
-  if(mins < r.min) return;
+  if(state.playtime / 60 < r.min) return;
   state.claimedTimeRewards.push(idx);
   state.money += r.amount;
-  addXP(Math.max(1, Math.round(r.amount * 0.5)));
-  updateHUD();
+  addXP(Math.max(1, Math.round(r.amount * 0.5 * xpMul())));
   scheduleSave();
   toast('+' + fmt(r.amount) + ' \u20BF', '#ffd257');
 }
-
 function openTimeRewards(){
   openModal(t('timeRewards'), el => {
     const info = document.createElement('div');
     info.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px';
-    info.innerHTML = `
-      <div class="chip">${t('timePlayed')}: ${fmtTime(state.playtime)}</div>
-    `;
+    info.innerHTML = `<div class="chip">${t('timePlayed')}: ${fmtTime(state.playtime)}</div>`;
     el.appendChild(info);
-
     const desc = document.createElement('div');
     desc.style.cssText = 'font-size:12.5px;color:#8798ad;padding:2px 4px 10px';
     desc.textContent = t('timeRewardsDesc');
     el.appendChild(desc);
-
     const mins = state.playtime / 60;
     TIME_REWARDS.forEach((r, i) => {
       const claimed = state.claimedTimeRewards.indexOf(i) >= 0;
@@ -2521,16 +2589,10 @@ function openTimeRewards(){
       b.className = 'btn' + (claimed ? ' ghost' : (reached ? '' : ' ghost'));
       b.textContent = claimed ? t('claimed') : t('claim');
       b.disabled = claimed || !reached;
-      b.onclick = () => {
-        claimTimeReward(i);
-        closeModal();
-        openTimeRewards();
-      };
+      b.onclick = () => { claimTimeReward(i); closeModal(); openTimeRewards(); };
       row.appendChild(ic); row.appendChild(nm); row.appendChild(b);
       el.appendChild(row);
     });
-
-    // Кнопка назад к обычным наградам не нужна. Низ модалки — просто индикатор.
     const foot = document.createElement('div');
     foot.style.cssText = 'margin-top:12px;color:#8798ad;font-size:11.5px;text-align:center';
     foot.textContent = state.lang === 'en' ? 'New rewards unlock as you play' : 'Новые награды открываются со временем игры';
@@ -2538,13 +2600,128 @@ function openTimeRewards(){
   });
 }
 
+/* -------------------- 10e. ПРОКАЧКИ ------------------------------- */
+function openUpgrades(){
+  openModal(t('upgrades'), el => {
+    const top = document.createElement('div');
+    top.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+    top.innerHTML = `<div class="chip">\uD83D\uDCB0 ${fmt(state.money)} \u20BF</div>`;
+    el.appendChild(top);
+    Object.keys(UPGRADES).forEach(key => {
+      const u = UPGRADES[key];
+      const lvl = upgradeLevel(key);
+      const maxed = lvl >= u.max;
+      const cost = maxed ? 0 : u.costs[lvl];
+      const canBuy = !maxed && state.money >= cost;
+      const row = document.createElement('div');
+      row.className = 'row';
+      const ic = document.createElement('div');
+      ic.className = 'ic';
+      ic.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffd257" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/></svg>`;
+      const nm = document.createElement('div');
+      nm.className = 'nm';
+      nm.innerHTML = `<b>${uname(key)} <span style="color:#8798ad;font-size:11px">${lvl}/${u.max}</span></b><span>${udesc(key)}</span>`;
+      const pr = document.createElement('div');
+      pr.className = 'pr';
+      pr.textContent = maxed ? t('maxed') : fmt(cost);
+      const b = document.createElement('button');
+      b.className = 'btn' + (canBuy ? '' : ' ghost');
+      b.textContent = maxed ? '\u2713' : t('buyUpgrade');
+      b.disabled = maxed || !canBuy;
+      b.onclick = () => {
+        if(maxed || state.money < cost) return;
+        state.money -= cost;
+        state.upgrades[key] = lvl + 1;
+        updateHUD(); scheduleSave();
+        toast(uname(key) + ' \u2192 ' + (lvl + 1), '#7fd07f');
+        closeModal(); openUpgrades();
+      };
+      row.appendChild(ic); row.appendChild(nm); row.appendChild(pr); row.appendChild(b);
+      el.appendChild(row);
+    });
+  });
+}
+
+/* -------------------- 10f. ПЕРЕРОЖДЕНИЕ ------------------------------- */
+function openPrestige(){
+  openModal(t('prestige'), el => {
+    const lvl = getLevel();
+    const bonusPct = Math.round(PRESTIGE_BONUS * state.prestige * 100);
+    const nextBonusPct = Math.round(PRESTIGE_BONUS * (state.prestige + 1) * 100);
+    const info = document.createElement('div');
+    info.style.cssText = 'text-align:center;padding:8px';
+    info.innerHTML = `
+      <div style="font-size:60px;line-height:1">⭐</div>
+      <div style="font-size:16px;font-weight:800;color:#ffd257;margin-top:6px">+${bonusPct}%</div>
+      <div style="font-size:12px;color:#8798ad;margin-top:4px">${fmtStr(t('prestigeBonusTotal'), {n: bonusPct})}</div>
+      <div style="margin-top:10px" class="chip">${fmtStr(t('prestigeTotal'), {n: state.prestige})}</div>
+      <div style="margin-top:8px" class="chip">${t('level')} ${lvl} / ${PRESTIGE_LEVEL}</div>
+    `;
+    el.appendChild(info);
+
+    if(!canPrestige()){
+      const w = document.createElement('div');
+      w.style.cssText = 'margin-top:14px;color:#8798ad;font-size:13px;text-align:center;padding:10px';
+      w.textContent = fmtStr(t('prestigeRequires'), {n: PRESTIGE_LEVEL});
+      el.appendChild(w);
+    } else {
+      const b = document.createElement('button');
+      b.className = 'btn gold';
+      b.style.cssText = 'width:100%;padding:14px;font-size:15px;margin-top:14px';
+      b.textContent = t('prestigeBtn') + ' (+5%)';
+      b.onclick = () => {
+        openModal(t('prestigeConfirmTitle'), el2 => {
+          const q = document.createElement('div');
+          q.style.cssText = 'text-align:center;padding:20px 10px;font-size:14.5px;font-weight:600;line-height:1.5';
+          q.textContent = t('prestigeConfirm');
+          el2.appendChild(q);
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+          const yes = document.createElement('button');
+          yes.className = 'btn gold';
+          yes.style.cssText = 'flex:1;padding:13px;font-size:14px';
+          yes.textContent = t('prestigeYes');
+          yes.onclick = () => { doPrestige(); closeModal(); };
+          const no = document.createElement('button');
+          no.className = 'btn ghost';
+          no.style.cssText = 'flex:1;padding:13px;font-size:14px';
+          no.textContent = t('cancel');
+          no.onclick = () => { closeModal(); openPrestige(); };
+          row.appendChild(yes); row.appendChild(no);
+          el2.appendChild(row);
+        });
+      };
+      el.appendChild(b);
+    }
+  });
+}
+
+function doPrestige(){
+  const savedLang = state.lang;
+  const savedMusic = state.music;
+  const savedTutorial = state.tutorialDone;
+  const savedUpgrades = JSON.parse(JSON.stringify(state.upgrades));
+  const newPrestige = state.prestige + 1;
+
+  state = newState();
+  state.lang = savedLang;
+  state.music = savedMusic;
+  state.tutorialDone = savedTutorial;
+  state.upgrades = savedUpgrades;
+  state.prestige = newPrestige;
+  initGrid();
+  checkDailyReset();
+  updateHUD();
+  scheduleSave();
+  toast(t('prestigeDone') + ' +5%', '#ffd257');
+  if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
+}
+
 /* ------------------------------- 11. ВВОД ---------------------------------- */
 function screenToCell(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
-  const x = clientX - rect.left;
-  const y = clientY - rect.top;
-  const gx = Math.floor((x - getOX()) / CS);
-  const gy = Math.floor((y - getOY()) / CS);
+  const gx = Math.floor((clientX - rect.left - getOX()) / CS);
+  const gy = Math.floor((clientY - rect.top - getOY()) / CS);
   if(gx < 0 || gy < 0 || gx >= GW || gy >= GH) return null;
   return {x: gx, y: gy};
 }
@@ -2555,34 +2732,23 @@ function screenToWorld(clientX, clientY){
     y: (clientY - rect.top - getOY()) / CS
   };
 }
-
 let placeMode = null;
 
 function onCellClick(gx, gy){
   if(isTutorialBlocking() && tutorialStep <= 2) return;
-
-  if(dirtAtCell(gx, gy)){
-    cleanDirtAt(gx, gy);
-    return;
-  }
-
+  if(dirtAtCell(gx, gy)){ cleanDirtAt(gx, gy); return; }
   const c = cellAt(gx, gy);
   if(!c) return;
-
   if(placeMode && placeMode.kind === 'furniture'){
     if(!c.u){ toast(t('noMoney')); return; }
     if(c.t || c.door){ toast(t('occupied')); return; }
-    c.t = placeMode.type;
-    c.stock = [];
+    c.t = placeMode.type; c.stock = [];
     state.ds.place++;
     scheduleSave();
     toast(t('placed') + ': ' + fname(placeMode.type), '#7fd07f');
-    placeMode = null;
-    updatePlaceBar();
-    updateHUD();
+    placeMode = null; updatePlaceBar(); updateHUD();
     return;
   }
-
   if(placeMode && placeMode.kind === 'stock'){
     if(!c.u || !c.t || c.t === 'counter'){ return; }
     if(!canAccept(c, placeMode.pid)){
@@ -2596,59 +2762,38 @@ function onCellClick(gx, gy){
       state.warehouse[placeMode.pid] -= added;
       if(state.warehouse[placeMode.pid] <= 0) delete state.warehouse[placeMode.pid];
       state.ds.stock += added;
-      scheduleSave();
-      updateHUD();
+      scheduleSave(); updateHUD();
       if(tutorialStep === 3){
         tutorialStep = 4;
-        updateTutorialBlock();
-        showTutorialHint();
+        updateTutorialBlock(); showTutorialHint();
       }
-    } else {
-      toast(t('shelfFull'));
-      return;
-    }
-    if(!state.warehouse[placeMode.pid]){
-      placeMode = null;
-      updatePlaceBar();
-    }
+    } else { toast(t('shelfFull')); return; }
+    if(!state.warehouse[placeMode.pid]){ placeMode = null; updatePlaceBar(); }
     return;
   }
-
   if(!c.u){
     if(!isAdjacentToUnlocked(gx, gy)){ toast(t('tooFar')); return; }
     const maxCells = maxCellsForLevel(getLevel());
-    if(unlockedCount() >= maxCells){
-      toast(t('maxCells'), '#e0575b');
-      return;
-    }
+    if(unlockedCount() >= maxCells){ toast(t('maxCells'), '#e0575b'); return; }
     const price = expandPrice();
     if(state.money < price){ toast(t('noMoney')); return; }
-    state.money -= price;
-    c.u = true;
+    state.money -= price; c.u = true;
     state.ds.expand++;
-    scheduleSave();
-    updateHUD();
+    scheduleSave(); updateHUD();
     toast(t('cellAdded'), '#7fd07f');
     return;
   }
-
-  if(c.t && c.t !== 'counter'){
-    openShelfInfo(gx, gy);
-  }
+  if(c.t && c.t !== 'counter'){ openShelfInfo(gx, gy); }
 }
 
 canvas.addEventListener('pointerdown', e => {
   if($('#modalRoot').style.display === 'block') return;
-  dragging = true;
-  dragMoved = false;
-  dragStartX = e.clientX;
-  dragStartY = e.clientY;
-  dragBaseCamX = camX;
-  dragBaseCamY = camY;
+  dragging = true; dragMoved = false;
+  dragStartX = e.clientX; dragStartY = e.clientY;
+  dragBaseCamX = camX; dragBaseCamY = camY;
   canvas.classList.add('dragging');
   try { canvas.setPointerCapture(e.pointerId); } catch(_){}
 });
-
 canvas.addEventListener('pointermove', e => {
   if(!dragging) return;
   const dx = e.clientX - dragStartX;
@@ -2660,26 +2805,21 @@ canvas.addEventListener('pointermove', e => {
     clampCamera();
   }
 });
-
 function endDrag(e){
   if(!dragging) return;
   const wasMoved = dragMoved;
-  dragging = false;
-  dragMoved = false;
+  dragging = false; dragMoved = false;
   canvas.classList.remove('dragging');
   try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
   if(!wasMoved){
     const wld = screenToWorld(e.clientX, e.clientY);
-    if(truck.hitTest(wld.x, wld.y)){
-      openTruckModal();
-      return;
-    }
+    if(truck.hitTest(wld.x, wld.y)){ openTruckModal(); return; }
     const cell = screenToCell(e.clientX, e.clientY);
     if(cell) onCellClick(cell.x, cell.y);
   }
 }
 canvas.addEventListener('pointerup', endDrag);
-canvas.addEventListener('pointercancel', e => { dragging = false; dragMoved = false; canvas.classList.remove('dragging'); });
+canvas.addEventListener('pointercancel', () => { dragging = false; dragMoved = false; canvas.classList.remove('dragging'); });
 canvas.addEventListener('dblclick', () => { camX = 0; camY = 0; clampCamera(); });
 
 /* ------------------------------- 12. UI ----------------------------------- */
@@ -2713,6 +2853,15 @@ function updateHUD(){
   const canDaily = state.lastDaily !== todayStr();
   $('#dailyBadge').style.display = canDaily ? 'block' : 'none';
 
+  // Престиж
+  const pc = $('#prestigeChip');
+  if(state.prestige > 0){
+    pc.style.display = 'flex';
+    $('#prestigeVal').textContent = state.prestige;
+  } else {
+    pc.style.display = 'none';
+  }
+
   // Бонус x2
   const bonusChip = $('#bonusChip');
   if(hasIncomeBonus()){
@@ -2723,7 +2872,7 @@ function updateHUD(){
     bonusChip.style.display = 'none';
   }
 
-  // Точка на кнопке наград за время
+  // Точка на наградах
   const dot = $('#timeRewardDot');
   if(hasClaimableTimeReward()) dot.style.display = 'block';
   else dot.style.display = 'none';
@@ -2762,13 +2911,11 @@ function openModal(titleText, builder){
   close.className = 'close-btn';
   close.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>';
   close.onclick = closeModal;
-  head.appendChild(h3);
-  head.appendChild(close);
+  head.appendChild(h3); head.appendChild(close);
   const body = document.createElement('div');
   body.className = 'modal-body';
   wrap.appendChild(box);
-  box.appendChild(head);
-  box.appendChild(body);
+  box.appendChild(head); box.appendChild(body);
   root.appendChild(wrap);
   wrap.addEventListener('pointerdown', e => { if(e.target === wrap) closeModal(); });
   builder(body);
@@ -2784,20 +2931,17 @@ let shopCurCat = 'all';
 function openShop(){
   openModal(t('shop'), el => {
     let curTab = 'items';
-
     const tabs = document.createElement('div');
     tabs.className = 'tabs';
     const tabsData = [
-      {id: 'items', label: t('items')},
-      {id: 'furn', label: t('furniture')},
-      {id: 'decor', label: t('decor')},
-      {id: 'expand', label: t('expand')}
+      {id:'items',label:t('items')},
+      {id:'furn',label:t('furniture')},
+      {id:'decor',label:t('decor')},
+      {id:'expand',label:t('expand')}
     ];
-
     const catSel = document.createElement('div');
     catSel.className = 'cat-sel';
     catSel.style.cssText = 'display:flex;gap:5px;overflow-x:auto;padding:8px 2px;';
-
     const content = document.createElement('div');
 
     function renderContent(){
@@ -2812,7 +2956,6 @@ function openShop(){
       content.innerHTML = '';
       catSel.style.display = 'flex';
       catSel.innerHTML = '';
-
       const cats = ['all'].concat(Object.keys(CATS));
       cats.forEach(ck => {
         const chip = document.createElement('div');
@@ -2820,16 +2963,11 @@ function openShop(){
         chip.style.padding = '6px 11px';
         chip.style.fontSize = '12px';
         chip.textContent = ck === 'all' ? (state.lang === 'en' ? 'All' : 'Все') : catName(ck);
-        chip.onclick = () => {
-          shopCurCat = ck;
-          renderItems();
-        };
+        chip.onclick = () => { shopCurCat = ck; renderItems(); };
         catSel.appendChild(chip);
       });
-
       const lvl = getLevel();
       const list = PRODUCTS.filter(p => shopCurCat === 'all' || p.cat === shopCurCat);
-
       if(shopCurCat === 'all'){
         const byCat = {};
         Object.keys(CATS).forEach(ck => byCat[ck] = []);
@@ -2858,8 +2996,7 @@ function openShop(){
       const unlocked = lvl >= productLevel(p);
       const row = document.createElement('div');
       row.className = 'row' + (unlocked ? '' : ' locked');
-      row.style.margin = '0';
-      row.style.padding = '7px';
+      row.style.margin = '0'; row.style.padding = '7px';
       const ic = document.createElement('div');
       ic.className = 'ic';
       ic.style.width = '32px'; ic.style.height = '32px';
@@ -2868,8 +3005,7 @@ function openShop(){
       ic.appendChild(im);
       if(!unlocked){
         const lock = document.createElement('div');
-        lock.className = 'lock';
-        lock.textContent = '\uD83D\uDD12';
+        lock.className = 'lock'; lock.textContent = '\uD83D\uDD12';
         ic.appendChild(lock);
       }
       const nm = document.createElement('div');
@@ -2877,18 +3013,15 @@ function openShop(){
       const sub = unlocked ? catName(p.cat) : (t('requires') + ' ' + t('level') + ' ' + productLevel(p));
       nm.innerHTML = `<b style="font-size:12px">${pname(p)}</b><span>${sub}</span>`;
       const pr = document.createElement('div');
-      pr.className = 'pr';
-      pr.style.fontSize = '12px';
+      pr.className = 'pr'; pr.style.fontSize = '12px';
       pr.textContent = unlocked ? fmt(p.cost) : '\u2014';
       row.appendChild(ic); row.appendChild(nm); row.appendChild(pr);
       if(unlocked){
         const b = document.createElement('button');
-        b.className = 'btn sm';
-        b.textContent = '+';
+        b.className = 'btn sm'; b.textContent = '+';
         b.onclick = () => buyProduct(p.id, 1);
         const b10 = document.createElement('button');
-        b10.className = 'btn sm ghost';
-        b10.textContent = '\u00D710';
+        b10.className = 'btn sm ghost'; b10.textContent = '\u00D710';
         b10.onclick = () => buyProduct(p.id, 10);
         row.appendChild(b); row.appendChild(b10);
       } else {
@@ -2913,14 +3046,9 @@ function openShop(){
       }
       if(bought === 0){ toast(t('noMoney')); return; }
       state.ds.buy += bought;
-      updateHUD();
-      scheduleSave();
+      updateHUD(); scheduleSave();
       toast(t('bought') + ': ' + pname(p) + ' \u00D7' + bought, '#7fd07f');
-      if(tutorialStep === 2){
-        tutorialStep = 3;
-        updateTutorialBlock();
-        showTutorialHint();
-      }
+      if(tutorialStep === 2){ tutorialStep = 3; updateTutorialBlock(); showTutorialHint(); }
     }
 
     function renderFurniture(){
@@ -2938,18 +3066,16 @@ function openShop(){
         const nm = document.createElement('div');
         nm.className = 'nm';
         const cnt = countFurniture(k);
-        nm.innerHTML = `<b>${fname(k)}</b><span>${t('onMap')}: ${cnt}${f.cap ? ' \u00B7 ' + f.cap + ' ' + t('slots') : ''}</span>`;
+        const cap = f.cap + (f.cap > 0 ? extraCapacity() : 0);
+        nm.innerHTML = `<b>${fname(k)}</b><span>${t('onMap')}: ${cnt}${f.cap ? ' \u00B7 ' + cap + ' ' + t('slots') : ''}</span>`;
         const pr = document.createElement('div');
-        pr.className = 'pr';
-        pr.textContent = fmt(f.cost);
+        pr.className = 'pr'; pr.textContent = fmt(f.cost);
         const b = document.createElement('button');
-        b.className = 'btn';
-        b.textContent = t('buy');
+        b.className = 'btn'; b.textContent = t('buy');
         b.onclick = () => {
           if(state.money < f.cost){ toast(t('noMoney')); return; }
           state.money -= f.cost;
-          updateHUD();
-          scheduleSave();
+          updateHUD(); scheduleSave();
           placeMode = {kind: 'furniture', type: k};
           updatePlaceBar();
           closeModal();
@@ -2996,7 +3122,6 @@ function openShop(){
         row.appendChild(ic); row.appendChild(nm); row.appendChild(b);
         content.appendChild(row);
       });
-
       const tn = document.createElement('div');
       tn.className = 'sec-title'; tn.textContent = t('windows');
       content.appendChild(tn);
@@ -3047,8 +3172,7 @@ function openShop(){
         </div>
         <div style="font-size:24px;font-weight:800;color:#ffd257;margin-bottom:8px">${fmt(expandPrice())} \u20BF</div>
         <div style="color:#8798ad;font-size:12.5px">${t('expandHint')}</div>
-        <div class="progressbar" style="margin-top:14px"><i style="width:${(cur / maxCells * 100).toFixed(1)}%"></i></div>
-      `;
+        <div class="progressbar" style="margin-top:14px"><i style="width:${(cur / maxCells * 100).toFixed(1)}%"></i></div>`;
       content.appendChild(info);
       const btn = document.createElement('button');
       btn.className = 'btn';
@@ -3090,10 +3214,7 @@ function countFurniture(k){
 function openWarehouse(){
   openModal(t('warehouse'), el => {
     const total = warehouseTotal();
-    if(total === 0){
-      el.innerHTML = `<div class="empty">${t('stockEmpty')}</div>`;
-      return;
-    }
+    if(total === 0){ el.innerHTML = `<div class="empty">${t('stockEmpty')}</div>`; return; }
     const top = document.createElement('div');
     top.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:10px';
     top.innerHTML = `<div class="chip">${t('total')}: ${total}</div>`;
@@ -3101,17 +3222,11 @@ function openWarehouse(){
     auto.className = 'btn g';
     auto.style.marginLeft = 'auto';
     auto.textContent = t('autoStock');
-    auto.onclick = () => {
-      autoStock();
-      closeModal();
-      openWarehouse();
-    };
+    auto.onclick = () => { autoStock(); closeModal(); openWarehouse(); };
     top.appendChild(auto);
     el.appendChild(top);
-
     const ids = Object.keys(state.warehouse).filter(k => state.warehouse[k] > 0)
       .sort((a, b) => PROD_BY_ID[b].cost - PROD_BY_ID[a].cost);
-
     ids.forEach(idStr => {
       const pid = Number(idStr);
       const p = PROD_BY_ID[pid];
@@ -3127,8 +3242,7 @@ function openWarehouse(){
       nm.className = 'nm';
       nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${state.warehouse[pid]} \u0448\u0442</span>`;
       const b = document.createElement('button');
-      b.className = 'btn';
-      b.textContent = t('place');
+      b.className = 'btn'; b.textContent = t('place');
       b.onclick = () => {
         placeMode = {kind: 'stock', pid};
         updatePlaceBar();
@@ -3161,11 +3275,8 @@ function autoStock(){
   if(moved > 0){
     state.ds.stock += moved;
     toast(t('stocked') + ': ' + moved, '#7fd07f');
-    updateHUD();
-    scheduleSave();
-  } else {
-    toast(t('noSlots'));
-  }
+    updateHUD(); scheduleSave();
+  } else { toast(t('noSlots')); }
 }
 
 function openShelfInfo(gx, gy){
@@ -3182,7 +3293,6 @@ function openShelfInfo(gx, gy){
     bar.innerHTML = `<i style="width:${(ratio*100).toFixed(0)}%"></i>`;
     info.appendChild(bar);
     el.appendChild(info);
-
     if(c.stock.length){
       const list = document.createElement('div');
       list.style.marginTop = '4px';
@@ -3200,38 +3310,27 @@ function openShelfInfo(gx, gy){
         nm.className = 'nm';
         nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${t('sellAt')} ${p.sell} \u20BF</span>`;
         const qty = document.createElement('div');
-        qty.className = 'pr';
-        qty.textContent = '\u00D7' + s.n;
+        qty.className = 'pr'; qty.textContent = '\u00D7' + s.n;
         const b = document.createElement('button');
-        b.className = 'btn ghost sm';
-        b.textContent = t('take');
-        b.onclick = () => {
-          takeFromShelf(c, s.id, s.n);
-          updateHUD(); scheduleSave();
-          closeModal(); openShelfInfo(gx, gy);
-        };
+        b.className = 'btn ghost sm'; b.textContent = t('take');
+        b.onclick = () => { takeFromShelf(c, s.id, s.n); updateHUD(); scheduleSave(); closeModal(); openShelfInfo(gx, gy); };
         row.appendChild(ic); row.appendChild(nm); row.appendChild(qty); row.appendChild(b);
         list.appendChild(row);
       });
       el.appendChild(list);
     } else {
       const e = document.createElement('div');
-      e.className = 'empty';
-      e.textContent = t('emptyShelf');
+      e.className = 'empty'; e.textContent = t('emptyShelf');
       el.appendChild(e);
     }
-
     const del = document.createElement('button');
     del.className = 'btn r';
     del.style.cssText = 'width:100%;padding:12px;margin-top:12px';
     del.textContent = t('remove') + ' (+' + Math.floor(FURNITURE[c.t].cost * 0.5) + ' \u20BF)';
     del.onclick = () => {
       state.money += Math.floor(FURNITURE[c.t].cost * 0.5);
-      for(const s of c.stock){
-        state.warehouse[s.id] = (state.warehouse[s.id] || 0) + s.n;
-      }
-      c.stock = [];
-      c.t = null;
+      for(const s of c.stock){ state.warehouse[s.id] = (state.warehouse[s.id] || 0) + s.n; }
+      c.stock = []; c.t = null;
       updateHUD(); scheduleSave();
       closeModal();
       toast(t('remove'), '#e0575b');
@@ -3242,9 +3341,26 @@ function openShelfInfo(gx, gy){
 
 function openSettings(){
   openModal(t('settings'), el => {
-    // ==== Рендер основной страницы настроек ====
+    // Табы внутри настроек
+    const tabs = document.createElement('div');
+    tabs.className = 'tabs';
+    tabs.style.marginBottom = '8px';
+    const tabList = [
+      {id:'main',label:t('settingsTabMain')},
+      {id:'upgrades',label:t('settingsTabUpgrades')},
+      {id:'prestige',label:t('settingsTabPrestige')}
+    ];
+    let curTab = 'main';
+    const content = document.createElement('div');
+
+    function renderContent(){
+      content.innerHTML = '';
+      if(curTab === 'main') renderMain();
+      else if(curTab === 'upgrades') renderUpgradesTab();
+      else renderPrestigeTab();
+    }
+
     function renderMain(){
-      el.innerHTML = '';
       const r1 = document.createElement('div');
       r1.className = 'row';
       r1.innerHTML = `<div class="nm"><b>${t('music')}</b><span>${state.lang === 'en' ? 'Background music' : 'Фоновая музыка'}</span></div>`;
@@ -3258,14 +3374,14 @@ function openSettings(){
         scheduleSave();
       };
       r1.appendChild(sw);
-      el.appendChild(r1);
+      content.appendChild(r1);
 
       const r2 = document.createElement('div');
       r2.className = 'row';
       r2.innerHTML = `<div class="nm"><b>${t('language')}</b><span>${state.lang === 'ru' ? 'Русский' : 'English'}</span></div>`;
       const lg = document.createElement('div');
       lg.style.display = 'flex'; lg.style.gap = '6px';
-      ['ru', 'en'].forEach(code => {
+      ['ru','en'].forEach(code => {
         const b = document.createElement('button');
         b.className = 'btn sm' + (state.lang === code ? '' : ' ghost');
         b.textContent = code.toUpperCase();
@@ -3279,11 +3395,11 @@ function openSettings(){
         lg.appendChild(b);
       });
       r2.appendChild(lg);
-      el.appendChild(r2);
+      content.appendChild(r2);
 
       const tt = document.createElement('div');
       tt.className = 'sec-title'; tt.textContent = t('promo');
-      el.appendChild(tt);
+      content.appendChild(tt);
 
       const box = document.createElement('div');
       box.style.cssText = 'display:flex;gap:7px';
@@ -3295,8 +3411,7 @@ function openSettings(){
       ab.onclick = async () => {
         const code = inp.value.trim().toLowerCase();
         if(code === 'clear12'){
-          await wipeSave();
-          closeModal();
+          await wipeSave(); closeModal();
           toast(t('promoOk'), '#7fd07f');
           setTimeout(() => location.reload(), 900);
         } else if(code === 'admin17'){
@@ -3305,34 +3420,29 @@ function openSettings(){
           updateHUD(); scheduleSave();
           inp.value = '';
           toast(t('promoOk') + ' +1 000 000 \u20BF', '#ffd257');
-        } else {
-          toast(t('promoBad'), '#e0575b');
-        }
+        } else { toast(t('promoBad'), '#e0575b'); }
       };
       box.appendChild(inp); box.appendChild(ab);
-      el.appendChild(box);
+      content.appendChild(box);
 
       const rb = document.createElement('button');
       rb.className = 'btn r';
       rb.style.cssText = 'width:100%;padding:11px;margin-top:16px';
       rb.textContent = state.lang === 'en' ? 'Reset progress' : 'Сбросить прогресс';
       rb.onclick = () => renderConfirm();
-      el.appendChild(rb);
+      content.appendChild(rb);
     }
 
-    // ==== Страница подтверждения сброса ====
     function renderConfirm(){
-      el.innerHTML = '';
-      const q = document.createElement('div');
-      q.style.cssText = 'text-align:center;padding:22px 10px;font-size:15px;font-weight:600;line-height:1.5';
-      q.textContent = t('confirmReset');
-      el.appendChild(q);
-
+      content.innerHTML = '';
       const icon = document.createElement('div');
       icon.style.cssText = 'text-align:center;font-size:52px;padding-bottom:6px';
       icon.textContent = '⚠️';
-      el.insertBefore(icon, q);
-
+      content.appendChild(icon);
+      const q = document.createElement('div');
+      q.style.cssText = 'text-align:center;padding:14px 10px;font-size:15px;font-weight:600;line-height:1.5';
+      q.textContent = t('confirmReset');
+      content.appendChild(q);
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;gap:8px;margin-top:8px';
       const yes = document.createElement('button');
@@ -3340,8 +3450,7 @@ function openSettings(){
       yes.style.cssText = 'flex:1;padding:13px;font-size:14px';
       yes.textContent = t('yesReset');
       yes.onclick = async () => {
-        await wipeSave();
-        closeModal();
+        await wipeSave(); closeModal();
         toast(t('progressReset'), '#e0575b');
         updateHUD();
       };
@@ -3349,12 +3458,113 @@ function openSettings(){
       no.className = 'btn ghost';
       no.style.cssText = 'flex:1;padding:13px;font-size:14px';
       no.textContent = t('cancel');
-      no.onclick = () => renderMain();
+      no.onclick = () => renderContent();
       row.appendChild(yes); row.appendChild(no);
-      el.appendChild(row);
+      content.appendChild(row);
     }
 
-    renderMain();
+    function renderUpgradesTab(){
+      const top = document.createElement('div');
+      top.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+      top.innerHTML = `<div class="chip">\uD83D\uDCB0 ${fmt(state.money)} \u20BF</div>`;
+      content.appendChild(top);
+      Object.keys(UPGRADES).forEach(key => {
+        const u = UPGRADES[key];
+        const lvl = upgradeLevel(key);
+        const maxed = lvl >= u.max;
+        const cost = maxed ? 0 : u.costs[lvl];
+        const canBuy = !maxed && state.money >= cost;
+        const row = document.createElement('div');
+        row.className = 'row';
+        const ic = document.createElement('div');
+        ic.className = 'ic';
+        ic.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffd257" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z"/></svg>`;
+        const nm = document.createElement('div');
+        nm.className = 'nm';
+        nm.innerHTML = `<b>${uname(key)} <span style="color:#8798ad;font-size:11px">${lvl}/${u.max}</span></b><span>${udesc(key)}</span>`;
+        const pr = document.createElement('div');
+        pr.className = 'pr';
+        pr.textContent = maxed ? t('maxed') : fmt(cost);
+        const b = document.createElement('button');
+        b.className = 'btn' + (canBuy ? '' : ' ghost');
+        b.textContent = maxed ? '\u2713' : t('buyUpgrade');
+        b.disabled = maxed || !canBuy;
+        b.onclick = () => {
+          if(maxed || state.money < cost) return;
+          state.money -= cost;
+          state.upgrades[key] = lvl + 1;
+          updateHUD(); scheduleSave();
+          toast(uname(key) + ' \u2192 ' + (lvl + 1), '#7fd07f');
+          renderContent();
+        };
+        row.appendChild(ic); row.appendChild(nm); row.appendChild(pr); row.appendChild(b);
+        content.appendChild(row);
+      });
+    }
+
+    function renderPrestigeTab(){
+      const lvl = getLevel();
+      const bonusPct = Math.round(PRESTIGE_BONUS * state.prestige * 100);
+      const info = document.createElement('div');
+      info.style.cssText = 'text-align:center;padding:8px';
+      info.innerHTML = `
+        <div style="font-size:60px;line-height:1">⭐</div>
+        <div style="font-size:16px;font-weight:800;color:#ffd257;margin-top:6px">+${bonusPct}%</div>
+        <div style="font-size:12px;color:#8798ad;margin-top:4px">${fmtStr(t('prestigeBonusTotal'), {n: bonusPct})}</div>
+        <div style="margin-top:10px" class="chip">${fmtStr(t('prestigeTotal'), {n: state.prestige})}</div>
+        <div style="margin-top:8px" class="chip">${t('level')} ${lvl} / ${PRESTIGE_LEVEL}</div>`;
+      content.appendChild(info);
+      if(!canPrestige()){
+        const w = document.createElement('div');
+        w.style.cssText = 'margin-top:14px;color:#8798ad;font-size:13px;text-align:center;padding:10px';
+        w.textContent = fmtStr(t('prestigeRequires'), {n: PRESTIGE_LEVEL});
+        content.appendChild(w);
+      } else {
+        const b = document.createElement('button');
+        b.className = 'btn gold';
+        b.style.cssText = 'width:100%;padding:14px;font-size:15px;margin-top:14px';
+        b.textContent = t('prestigeBtn') + ' (+5%)';
+        b.onclick = () => {
+          const q = document.createElement('div');
+          content.innerHTML = '';
+          q.style.cssText = 'text-align:center;padding:20px 10px;font-size:14.5px;font-weight:600;line-height:1.5';
+          q.textContent = t('prestigeConfirm');
+          content.appendChild(q);
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+          const yes = document.createElement('button');
+          yes.className = 'btn gold';
+          yes.style.cssText = 'flex:1;padding:13px;font-size:14px';
+          yes.textContent = t('prestigeYes');
+          yes.onclick = () => { doPrestige(); closeModal(); };
+          const no = document.createElement('button');
+          no.className = 'btn ghost';
+          no.style.cssText = 'flex:1;padding:13px;font-size:14px';
+          no.textContent = t('cancel');
+          no.onclick = () => renderContent();
+          row.appendChild(yes); row.appendChild(no);
+          content.appendChild(row);
+        };
+        content.appendChild(b);
+      }
+    }
+
+    tabList.forEach(td => {
+      const el = document.createElement('div');
+      el.className = 'tab' + (curTab === td.id ? ' active' : '');
+      el.textContent = td.label;
+      el.onclick = () => {
+        curTab = td.id;
+        [...tabs.children].forEach(ch => ch.classList.remove('active'));
+        el.classList.add('active');
+        renderContent();
+      };
+      tabs.appendChild(el);
+    });
+
+    el.appendChild(tabs);
+    el.appendChild(content);
+    renderContent();
   });
 }
 
@@ -3365,7 +3575,6 @@ function openTasks(){
     head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px';
     head.innerHTML = `<div class="chip">${todayStr()}</div>`;
     el.appendChild(head);
-
     state.tasks.forEach(tk => {
       const prog = taskProgress(tk);
       const done = prog >= tk.target;
@@ -3385,7 +3594,7 @@ function openTasks(){
         if(tk.claimed || !done) return;
         tk.claimed = true;
         state.money += tk.reward;
-        addXP(Math.max(1, Math.round(tk.reward * 0.5)));
+        addXP(Math.max(1, Math.round(tk.reward * 0.5 * xpMul())));
         updateHUD(); scheduleSave();
         toast('+' + fmt(tk.reward) + ' \u20BF', '#ffd257');
         closeModal(); openTasks();
@@ -3402,7 +3611,6 @@ function openDaily(){
     const canTake = state.lastDaily !== today;
     const amounts = [100, 200, 350, 550, 800, 1200, 2000];
     const dayIdx = state.streak % 7;
-
     const wrap = document.createElement('div');
     wrap.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px';
     amounts.forEach((a, i) => {
@@ -3415,12 +3623,10 @@ function openDaily(){
       wrap.appendChild(d);
     });
     el.appendChild(wrap);
-
     const st = document.createElement('div');
     st.className = 'chip';
     st.textContent = t('streak') + ': ' + state.streak;
     el.appendChild(st);
-
     const btn = document.createElement('button');
     btn.className = 'btn' + (canTake ? '' : ' ghost');
     btn.style.cssText = 'width:100%;padding:14px;font-size:15px;margin-top:14px';
@@ -3429,7 +3635,7 @@ function openDaily(){
     btn.onclick = () => {
       if(!canTake) return;
       state.money += amounts[dayIdx];
-      addXP(Math.max(1, Math.round(amounts[dayIdx] * 0.5)));
+      addXP(Math.max(1, Math.round(amounts[dayIdx] * 0.5 * xpMul())));
       state.lastDaily = today;
       state.streak++;
       updateHUD(); scheduleSave();
@@ -3453,7 +3659,6 @@ function hideAdOverlay(){
 /* ---- обучение ---- */
 let tutorialStep = 0;
 function isTutorialBlocking(){ return tutorialStep > 0 && !state.tutorialDone; }
-
 function updateTutorialBlock(){
   document.body.classList.toggle('tutorial-on', isTutorialBlocking());
   document.querySelectorAll('.botbtn, .iconbtn').forEach(b => b.classList.remove('tutorial-active'));
@@ -3464,14 +3669,10 @@ function updateTutorialBlock(){
     document.getElementById('btnStock').classList.add('tutorial-active');
   }
 }
-
 function showTutorialHint(){
   const hint = $('#hint');
   if(!isTutorialBlocking()){ hint.style.display = 'none'; return; }
-  const msgs = {
-    1: t('tutorial1'), 2: t('tutorial2'), 3: t('tutorial3'),
-    4: t('tutorial4'), 5: t('tutorial5')
-  };
+  const msgs = {1:t('tutorial1'),2:t('tutorial2'),3:t('tutorial3'),4:t('tutorial4'),5:t('tutorial5')};
   const msg = msgs[tutorialStep];
   if(!msg){ hint.style.display = 'none'; return; }
   hint.style.display = 'block';
@@ -3480,21 +3681,15 @@ function showTutorialHint(){
     const row = document.createElement('div');
     row.className = 'hintrow';
     const b = document.createElement('button');
-    b.className = 'btn';
-    b.textContent = t('next');
-    b.onclick = () => {
-      tutorialStep = 2;
-      updateTutorialBlock();
-      showTutorialHint();
-    };
+    b.className = 'btn'; b.textContent = t('next');
+    b.onclick = () => { tutorialStep = 2; updateTutorialBlock(); showTutorialHint(); };
     row.appendChild(b);
     hint.appendChild(row);
   } else if(tutorialStep === 4){
     const row = document.createElement('div');
     row.className = 'hintrow';
     const b = document.createElement('button');
-    b.className = 'btn';
-    b.textContent = t('finish');
+    b.className = 'btn'; b.textContent = t('finish');
     b.onclick = () => {
       state.tutorialDone = true;
       tutorialStep = 0;
@@ -3507,7 +3702,6 @@ function showTutorialHint(){
     hint.appendChild(row);
   }
 }
-
 function startTutorial(){
   tutorialStep = 1;
   state.tutorialDone = false;
@@ -3521,7 +3715,6 @@ function skipTutorial(){
   $('#hint').style.display = 'none';
   scheduleSave();
 }
-
 function applyLang(){
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -3533,8 +3726,7 @@ function applyLang(){
 function initVK(){
   if(!vk) return;
   try { vk.send('VKWebAppInit'); } catch(e){}
-
-  vkSend('VKWebAppGetLaunchParams').then(data => {
+  vkSend('VKWebAppGetLaunchParams').then(() => {
     return vkSend('VKWebAppShowBannerAd', {
       banner_type: 'bottom', layout_type: 'resize', height: 60
     }).catch(() => vkSend('VKWebAppShowBannerAd').catch(() => {}));
@@ -3543,20 +3735,17 @@ function initVK(){
       banner_type: 'bottom', layout_type: 'resize', height: 60
     }).catch(() => {});
   });
-
   try {
     vk.subscribe(e => {
       const type = e.detail ? e.detail.type : e.type;
-      if(type === 'VKWebAppViewHide'){
-        paused = true; Music.stop();
-      } else if(type === 'VKWebAppViewRestore'){
+      if(type === 'VKWebAppViewHide'){ paused = true; Music.stop(); }
+      else if(type === 'VKWebAppViewRestore'){
         paused = false;
         if(state && state.music) Music.start();
       }
     });
   } catch(err){}
 }
-
 window.addEventListener('blur', () => { paused = true; Music.stop(); });
 window.addEventListener('focus', () => { paused = false; if(state && state.music) Music.start(); });
 document.addEventListener('visibilitychange', () => {
@@ -3567,7 +3756,6 @@ document.addEventListener('visibilitychange', () => {
 /* ------------------------------- 14. ЦИКЛ --------------------------------- */
 let paused = false;
 let lastTs = 0;
-
 function loop(ts){
   requestAnimationFrame(loop);
   if(!lastTs) lastTs = ts;
@@ -3575,7 +3763,6 @@ function loop(ts){
   lastTs = ts;
   if(dt > 0.1) dt = 0.1;
   if(dt < 0) dt = 0;
-
   if(!paused && state){
     updateWorld(dt);
     state.playtime += dt;
@@ -3583,10 +3770,7 @@ function loop(ts){
     if(!window._saveAcc) window._saveAcc = 0;
     window._saveAcc += dt;
     if(window._saveAcc > 20){ window._saveAcc = 0; scheduleSave(); }
-    if(state.tasksDate !== todayStr()){
-      checkDailyReset();
-      updateHUD();
-    }
+    if(state.tasksDate !== todayStr()){ checkDailyReset(); updateHUD(); }
   }
   if(state) draw();
 }
@@ -3595,16 +3779,11 @@ function loop(ts){
 async function boot(){
   state = newState();
   initGrid();
-
   const loaded = await loadGame();
-  if(!loaded){
-    state = newState();
-    initGrid();
-  }
+  if(!loaded){ state = newState(); initGrid(); }
   checkDailyReset();
   applyLang();
   resize();
-
   if(!loaded){
     setTimeout(() => {
       openModal(state.lang === 'en' ? 'Welcome!' : 'Добро пожаловать!', el => {
@@ -3629,11 +3808,9 @@ async function boot(){
       });
     }, 400);
   }
-
   updateHUD();
   updatePlaceBar();
   updateTutorialBlock();
-
   const startMusic = () => {
     if(state.music) Music.start();
     document.removeEventListener('pointerdown', startMusic);
@@ -3641,7 +3818,6 @@ async function boot(){
   };
   document.addEventListener('pointerdown', startMusic);
   document.addEventListener('keydown', startMusic);
-
   requestAnimationFrame(loop);
   setInterval(() => { if(state) updateHUD(); }, 1000);
 }
@@ -3658,6 +3834,7 @@ $('#btnStock').onclick = () => {
   openWarehouse();
 };
 $('#btnTimeRewards').onclick = () => { if(!paused && !isTutorialBlocking()) openTimeRewards(); };
+$('#btnUpgrades').onclick = () => { if(!paused && !isTutorialBlocking()) openUpgrades(); };
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
 $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(); };
 $('#btnSettings').onclick = () => { if(!paused && !isTutorialBlocking()) openSettings(); };
@@ -3665,17 +3842,13 @@ $('#btnInvite').onclick = () => {
   if(paused || isTutorialBlocking()) return;
   vkSend('VKWebAppShowInviteBox').then(() => {
     toast(t('inviteSent'), '#7fd07f');
-  }).catch(() => {
-    toast(t('inviteUnavailable'));
-  });
+  }).catch(() => { toast(t('inviteUnavailable')); });
 };
-
 window.addEventListener('resize', () => { if(state) resize(); });
 window.addEventListener('orientationchange', () => setTimeout(() => { if(state) resize(); }, 250));
 if(window.visualViewport){
   window.visualViewport.addEventListener('resize', () => { if(state) resize(); });
 }
-
 let lastTouchEnd = 0;
 document.addEventListener('touchend', e => {
   const now = Date.now();
