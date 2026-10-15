@@ -10,7 +10,9 @@
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#e8eef7}
 #app{position:fixed;inset:0;overflow:hidden}
-#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;
+  cursor:grab}
+#game.dragging{cursor:grabbing}
 
 /* ---------- CUSTOM SCROLLBARS ---------- */
 .modal-body::-webkit-scrollbar,
@@ -36,6 +38,12 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
   border-radius:12px;padding:5px 10px;font-weight:700;font-size:14px;white-space:nowrap}
 .stat svg{width:18px;height:18px;flex:none}
 #moneyVal{color:#ffd257}
+#lvlChip{background:linear-gradient(180deg,#6c4bd4,#4a2fa8);border-color:#8b6bff;color:#fff;
+  padding:4px 8px;font-size:12px;gap:4px;flex-direction:column;align-items:stretch;min-width:70px}
+#lvlChip .ln{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11px}
+#lvlChip .lvlXP{height:4px;border-radius:2px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:2px}
+#lvlChip .lvlXP i{display:block;height:100%;background:linear-gradient(90deg,#ffd257,#ff9500);
+  border-radius:2px;transition:width .3s}
 .spacer{flex:1}
 .iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid #2b3648;background:#1b2330;
   color:#cfe0f5;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;
@@ -62,7 +70,32 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
   box-shadow:0 0 0 2px #4a89ff,0 0 16px rgba(74,137,255,.7);
   animation:pulseGlow 1.6s ease-in-out infinite}
 @keyframes pulseGlow{50%{box-shadow:0 0 0 2px #4a89ff,0 0 24px rgba(74,137,255,1)}}
-body.tutorial-on #game{pointer-events:none}
+
+/* ---------- LEVEL UP OVERLAY ---------- */
+.levelup-overlay{position:fixed;inset:0;z-index:200;
+  background:radial-gradient(circle at center,rgba(74,137,255,.35),rgba(0,0,0,.82));
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  animation:luFadeIn .4s ease-out}
+@keyframes luFadeIn{from{opacity:0}}
+.levelup-content{text-align:center;position:relative;padding:20px;
+  animation:luPop .7s cubic-bezier(0.18,1.15,0.55,1)}
+@keyframes luPop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.levelup-burst{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,210,87,.75),transparent 65%);
+  animation:luBurst 1.4s ease-out;pointer-events:none}
+@keyframes luBurst{0%{transform:translate(-50%,-50%) scale(.2);opacity:1}100%{transform:translate(-50%,-50%) scale(2.4);opacity:0}}
+.levelup-num{font-size:110px;font-weight:900;line-height:1;position:relative;
+  background:linear-gradient(180deg,#fff5c8,#ffd257 45%,#ff9500);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 30px rgba(255,210,87,.9))}
+.levelup-title{font-size:28px;font-weight:900;letter-spacing:3px;color:#fff;
+  text-shadow:0 0 24px #4a89ff,0 0 8px #4a89ff;margin-top:4px;
+  animation:luText 1.2s ease-in-out infinite alternate}
+@keyframes luText{from{text-shadow:0 0 20px #4a89ff,0 0 6px #4a89ff}
+  to{text-shadow:0 0 40px #4a89ff,0 0 14px #4a89ff,0 0 60px #8b6bff}}
+.levelup-sub{margin-top:16px;font-size:14px;color:#dbe6f8;opacity:.9;font-weight:600}
+.levelup-hint{margin-top:6px;font-size:12px;color:#8798ad}
 
 /* ---------- BANNER ---------- */
 #banner{position:absolute;left:0;right:0;bottom:0;height:0;z-index:19;pointer-events:none}
@@ -90,9 +123,12 @@ body.tutorial-on #game{pointer-events:none}
 /* ---------- ROWS ---------- */
 .row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#1a212c;
   border:1px solid #232d3b;margin-bottom:7px}
+.row.locked{opacity:.55}
 .row .ic{width:38px;height:38px;flex:none;border-radius:9px;background:#0f151d;display:flex;
-  align-items:center;justify-content:center;overflow:hidden}
+  align-items:center;justify-content:center;overflow:hidden;position:relative}
 .row .ic img{width:32px;height:32px;display:block}
+.row .ic .lock{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;
+  align-items:center;justify-content:center;color:#ffd257;font-size:11px;font-weight:800}
 .row .nm{flex:1;min-width:0}
 .row .nm b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .nm span{font-size:11px;color:#8798ad}
@@ -104,6 +140,7 @@ body.tutorial-on #game{pointer-events:none}
 .btn.r{background:#c0392b}
 .btn.y{background:#b8860b}
 .btn.ghost{background:#26313f;color:#cfe0f5}
+.btn.locked{background:#2b3648;color:#8798ad}
 .btn:disabled{opacity:.45;pointer-events:none}
 .btn.sm{padding:6px 9px;font-size:11.5px;border-radius:9px}
 
@@ -157,6 +194,10 @@ input[type=text]:focus{border-color:#4a89ff}
     <div class="stat">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ffd257" stroke="#c9a227" stroke-width="1.6"/><path d="M12 7v10M9.5 9.2h4a1.9 1.9 0 010 3.8h-4" stroke="#8a6a10" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
       <span id="moneyVal">0</span>
+    </div>
+    <div class="stat" id="lvlChip">
+      <div class="ln"><span>Ур.</span><b id="lvlVal">1</b></div>
+      <div class="lvlXP"><i id="lvlBar" style="width:0%"></i></div>
     </div>
     <div class="stat" style="font-size:12px">
       <svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11" fill="none" stroke="#7fd07f" stroke-width="1.8" stroke-linejoin="round"/><rect x="9" y="13" width="6" height="7" fill="#7fd07f" opacity=".55"/></svg>
@@ -212,13 +253,14 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН — полная игра (v2)
+   МАГАЗИН v3 — с уровнями, панорамированием и исправлениями
    ========================================================================= */
 'use strict';
 
 /* ------------------------- 1. КОНСТАНТЫ И ДАННЫЕ ------------------------- */
 const GW = 11, GH = 10;
 const DOOR = {x: 0, y: 5};
+const OUT_MARGIN = 30;
 
 const CATS = {
   dairy:    {ru:'Молочное',   en:'Dairy',      c:'#8fd3ff'},
@@ -236,7 +278,6 @@ const CATS = {
   household:{ru:'Бытовая химия', en:'Household', c:'#b0b8c0'}
 };
 
-/* shape варианты: bottle, can, carton, box, packet, bag, round, jar, tube, bar, wedge, pouch, tetra, tub, wrap, cylinder */
 const P_RAW = [
 ['Молоко','Milk','dairy','carton',20],
 ['Кефир','Kefir','dairy','bottle',25],
@@ -352,6 +393,10 @@ const PRODUCTS = P_RAW.map((p, i) => ({
 const PROD_BY_ID = {};
 PRODUCTS.forEach(p => PROD_BY_ID[p.id] = p);
 
+// Уровень, с которого открывается товар: 10 товаров на уровень
+function productLevel(p){ return Math.floor((p.id - 1) / 10) + 1; }
+const MAX_PRODUCT_LEVEL = Math.ceil(PRODUCTS.length / 10);
+
 const FURNITURE = {
   shelf:   {ru:'Полка',        en:'Shelf',    cost:120, cap:6,  accepts:null},
   rack:    {ru:'Стеллаж',      en:'Rack',     cost:320, cap:12, accepts:null},
@@ -411,11 +456,15 @@ const STR = {
     tapShelf:'Нажмите на полку, чтобы разложить товар', adDone:'Награда за рекламу получена!',
     shelfInfo:'Информация о полке', total:'Всего', slots:'мест', onMap:'На карте',
     tutorial1:'Добро пожаловать! Это ваш магазин. Нажмите «Далее».',
-    tutorial2:'Откройте «Магазин» и купите товар.',
-    tutorial3:'Откройте «Склад» и разложите товар на полки.',
+    tutorial2:'Откройте «Магазин» и купите хотя бы один товар.',
+    tutorial3:'Откройте «Склад», выберите товар и разместите на полку.',
     tutorial4:'Отлично! Теперь ждите покупателей и зарабатывайте.',
     tutorial5:'Готово! Ваш магазин работает. Удачи!',
-    next:'Далее', finish:'Завершить', emptyShelf:'Пусто'
+    next:'Далее', finish:'Завершить', emptyShelf:'Пусто',
+    locked:'Заблокировано', requires:'Требуется', level:'Ур.',
+    levelUp:'НОВЫЙ УРОВЕНЬ!', levelUpSub:'Открыты новые товары и клетки!',
+    maxCells:'Достигнут лимит клеток для этого уровня',
+    xpEarned:'Опыт', xpForLevel:'до следующего уровня'
   },
   en:{ shop:'Shop', warehouse:'Storage', build:'Build', friends:'Friends', settings:'Settings',
     tasks:'Tasks', daily:'Daily reward', close:'Close', buy:'Buy',
@@ -434,11 +483,15 @@ const STR = {
     tapShelf:'Tap a shelf to place goods', adDone:'Ad reward received!',
     shelfInfo:'Shelf info', total:'Total', slots:'slots', onMap:'On map',
     tutorial1:'Welcome! This is your shop. Tap Next to continue.',
-    tutorial2:'Open the Shop and buy some goods.',
-    tutorial3:'Open Storage and place goods on shelves.',
+    tutorial2:'Open the Shop and buy at least one item.',
+    tutorial3:'Open Storage, pick an item and place it on a shelf.',
     tutorial4:'Great! Now wait for customers and earn money.',
     tutorial5:'Done! Your shop is running. Good luck!',
-    next:'Next', finish:'Finish', emptyShelf:'Empty'
+    next:'Next', finish:'Finish', emptyShelf:'Empty',
+    locked:'Locked', requires:'Requires', level:'Lv.',
+    levelUp:'NEW LEVEL!', levelUpSub:'New products and cells unlocked!',
+    maxCells:'Cell limit reached for this level',
+    xpEarned:'XP', xpForLevel:'to next level'
   }
 };
 
@@ -484,6 +537,26 @@ function lerpAngle(a, b, k){
   return a + d * k;
 }
 
+/* --------------------- 2b. СИСТЕМА УРОВНЕЙ -------------------------------- */
+// XP, требуемый для достижения уровня L (суммарно от 0)
+function cumulativeXP(level){
+  return 250 * level * (level - 1);
+}
+function getLevel(){
+  let lvl = 1;
+  while(lvl < 40 && state.xp >= cumulativeXP(lvl + 1)) lvl++;
+  return lvl;
+}
+function xpProgress(){
+  const lvl = getLevel();
+  const cur = state.xp - cumulativeXP(lvl);
+  const next = cumulativeXP(lvl + 1) - cumulativeXP(lvl);
+  return {cur, next, ratio: next > 0 ? cur / next : 0};
+}
+function maxCellsForLevel(lvl){
+  return Math.min(36 + (lvl - 1) * 6, GW * GH);
+}
+
 /* --------------------------- 3. SVG-СПРАЙТЫ ------------------------------- */
 const SPRITES = {};
 function svgURI(s){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s); }
@@ -496,7 +569,6 @@ function makeSprite(key, svg){
   return img;
 }
 
-/* --- мебель --- */
 function furnitureSVG(type){
   if(type === 'shelf'){
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -527,23 +599,23 @@ function furnitureSVG(type){
     </svg>`;
   }
   if(type === 'counter'){
+    // Прилавок — невысокий, чтобы кассир виднелся сверху
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-      <rect x="6" y="18" width="88" height="64" rx="10" fill="#5b6b7d" stroke="#3d4a58" stroke-width="5"/>
-      <rect x="58" y="26" width="28" height="22" rx="4" fill="#26313f"/>
-      <rect x="62" y="30" width="20" height="14" rx="2" fill="#4ad3a0"/>
-      <rect x="16" y="30" width="32" height="9" rx="4" fill="#8093a8"/>
-      <rect x="16" y="44" width="32" height="9" rx="4" fill="#8093a8"/>
-      <rect x="16" y="58" width="60" height="9" rx="4" fill="#8093a8"/>
+      <rect x="6" y="42" width="88" height="52" rx="8" fill="#5b6b7d" stroke="#3d4a58" stroke-width="5"/>
+      <rect x="10" y="38" width="80" height="12" rx="4" fill="#8093a8" stroke="#3d4a58" stroke-width="3"/>
+      <rect x="60" y="50" width="26" height="20" rx="3" fill="#26313f"/>
+      <rect x="64" y="54" width="18" height="12" rx="2" fill="#4ad3a0"/>
+      <rect x="14" y="56" width="34" height="7" rx="3" fill="#8093a8"/>
+      <rect x="14" y="68" width="34" height="7" rx="3" fill="#8093a8"/>
+      <rect x="14" y="80" width="60" height="8" rx="3" fill="#8093a8"/>
     </svg>`;
   }
   return '';
 }
 
-/* --- товары: 16 разных форм для наглядного различия --- */
 function productSVG(shape, color){
   const dark = shade(color, -65);
   const light = shade(color, 55);
-  const cream = '#fbf2df';
   let inner = '';
   switch(shape){
     case 'bottle':
@@ -641,7 +713,6 @@ function productSVG(shape, color){
       break;
     case 'bar':
       inner = `<rect x="14" y="24" width="72" height="52" rx="6" fill="${color}" stroke="${dark}" stroke-width="4"/>
-        <rect x="14" y="24" width="72" height="52" rx="6" fill="none" stroke="${dark}" stroke-width="4"/>
         <rect x="22" y="32" width="56" height="36" rx="3" fill="#5b3a1a"/>
         <rect x="22" y="32" width="56" height="36" rx="3" fill="none" stroke="${dark}" stroke-width="2"/>
         <path d="M30 50 L70 50" stroke="#8a5a2b" stroke-width="3"/>
@@ -650,7 +721,6 @@ function productSVG(shape, color){
       break;
     case 'wedge':
       inner = `<path d="M18 76 L82 76 L82 60 Q82 30 50 26 L18 40 Z" fill="${color}" stroke="${dark}" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M18 76 L82 76 L82 60 Q82 30 50 26 L18 40 Z" fill="none" stroke="${light}" stroke-width="1" opacity=".5"/>
         <circle cx="46" cy="52" r="4" fill="${light}" opacity=".7"/>
         <circle cx="58" cy="60" r="3" fill="${light}" opacity=".7"/>
         <circle cx="38" cy="62" r="2.5" fill="${light}" opacity=".7"/>
@@ -697,13 +767,14 @@ let state = null;
 function newState(){
   return {
     money: 600, lang: 'ru', music: true, tutorialDone: false,
+    xp: 0,
     grid: [], warehouse: {}, decor: {wall: 0, window: 0},
     owned: {wall: [0], window: [0]},
     lastDaily: 0, streak: 0,
     tasks: [], tasksDate: '',
     ds: {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0},
     playtime: 0, lastRewardIdx: 0,
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 2
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 3
   };
 }
 
@@ -804,7 +875,6 @@ function vkSend(method, params){
   try { return vk.send(method, params || {}); }
   catch(e){ return Promise.reject(e); }
 }
-
 const memStore = {};
 async function storageSet(key, value){
   if(vkAvailable){
@@ -845,7 +915,8 @@ function serialize(){
 
   return {
     m: Math.floor(state.money), l: state.lang, mu: state.music ? 1 : 0,
-    td: state.tutorialDone ? 1 : 0, g, st: stocks.join('|'), wh,
+    td: state.tutorialDone ? 1 : 0, xp: Math.floor(state.xp),
+    g, st: stocks.join('|'), wh,
     dw: state.decor.wall, dn: state.decor.window,
     ow: state.owned.wall, on: state.owned.window,
     ld: state.lastDaily, sk: state.streak,
@@ -860,6 +931,7 @@ function deserialize(o){
   state.lang = o.l || 'ru';
   state.music = o.mu === 1;
   state.tutorialDone = !!o.td;
+  state.xp = o.xp || 0;
   state.decor.wall = o.dw || 0;
   state.decor.window = o.dn || 0;
   state.owned.wall = o.ow || [0];
@@ -966,8 +1038,8 @@ class Customer {
     this.cart = [];
     this.timer = 0;
     this.walk = 0;
-    this.dir = 0;
-    this.targetDir = 0;
+    this.dir = Math.PI / 2; // смотрим вниз (на зрителя)
+    this.targetDir = Math.PI / 2;
     this.bob = 0;
     this.visited = [];
     this.wants = randInt(2, 4);
@@ -976,7 +1048,6 @@ class Customer {
     this.spot = null;
     this.dead = false;
     this.patience = 45;
-    this.exitX = this.x;
   }
 
   moveTo(gx, gy){
@@ -999,6 +1070,8 @@ class Customer {
       this.x -= dt * 1.2;
       this.bob = Math.sin(this.walk) * 0.045;
       this.walk += dt * 9;
+      this.targetDir = Math.PI; // смотрим влево при уходе
+      this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 8));
       if(this.alpha <= 0) this.dead = true;
       return;
     }
@@ -1029,7 +1102,6 @@ class Customer {
         this.x += dx / d * step;
         this.y += dy / d * step;
       }
-      // плавный поворот по направлению движения
       if(d > 0.01){
         this.targetDir = Math.atan2(dy, dx);
       }
@@ -1087,7 +1159,10 @@ class Customer {
       state.totalEarned += sum;
       state.ds.earn += sum;
       state.ds.serve += 1;
+      state.ds.sell += this.cart.length;
       state.totalServed += 1;
+      // Начисление опыта за продажу
+      addXP(sum);
       if(this.spot) busySpots.delete(this.spot);
       this.spot = null;
       this.cart = [];
@@ -1211,13 +1286,13 @@ function findPath(sx, sy, gx, gy){
 
 /* ------------------------ 6b. КАССИР (NPC) ------------------------------- */
 const cashier = {
-  x: 5.5, y: 5.5, // будет обновлено под ближайшую кассу
+  x: 5.5, y: 5.15,
   skin: '#e0aa7a', hair: '#4a2f1c', shirt: '#2b5fae',
-  bob: 0, walk: 0, anchorX: -1, anchorY: -1,
+  bob: 0, walk: 0,
+  anchorX: -1, anchorY: -1,
   update(dt){
     const counters = counterCells();
     if(!counters.length) return;
-    // занимает кассу, ближайшую к центру
     let best = counters[0], bd = 1e9;
     for(const c of counters){
       const d = Math.abs(c.x - GW/2) + Math.abs(c.y - GH/2);
@@ -1226,21 +1301,10 @@ const cashier = {
     if(best.x !== this.anchorX || best.y !== this.anchorY){
       this.anchorX = best.x;
       this.anchorY = best.y;
-      // встаём за прилавком: с противоположной стороны от входа (справой/верхней)
-      let px = best.x + 0.5, py = best.y + 0.5;
-      // Ищем направление от входа
-      const dx = best.x - DOOR.x, dy = best.y - DOOR.y;
-      if(Math.abs(dx) > Math.abs(dy)){
-        px = best.x + 0.5 + (dx > 0 ? 0.0 : 0.0);
-        py = best.y + 0.5 - 0.28;
-      } else {
-        px = best.x + 0.5 - 0.28;
-        py = best.y + 0.5;
-      }
-      this.x = px;
-      this.y = py;
+      // Стоим чуть выше центра кассы — за прилавком
+      this.x = best.x + 0.5;
+      this.y = best.y + 0.30;
     }
-    // небольшое покачивание
     this.walk += dt * 2.5;
     this.bob = Math.sin(this.walk) * 0.02;
   }
@@ -1333,8 +1397,11 @@ const Music = {
 };
 
 /* ------------------------------ 9. РЕНДЕР --------------------------------- */
-let CS = 40, OX = 0, OY = 0;
-const OUT_MARGIN = 28; // отступ для декоративной территории вокруг магазина
+let CS = 40;
+let baseOX = 0, baseOY = 0;   // базовая позиция сетки (центр экрана)
+let camX = 0, camY = 0;       // смещение камеры от базовой позиции (панорама)
+let dragging = false, dragMoved = false;
+let dragStartX = 0, dragStartY = 0, dragBaseCamX = 0, dragBaseCamY = 0;
 
 function resize(){
   const w = canvas.clientWidth || window.innerWidth;
@@ -1346,24 +1413,40 @@ function resize(){
 
   const topbarH = $('#topbar').offsetHeight || 52;
   const bottombarH = $('#bottombar').offsetHeight || 70;
-  const availH = h - topbarH - bottombarH - 8;
+  const availTop = topbarH + 6;
+  const availBottom = h - bottombarH - 6;
+  const availH = availBottom - availTop;
   const availW = w - 12;
 
-  CS = Math.min((availW - OUT_MARGIN * 2) / GW, (availH - OUT_MARGIN * 2) / GH);
-  CS = Math.max(14, CS);
-  OX = (w - GW * CS) / 2;
-  OY = topbarH + 4 + (availH - GH * CS) / 2;
+  CS = Math.min((availW - 2 * OUT_MARGIN) / GW, (availH - 2 * OUT_MARGIN) / GH);
+  CS = Math.max(12, CS);
+  baseOX = (w - GW * CS) / 2;
+  baseOY = availTop + (availH - GH * CS) / 2;
+
+  clampCamera();
 }
+
+function clampCamera(){
+  const maxPan = CS * 3;
+  camX = clamp(camX, -maxPan, maxPan);
+  camY = clamp(camY, -maxPan, maxPan);
+}
+
+function getOX(){ return baseOX + camX; }
+function getOY(){ return baseOY + camY; }
 
 function draw(){
   const w = canvas.clientWidth, h = canvas.clientHeight;
   ctx.clearRect(0, 0, w, h);
-  // небо/фон
   const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
   skyGrad.addColorStop(0, '#0d1219');
   skyGrad.addColorStop(1, '#1a2330');
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, w, h);
+
+  // Всё рисуется относительно (OX, OY)
+  ctx.save();
+  ctx.translate(getOX(), getOY());
 
   drawOutside();
   drawWalls();
@@ -1373,6 +1456,10 @@ function draw(){
   ctx.scale(CS, CS);
   ctx.lineJoin = 'round';
 
+  // 1) сначала кассир (чтобы прилавок его перекрывал)
+  drawCashier();
+
+  // 2) затем мебель (касса перекроет ноги кассира)
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
       const c = state.grid[y][x];
@@ -1380,6 +1467,7 @@ function draw(){
     }
   }
 
+  // 3) подсветка режима размещения
   if(placeMode){
     ctx.lineWidth = 0.06;
     for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -1396,55 +1484,50 @@ function draw(){
     }
   }
 
-  // кассир рисуется до клиентов, чтобы клиенты были поверх, если стоят рядом
-  drawCashier();
-
+  // 4) клиенты поверх всей мебели
   for(const c of customers) drawCustomer(c);
 
-  ctx.restore();
+  ctx.restore(); // scale
+  ctx.restore(); // translate
+
+  // Рамка вокруг сетки (в экранных координатах)
+  ctx.strokeStyle = '#2b3648';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(getOX() - 1, getOY() - 1, GW * CS + 2, GH * CS + 2);
 }
 
 function drawOutside(){
-  ctx.save();
-  ctx.translate(OX, OY);
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
 
-  // тротуар
   const sideCol = '#5a6470';
   const sideCol2 = '#4f5864';
   ctx.fillStyle = sideCol;
   ctx.fillRect(-MB, -MB, totalW + MB * 2, totalH + MB * 2);
   ctx.fillStyle = sideCol2;
-  ctx.fillRect(-MB, -MB, totalW + MB * 2, MB); // верхняя полоса
-  ctx.fillRect(-MB, totalH, totalW + MB * 2, MB); // нижняя полоса
-  ctx.fillRect(-MB, 0, MB, totalH); // левая
-  ctx.fillRect(totalW, 0, MB, totalH); // правая
+  ctx.fillRect(-MB, -MB, totalW + MB * 2, MB);
+  ctx.fillRect(-MB, totalH, totalW + MB * 2, MB);
+  ctx.fillRect(-MB, 0, MB, totalH);
+  ctx.fillRect(totalW, 0, MB, totalH);
 
-  // плитка тротуара (швы)
   ctx.strokeStyle = 'rgba(0,0,0,.18)';
   ctx.lineWidth = 1;
   for(let x = -MB; x <= totalW + MB; x += 14){
-    ctx.beginPath();
-    ctx.moveTo(x, -MB); ctx.lineTo(x, 0); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + MB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, -MB); ctx.lineTo(x, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + MB); ctx.stroke();
   }
   for(let y = -MB; y <= totalH + MB; y += 14){
-    ctx.beginPath();
-    ctx.moveTo(-MB, y); ctx.lineTo(0, y); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(totalW, y); ctx.lineTo(totalW + MB, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-MB, y); ctx.lineTo(0, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + MB, y); ctx.stroke();
   }
 
-  // дорожка у входа
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
   ctx.fillRect(doorX - 3, doorY, CS + 6, MB);
   ctx.strokeStyle = 'rgba(0,0,0,.28)';
   ctx.strokeRect(doorX - 3, doorY, CS + 6, MB);
-  // разметка входа (пунктир)
+
   ctx.strokeStyle = 'rgba(255,255,255,.3)';
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
@@ -1453,30 +1536,20 @@ function drawOutside(){
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // деревья сверху
   drawTreeCtx(-MB + 12, -MB + 12);
   drawTreeCtx(totalW - 12, -MB + 12);
   drawTreeCtx(totalW / 2, -MB + 10);
-
-  // фонарь у двери
   drawLamp(-MB + 10, doorY + MB / 2);
-  // скамейка справа
   drawBench(totalW + MB / 2, totalH / 2);
-
-  // маленькие кустики
   drawBush(-MB - 4, totalH - MB / 2);
   drawBush(totalW + MB + 4, -MB / 2);
-
-  ctx.restore();
 }
 
 function drawTreeCtx(x, y){
   ctx.save();
   ctx.translate(x, y);
-  // ствол
   ctx.fillStyle = '#4a2f1c';
   ctx.fillRect(-2, 2, 4, 8);
-  // крона
   ctx.fillStyle = '#3b7a3f';
   ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#4a8c4e';
@@ -1491,14 +1564,10 @@ function drawLamp(x, y){
   ctx.translate(x, y);
   ctx.fillStyle = '#3a4149';
   ctx.fillRect(-1, -4, 2, 16);
-  ctx.beginPath();
-  ctx.arc(0, -6, 5, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,235,150,.35)';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(0, -6, 3, 0, Math.PI * 2);
-  ctx.fillStyle = '#fff1a8';
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(0, -6, 5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,235,150,.35)'; ctx.fill();
+  ctx.beginPath(); ctx.arc(0, -6, 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff1a8'; ctx.fill();
   ctx.restore();
 }
 function drawBench(x, y){
@@ -1531,6 +1600,8 @@ function drawWalls(){
 function drawFloor(){
   const wall = WALLS[state.decor.wall] || WALLS[0];
   const isNeon = state.decor.wall === 4;
+  const lvl = getLevel();
+  const maxCells = maxCellsForLevel(lvl);
 
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
@@ -1549,7 +1620,6 @@ function drawFloor(){
           ctx.beginPath();
           ctx.arc(px + CS * 0.5, py + CS * 0.5, CS * 0.16, 0, Math.PI * 2);
           ctx.fill();
-          // стрелка выхода
           ctx.strokeStyle = '#fff';
           ctx.lineWidth = 2;
           ctx.beginPath();
@@ -1565,17 +1635,18 @@ function drawFloor(){
         ctx.fillStyle = '#0b0f15';
         ctx.fillRect(px, py, CS, CS);
         if(isAdjacentToUnlocked(x, y)){
+          const atCap = unlockedCount() >= maxCells;
           const pr = expandPrice();
-          ctx.strokeStyle = 'rgba(74,137,255,.35)';
+          ctx.strokeStyle = atCap ? 'rgba(255,90,90,.35)' : 'rgba(74,137,255,.35)';
           ctx.lineWidth = 1.5;
           ctx.setLineDash([4, 4]);
           ctx.strokeRect(px + 2, py + 2, CS - 4, CS - 4);
           ctx.setLineDash([]);
-          ctx.fillStyle = 'rgba(200,220,255,.4)';
+          ctx.fillStyle = atCap ? 'rgba(255,120,120,.5)' : 'rgba(200,220,255,.4)';
           ctx.font = 'bold ' + Math.max(8, CS * 0.22) + 'px system-ui';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(fmt(pr), px + CS / 2, py + CS / 2);
+          ctx.fillText(atCap ? '\uD83D\uDD12' : fmt(pr), px + CS / 2, py + CS / 2);
         }
       }
     }
@@ -1654,26 +1725,18 @@ function drawFurniture(gx, gy, c){
   }
 }
 
-function drawCustomer(c){
-  const x = c.x, y = c.y;
+/* --- Рисование человечка (универсальное) --- */
+function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opts){
+  opts = opts || {};
+  const scale = opts.scale || 1;
   ctx.save();
-  ctx.globalAlpha = clamp(c.alpha, 0, 1);
-
-  ctx.fillStyle = 'rgba(0,0,0,.22)';
-  ctx.beginPath();
-  ctx.ellipse(x, y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const bob = c.bob;
-  const walking = c.path.length > 0 || c.state === 'gone';
-
-  // Весь "человечек" поворачивается целиком
-  ctx.translate(x, y + bob);
-  ctx.rotate(c.dir + Math.PI / 2); // смотрим вверх по-умолчанию
+  ctx.translate(px, py + bob);
+  ctx.rotate(dir - Math.PI / 2); // default = смотрит вниз (на зрителя)
+  ctx.scale(scale, scale);
 
   // ноги
   if(walking){
-    const legPhase = Math.sin(c.walk);
+    const legPhase = Math.sin(walkPhase);
     ctx.fillStyle = '#2b3546';
     ctx.beginPath();
     ctx.ellipse(-0.12, 0.18 + legPhase * 0.05, 0.09, 0.13, 0, 0, Math.PI * 2);
@@ -1692,26 +1755,65 @@ function drawCustomer(c){
   }
 
   // тело
-  ctx.fillStyle = c.shirt;
+  ctx.fillStyle = shirt;
   ctx.beginPath();
   ctx.ellipse(0, 0, 0.28, 0.24, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = shade(c.shirt, -50);
+  ctx.strokeStyle = shade(shirt, -50);
   ctx.lineWidth = 0.025;
   ctx.stroke();
 
-  // руки (по бокам — сбоку относительно направления)
-  ctx.fillStyle = c.skin;
-  const swing = walking ? Math.sin(c.walk) * 0.03 : 0;
+  // руки
+  ctx.fillStyle = skin;
+  const swing = walking ? Math.sin(walkPhase) * 0.03 : 0;
+  ctx.beginPath(); ctx.arc(-0.27, swing, 0.075, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0.27, -swing, 0.075, 0, Math.PI * 2); ctx.fill();
+
+  // бейджик опционально
+  if(opts.badge){
+    ctx.fillStyle = '#ffd257';
+    ctx.fillRect(-0.06, 0.02, 0.12, 0.06);
+    ctx.fillStyle = '#8a6a10';
+    ctx.fillRect(-0.05, 0.04, 0.1, 0.02);
+  }
+
+  // голова
+  ctx.fillStyle = skin;
   ctx.beginPath();
-  ctx.arc(-0.27, swing, 0.075, 0, Math.PI * 2);
+  ctx.arc(0, -0.13, 0.17, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = shade(skin, -45);
+  ctx.lineWidth = 0.02;
+  ctx.stroke();
+
+  // волосы (шапка сверху)
+  ctx.fillStyle = hair;
+  ctx.beginPath();
+  ctx.arc(0, -0.17, 0.165, Math.PI, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(0.27, -swing, 0.075, 0, Math.PI * 2);
+  ctx.ellipse(0, -0.2, 0.16, 0.09, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // корзина — перед телом если идёт на кассу
-  if(c.cart.length && (c.state === 'toCashier' || c.state === 'paying' || c.state === 'waiting')){
+  // Лицо — глаза чуть ниже центра головы и ближе к низу (лицо смотрит "вниз", т.е. на нас)
+  const faceY = -0.09;
+  ctx.fillStyle = '#1b2330';
+  ctx.beginPath(); ctx.arc(-0.06, faceY, 0.026, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0.06, faceY, 0.026, 0, Math.PI * 2); ctx.fill();
+  // блики
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  ctx.beginPath(); ctx.arc(-0.052, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0.068, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
+
+  // улыбка
+  ctx.strokeStyle = '#5a3a20';
+  ctx.lineWidth = 0.018;
+  ctx.beginPath();
+  ctx.arc(0, -0.035, 0.045, 0.15, Math.PI - 0.15);
+  ctx.stroke();
+
+  // корзина перед телом
+  if(opts.cart){
     ctx.fillStyle = '#c9a227';
     ctx.fillRect(-0.1, -0.36, 0.2, 0.16);
     ctx.strokeStyle = '#8a6a10';
@@ -1719,48 +1821,29 @@ function drawCustomer(c){
     ctx.strokeRect(-0.1, -0.36, 0.2, 0.16);
   }
 
-  // голова
-  ctx.fillStyle = c.skin;
-  ctx.beginPath();
-  ctx.arc(0, -0.13, 0.17, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = shade(c.skin, -45);
-  ctx.lineWidth = 0.02;
-  ctx.stroke();
-
-  // волосы (сверху, сдвинуты в направлении движения)
-  ctx.fillStyle = c.hair;
-  ctx.beginPath();
-  ctx.arc(0, -0.16, 0.165, Math.PI, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(0, -0.19, 0.16, 0.1, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // глаза — на "лице", которое теперь смотрит в направлении движения
-  ctx.fillStyle = '#1b2330';
-  ctx.beginPath();
-  ctx.arc(-0.06, -0.06, 0.026, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(0.06, -0.06, 0.026, 0, Math.PI * 2);
-  ctx.fill();
-
-  // улыбка
-  ctx.strokeStyle = '#5a3a20';
-  ctx.lineWidth = 0.018;
-  ctx.beginPath();
-  ctx.arc(0, -0.02, 0.05, 0.15, Math.PI - 0.15);
-  ctx.stroke();
-
   ctx.restore();
+}
 
-  // пузырь с товаром при выборе
+function drawCustomer(c){
+  ctx.save();
+  ctx.globalAlpha = clamp(c.alpha, 0, 1);
+
+  // тень (не вращается)
+  ctx.fillStyle = 'rgba(0,0,0,.22)';
+  ctx.beginPath();
+  ctx.ellipse(c.x, c.y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const walking = c.path.length > 0 || c.state === 'gone';
+  const hasCart = c.cart.length && (c.state === 'toCashier' || c.state === 'paying' || c.state === 'waiting');
+
+  drawPerson(c.x, c.y, c.dir, c.bob, walking, c.walk, c.skin, c.hair, c.shirt, {cart: hasCart});
+
+  // пузырь с товаром
   if(c.bubble && c.bubbleT > 0){
     const p = PROD_BY_ID[c.bubble];
     if(p){
-      const bx = x, by = y - 0.62;
-      ctx.save();
+      const bx = c.x, by = c.y - 0.62;
       ctx.fillStyle = 'rgba(255,255,255,.95)';
       if(ctx.roundRect){
         ctx.beginPath(); ctx.roundRect(bx - 0.2, by - 0.2, 0.4, 0.4, 0.1); ctx.fill();
@@ -1774,7 +1857,6 @@ function drawCustomer(c){
       if(spr && spr.complete && spr.naturalWidth){
         ctx.drawImage(spr, bx - 0.15, by - 0.15, 0.3, 0.3);
       }
-      ctx.restore();
     }
   }
 
@@ -1783,91 +1865,23 @@ function drawCustomer(c){
     ctx.fillStyle = 'rgba(255,210,87,.95)';
     ctx.font = 'bold 0.3px system-ui';
     ctx.textAlign = 'center';
-    ctx.fillText('!', x, y - 0.5);
+    ctx.fillText('!', c.x, c.y - 0.5);
   }
+
+  ctx.restore();
 }
 
 function drawCashier(){
   const c = cashier;
   if(!c) return;
   ctx.save();
-  ctx.globalAlpha = 1;
-
   // тень
   ctx.fillStyle = 'rgba(0,0,0,.22)';
   ctx.beginPath();
-  ctx.ellipse(c.x, c.y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2);
+  ctx.ellipse(c.x, c.y + 0.28, 0.26, 0.1, 0, 0, Math.PI * 2);
   ctx.fill();
-
-  const x = c.x, y = c.y + c.bob;
-
-  // ноги
-  ctx.fillStyle = '#2b3546';
-  ctx.beginPath();
-  ctx.ellipse(x - 0.1, y + 0.18, 0.08, 0.12, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(x + 0.1, y + 0.18, 0.08, 0.12, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // тело — форма кассира
-  ctx.fillStyle = c.shirt;
-  ctx.beginPath();
-  ctx.ellipse(x, y, 0.28, 0.24, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = shade(c.shirt, -50);
-  ctx.lineWidth = 0.025;
-  ctx.stroke();
-
-  // бейджик
-  ctx.fillStyle = '#ffd257';
-  ctx.fillRect(x - 0.06, y - 0.02, 0.12, 0.06);
-  ctx.fillStyle = '#8a6a10';
-  ctx.fillRect(x - 0.05, y, 0.1, 0.02);
-
-  // руки (сложены перед телом)
-  ctx.fillStyle = c.skin;
-  ctx.beginPath();
-  ctx.arc(x - 0.24, y - 0.02, 0.075, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(x + 0.24, y - 0.02, 0.075, 0, Math.PI * 2);
-  ctx.fill();
-
-  // голова
-  ctx.fillStyle = c.skin;
-  ctx.beginPath();
-  ctx.arc(x, y - 0.13, 0.17, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = shade(c.skin, -45);
-  ctx.lineWidth = 0.02;
-  ctx.stroke();
-
-  // волосы
-  ctx.fillStyle = c.hair;
-  ctx.beginPath();
-  ctx.arc(x, y - 0.16, 0.165, Math.PI, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(x, y - 0.19, 0.16, 0.1, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // глаза
-  ctx.fillStyle = '#1b2330';
-  ctx.beginPath();
-  ctx.arc(x - 0.06, y - 0.1, 0.026, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(x + 0.06, y - 0.1, 0.026, 0, Math.PI * 2);
-  ctx.fill();
-
-  // улыбка
-  ctx.strokeStyle = '#5a3a20';
-  ctx.lineWidth = 0.018;
-  ctx.beginPath();
-  ctx.arc(x, y - 0.07, 0.05, 0.15, Math.PI - 0.15);
-  ctx.stroke();
-
+  // Смотрит вниз на покупателей, чуть меньшего размера
+  drawPerson(c.x, c.y, Math.PI / 2, c.bob, false, 0, c.skin, c.hair, c.shirt, {badge: true, scale: 0.85});
   ctx.restore();
 }
 
@@ -1895,13 +1909,51 @@ function updateWorld(dt){
   }
 }
 
+/* -------------------- 10b. ДОБАВЛЕНИЕ XP И LEVEL UP ---------------------- */
+let lastKnownLevel = 1;
+
+function addXP(amount){
+  if(amount <= 0) return;
+  const before = getLevel();
+  state.xp += amount;
+  const after = getLevel();
+  if(after > before){
+    showLevelUp(after);
+  }
+}
+
+function showLevelUp(newLevel){
+  const overlay = document.createElement('div');
+  overlay.className = 'levelup-overlay';
+  overlay.innerHTML = `
+    <div class="levelup-content">
+      <div class="levelup-burst"></div>
+      <div class="levelup-num">${newLevel}</div>
+      <div class="levelup-title">${t('levelUp')}</div>
+      <div class="levelup-sub">${t('levelUpSub')}</div>
+      <div class="levelup-hint">${state.lang === 'en' ? 'Tap to continue' : 'Нажмите, чтобы продолжить'}</div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const dismiss = () => {
+    overlay.style.transition = 'opacity .4s';
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 420);
+    overlay.removeEventListener('click', dismiss);
+  };
+  overlay.addEventListener('click', dismiss);
+  setTimeout(dismiss, 3200);
+  if(state.music) Music.note(523.25, 0.5, 0.14, 'triangle');
+  setTimeout(() => { if(state.music) Music.note(659.25, 0.5, 0.14, 'triangle'); }, 140);
+  setTimeout(() => { if(state.music) Music.note(783.99, 0.7, 0.16, 'triangle'); }, 280);
+}
+
 /* ------------------------------- 11. ВВОД ---------------------------------- */
 function screenToCell(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
   const x = clientX - rect.left;
   const y = clientY - rect.top;
-  const gx = Math.floor((x - OX) / CS);
-  const gy = Math.floor((y - OY) / CS);
+  const gx = Math.floor((x - getOX()) / CS);
+  const gy = Math.floor((y - getOY()) / CS);
   if(gx < 0 || gy < 0 || gx >= GW || gy >= GH) return null;
   return {x: gx, y: gy};
 }
@@ -1909,8 +1961,7 @@ function screenToCell(clientX, clientY){
 let placeMode = null;
 
 function onCellClick(gx, gy){
-  // блок при обучении
-  if(isTutorialBlocking()) return;
+  if(isTutorialBlocking() && tutorialStep <= 2) return;
 
   const c = cellAt(gx, gy);
   if(!c) return;
@@ -1944,7 +1995,6 @@ function onCellClick(gx, gy){
       state.ds.stock += added;
       scheduleSave();
       updateHUD();
-      // проходим обучающий шаг 3
       if(tutorialStep === 3){
         tutorialStep = 4;
         updateTutorialBlock();
@@ -1963,6 +2013,11 @@ function onCellClick(gx, gy){
 
   if(!c.u){
     if(!isAdjacentToUnlocked(gx, gy)){ toast('Слишком далеко'); return; }
+    const maxCells = maxCellsForLevel(getLevel());
+    if(unlockedCount() >= maxCells){
+      toast(t('maxCells'), '#e0575b');
+      return;
+    }
     const price = expandPrice();
     if(state.money < price){ toast(t('noMoney')); return; }
     state.money -= price;
@@ -1979,11 +2034,48 @@ function onCellClick(gx, gy){
   }
 }
 
+// Панорамирование и клики
 canvas.addEventListener('pointerdown', e => {
   if($('#modalRoot').style.display === 'block') return;
-  const cell = screenToCell(e.clientX, e.clientY);
-  if(cell) onCellClick(cell.x, cell.y);
+  dragging = true;
+  dragMoved = false;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  dragBaseCamX = camX;
+  dragBaseCamY = camY;
+  canvas.classList.add('dragging');
+  try { canvas.setPointerCapture(e.pointerId); } catch(_){}
 });
+
+canvas.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  const dx = e.clientX - dragStartX;
+  const dy = e.clientY - dragStartY;
+  if(!dragMoved && Math.hypot(dx, dy) > 8) dragMoved = true;
+  if(dragMoved){
+    camX = dragBaseCamX + dx;
+    camY = dragBaseCamY + dy;
+    clampCamera();
+  }
+});
+
+function endDrag(e){
+  if(!dragging) return;
+  const wasMoved = dragMoved;
+  dragging = false;
+  dragMoved = false;
+  canvas.classList.remove('dragging');
+  try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
+  if(!wasMoved){
+    const cell = screenToCell(e.clientX, e.clientY);
+    if(cell) onCellClick(cell.x, cell.y);
+  }
+}
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', e => { dragging = false; dragMoved = false; canvas.classList.remove('dragging'); });
+
+// Двойной тап по пустому месту — сброс панорамы в центр
+canvas.addEventListener('dblclick', () => { camX = 0; camY = 0; clampCamera(); });
 
 /* ------------------------------- 12. UI ----------------------------------- */
 function toast(msg, color){
@@ -2004,6 +2096,11 @@ function toast(msg, color){
 function updateHUD(){
   $('#moneyVal').textContent = fmt(state.money);
   $('#cellsVal').textContent = unlockedCount();
+  const lvl = getLevel();
+  $('#lvlVal').textContent = lvl;
+  const p = xpProgress();
+  $('#lvlBar').style.width = (p.ratio * 100).toFixed(1) + '%';
+
   const tr = tasksReadyCount();
   const badge = $('#taskBadge');
   if(tr > 0){ badge.style.display = 'block'; badge.textContent = tr; }
@@ -2030,7 +2127,6 @@ function updatePlaceBar(){
   bar.appendChild(btn);
 }
 
-/* ---- модальные окна ---- */
 function openModal(titleText, builder){
   const root = $('#modalRoot');
   root.style.display = 'block';
@@ -2063,7 +2159,6 @@ function closeModal(){
   $('#modalRoot').style.display = 'none';
 }
 
-/* ---- магазин ---- */
 let shopCurCat = 'all';
 
 function openShop(){
@@ -2107,12 +2202,14 @@ function openShop(){
         catSel.appendChild(chip);
       });
 
+      const lvl = getLevel();
       const list = PRODUCTS.filter(p => shopCurCat === 'all' || p.cat === shopCurCat);
       const grid = document.createElement('div');
       grid.className = 'grid2';
       list.forEach(p => {
+        const unlocked = lvl >= productLevel(p);
         const row = document.createElement('div');
-        row.className = 'row';
+        row.className = 'row' + (unlocked ? '' : ' locked');
         row.style.margin = '0';
         row.style.padding = '7px';
         const ic = document.createElement('div');
@@ -2121,23 +2218,38 @@ function openShop(){
         const im = document.createElement('img');
         im.src = svgURI(productSVG(p.shape, p.color));
         ic.appendChild(im);
+        if(!unlocked){
+          const lock = document.createElement('div');
+          lock.className = 'lock';
+          lock.textContent = '\uD83D\uDD12';
+          ic.appendChild(lock);
+        }
         const nm = document.createElement('div');
         nm.className = 'nm';
-        nm.innerHTML = `<b style="font-size:12px">${pname(p)}</b><span>${catName(p.cat)}</span>`;
+        const sub = unlocked ? catName(p.cat) : (t('requires') + ' ' + t('level') + ' ' + productLevel(p));
+        nm.innerHTML = `<b style="font-size:12px">${pname(p)}</b><span>${sub}</span>`;
         const pr = document.createElement('div');
         pr.className = 'pr';
         pr.style.fontSize = '12px';
-        pr.textContent = fmt(p.cost);
-        const b = document.createElement('button');
-        b.className = 'btn sm';
-        b.textContent = '+';
-        b.onclick = () => buyProduct(p.id, 1);
-        const b10 = document.createElement('button');
-        b10.className = 'btn sm ghost';
-        b10.textContent = '\u00D710';
-        b10.onclick = () => buyProduct(p.id, 10);
+        pr.textContent = unlocked ? fmt(p.cost) : '\u2014';
         row.appendChild(ic); row.appendChild(nm); row.appendChild(pr);
-        row.appendChild(b); row.appendChild(b10);
+        if(unlocked){
+          const b = document.createElement('button');
+          b.className = 'btn sm';
+          b.textContent = '+';
+          b.onclick = () => buyProduct(p.id, 1);
+          const b10 = document.createElement('button');
+          b10.className = 'btn sm ghost';
+          b10.textContent = '\u00D710';
+          b10.onclick = () => buyProduct(p.id, 10);
+          row.appendChild(b); row.appendChild(b10);
+        } else {
+          const b = document.createElement('button');
+          b.className = 'btn sm locked';
+          b.textContent = t('level') + ' ' + productLevel(p);
+          b.disabled = true;
+          row.appendChild(b);
+        }
         grid.appendChild(row);
       });
       content.appendChild(grid);
@@ -2145,6 +2257,7 @@ function openShop(){
 
     function buyProduct(pid, count){
       const p = PROD_BY_ID[pid];
+      if(getLevel() < productLevel(p)){ toast(t('locked'), '#e0575b'); return; }
       let bought = 0;
       for(let i = 0; i < count; i++){
         if(state.money < p.cost) break;
@@ -2272,19 +2385,23 @@ function openShop(){
 
     function renderExpand(){
       catSel.style.display = 'none';
+      const lvl = getLevel();
+      const maxCells = maxCellsForLevel(lvl);
+      const cur = unlockedCount();
       const info = document.createElement('div');
       info.style.cssText = 'padding:14px;text-align:center;';
-      const price = expandPrice();
-      const total = GW * GH;
-      const cur = unlockedCount();
       info.innerHTML = `
         <div style="font-size:15px;font-weight:700;margin-bottom:6px">${t('expand')}</div>
         <div style="color:#8798ad;font-size:13px;margin-bottom:10px">
-          ${state.lang === 'en' ? 'Unlocked' : 'Открыто'}: ${cur} / ${total}
+          ${state.lang === 'en' ? 'Unlocked' : 'Открыто'}: ${cur} / ${maxCells}
+          <span style="opacity:.6">(${t('level')} ${lvl})</span>
         </div>
-        <div style="font-size:24px;font-weight:800;color:#ffd257;margin-bottom:8px">${fmt(price)} \u20BF</div>
+        <div style="font-size:24px;font-weight:800;color:#ffd257;margin-bottom:8px">${fmt(expandPrice())} \u20BF</div>
         <div style="color:#8798ad;font-size:12.5px">${t('expandHint')}</div>
-        <div class="progressbar" style="margin-top:14px"><i style="width:${(cur / total * 100).toFixed(1)}%"></i></div>
+        <div class="progressbar" style="margin-top:14px"><i style="width:${(cur / maxCells * 100).toFixed(1)}%"></i></div>
+        <div style="color:#8798ad;font-size:11.5px;margin-top:8px">
+          ${state.lang === 'en' ? 'Max cells grow with your level' : 'Максимум клеток растёт с уровнем'}
+        </div>
       `;
       content.appendChild(info);
       const btn = document.createElement('button');
@@ -2324,7 +2441,6 @@ function countFurniture(k){
   return n;
 }
 
-/* ---- склад ---- */
 function openWarehouse(){
   openModal(t('warehouse'), el => {
     const total = warehouseTotal();
@@ -2406,7 +2522,6 @@ function autoStock(){
   }
 }
 
-/* ---- информация о полке ---- */
 function openShelfInfo(gx, gy){
   const c = cellAt(gx, gy);
   if(!c || !c.t) return;
@@ -2414,7 +2529,6 @@ function openShelfInfo(gx, gy){
     const info = document.createElement('div');
     info.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
     info.innerHTML = `<div class="chip">${t('total')}: ${shelfQty(c)} / ${shelfCapacity(c)}</div>`;
-
     const bar = document.createElement('div');
     bar.className = 'progressbar';
     bar.style.flex = '1';
@@ -2438,7 +2552,7 @@ function openShelfInfo(gx, gy){
         ic.appendChild(im);
         const nm = document.createElement('div');
         nm.className = 'nm';
-        nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${t('sell')} ${p.sell} \u20BF</span>`;
+        nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${state.lang === 'en' ? 'Sell' : 'Продажа'} ${p.sell} \u20BF</span>`;
         const qty = document.createElement('div');
         qty.className = 'pr';
         qty.textContent = '\u00D7' + s.n;
@@ -2480,7 +2594,6 @@ function openShelfInfo(gx, gy){
   });
 }
 
-/* ---- настройки ---- */
 function openSettings(){
   openModal(t('settings'), el => {
     const r1 = document.createElement('div');
@@ -2539,6 +2652,7 @@ function openSettings(){
         setTimeout(() => location.reload(), 900);
       } else if(code === 'admin17'){
         state.money += 1000000;
+        state.xp += 1000000;
         updateHUD(); scheduleSave();
         inp.value = '';
         toast(t('promoOk') + ' +1 000 000 \u20BF', '#ffd257');
@@ -2556,13 +2670,11 @@ function openSettings(){
     rb.onclick = async () => {
       await wipeSave();
       closeModal();
-      toast(t('stockEmpty'));
     };
     el.appendChild(rb);
   });
 }
 
-/* ---- задания ---- */
 function openTasks(){
   checkDailyReset();
   openModal(t('tasks'), el => {
@@ -2590,8 +2702,11 @@ function openTasks(){
         if(tk.claimed || !done) return;
         tk.claimed = true;
         state.money += tk.reward;
+        state.xp += Math.round(tk.reward * 0.5);
         updateHUD(); scheduleSave();
         toast('+' + fmt(tk.reward) + ' \u20BF', '#ffd257');
+        // проверка на новый уровень после задач
+        if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
         closeModal(); openTasks();
       };
       row.appendChild(nm); row.appendChild(b);
@@ -2600,7 +2715,6 @@ function openTasks(){
   });
 }
 
-/* ---- ежедневная награда ---- */
 function openDaily(){
   openModal(t('daily'), el => {
     const today = todayStr();
@@ -2634,17 +2748,18 @@ function openDaily(){
     btn.onclick = () => {
       if(!canTake) return;
       state.money += amounts[dayIdx];
+      state.xp += Math.round(amounts[dayIdx] * 0.5);
       state.lastDaily = today;
       state.streak++;
       updateHUD(); scheduleSave();
       toast('+' + fmt(amounts[dayIdx]) + ' \u20BF', '#ffd257');
+      if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
       closeModal();
     };
     el.appendChild(btn);
   });
 }
 
-/* ---- награда за время ---- */
 function checkTimeRewards(){
   const mins = state.playtime / 60;
   const next = TIME_REWARDS[state.lastRewardIdx];
@@ -2652,12 +2767,13 @@ function checkTimeRewards(){
   if(mins >= next.min){
     state.lastRewardIdx++;
     state.money += next.amount;
+    state.xp += Math.round(next.amount * 0.5);
     updateHUD(); scheduleSave();
     toast(t('onlineReward') + ': +' + fmt(next.amount) + ' \u20BF', '#ffd257');
+    if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
   }
 }
 
-/* ---- реклама ---- */
 function showAdOverlay(text){
   $('#overlayText').textContent = text || t('adLoading');
   $('#overlay').style.display = 'flex';
@@ -2668,7 +2784,6 @@ function hideAdOverlay(){
   if(state.music) Music.start();
 }
 
-/* ---- обучение ---- */
 let tutorialStep = 0;
 
 function isTutorialBlocking(){
@@ -2711,7 +2826,6 @@ function showTutorialHint(){
     row.appendChild(b);
     hint.appendChild(row);
   } else if(tutorialStep === 4){
-    // Показываем кнопку "Завершить" сразу после того как игрок разложил товар
     const row = document.createElement('div');
     row.className = 'hintrow';
     const b = document.createElement('button');
@@ -2744,7 +2858,6 @@ function skipTutorial(){
   scheduleSave();
 }
 
-/* ---- язык ---- */
 function applyLang(){
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -2753,14 +2866,11 @@ function applyLang(){
 }
 
 /* ------------------------------- 13. VK ----------------------------------- */
-let launchParams = null;
-
 function initVK(){
   if(!vk) return;
   try { vk.send('VKWebAppInit'); } catch(e){}
 
   vkSend('VKWebAppGetLaunchParams').then(data => {
-    launchParams = data;
     return vkSend('VKWebAppShowBannerAd', {
       banner_type: 'bottom', layout_type: 'resize', height: 60
     }).catch(() => vkSend('VKWebAppShowBannerAd').catch(() => {}));
@@ -2828,6 +2938,7 @@ async function boot(){
     initGrid();
   }
   checkDailyReset();
+  lastKnownLevel = getLevel();
   applyLang();
   resize();
 
@@ -2854,13 +2965,6 @@ async function boot(){
         el.appendChild(row);
       });
     }, 400);
-  } else if(!state.tutorialDone){
-    // сохраняем прогресс обучения
-    setTimeout(() => {
-      if(!state.tutorialDone && tutorialStep === 0){
-        // если игра была прервана, не продолжаем обучение с середины
-      }
-    }, 100);
   }
 
   updateHUD();
@@ -2876,13 +2980,20 @@ async function boot(){
   document.addEventListener('keydown', startMusic);
 
   requestAnimationFrame(loop);
-
   setInterval(() => { if(state) updateHUD(); }, 5000);
 }
 
 /* ------------------------------ 16. СОБЫТИЯ ------------------------------- */
-$('#btnShop').onclick = () => { if(!paused && !isTutorialBlocking()) openShop(); };
-$('#btnStock').onclick = () => { if(!paused && !isTutorialBlocking()) openWarehouse(); };
+$('#btnShop').onclick = () => {
+  if(paused) return;
+  if(isTutorialBlocking() && tutorialStep !== 2) return;
+  openShop();
+};
+$('#btnStock').onclick = () => {
+  if(paused) return;
+  if(isTutorialBlocking() && tutorialStep !== 3) return;
+  openWarehouse();
+};
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
 $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(); };
 $('#btnSettings').onclick = () => { if(!paused && !isTutorialBlocking()) openSettings(); };
@@ -2912,22 +3023,6 @@ $('#btnInvite').onclick = () => {
     toast(state.lang === 'en' ? 'Invite unavailable' : 'Приглашение недоступно');
   });
 };
-
-// переопределим обработчик магазина и склада для обучения
-const _origShopHandler = $('#btnShop').onclick;
-$('#btnShop').onclick = () => {
-  if(paused) return;
-  if(isTutorialBlocking() && tutorialStep !== 2) return;
-  openShop();
-};
-const _origStockHandler = $('#btnStock').onclick;
-$('#btnStock').onclick = () => {
-  if(paused) return;
-  if(isTutorialBlocking() && tutorialStep !== 3) return;
-  openWarehouse();
-};
-
-// кнопка магазина во время обучения тоже вызывает openShop с покупкой
 
 window.addEventListener('resize', () => { if(state) resize(); });
 window.addEventListener('orientationchange', () => setTimeout(() => { if(state) resize(); }, 250));
