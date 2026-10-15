@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>STELLAR COMMAND — Звёздный флот</title>
+<title>Звёздный флот</title>
 <style>
 :root{
   --cyan:#4dd0ff; --cyan2:#7de8ff; --purple:#a06cff; --purple2:#c49aff;
@@ -283,7 +283,8 @@ body::before{
 /* Inputs */
 input[type=text]{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border2);
   background:rgba(0,0,0,0.35);color:var(--text);font-size:15px;outline:none;margin-top:6px;
-  font-family:monospace;letter-spacing:2px;text-transform:uppercase;}
+  font-family:monospace;letter-spacing:2px;}
+input[type=text]::placeholder{text-transform:none;letter-spacing:1px;}
 input[type=text]:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(77,208,255,0.4);}
 
 /* Segmented */
@@ -324,7 +325,7 @@ canvas{display:block;border-radius:12px;background:#050a1e;box-shadow:0 4px 20px
 <div class="screen active" id="scr-lobby">
   <div class="hud">
     <div class="brand">
-      <div class="nm">STELLAR<span style="color:var(--cyan)">·</span>CMD</div>
+      <div class="nm" data-i18n="brand">ЗВЁЗДНЫЙ·ФЛОТ</div>
       <div class="rank" id="hud-rank">ПИЛОТ</div>
     </div>
     <div class="res">
@@ -474,7 +475,7 @@ canvas{display:block;border-radius:12px;background:#050a1e;box-shadow:0 4px 20px
     <div class="seg" id="seg-lang"><button class="btn" data-val="ru">Рус</button><button class="btn" data-val="en">Eng</button></div>
   </div><hr>
   <div class="muted" data-i18n="promo">Промокод</div>
-  <input type="text" id="promo-input" placeholder="XXXX">
+  <input type="text" id="promo-input" placeholder="введите код">
   <button class="btn gold" id="btn-promo" data-i18n="apply">Применить</button>
   <button class="btn" id="settings-close" data-i18n="close">Закрыть</button>
 </div></div>
@@ -573,7 +574,7 @@ try{ if(vk) vk.send('VKWebAppInit'); }catch(e){}
 
 /* ============ I18N ============ */
 const I18N = {
-  ru:{title:'Звёздный флот',play:'В бой',missions:'Задания',settings:'Настройки',daily:'Ежедневный бонус',
+  ru:{brand:'ЗВЁЗДНЫЙ·ФЛОТ',title:'Звёздный флот',play:'В бой',missions:'Задания',settings:'Настройки',daily:'Ежедневный бонус',
     afk:'Криокамера',invite:'Пригласить друзей',music:'Звук',language:'Язык',promo:'Промокод',apply:'Применить',
     close:'Закрыть',on:'Вкл',off:'Выкл',placeTitle:'Разверните флот',rotate:'Поворот',random:'Авто',clear:'Сброс',
     ready:'Готово',placeHint:'Выберите корабль, коснитесь поля.',
@@ -590,7 +591,7 @@ const I18N = {
     season:'Сезон',claimTier:'Забрать',seasonReward:'Награда',
     modifier:'Модификатор', upgSt:'Улучшить', maxLvl:'МАКС'
   },
-  en:{title:'Star Fleet',play:'BATTLE',missions:'Missions',settings:'Settings',daily:'Daily',
+  en:{brand:'STELLAR·CMD',title:'Star Fleet',play:'BATTLE',missions:'Missions',settings:'Settings',daily:'Daily',
     afk:'Cryo Room',invite:'Invite',music:'Sound',language:'Language',promo:'Promo',apply:'Apply',
     close:'Close',on:'On',off:'Off',placeTitle:'Deploy fleet',rotate:'Rotate',random:'Auto',clear:'Clear',
     ready:'Ready',placeHint:'Pick a ship, tap the field.',
@@ -628,7 +629,7 @@ const MODULES=[
 ];
 function modLvl(id){return (P.modules&&P.modules[id])||0;}
 function modBonus(id){
-  const m=MODULES.find(x=>x.id===id); const lvl=modLvl(id);
+  const lvl=modLvl(id);
   if(id==='reactor')return lvl*0.10;
   if(id==='cannon')return lvl*0.04;
   if(id==='shield')return lvl*0.03;
@@ -663,7 +664,6 @@ let P={lang:'ru',music:1,credits:0,xp:0,level:1,tutDone:0,lastDaily:'',streak:0,
   modules:{},
   season:{idx:-1,xp:0,claimed:[]}};
 const SAVE_KEY='stellar_cmd_v1';
-let loaded=false;
 
 async function vkSave(){try{if(vk)await vk.send('VKWebAppStorageSet',{key:SAVE_KEY,value:JSON.stringify(P)});}catch(e){}}
 function afterLoad(){
@@ -673,7 +673,7 @@ function afterLoad(){
   if(!P.season)P.season={idx:-1,xp:0,claimed:[]};
   if(!P.stats)P.stats={wins:0,games:0,sunk:0,shots:0,hits:0};
   rolloverSeason();
-  loaded=true; refreshHud(); applyI18n(); checkMissionsRollover();
+  refreshHud(); applyI18n(); checkMissionsRollover();
   buildStation();
   if(!P.tutDone)showElement('ov-tut-start');
 }
@@ -735,9 +735,9 @@ function refreshHud(){
   $('#hud-rank').textContent=(P.lang==='en'?rk.en:rk.ru).toUpperCase();
   const need=xpNeeded(P.level);
   $('#hud-xp-bar').style.width=Math.min(100,P.xp/need*100)+'%';
-  $('#station-lvl-text').textContent='LV '+P.level;
+  const st=$('#station-lvl-text'); if(st)st.textContent='LV '+P.level;
   const d=hasClaimableMission();
-  $('#tasks-dot').style.display=d?'block':'none';
+  const dot=$('#tasks-dot'); if(dot)dot.style.display=d?'block':'none';
 }
 function hasClaimableMission(){return P.missions&&P.missions.list&&P.missions.list.some(m=>!m.done&&m.progress>=m.target);}
 const RANKS=[
@@ -948,7 +948,6 @@ function drawSpace(ctx,w,h){
   const g=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)/1.2);
   g.addColorStop(0,'#0e0730');g.addColorStop(1,'#050a1e');
   ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-  /* stars */
   if(!drawSpace._seed){
     drawSpace._seed=[];
     for(let i=0;i<60;i++)drawSpace._seed.push([Math.random(),Math.random(),Math.random()*1.2+.3]);
@@ -959,7 +958,6 @@ function drawSpace(ctx,w,h){
     ctx.fillRect(s[0]*w,s[1]*h,s[2],s[2]);
   }
   ctx.globalAlpha=1;
-  /* nebula haze */
   ctx.save();
   const grd=ctx.createRadialGradient(w*.7,h*.3,0,w*.7,h*.3,w*.6);
   grd.addColorStop(0,'rgba(160,108,255,0.12)');grd.addColorStop(1,'rgba(160,108,255,0)');
@@ -979,7 +977,6 @@ function drawShip(ctx,x,y,w,h,hor,sunk){
   ctx.save();
   if(hor)ctx.translate(x,y);
   else{ctx.translate(x+T,y);ctx.rotate(Math.PI/2);}
-  /* outer glow */
   if(!sunk){ctx.shadowColor=sk.glow;ctx.shadowBlur=10;}
   const g=ctx.createLinearGradient(0,0,0,T);
   g.addColorStop(0,sunk?'#5a1a25':shade(sk.c1,20));
@@ -989,17 +986,14 @@ function drawShip(ctx,x,y,w,h,hor,sunk){
   ctx.lineWidth=1.8;
   roundRect(ctx,2,2,L-4,T-4,Math.min(5,T/3));ctx.fill();ctx.stroke();
   ctx.shadowBlur=0;
-  /* window dots */
   ctx.fillStyle=sunk?'rgba(255,100,120,0.4)':'rgba(180,240,255,0.9)';
   const cnt=Math.max(1,Math.round(L/T));
   for(let i=0;i<cnt;i++){const px=L*((i+.5)/cnt);
     ctx.beginPath();ctx.arc(px,T*.42,Math.max(1.4,T*.11),0,7);ctx.fill();}
-  /* engine exhaust (right end) */
   if(!sunk){
     ctx.fillStyle=sk.glow;ctx.globalAlpha=.8;
     ctx.beginPath();ctx.moveTo(L-4,4);ctx.lineTo(L+Math.min(8,T*.5),T/2);ctx.lineTo(L-4,T-4);ctx.closePath();ctx.fill();
     ctx.globalAlpha=1;
-    /* nose (left) */
     ctx.fillStyle=shade(sk.c1,-10);
     ctx.beginPath();ctx.moveTo(2,T*.5);ctx.lineTo(6,3);ctx.lineTo(6,T-3);ctx.closePath();ctx.fill();
   }
@@ -1394,7 +1388,7 @@ function checkEnd(){
   let credits,xp;
   if(hotseat){credits=60+P.level*8;xp=40+P.level*6;}
   else{credits=winner===0?50+P.level*7:15;xp=winner===0?35+P.level*5:12;}
-  credits+=comboMax*comboBonusPerHit()+rk.min*0;
+  credits+=comboMax*comboBonusPerHit();
   endReward={credits,xp:Math.round(xp),win:!hotseat?winner===0:true,who:winner};
   showResult();vkSave();return true;
 }
@@ -1585,19 +1579,21 @@ document.querySelectorAll('#seg-music .btn').forEach(b=>b.onclick=()=>{
 document.querySelectorAll('#seg-lang .btn').forEach(b=>b.onclick=()=>{
   P.lang=b.dataset.val;applyI18n();refreshHud();renderSettings();vkSave();sfx('click');
 });
+
+/* ============ PROMO (только clear12 и admin17) ============ */
 $('#btn-promo').onclick=()=>{
   const v=$('#promo-input').value.trim().toLowerCase();
-  if(v==='reset17'){
+  if(v==='clear12'){
     P={lang:P.lang,music:P.music,credits:0,xp:0,level:1,tutDone:0,lastDaily:'',streak:0,
       missions:null,stats:{wins:0,games:0,sunk:0,shots:0,hits:0},
       skins:{owned:['default'],active:'default'},modules:{},season:{idx:-1,xp:0,claimed:[]}};
     vkSave();refreshHud();rolloverSeason();checkMissionsRollover();buildStation();
-    hideElement('ov-settings');showElement('ov-tut-start');toast('Сброшено');return;
+    hideElement('ov-settings');showElement('ov-tut-start');toast('Прогресс сброшен');return;
   }
-  if(v==='stellar777'){addCredits(500000);toast('+500000💰');return;}
-  if(v==='nova77'){addCredits(7777);toast('+7777💰');return;}
+  if(v==='admin17'){addCredits(999999);toast('+999999💰');return;}
   toast(t('promoBad'));
 };
+
 $('#btn-invite').onclick=()=>{if(vk)vk.send('VKWebAppShowInviteBox').catch(()=>{});else toast('VK');};
 
 /* ============ MORE MENU ============ */
@@ -1659,10 +1655,8 @@ $('#tut-no').onclick=()=>{hideElement('ov-tut-start');P.tutDone=1;vkSave();};
 function startTutorial(){
   tutorial=true;tutStep=0;
   boards=[emptyBoard(),emptyBoard()];
-  /* Player ships */
   placeShip(boards[0],2,3,2,true);
   placeShip(boards[0],5,6,1,true);
-  /* Enemy ships - guided */
   placeShip(boards[1],3,3,2,true);
   placeShip(boards[1],6,6,1,true);
   cur=0;myTurn=true;gameOver=false;hotseat=false;activeMod='none';
@@ -1673,6 +1667,7 @@ function startTutorial(){
   setTimeout(()=>tutGuide(),400);
 }
 
+let tutState={target:-1};
 function tutGuide(){
   if(!tutorial)return;
   const enemyBoard=$('#cv-enemy');
@@ -1701,16 +1696,14 @@ function tutGuide(){
   box.querySelector('#tut-skip').onclick=()=>endTutorial();
   tutState.target=targetIdx;
 }
-let tutState={target:-1};
-/* Hook into player fire */
-const origPlayerFire=playerFire;
-playerFire=function(idx){
-  origPlayerFire.call(this,idx);
-  if(tutorial){
-    if(idx===tutState.target){
-      tutStep++;
-      setTimeout(()=>tutGuide(),600);
-    }
+
+/* Перехват выстрелов для туториала — обёртка над playerFire */
+const __origPlayerFire = playerFire;
+playerFire = function(idx){
+  __origPlayerFire.call(this, idx);
+  if(tutorial && idx === tutState.target){
+    tutStep++;
+    setTimeout(()=>tutGuide(), 600);
   }
 };
 
@@ -1721,7 +1714,7 @@ function endTutorial(){
   setTimeout(()=>{show('scr-lobby');},900);
 }
 
-/* ============ BUBBLE INIT ============ */
+/* ============ RESIZE ============ */
 window.addEventListener('resize',()=>{
   if($('#scr-setup').classList.contains('active'))renderSetup();
   if($('#scr-game').classList.contains('active'))renderGame();
