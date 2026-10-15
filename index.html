@@ -3051,7 +3051,6 @@ function autoStock(){
     checkTutorialStock();   // ← добавлено: обучение тоже продвинется
   } else toast(t('noSlots'));
 }
-}
 function openShelfInfo(gx, gy){
   const c = cellAt(gx, gy);
   if(!c || !c.t) return;
