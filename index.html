@@ -10,11 +10,9 @@
 html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:#e8eef7}
 #app{position:fixed;inset:0;overflow:hidden}
-#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;
-  cursor:grab}
+#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 #game.dragging{cursor:grabbing}
 
-/* ---------- CUSTOM SCROLLBARS ---------- */
 .modal-body::-webkit-scrollbar,
 .tabs::-webkit-scrollbar,
 .cat-sel::-webkit-scrollbar{width:8px;height:8px}
@@ -30,7 +28,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 .cat-sel::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4a89ff,#2d6cdf)}
 .modal-body,.tabs,.cat-sel{scrollbar-width:thin;scrollbar-color:#3b4d66 #0f151d}
 
-/* ---------- TOP BAR ---------- */
 #topbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;gap:6px;
   padding:0 8px;background:linear-gradient(180deg,rgba(14,18,25,.96),rgba(14,18,25,.72));
   backdrop-filter:blur(6px);z-index:20;pointer-events:auto}
@@ -44,6 +41,9 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 #lvlChip .lvlXP{height:4px;border-radius:2px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:2px}
 #lvlChip .lvlXP i{display:block;height:100%;background:linear-gradient(90deg,#ffd257,#ff9500);
   border-radius:2px;transition:width .3s}
+#bonusChip{background:linear-gradient(180deg,#e06b1c,#a8420c);border-color:#ffb070;color:#fff;
+  font-size:12px;font-weight:800;display:none;gap:4px;animation:bonusPulse 1s ease-in-out infinite}
+@keyframes bonusPulse{50%{box-shadow:0 0 14px rgba(255,150,60,.85)}}
 .spacer{flex:1}
 .iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid #2b3648;background:#1b2330;
   color:#cfe0f5;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;
@@ -53,7 +53,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 .badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:8px;background:#ff4d5e;
   color:#fff;font-size:10px;line-height:16px;text-align:center;padding:0 4px;font-weight:700}
 
-/* ---------- BOTTOM BAR ---------- */
 #bottombar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;padding:8px 8px 10px;
   background:linear-gradient(0deg,rgba(14,18,25,.98),rgba(14,18,25,.7));z-index:20}
 .botbtn{flex:1;height:52px;border-radius:14px;border:1px solid #2b3648;background:#1b2330;color:#dce8f8;
@@ -63,7 +62,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
 .botbtn:active{transform:scale(.95);background:#243044}
 .botbtn.primary{background:linear-gradient(180deg,#2e7d5b,#1f5f44);border-color:#3aa477;color:#eafff4}
 
-/* ---------- TUTORIAL BLOCKING ---------- */
 body.tutorial-on .botbtn,body.tutorial-on .iconbtn{pointer-events:none;opacity:.35;filter:grayscale(.4)}
 body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-active{
   pointer-events:auto;opacity:1;filter:none;
@@ -71,7 +69,6 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
   animation:pulseGlow 1.6s ease-in-out infinite}
 @keyframes pulseGlow{50%{box-shadow:0 0 0 2px #4a89ff,0 0 24px rgba(74,137,255,1)}}
 
-/* ---------- LEVEL UP OVERLAY ---------- */
 .levelup-overlay{position:fixed;inset:0;z-index:200;
   background:radial-gradient(circle at center,rgba(74,137,255,.35),rgba(0,0,0,.82));
   display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -97,10 +94,8 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
 .levelup-sub{margin-top:16px;font-size:14px;color:#dbe6f8;opacity:.9;font-weight:600}
 .levelup-hint{margin-top:6px;font-size:12px;color:#8798ad}
 
-/* ---------- BANNER ---------- */
 #banner{position:absolute;left:0;right:0;bottom:0;height:0;z-index:19;pointer-events:none}
 
-/* ---------- MODALS ---------- */
 #modalRoot{position:absolute;inset:0;z-index:60;display:none}
 .modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   background:rgba(5,8,12,.72);backdrop-filter:blur(3px);padding:10px}
@@ -120,7 +115,6 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
   font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 .tab.active{background:#2d6cdf;border-color:#4a89ff;color:#fff}
 
-/* ---------- ROWS ---------- */
 .row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#1a212c;
   border:1px solid #232d3b;margin-bottom:7px}
 .row.locked{opacity:.55}
@@ -133,6 +127,9 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
 .row .nm b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .nm span{font-size:11px;color:#8798ad}
 .row .pr{font-size:13px;font-weight:700;color:#ffd257;white-space:nowrap}
+.cat-header{font-size:11px;font-weight:800;color:#8bb4ff;text-transform:uppercase;letter-spacing:1px;
+  padding:10px 4px 4px;border-top:1px solid #232d3b;margin-top:6px}
+.cat-header:first-child{border-top:none;margin-top:0}
 .btn{padding:8px 12px;border-radius:10px;border:none;background:#2d6cdf;color:#fff;font-weight:700;
   font-size:12.5px;cursor:pointer;transition:.15s;white-space:nowrap}
 .btn:active{transform:scale(.95)}
@@ -144,7 +141,6 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
 .btn:disabled{opacity:.45;pointer-events:none}
 .btn.sm{padding:6px 9px;font-size:11.5px;border-radius:9px}
 
-/* ---------- HINT / TOAST ---------- */
 #hint{position:absolute;left:50%;transform:translateX(-50%);top:60px;z-index:30;max-width:92vw;
   background:rgba(28,60,110,.96);border:1px solid #4a89ff;border-radius:14px;padding:10px 14px;
   font-size:13.5px;font-weight:600;text-align:center;display:none;box-shadow:0 8px 26px rgba(0,0,0,.5)}
@@ -155,14 +151,12 @@ body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-acti
   font-size:13px;font-weight:600;animation:tin .25s ease-out;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 @keyframes tin{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-/* ---------- OVERLAY ---------- */
 #overlay{position:absolute;inset:0;z-index:100;background:rgba(6,9,14,.92);display:none;
   align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:24px}
 .spinner{width:46px;height:46px;border:4px solid #2b3648;border-top-color:#4a89ff;border-radius:50%;
   animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---------- MISC ---------- */
 .sec-title{font-size:12px;color:#8798ad;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
   margin:12px 4px 7px}
 .empty{text-align:center;color:#6d7d92;font-size:13px;padding:26px 10px}
@@ -199,6 +193,10 @@ input[type=text]:focus{border-color:#4a89ff}
       <div class="ln"><span>Ур.</span><b id="lvlVal">1</b></div>
       <div class="lvlXP"><i id="lvlBar" style="width:0%"></i></div>
     </div>
+    <div class="stat" id="bonusChip">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z" fill="#ffd257" stroke="#8a6a10" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <span id="bonusTime">x2</span>
+    </div>
     <div class="stat" style="font-size:12px">
       <svg viewBox="0 0 24 24"><path d="M4 20V9l8-5 8 5v11" fill="none" stroke="#7fd07f" stroke-width="1.8" stroke-linejoin="round"/><rect x="9" y="13" width="6" height="7" fill="#7fd07f" opacity=".55"/></svg>
       <span id="cellsVal">0</span>
@@ -229,9 +227,9 @@ input[type=text]:focus{border-color:#4a89ff}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>
       <span data-i18n="warehouse">Склад</span>
     </button>
-    <button class="botbtn" id="btnBuild">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M3 20V9l9-6 9 6v11"/><path d="M9 20v-6h6v6"/></svg>
-      <span data-i18n="build">Строить</span>
+    <button class="botbtn" id="btnExpand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20V8"/></svg>
+      <span data-i18n="expand">Расширить</span>
     </button>
     <button class="botbtn" id="btnInvite">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M18 8v6M15 11h6"/></svg>
@@ -253,14 +251,17 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН v3 — с уровнями, панорамированием и исправлениями
+   МАГАЗИН v4 — городок, уборка, грузовик с бонусом
    ========================================================================= */
 'use strict';
 
 /* ------------------------- 1. КОНСТАНТЫ И ДАННЫЕ ------------------------- */
 const GW = 11, GH = 10;
 const DOOR = {x: 0, y: 5};
-const OUT_MARGIN = 30;
+const OUT_MARGIN = 90;
+const TRUCK_CYCLE = 180;   // сек между приездами
+const TRUCK_OFFER = 120;   // сек на раздумье
+const TRUCK_BONUS = 120;   // длительность бонуса x2
 
 const CATS = {
   dairy:    {ru:'Молочное',   en:'Dairy',      c:'#8fd3ff'},
@@ -393,9 +394,7 @@ const PRODUCTS = P_RAW.map((p, i) => ({
 const PROD_BY_ID = {};
 PRODUCTS.forEach(p => PROD_BY_ID[p.id] = p);
 
-// Уровень, с которого открывается товар: 10 товаров на уровень
 function productLevel(p){ return Math.floor((p.id - 1) / 10) + 1; }
-const MAX_PRODUCT_LEVEL = Math.ceil(PRODUCTS.length / 10);
 
 const FURNITURE = {
   shelf:   {ru:'Полка',        en:'Shelf',    cost:120, cap:6,  accepts:null},
@@ -439,19 +438,18 @@ const TIME_REWARDS = [
 ];
 
 const STR = {
-  ru:{ shop:'Магазин', warehouse:'Склад', build:'Строить', friends:'Друзья', settings:'Настройки',
+  ru:{ shop:'Магазин', warehouse:'Склад', expand:'Расширить', friends:'Друзья', settings:'Настройки',
     tasks:'Задания', daily:'Ежедневная награда', close:'Закрыть', buy:'Купить',
     cancel:'Отмена', place:'Разместить', money:'Монеты', music:'Музыка', language:'Язык',
     promo:'Промокод', apply:'Применить', tutorialQ:'Хотите пройти обучение?',
     tutorialYes:'Пройти обучение', tutorialSkip:'Пропустить', items:'Товары', furniture:'Мебель',
-    decor:'Оформление', expand:'Расширение', autoStock:'Разложить всё',
+    decor:'Оформление', autoStock:'Разложить всё',
     nothing:'Пусто', reward:'Награда', claim:'Забрать', claimed:'Получено', take:'Получить',
     remove:'Убрать', done:'Готово', adLoading:'Загрузка рекламы...', onlineReward:'Награда за игру',
-    youGet:'Вы получили', walls:'Стены', windows:'Окна',
+    walls:'Стены', windows:'Окна',
     promoOk:'Промокод активирован!', promoBad:'Неверный промокод',
     noMoney:'Недостаточно монет', placed:'Установлено',
-    needCounter:'Нужна касса, чтобы покупатели могли платить!',
-    needGoods:'Нужен товар на полках!', bought:'Куплено', expandHint:'Нажмите на тёмную клетку рядом',
+    bought:'Куплено', expandHint:'Нажмите на тёмную клетку рядом',
     streak:'Серия дней', dailyTaken:'Уже получено сегодня', stockEmpty:'Склад пуст — купите товар в магазине',
     tapShelf:'Нажмите на полку, чтобы разложить товар', adDone:'Награда за рекламу получена!',
     shelfInfo:'Информация о полке', total:'Всего', slots:'мест', onMap:'На карте',
@@ -464,21 +462,27 @@ const STR = {
     locked:'Заблокировано', requires:'Требуется', level:'Ур.',
     levelUp:'НОВЫЙ УРОВЕНЬ!', levelUpSub:'Открыты новые товары и клетки!',
     maxCells:'Достигнут лимит клеток для этого уровня',
-    xpEarned:'Опыт', xpForLevel:'до следующего уровня'
+    truckTitle:'🚚 Грузовик с акцией!',
+    truckDesc:'Смотрите рекламу и получите x2 доход с продаж на 2 минуты!',
+    truckAccept:'Смотреть рекламу',
+    truckDecline:'Прогнать',
+    truckSoon:'Грузовик приедет через',
+    truckLeft:'Акция активна',
+    dirtClean:'+опыт за уборку!',
+    bonusActive:'x2 доход!'
   },
-  en:{ shop:'Shop', warehouse:'Storage', build:'Build', friends:'Friends', settings:'Settings',
+  en:{ shop:'Shop', warehouse:'Storage', expand:'Expand', friends:'Friends', settings:'Settings',
     tasks:'Tasks', daily:'Daily reward', close:'Close', buy:'Buy',
     cancel:'Cancel', place:'Place', money:'Coins', music:'Music', language:'Language',
     promo:'Promo code', apply:'Apply', tutorialQ:'Would you like a tutorial?',
     tutorialYes:'Start tutorial', tutorialSkip:'Skip', items:'Products', furniture:'Furniture',
-    decor:'Decor', expand:'Expansion', autoStock:'Auto-stock',
+    decor:'Decor', autoStock:'Auto-stock',
     nothing:'Empty', reward:'Reward', claim:'Claim', claimed:'Claimed', take:'Get',
     remove:'Remove', done:'Done', adLoading:'Loading ad...', onlineReward:'Playtime reward',
-    youGet:'You received', walls:'Walls', windows:'Windows',
+    walls:'Walls', windows:'Windows',
     promoOk:'Promo code activated!', promoBad:'Invalid promo code',
     noMoney:'Not enough coins', placed:'Placed',
-    needCounter:'You need a cashier so customers can pay!',
-    needGoods:'You need goods on shelves!', bought:'Purchased', expandHint:'Tap a dark cell nearby',
+    bought:'Purchased', expandHint:'Tap a dark cell nearby',
     streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty — buy goods in the Shop',
     tapShelf:'Tap a shelf to place goods', adDone:'Ad reward received!',
     shelfInfo:'Shelf info', total:'Total', slots:'slots', onMap:'On map',
@@ -491,7 +495,14 @@ const STR = {
     locked:'Locked', requires:'Requires', level:'Lv.',
     levelUp:'NEW LEVEL!', levelUpSub:'New products and cells unlocked!',
     maxCells:'Cell limit reached for this level',
-    xpEarned:'XP', xpForLevel:'to next level'
+    truckTitle:'🚚 Sale truck!',
+    truckDesc:'Watch an ad and get x2 income for 2 minutes!',
+    truckAccept:'Watch ad',
+    truckDecline:'Drive away',
+    truckSoon:'Truck arrives in',
+    truckLeft:'Bonus active',
+    dirtClean:'+XP for cleaning!',
+    bonusActive:'x2 income!'
   }
 };
 
@@ -537,11 +548,8 @@ function lerpAngle(a, b, k){
   return a + d * k;
 }
 
-/* --------------------- 2b. СИСТЕМА УРОВНЕЙ -------------------------------- */
-// XP, требуемый для достижения уровня L (суммарно от 0)
-function cumulativeXP(level){
-  return 250 * level * (level - 1);
-}
+/* --------------------- 2b. УРОВНИ И БОНУСЫ -------------------------------- */
+function cumulativeXP(level){ return 250 * level * (level - 1); }
 function getLevel(){
   let lvl = 1;
   while(lvl < 40 && state.xp >= cumulativeXP(lvl + 1)) lvl++;
@@ -553,9 +561,9 @@ function xpProgress(){
   const next = cumulativeXP(lvl + 1) - cumulativeXP(lvl);
   return {cur, next, ratio: next > 0 ? cur / next : 0};
 }
-function maxCellsForLevel(lvl){
-  return Math.min(36 + (lvl - 1) * 6, GW * GH);
-}
+function maxCellsForLevel(lvl){ return Math.min(36 + (lvl - 1) * 6, GW * GH); }
+function hasIncomeBonus(){ return state.bonusUntil > Date.now(); }
+function incomeMultiplier(){ return hasIncomeBonus() ? 2 : 1; }
 
 /* --------------------------- 3. SVG-СПРАЙТЫ ------------------------------- */
 const SPRITES = {};
@@ -599,7 +607,6 @@ function furnitureSVG(type){
     </svg>`;
   }
   if(type === 'counter'){
-    // Прилавок — невысокий, чтобы кассир виднелся сверху
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
       <rect x="6" y="42" width="88" height="52" rx="8" fill="#5b6b7d" stroke="#3d4a58" stroke-width="5"/>
       <rect x="10" y="38" width="80" height="12" rx="4" fill="#8093a8" stroke="#3d4a58" stroke-width="3"/>
@@ -774,7 +781,12 @@ function newState(){
     tasks: [], tasksDate: '',
     ds: {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0},
     playtime: 0, lastRewardIdx: 0,
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 3
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 4,
+    dirt: [],
+    truckTimer: TRUCK_CYCLE,
+    truckState: 'away',
+    truckOfferTimer: 0,
+    bonusUntil: 0
   };
 }
 
@@ -808,9 +820,7 @@ function unlockedCount(){
   for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++) if(state.grid[y][x].u) n++;
   return n;
 }
-function expandPrice(){
-  return Math.round(120 * Math.pow(1.16, unlockedCount() - 36));
-}
+function expandPrice(){ return Math.round(120 * Math.pow(1.16, unlockedCount() - 36)); }
 function isAdjacentToUnlocked(x, y){
   const d = [[1,0],[-1,0],[0,1],[0,-1]];
   for(const [dx, dy] of d){
@@ -867,6 +877,30 @@ function warehouseTotal(){
   return n;
 }
 
+/* ------------------------------ 4b. ГРЯЗЬ -------------------------------- */
+function dropDirt(x, y){
+  const cx = Math.floor(x), cy = Math.floor(y);
+  const c = cellAt(cx, cy);
+  if(!c || !c.u) return;
+  // не больше одной грязи на клетку
+  if(state.dirt.find(d => d.x === cx && d.y === cy)) return;
+  const type = randInt(0, 2);
+  state.dirt.push({x: cx, y: cy, type, t: Date.now()});
+}
+function dirtAtCell(x, y){
+  return state.dirt.find(d => d.x === x && d.y === y);
+}
+function cleanDirtAt(x, y){
+  const idx = state.dirt.findIndex(d => d.x === x && d.y === y);
+  if(idx < 0) return false;
+  state.dirt.splice(idx, 1);
+  addXP(8);
+  toast(t('dirtClean') + ' +8 XP', '#8fd3ff');
+  updateHUD();
+  scheduleSave();
+  return true;
+}
+
 /* ------------------------- 5. СОХРАНЕНИЕ (VK) ----------------------------- */
 const vk = (typeof window.vkBridge !== 'undefined') ? window.vkBridge : null;
 let vkAvailable = !!vk;
@@ -912,17 +946,20 @@ function serialize(){
   }
   const wh = Object.keys(state.warehouse).filter(k => state.warehouse[k] > 0)
     .map(k => k + '-' + state.warehouse[k]).join(',');
+  const drt = state.dirt.map(d => d.x + ',' + d.y + ',' + d.type).join('|');
 
   return {
     m: Math.floor(state.money), l: state.lang, mu: state.music ? 1 : 0,
     td: state.tutorialDone ? 1 : 0, xp: Math.floor(state.xp),
-    g, st: stocks.join('|'), wh,
+    g, st: stocks.join('|'), wh, drt,
     dw: state.decor.wall, dn: state.decor.window,
     ow: state.owned.wall, on: state.owned.window,
     ld: state.lastDaily, sk: state.streak,
     tk: state.tasks, tkd: state.tasksDate, ds: state.ds,
     pt: Math.floor(state.playtime), lr: state.lastRewardIdx,
-    ts: state.totalServed, te: Math.floor(state.totalEarned), ac: state.adCount
+    ts: state.totalServed, te: Math.floor(state.totalEarned), ac: state.adCount,
+    tt: state.truckTimer, ts2: state.truckState, tot: state.truckOfferTimer,
+    bu: state.bonusUntil
   };
 }
 
@@ -946,7 +983,12 @@ function deserialize(o){
   state.totalServed = o.ts || 0;
   state.totalEarned = o.te || 0;
   state.adCount = o.ac || 0;
+  state.truckTimer = o.tt !== undefined ? o.tt : TRUCK_CYCLE;
+  state.truckState = o.ts2 || 'away';
+  state.truckOfferTimer = o.tot || 0;
+  state.bonusUntil = o.bu || 0;
   state.warehouse = {};
+  state.dirt = [];
 
   initGrid();
 
@@ -977,6 +1019,13 @@ function deserialize(o){
       if(!part) return;
       const [id, n] = part.split('-').map(Number);
       if(PROD_BY_ID[id] && n > 0) state.warehouse[id] = n;
+    });
+  }
+  if(o.drt){
+    o.drt.split('|').forEach(part => {
+      if(!part) return;
+      const [x, y, type] = part.split(',').map(Number);
+      if(!isNaN(x) && !isNaN(y)) state.dirt.push({x, y, type: type || 0, t: Date.now()});
     });
   }
   state.grid[DOOR.y][DOOR.x].door = true;
@@ -1038,7 +1087,7 @@ class Customer {
     this.cart = [];
     this.timer = 0;
     this.walk = 0;
-    this.dir = Math.PI / 2; // смотрим вниз (на зрителя)
+    this.dir = Math.PI / 2;
     this.targetDir = Math.PI / 2;
     this.bob = 0;
     this.visited = [];
@@ -1048,6 +1097,9 @@ class Customer {
     this.spot = null;
     this.dead = false;
     this.patience = 45;
+    this.dirtDropped = false;
+    // шанс 20% оставить грязь при уходе
+    this.willDropDirt = Math.random() < 0.2;
   }
 
   moveTo(gx, gy){
@@ -1059,7 +1111,6 @@ class Customer {
 
   update(dt){
     if(this.alpha < 1 && this.state !== 'gone') this.alpha = Math.min(1, this.alpha + dt * 2.5);
-
     if(this.bubbleT > 0){
       this.bubbleT -= dt;
       if(this.bubbleT <= 0) this.bubble = null;
@@ -1070,8 +1121,13 @@ class Customer {
       this.x -= dt * 1.2;
       this.bob = Math.sin(this.walk) * 0.045;
       this.walk += dt * 9;
-      this.targetDir = Math.PI; // смотрим влево при уходе
+      this.targetDir = Math.PI;
       this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 8));
+      // Оставляем грязь возле выхода — один раз
+      if(this.willDropDirt && !this.dirtDropped && this.alpha < 0.85){
+        this.dirtDropped = true;
+        dropDirt(DOOR.x + 1 + Math.random() * 1.5, DOOR.y + (Math.random() - 0.5) * 1.2);
+      }
       if(this.alpha <= 0) this.dead = true;
       return;
     }
@@ -1102,9 +1158,7 @@ class Customer {
         this.x += dx / d * step;
         this.y += dy / d * step;
       }
-      if(d > 0.01){
-        this.targetDir = Math.atan2(dy, dx);
-      }
+      if(d > 0.01) this.targetDir = Math.atan2(dy, dx);
       this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 10));
       this.walk += dt * 11;
       this.bob = Math.sin(this.walk) * 0.045;
@@ -1155,18 +1209,19 @@ class Customer {
     } else if(this.state === 'paying'){
       let sum = 0;
       for(const it of this.cart) sum += it.price;
-      state.money += sum;
-      state.totalEarned += sum;
-      state.ds.earn += sum;
+      const mult = incomeMultiplier();
+      const total = Math.round(sum * mult);
+      state.money += total;
+      state.totalEarned += total;
+      state.ds.earn += total;
       state.ds.serve += 1;
       state.ds.sell += this.cart.length;
       state.totalServed += 1;
-      // Начисление опыта за продажу
-      addXP(sum);
+      addXP(total);
       if(this.spot) busySpots.delete(this.spot);
       this.spot = null;
       this.cart = [];
-      toast('+' + fmt(sum) + ' \u20BF', '#7fd07f');
+      toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x2!' : ''), mult > 1 ? '#ffd257' : '#7fd07f');
       updateHUD();
       scheduleSave();
       this.leave();
@@ -1177,7 +1232,7 @@ class Customer {
     const shelves = shelfCells().filter(s => s.c.stock.length > 0);
     const fresh = shelves.filter(s => this.visited.indexOf(s.x + ',' + s.y) < 0);
     const pool = fresh.length ? fresh : shelves;
-    if(!pool.length){ this.leave(); return; }
+    if(!pool.length){ this.returnCartAndLeave(); return; }
     const target = pick(pool);
     const spots = adjacentWalkable(target.x, target.y);
     if(!spots.length){ this.visited.push(target.x + ',' + target.y); this.planShopping(); return; }
@@ -1186,12 +1241,17 @@ class Customer {
     this.targetX = target.x;
     this.targetY = target.y;
     this.state = 'toShelf';
-    if(!this.moveTo(spot.x, spot.y)){ this.leave(); }
+    if(!this.moveTo(spot.x, spot.y)){ this.returnCartAndLeave(); }
   }
 
   goToCashier(){
     if(!this.cart.length){ this.leave(); return; }
-    if(!counterCells().length){ this.leave(); return; }
+    if(!counterCells().length){
+      // нет кассы — вернуть всё на склад и уйти (без воровства)
+      toast(state.lang === 'en' ? 'Customer left — no cashier!' : 'Нужна касса! Клиент вернул товар', '#e0575b');
+      this.returnCartAndLeave();
+      return;
+    }
     this.tryCashier();
   }
 
@@ -1213,17 +1273,30 @@ class Customer {
     if(!this.moveTo(best.x, best.y)){
       busySpots.delete(best.x + ',' + best.y);
       this.spot = null;
-      this.leave();
+      this.returnCartAndLeave();
     }
+  }
+
+  // Возврат товаров из корзины на склад (никакого воровства)
+  returnCartAndLeave(){
+    if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
+    for(const it of this.cart){
+      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
+    }
+    this.cart = [];
+    scheduleSave();
+    this.leave();
   }
 
   leave(){
     if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
-    this.state = 'leaving';
-    this.cart = [];
-    if(!this.moveTo(DOOR.x, DOOR.y)){
-      this.state = 'gone';
+    // На всякий случай вернём, если что-то осталось
+    for(const it of this.cart){
+      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
     }
+    this.cart = [];
+    this.state = 'leaving';
+    if(!this.moveTo(DOOR.x, DOOR.y)){ this.state = 'gone'; }
   }
 }
 
@@ -1301,7 +1374,6 @@ const cashier = {
     if(best.x !== this.anchorX || best.y !== this.anchorY){
       this.anchorX = best.x;
       this.anchorY = best.y;
-      // Стоим чуть выше центра кассы — за прилавком
       this.x = best.x + 0.5;
       this.y = best.y + 0.30;
     }
@@ -1309,6 +1381,122 @@ const cashier = {
     this.bob = Math.sin(this.walk) * 0.02;
   }
 };
+
+/* --------------------------- 6c. ГРУЗОВИК -------------------------------- */
+const truck = {
+  x: -8,           // позиция по горизонтали (в клетках)
+  targetX: 0,      // где остановится
+  baseY: GH + 0.6, // чуть ниже магазина
+  arrived: false,
+  wheels: 0,
+
+  update(dt){
+    // в состоянии offering едет к позиции, потом стоит
+    if(state.truckState === 'offering'){
+      const dx = this.targetX - this.x;
+      if(Math.abs(dx) > 0.1){
+        this.x += Math.sign(dx) * dt * 3;
+        this.wheels += dt * 12;
+      } else {
+        this.x = this.targetX;
+        this.arrived = true;
+      }
+    } else if(state.truckState === 'away'){
+      // уехал далеко
+      if(this.x > -10) this.x = -10;
+      this.arrived = false;
+    }
+  },
+
+  draw(){
+    if(state.truckState !== 'offering') return;
+    const px = this.x;
+    const py = this.baseY;
+
+    // тень
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath();
+    ctx.ellipse(px, py + 0.55, 1.7, 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // колёса
+    ctx.fillStyle = '#1b1b1b';
+    ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#3a3a3a';
+    ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
+
+    // кабина (справа, смотрит вправо)
+    ctx.fillStyle = '#e63c3c';
+    ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.55);
+    ctx.fillStyle = '#8fd3ff';
+    ctx.fillRect(px + 0.75, py + 0.05, 0.5, 0.3);
+    ctx.fillStyle = '#c92a2a';
+    ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.06);
+
+    // кузов
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(px - 1.3, py - 0.15, 1.8, 0.65);
+    ctx.fillStyle = '#dcdcdc';
+    ctx.fillRect(px - 1.3, py + 0.3, 1.8, 0.2);
+
+    // надпись "SALE" x2
+    ctx.save();
+    ctx.translate(px - 0.4, py + 0.15);
+    ctx.fillStyle = '#e63c3c';
+    ctx.font = 'bold 0.32px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('SALE', 0, 0);
+    ctx.fillStyle = '#ffd257';
+    ctx.font = 'bold 0.22px system-ui';
+    ctx.fillText('x2', 0, 0.34);
+    ctx.restore();
+
+    // мигающий огонёк
+    const blink = Math.sin(Date.now() / 200) > 0;
+    if(blink){
+      ctx.fillStyle = '#ffd257';
+      ctx.beginPath();
+      ctx.arc(px + 1.3, py - 0.05, 0.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,210,87,.4)';
+      ctx.beginPath();
+      ctx.arc(px + 1.3, py - 0.05, 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // восклицательный знак над машиной
+    const bob = Math.sin(Date.now() / 300) * 0.05;
+    ctx.fillStyle = '#ffd257';
+    ctx.font = 'bold 0.7px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('!', px - 0.3, py - 0.55 + bob);
+  },
+
+  hitTest(worldX, worldY){
+    if(state.truckState !== 'offering') return false;
+    // прямоугольная область вокруг грузовика
+    if(worldX < this.x - 1.5 || worldX > this.x + 1.5) return false;
+    if(worldY < this.baseY - 0.7 || worldY > this.baseY + 0.9) return false;
+    return true;
+  }
+};
+
+function startTruckCycle(){
+  state.truckState = 'offering';
+  state.truckOfferTimer = TRUCK_OFFER;
+  truck.x = -8;
+  truck.arrived = false;
+  truck.targetX = (DOOR.x - 1.2);
+  toast(state.lang === 'en' ? '🚚 Sale truck arrived! Tap it!' : '🚚 Приехал грузовик с акцией! Нажмите!', '#ffb070');
+}
+function endTruckCycle(){
+  state.truckState = 'away';
+  state.truckTimer = TRUCK_CYCLE;
+}
 
 /* ------------------------------ 7. ЗАДАНИЯ -------------------------------- */
 function genTasks(){
@@ -1398,8 +1586,8 @@ const Music = {
 
 /* ------------------------------ 9. РЕНДЕР --------------------------------- */
 let CS = 40;
-let baseOX = 0, baseOY = 0;   // базовая позиция сетки (центр экрана)
-let camX = 0, camY = 0;       // смещение камеры от базовой позиции (панорама)
+let baseOX = 0, baseOY = 0;
+let camX = 0, camY = 0;
 let dragging = false, dragMoved = false;
 let dragStartX = 0, dragStartY = 0, dragBaseCamX = 0, dragBaseCamY = 0;
 
@@ -1418,20 +1606,18 @@ function resize(){
   const availH = availBottom - availTop;
   const availW = w - 12;
 
-  CS = Math.min((availW - 2 * OUT_MARGIN) / GW, (availH - 2 * OUT_MARGIN) / GH);
+  CS = Math.min((availW - 2 * 20) / GW, (availH - 2 * 20) / GH);
   CS = Math.max(12, CS);
   baseOX = (w - GW * CS) / 2;
   baseOY = availTop + (availH - GH * CS) / 2;
 
   clampCamera();
 }
-
 function clampCamera(){
-  const maxPan = CS * 3;
+  const maxPan = CS * 4;
   camX = clamp(camX, -maxPan, maxPan);
   camY = clamp(camY, -maxPan, maxPan);
 }
-
 function getOX(){ return baseOX + camX; }
 function getOY(){ return baseOY + camY; }
 
@@ -1444,22 +1630,29 @@ function draw(){
   ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Всё рисуется относительно (OX, OY)
   ctx.save();
   ctx.translate(getOX(), getOY());
 
   drawOutside();
   drawWalls();
   drawFloor();
+  drawDirt();
+  drawWindows();
+
+  // Грузовик рисуем ДО магазина — он за домом
+  ctx.save();
+  ctx.scale(CS, CS);
+  truck.draw();
+  ctx.restore();
 
   ctx.save();
   ctx.scale(CS, CS);
   ctx.lineJoin = 'round';
 
-  // 1) сначала кассир (чтобы прилавок его перекрывал)
+  // Кассир (рисуется первым, чтобы прилавок перекрывал)
   drawCashier();
 
-  // 2) затем мебель (касса перекроет ноги кассира)
+  // Мебель
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
       const c = state.grid[y][x];
@@ -1467,7 +1660,7 @@ function draw(){
     }
   }
 
-  // 3) подсветка режима размещения
+  // Подсветка размещения
   if(placeMode){
     ctx.lineWidth = 0.06;
     for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -1484,32 +1677,39 @@ function draw(){
     }
   }
 
-  // 4) клиенты поверх всей мебели
+  // Клиенты поверх мебели
   for(const c of customers) drawCustomer(c);
 
-  ctx.restore(); // scale
-  ctx.restore(); // translate
+  ctx.restore();
+  ctx.restore();
 
-  // Рамка вокруг сетки (в экранных координатах)
+  // Рамка вокруг сетки
   ctx.strokeStyle = '#2b3648';
   ctx.lineWidth = 2;
   ctx.strokeRect(getOX() - 1, getOY() - 1, GW * CS + 2, GH * CS + 2);
 }
 
+/* --------- 9a. МИР ЗА МАГАЗИНОМ (ГОРОДОК) --------- */
 function drawOutside(){
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
 
-  const sideCol = '#5a6470';
-  const sideCol2 = '#4f5864';
-  ctx.fillStyle = sideCol;
-  ctx.fillRect(-MB, -MB, totalW + MB * 2, totalH + MB * 2);
-  ctx.fillStyle = sideCol2;
-  ctx.fillRect(-MB, -MB, totalW + MB * 2, MB);
-  ctx.fillRect(-MB, totalH, totalW + MB * 2, MB);
-  ctx.fillRect(-MB, 0, MB, totalH);
-  ctx.fillRect(totalW, 0, MB, totalH);
+  // Дорога — ободок вокруг
+  ctx.fillStyle = '#2a2f38';
+  ctx.fillRect(-MB * 2, -MB * 2, totalW + MB * 4, totalH + MB * 4);
 
+  // Тротуар
+  ctx.fillStyle = '#5a6470';
+  ctx.fillRect(-MB, -MB, totalW + MB * 2, totalH + MB * 2);
+
+  // Здания вокруг (силуэты)
+  drawTownBuildings(-MB - 60, -MB - 60, totalW + MB * 2 + 120, 45, true);  // задний фон сверху
+  drawTownBuildings(-MB - 55, totalH + MB + 5, totalW + MB * 2 + 110, 50, false); // нижний ряд
+  // Слева и справа — вертикальные дома
+  drawSideBuildings(-MB - 55, 0, totalH);
+  drawSideBuildings(totalW + MB + 5, 0, totalH);
+
+  // Внутренняя плитка тротуара
   ctx.strokeStyle = 'rgba(0,0,0,.18)';
   ctx.lineWidth = 1;
   for(let x = -MB; x <= totalW + MB; x += 14){
@@ -1521,14 +1721,14 @@ function drawOutside(){
     ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + MB, y); ctx.stroke();
   }
 
+  // Дорожка ко входу
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
   ctx.fillRect(doorX - 3, doorY, CS + 6, MB);
   ctx.strokeStyle = 'rgba(0,0,0,.28)';
   ctx.strokeRect(doorX - 3, doorY, CS + 6, MB);
-
-  ctx.strokeStyle = 'rgba(255,255,255,.3)';
+  ctx.strokeStyle = 'rgba(255,255,255,.35)';
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
   ctx.moveTo(doorX + CS / 2, doorY + 2);
@@ -1536,13 +1736,104 @@ function drawOutside(){
   ctx.stroke();
   ctx.setLineDash([]);
 
+  // Разметка дороги вокруг
+  ctx.strokeStyle = 'rgba(255,240,150,.7)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([14, 12]);
+  ctx.beginPath();
+  ctx.moveTo(-MB * 2 + 4, -MB * 1.5);
+  ctx.lineTo(totalW + MB * 2 - 4, -MB * 1.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-MB * 2 + 4, totalH + MB * 1.5);
+  ctx.lineTo(totalW + MB * 2 - 4, totalH + MB * 1.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-MB * 1.5, -MB * 2 + 4);
+  ctx.lineTo(-MB * 1.5, totalH + MB * 2 - 4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(totalW + MB * 1.5, -MB * 2 + 4);
+  ctx.lineTo(totalW + MB * 1.5, totalH + MB * 2 - 4);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Скамейка справа от двери
+  drawBench(totalW + MB / 2, totalH / 2);
+  // Скамейка слева
+  drawBench(-MB / 2, totalH / 2);
+  // Фонарь у входа
+  drawLamp(-MB + 10, doorY + MB / 2);
+
+  // Деревья и кусты по периметру
   drawTreeCtx(-MB + 12, -MB + 12);
   drawTreeCtx(totalW - 12, -MB + 12);
   drawTreeCtx(totalW / 2, -MB + 10);
-  drawLamp(-MB + 10, doorY + MB / 2);
-  drawBench(totalW + MB / 2, totalH / 2);
+  drawTreeCtx(-MB + 20, totalH + MB - 12);
+  drawTreeCtx(totalW - 20, totalH + MB - 12);
   drawBush(-MB - 4, totalH - MB / 2);
   drawBush(totalW + MB + 4, -MB / 2);
+  drawBush(-MB - 6, -MB - 4);
+  drawBush(totalW + MB + 6, totalH + MB + 4);
+}
+
+// Полоса дальних домов (фон)
+function drawTownBuildings(x, y, w, h, tall){
+  const colors = ['#2a3a4d', '#3a4a5d', '#2f4050', '#354a5c', '#28425c'];
+  const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f', '#2f4a3d'];
+  let cx = x;
+  let idx = 0;
+  while(cx < x + w){
+    const bw = 40 + ((idx * 17) % 30);
+    const bh = h + ((idx * 13) % 20);
+    const col = colors[idx % colors.length];
+    const roofCol = roofColors[idx % roofColors.length];
+    // стена
+    ctx.fillStyle = col;
+    ctx.fillRect(cx, y + (h - bh), bw, bh);
+    // крыша
+    ctx.fillStyle = roofCol;
+    ctx.fillRect(cx - 3, y + (h - bh) - 5, bw + 6, 6);
+    // окна
+    ctx.fillStyle = 'rgba(255,225,130,.55)';
+    const winCount = Math.max(2, Math.floor(bw / 15));
+    for(let i = 0; i < winCount; i++){
+      for(let j = 0; j < 2; j++){
+        const wx = cx + 6 + i * 14;
+        const wy = y + (h - bh) + 10 + j * 18;
+        if(wx + 8 < cx + bw - 4 && wy + 10 < y + h - 4){
+          ctx.fillRect(wx, wy, 8, 10);
+        }
+      }
+    }
+    cx += bw + 6;
+    idx++;
+  }
+}
+
+function drawSideBuildings(x, y, h){
+  const colors = ['#2a3a4d', '#3a4a5d', '#354a5c'];
+  const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f'];
+  let cy = y;
+  let idx = 0;
+  while(cy < y + h){
+    const bh = 50 + ((idx * 21) % 40);
+    const bw = 45 + ((idx * 11) % 20);
+    const col = colors[idx % colors.length];
+    ctx.fillStyle = col;
+    ctx.fillRect(x, cy, bw, bh);
+    ctx.fillStyle = roofColors[idx % roofColors.length];
+    ctx.fillRect(x - 4, cy - 3, bw + 8, 6);
+    // окна
+    ctx.fillStyle = 'rgba(255,225,130,.5)';
+    for(let i = 0; i < 2; i++){
+      for(let j = 0; j < 3; j++){
+        ctx.fillRect(x + 6 + i * 18, cy + 10 + j * 16, 10, 10);
+      }
+    }
+    cy += bh + 8;
+    idx++;
+  }
 }
 
 function drawTreeCtx(x, y){
@@ -1551,12 +1842,12 @@ function drawTreeCtx(x, y){
   ctx.fillStyle = '#4a2f1c';
   ctx.fillRect(-2, 2, 4, 8);
   ctx.fillStyle = '#3b7a3f';
-  ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#4a8c4e';
-  ctx.beginPath(); ctx.arc(-3, -2, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(4, -1, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-3, -2, 7, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4, -1, 6, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#5da063';
-  ctx.beginPath(); ctx.arc(-1, -4, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(-1, -4, 3.5, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
 function drawLamp(x, y){
@@ -1642,7 +1933,7 @@ function drawFloor(){
           ctx.setLineDash([4, 4]);
           ctx.strokeRect(px + 2, py + 2, CS - 4, CS - 4);
           ctx.setLineDash([]);
-          ctx.fillStyle = atCap ? 'rgba(255,120,120,.5)' : 'rgba(200,220,255,.4)';
+          ctx.fillStyle = atCap ? 'rgba(255,120,120,.55)' : 'rgba(200,220,255,.4)';
           ctx.font = 'bold ' + Math.max(8, CS * 0.22) + 'px system-ui';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
@@ -1651,7 +1942,64 @@ function drawFloor(){
       }
     }
   }
-  drawWindows();
+}
+
+function drawDirt(){
+  for(const d of state.dirt){
+    const px = d.x * CS, py = d.y * CS;
+    const seed = (d.x * 31 + d.y * 17) % 100;
+    const r1 = 4 + (seed % 4);
+    const r2 = 3 + ((seed * 3) % 5);
+    if(d.type === 0){
+      // коричневая лужа
+      ctx.fillStyle = 'rgba(90,60,30,.55)';
+      ctx.beginPath();
+      ctx.ellipse(px + CS * 0.35, py + CS * 0.55, CS * 0.22, CS * 0.16, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(60,40,20,.5)';
+      ctx.beginPath();
+      ctx.ellipse(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px + CS * 0.25, py + CS * 0.45, CS * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+    } else if(d.type === 1){
+      // грязные следы
+      ctx.fillStyle = 'rgba(50,40,30,.5)';
+      ctx.beginPath();
+      ctx.ellipse(px + CS * 0.3, py + CS * 0.4, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(px + CS * 0.55, py + CS * 0.55, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(px + CS * 0.4, py + CS * 0.7, CS * 0.08, CS * 0.11, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // мусор (бумажки, крошки)
+      ctx.fillStyle = 'rgba(230,220,180,.85)';
+      ctx.fillRect(px + CS * 0.3, py + CS * 0.4, CS * 0.16, CS * 0.12);
+      ctx.fillStyle = 'rgba(180,150,100,.7)';
+      ctx.fillRect(px + CS * 0.35, py + CS * 0.42, CS * 0.06, CS * 0.06);
+      ctx.fillStyle = 'rgba(200,180,140,.75)';
+      ctx.fillRect(px + CS * 0.55, py + CS * 0.6, CS * 0.12, CS * 0.09);
+      ctx.fillStyle = 'rgba(120,90,50,.6)';
+      for(let i = 0; i < 4; i++){
+        const rx = px + CS * (0.3 + (i * 13 + seed) % 40 / 100);
+        const ry = py + CS * (0.5 + (i * 7 + seed) % 40 / 100);
+        ctx.beginPath();
+        ctx.arc(rx, ry, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    // значок "протри"
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 350);
+    ctx.strokeStyle = `rgba(143,211,255,${0.3 + pulse * 0.5})`;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.strokeRect(px + 2, py + 2, CS - 4, CS - 4);
+    ctx.setLineDash([]);
+  }
 }
 
 function drawWindows(){
@@ -1725,16 +2073,14 @@ function drawFurniture(gx, gy, c){
   }
 }
 
-/* --- Рисование человечка (универсальное) --- */
 function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opts){
   opts = opts || {};
   const scale = opts.scale || 1;
   ctx.save();
   ctx.translate(px, py + bob);
-  ctx.rotate(dir - Math.PI / 2); // default = смотрит вниз (на зрителя)
+  ctx.rotate(dir - Math.PI / 2);
   ctx.scale(scale, scale);
 
-  // ноги
   if(walking){
     const legPhase = Math.sin(walkPhase);
     ctx.fillStyle = '#2b3546';
@@ -1754,7 +2100,6 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
     ctx.fill();
   }
 
-  // тело
   ctx.fillStyle = shirt;
   ctx.beginPath();
   ctx.ellipse(0, 0, 0.28, 0.24, 0, 0, Math.PI * 2);
@@ -1763,13 +2108,11 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   ctx.lineWidth = 0.025;
   ctx.stroke();
 
-  // руки
   ctx.fillStyle = skin;
   const swing = walking ? Math.sin(walkPhase) * 0.03 : 0;
   ctx.beginPath(); ctx.arc(-0.27, swing, 0.075, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(0.27, -swing, 0.075, 0, Math.PI * 2); ctx.fill();
 
-  // бейджик опционально
   if(opts.badge){
     ctx.fillStyle = '#ffd257';
     ctx.fillRect(-0.06, 0.02, 0.12, 0.06);
@@ -1777,7 +2120,6 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
     ctx.fillRect(-0.05, 0.04, 0.1, 0.02);
   }
 
-  // голова
   ctx.fillStyle = skin;
   ctx.beginPath();
   ctx.arc(0, -0.13, 0.17, 0, Math.PI * 2);
@@ -1786,7 +2128,6 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   ctx.lineWidth = 0.02;
   ctx.stroke();
 
-  // волосы (шапка сверху)
   ctx.fillStyle = hair;
   ctx.beginPath();
   ctx.arc(0, -0.17, 0.165, Math.PI, Math.PI * 2);
@@ -1795,24 +2136,20 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
   ctx.ellipse(0, -0.2, 0.16, 0.09, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Лицо — глаза чуть ниже центра головы и ближе к низу (лицо смотрит "вниз", т.е. на нас)
   const faceY = -0.09;
   ctx.fillStyle = '#1b2330';
   ctx.beginPath(); ctx.arc(-0.06, faceY, 0.026, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(0.06, faceY, 0.026, 0, Math.PI * 2); ctx.fill();
-  // блики
   ctx.fillStyle = 'rgba(255,255,255,.9)';
   ctx.beginPath(); ctx.arc(-0.052, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(0.068, faceY - 0.006, 0.008, 0, Math.PI * 2); ctx.fill();
 
-  // улыбка
   ctx.strokeStyle = '#5a3a20';
   ctx.lineWidth = 0.018;
   ctx.beginPath();
   ctx.arc(0, -0.035, 0.045, 0.15, Math.PI - 0.15);
   ctx.stroke();
 
-  // корзина перед телом
   if(opts.cart){
     ctx.fillStyle = '#c9a227';
     ctx.fillRect(-0.1, -0.36, 0.2, 0.16);
@@ -1827,8 +2164,6 @@ function drawPerson(px, py, dir, bob, walking, walkPhase, skin, hair, shirt, opt
 function drawCustomer(c){
   ctx.save();
   ctx.globalAlpha = clamp(c.alpha, 0, 1);
-
-  // тень (не вращается)
   ctx.fillStyle = 'rgba(0,0,0,.22)';
   ctx.beginPath();
   ctx.ellipse(c.x, c.y + 0.28, 0.3, 0.13, 0, 0, Math.PI * 2);
@@ -1839,7 +2174,6 @@ function drawCustomer(c){
 
   drawPerson(c.x, c.y, c.dir, c.bob, walking, c.walk, c.skin, c.hair, c.shirt, {cart: hasCart});
 
-  // пузырь с товаром
   if(c.bubble && c.bubbleT > 0){
     const p = PROD_BY_ID[c.bubble];
     if(p){
@@ -1860,7 +2194,6 @@ function drawCustomer(c){
     }
   }
 
-  // индикатор ожидания
   if(c.state === 'waiting'){
     ctx.fillStyle = 'rgba(255,210,87,.95)';
     ctx.font = 'bold 0.3px system-ui';
@@ -1875,12 +2208,10 @@ function drawCashier(){
   const c = cashier;
   if(!c) return;
   ctx.save();
-  // тень
   ctx.fillStyle = 'rgba(0,0,0,.22)';
   ctx.beginPath();
   ctx.ellipse(c.x, c.y + 0.28, 0.26, 0.1, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Смотрит вниз на покупателей, чуть меньшего размера
   drawPerson(c.x, c.y, Math.PI / 2, c.bob, false, 0, c.skin, c.hair, c.shirt, {badge: true, scale: 0.85});
   ctx.restore();
 }
@@ -1891,6 +2222,7 @@ let spawnTimer = 3;
 
 function updateWorld(dt){
   cashier.update(dt);
+  truck.update(dt);
   for(const c of customers) c.update(dt);
   for(let i = customers.length - 1; i >= 0; i--){
     if(customers[i].dead) customers.splice(i, 1);
@@ -1907,9 +2239,23 @@ function updateWorld(dt){
       customers.push(new Customer());
     }
   }
+
+  // Грузовик: цикл
+  if(state.truckState === 'away'){
+    state.truckTimer -= dt;
+    if(state.truckTimer <= 0){
+      startTruckCycle();
+    }
+  } else if(state.truckState === 'offering'){
+    state.truckOfferTimer -= dt;
+    if(state.truckOfferTimer <= 0){
+      endTruckCycle();
+      toast(state.lang === 'en' ? '🚚 Truck left' : '🚚 Грузовик уехал');
+    }
+  }
 }
 
-/* -------------------- 10b. ДОБАВЛЕНИЕ XP И LEVEL UP ---------------------- */
+/* -------------------- 10b. ОПЫТ / LEVEL UP -------------------------------- */
 let lastKnownLevel = 1;
 
 function addXP(amount){
@@ -1920,6 +2266,7 @@ function addXP(amount){
   if(after > before){
     showLevelUp(after);
   }
+  updateHUD();
 }
 
 function showLevelUp(newLevel){
@@ -1947,6 +2294,64 @@ function showLevelUp(newLevel){
   setTimeout(() => { if(state.music) Music.note(783.99, 0.7, 0.16, 'triangle'); }, 280);
 }
 
+/* -------------------- 10c. ДИАЛОГ ГРУЗОВИКА ------------------------------- */
+function openTruckModal(){
+  if(state.truckState !== 'offering') return;
+  openModal(t('truckTitle'), el => {
+    const p = document.createElement('div');
+    p.style.cssText = 'text-align:center;padding:8px 4px';
+    p.innerHTML = `
+      <div style="font-size:60px;margin-bottom:6px">🚚</div>
+      <div style="font-size:15px;font-weight:600;line-height:1.4">${t('truckDesc')}</div>
+      <div style="font-size:13px;color:#ffd257;margin-top:10px;font-weight:800">SALE  x2</div>
+    `;
+    el.appendChild(p);
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;margin-top:14px';
+
+    const accept = document.createElement('button');
+    accept.className = 'btn';
+    accept.style.cssText = 'flex:1;padding:13px;font-size:14px';
+    accept.textContent = t('truckAccept');
+    accept.onclick = async () => {
+      closeModal();
+      showAdOverlay(t('adLoading'));
+      try {
+        const res = await vkSend('VKWebAppShowNativeAds', {ad_format: 'reward'});
+        hideAdOverlay();
+        if(res && res.result){
+          state.bonusUntil = Date.now() + TRUCK_BONUS * 1000;
+          endTruckCycle();
+          updateHUD();
+          scheduleSave();
+          toast(t('bonusActive') + ' +2\u00D7 (' + TRUCK_BONUS + 's)', '#ffd257');
+          if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
+        } else {
+          toast(state.lang === 'en' ? 'Ad not available' : 'Реклама недоступна');
+        }
+      } catch(e){
+        hideAdOverlay();
+        toast(state.lang === 'en' ? 'Ad not available' : 'Реклама недоступна');
+      }
+    };
+
+    const decline = document.createElement('button');
+    decline.className = 'btn ghost';
+    decline.style.cssText = 'flex:1;padding:13px;font-size:14px';
+    decline.textContent = t('truckDecline');
+    decline.onclick = () => {
+      closeModal();
+      endTruckCycle();
+      toast(state.lang === 'en' ? '🚚 Truck drove away' : '🚚 Грузовик уехал');
+    };
+
+    row.appendChild(accept);
+    row.appendChild(decline);
+    el.appendChild(row);
+  });
+}
+
 /* ------------------------------- 11. ВВОД ---------------------------------- */
 function screenToCell(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
@@ -1957,11 +2362,24 @@ function screenToCell(clientX, clientY){
   if(gx < 0 || gy < 0 || gx >= GW || gy >= GH) return null;
   return {x: gx, y: gy};
 }
+function screenToWorld(clientX, clientY){
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left - getOX()) / CS,
+    y: (clientY - rect.top - getOY()) / CS
+  };
+}
 
 let placeMode = null;
 
 function onCellClick(gx, gy){
   if(isTutorialBlocking() && tutorialStep <= 2) return;
+
+  // 1) Уборка грязи — в приоритете
+  if(dirtAtCell(gx, gy)){
+    cleanDirtAt(gx, gy);
+    return;
+  }
 
   const c = cellAt(gx, gy);
   if(!c) return;
@@ -2034,7 +2452,6 @@ function onCellClick(gx, gy){
   }
 }
 
-// Панорамирование и клики
 canvas.addEventListener('pointerdown', e => {
   if($('#modalRoot').style.display === 'block') return;
   dragging = true;
@@ -2067,14 +2484,18 @@ function endDrag(e){
   canvas.classList.remove('dragging');
   try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
   if(!wasMoved){
+    // клик — проверяем грузовик в мировых координатах, потом клетку
+    const wld = screenToWorld(e.clientX, e.clientY);
+    if(truck.hitTest(wld.x, wld.y)){
+      openTruckModal();
+      return;
+    }
     const cell = screenToCell(e.clientX, e.clientY);
     if(cell) onCellClick(cell.x, cell.y);
   }
 }
 canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', e => { dragging = false; dragMoved = false; canvas.classList.remove('dragging'); });
-
-// Двойной тап по пустому месту — сброс панорамы в центр
 canvas.addEventListener('dblclick', () => { camX = 0; camY = 0; clampCamera(); });
 
 /* ------------------------------- 12. UI ----------------------------------- */
@@ -2107,6 +2528,16 @@ function updateHUD(){
   else badge.style.display = 'none';
   const canDaily = state.lastDaily !== todayStr();
   $('#dailyBadge').style.display = canDaily ? 'block' : 'none';
+
+  // Бонус x2
+  const bonusChip = $('#bonusChip');
+  if(hasIncomeBonus()){
+    const left = Math.ceil((state.bonusUntil - Date.now()) / 1000);
+    bonusChip.style.display = 'flex';
+    $('#bonusTime').textContent = 'x2 ' + left + 'с';
+  } else {
+    bonusChip.style.display = 'none';
+  }
 }
 
 function updatePlaceBar(){
@@ -2203,56 +2634,75 @@ function openShop(){
       });
 
       const lvl = getLevel();
-      const list = PRODUCTS.filter(p => shopCurCat === 'all' || p.cat === shopCurCat);
-      const grid = document.createElement('div');
-      grid.className = 'grid2';
-      list.forEach(p => {
-        const unlocked = lvl >= productLevel(p);
-        const row = document.createElement('div');
-        row.className = 'row' + (unlocked ? '' : ' locked');
-        row.style.margin = '0';
-        row.style.padding = '7px';
-        const ic = document.createElement('div');
-        ic.className = 'ic';
-        ic.style.width = '32px'; ic.style.height = '32px';
-        const im = document.createElement('img');
-        im.src = svgURI(productSVG(p.shape, p.color));
-        ic.appendChild(im);
-        if(!unlocked){
-          const lock = document.createElement('div');
-          lock.className = 'lock';
-          lock.textContent = '\uD83D\uDD12';
-          ic.appendChild(lock);
-        }
-        const nm = document.createElement('div');
-        nm.className = 'nm';
-        const sub = unlocked ? catName(p.cat) : (t('requires') + ' ' + t('level') + ' ' + productLevel(p));
-        nm.innerHTML = `<b style="font-size:12px">${pname(p)}</b><span>${sub}</span>`;
-        const pr = document.createElement('div');
-        pr.className = 'pr';
-        pr.style.fontSize = '12px';
-        pr.textContent = unlocked ? fmt(p.cost) : '\u2014';
-        row.appendChild(ic); row.appendChild(nm); row.appendChild(pr);
-        if(unlocked){
-          const b = document.createElement('button');
-          b.className = 'btn sm';
-          b.textContent = '+';
-          b.onclick = () => buyProduct(p.id, 1);
-          const b10 = document.createElement('button');
-          b10.className = 'btn sm ghost';
-          b10.textContent = '\u00D710';
-          b10.onclick = () => buyProduct(p.id, 10);
-          row.appendChild(b); row.appendChild(b10);
-        } else {
-          const b = document.createElement('button');
-          b.className = 'btn sm locked';
-          b.textContent = t('level') + ' ' + productLevel(p);
-          b.disabled = true;
-          row.appendChild(b);
-        }
-        grid.appendChild(row);
-      });
-      content.appendChild(grid);
+
+      // Если "Все" — группируем по категориям, иначе один плоский список
+      if(shopCurCat === 'all'){
+        Object.keys(CATS).forEach(ck => {
+          const list = PRODUCTS.filter(p => p.cat === ck);
+          if(!list.length) return;
+          const hdr = document.createElement('div');
+          hdr.className = 'cat-header';
+          hdr.textContent = catName(ck);
+          content.appendChild(hdr);
+          const grid = document.createElement('div');
+          grid.className = 'grid2';
+          list.forEach(p => grid.appendChild(makeProductRow(p, lvl)));
+          content.appendChild(grid);
+        });
+      } else {
+        const list = PRODUCTS.filter(p => p.cat === shopCurCat);
+        const grid = document.createElement('div');
+        grid.className = 'grid2';
+        list.forEach(p => grid.appendChild(makeProductRow(p, lvl)));
+        content.appendChild(grid);
+      }
+    }
+
+    function makeProductRow(p, lvl){
+      const unlocked = lvl >= productLevel(p);
+      const row = document.createElement('div');
+      row.className = 'row' + (unlocked ? '' : ' locked');
+      row.style.margin = '0';
+      row.style.padding = '7px';
+      const ic = document.createElement('div');
+      ic.className = 'ic';
+      ic.style.width = '32px'; ic.style.height = '32px';
+      const im = document.createElement('img');
+      im.src = svgURI(productSVG(p.shape, p.color));
+      ic.appendChild(im);
+      if(!unlocked){
+        const lock = document.createElement('div');
+        lock.className = 'lock';
+        lock.textContent = '\uD83D\uDD12';
+        ic.appendChild(lock);
+      }
+      const nm = document.createElement('div');
+      nm.className = 'nm';
+      const sub = unlocked ? catName(p.cat) : (t('requires') + ' ' + t('level') + ' ' + productLevel(p));
+      nm.innerHTML = `<b style="font-size:12px">${pname(p)}</b><span>${sub}</span>`;
+      const pr = document.createElement('div');
+      pr.className = 'pr';
+      pr.style.fontSize = '12px';
+      pr.textContent = unlocked ? fmt(p.cost) : '\u2014';
+      row.appendChild(ic); row.appendChild(nm); row.appendChild(pr);
+      if(unlocked){
+        const b = document.createElement('button');
+        b.className = 'btn sm';
+        b.textContent = '+';
+        b.onclick = () => buyProduct(p.id, 1);
+        const b10 = document.createElement('button');
+        b10.className = 'btn sm ghost';
+        b10.textContent = '\u00D710';
+        b10.onclick = () => buyProduct(p.id, 10);
+        row.appendChild(b); row.appendChild(b10);
+      } else {
+        const b = document.createElement('button');
+        b.className = 'btn sm locked';
+        b.textContent = t('level') + ' ' + productLevel(p);
+        b.disabled = true;
+        row.appendChild(b);
+      }
+      return row;
     }
 
     function buyProduct(pid, count){
@@ -2399,9 +2849,6 @@ function openShop(){
         <div style="font-size:24px;font-weight:800;color:#ffd257;margin-bottom:8px">${fmt(expandPrice())} \u20BF</div>
         <div style="color:#8798ad;font-size:12.5px">${t('expandHint')}</div>
         <div class="progressbar" style="margin-top:14px"><i style="width:${(cur / maxCells * 100).toFixed(1)}%"></i></div>
-        <div style="color:#8798ad;font-size:11.5px;margin-top:8px">
-          ${state.lang === 'en' ? 'Max cells grow with your level' : 'Максимум клеток растёт с уровнем'}
-        </div>
       `;
       content.appendChild(info);
       const btn = document.createElement('button');
@@ -2667,10 +3114,7 @@ function openSettings(){
     rb.className = 'btn r';
     rb.style.cssText = 'width:100%;padding:11px;margin-top:16px';
     rb.textContent = state.lang === 'en' ? 'Reset progress' : 'Сбросить прогресс';
-    rb.onclick = async () => {
-      await wipeSave();
-      closeModal();
-    };
+    rb.onclick = async () => { await wipeSave(); closeModal(); };
     el.appendChild(rb);
   });
 }
@@ -2702,11 +3146,9 @@ function openTasks(){
         if(tk.claimed || !done) return;
         tk.claimed = true;
         state.money += tk.reward;
-        state.xp += Math.round(tk.reward * 0.5);
+        addXP(Math.round(tk.reward * 0.5));
         updateHUD(); scheduleSave();
         toast('+' + fmt(tk.reward) + ' \u20BF', '#ffd257');
-        // проверка на новый уровень после задач
-        if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
         closeModal(); openTasks();
       };
       row.appendChild(nm); row.appendChild(b);
@@ -2748,12 +3190,11 @@ function openDaily(){
     btn.onclick = () => {
       if(!canTake) return;
       state.money += amounts[dayIdx];
-      state.xp += Math.round(amounts[dayIdx] * 0.5);
+      addXP(Math.round(amounts[dayIdx] * 0.5));
       state.lastDaily = today;
       state.streak++;
       updateHUD(); scheduleSave();
       toast('+' + fmt(amounts[dayIdx]) + ' \u20BF', '#ffd257');
-      if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
       closeModal();
     };
     el.appendChild(btn);
@@ -2767,10 +3208,9 @@ function checkTimeRewards(){
   if(mins >= next.min){
     state.lastRewardIdx++;
     state.money += next.amount;
-    state.xp += Math.round(next.amount * 0.5);
+    addXP(Math.round(next.amount * 0.5));
     updateHUD(); scheduleSave();
     toast(t('onlineReward') + ': +' + fmt(next.amount) + ' \u20BF', '#ffd257');
-    if(getLevel() > lastKnownLevel){ showLevelUp(getLevel()); lastKnownLevel = getLevel(); }
   }
 }
 
@@ -2784,11 +3224,9 @@ function hideAdOverlay(){
   if(state.music) Music.start();
 }
 
+/* ---- обучение ---- */
 let tutorialStep = 0;
-
-function isTutorialBlocking(){
-  return tutorialStep > 0 && !state.tutorialDone;
-}
+function isTutorialBlocking(){ return tutorialStep > 0 && !state.tutorialDone; }
 
 function updateTutorialBlock(){
   document.body.classList.toggle('tutorial-on', isTutorialBlocking());
@@ -2923,6 +3361,8 @@ function loop(ts){
       checkDailyReset();
       updateHUD();
     }
+    // Обновляем HUD для счётчика бонуса
+    if(hasIncomeBonus() && Math.floor(ts / 1000) % 1 === 0) updateHUD();
   }
   if(state) draw();
 }
@@ -2980,7 +3420,7 @@ async function boot(){
   document.addEventListener('keydown', startMusic);
 
   requestAnimationFrame(loop);
-  setInterval(() => { if(state) updateHUD(); }, 5000);
+  setInterval(() => { if(state) updateHUD(); }, 1000);
 }
 
 /* ------------------------------ 16. СОБЫТИЯ ------------------------------- */
@@ -2994,27 +3434,13 @@ $('#btnStock').onclick = () => {
   if(isTutorialBlocking() && tutorialStep !== 3) return;
   openWarehouse();
 };
+$('#btnExpand').onclick = () => {
+  if(paused || isTutorialBlocking()) return;
+  openShop();
+};
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
 $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(); };
 $('#btnSettings').onclick = () => { if(!paused && !isTutorialBlocking()) openSettings(); };
-$('#btnBuild').onclick = () => {
-  if(paused || isTutorialBlocking()) return;
-  openModal(t('build'), el => {
-    const items = [
-      {label: t('furniture'), act: () => { closeModal(); openShop(); }},
-      {label: t('expand'), act: () => { closeModal(); openShop(); }},
-      {label: t('decor'), act: () => { closeModal(); openShop(); }}
-    ];
-    items.forEach(it => {
-      const row = document.createElement('div');
-      row.className = 'row';
-      row.style.cursor = 'pointer';
-      row.innerHTML = `<div class="nm"><b>${it.label}</b></div>`;
-      row.onclick = it.act;
-      el.appendChild(row);
-    });
-  });
-};
 $('#btnInvite').onclick = () => {
   if(paused || isTutorialBlocking()) return;
   vkSend('VKWebAppShowInviteBox').then(() => {
