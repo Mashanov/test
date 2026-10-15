@@ -29,7 +29,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;z-index:2}
 .screen.active{display:flex}
 
-/* ===== ЗАГРУЗКА ===== */
 #scr-loading{align-items:center;justify-content:center;gap:22px}
 .logo-wrap{text-align:center;animation:float 4s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
@@ -39,7 +38,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .load-bar{width:min(70vw,320px);height:14px;border:2px solid #5c2a9c;border-radius:10px;background:#140a22;overflow:hidden;box-shadow:0 0 20px rgba(138,75,214,.5)}
 #loadFill{height:100%;width:0%;background:linear-gradient(90deg,#4a1f80,#a765f0,#00ffcc);transition:width .3s;box-shadow:0 0 14px #a765f0}
 
-/* ===== КНОПКИ ===== */
 .btn{position:relative;border:2px solid #6b3fb0;background:linear-gradient(180deg,#2a1440,#170a28);
   color:#e0ccff;padding:11px 16px;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;
   transition:.15s;letter-spacing:.5px;box-shadow:0 3px 0 #0d0618,0 0 14px rgba(107,63,176,.3) inset}
@@ -54,7 +52,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .btn.danger{border-color:#c23c5c;background:linear-gradient(180deg,#4a1024,#2a0a15);color:#ffb8c8}
 .btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
 
-/* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
 .topbar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:linear-gradient(180deg,rgba(20,10,34,.95),rgba(12,6,22,.75));
   border-bottom:2px solid #33195c;flex-shrink:0;z-index:5}
 .cur{display:flex;align-items:center;gap:5px;background:#180c2a;border:2px solid #4a2a7a;border-radius:20px;
@@ -63,7 +60,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .cur svg{width:16px;height:16px}
 .spacer{flex:1}
 
-/* ===== ЛОББИ ===== */
 .lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px}
 .lobby-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
@@ -79,7 +75,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
   padding:2px 7px;border-radius:10px;box-shadow:0 0 10px #c2243c;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
-/* ===== ЭКРАНЫ-ПАНЕЛИ ===== */
 .panel-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:2px solid #33195c;
   background:linear-gradient(180deg,rgba(30,15,50,.98),rgba(15,8,26,.9));flex-shrink:0}
 .panel-head h2{font-size:16px;color:#d9b3ff;letter-spacing:1px;flex:1;text-align:center}
@@ -89,7 +84,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .back-btn svg{width:20px;height:20px}
 .panel-body{flex:1;overflow-y:auto;padding:12px}
 
-/* ===== УРОВНИ ===== */
 .lvl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
 .lvl-btn{aspect-ratio:1;border-radius:12px;border:2px solid #3d2266;background:linear-gradient(180deg,#1c0f2e,#100821);
   color:#8a76ad;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -102,7 +96,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .lvl-btn.boss.unlocked{background:linear-gradient(180deg,#4a1024,#2a0a15);color:#ffb8c8}
 .lvl-btn.done::after{content:'';position:absolute;inset:0;border-radius:10px;background:rgba(0,255,180,.07)}
 
-/* ===== ИГРА ===== */
 #scr-game{background:#05030a}
 #gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .game-hud{position:absolute;top:0;left:0;right:0;display:flex;gap:6px;padding:6px;pointer-events:none;z-index:3;flex-wrap:wrap}
@@ -114,16 +107,16 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .game-tools{position:absolute;bottom:0;left:0;right:0;z-index:4;display:flex;flex-direction:column;gap:6px;padding:8px;
   background:linear-gradient(0deg,rgba(8,4,16,.97),rgba(8,4,16,.6),transparent)}
 .tower-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
-.tower-btn{flex:0 0 auto;width:62px;height:70px;border-radius:12px;border:2px solid #4a2a7a;
+.tower-btn{flex:0 0 auto;width:64px;height:74px;border-radius:12px;border:2px solid #4a2a7a;
   background:linear-gradient(180deg,#1d0f30,#0f0719);cursor:pointer;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:2px;transition:.15s;padding:4px;font-family:inherit}
 .tower-btn:hover{border-color:#a765f0}
 .tower-btn.sel{border-color:#ffd766;box-shadow:0 0 16px rgba(255,215,102,.6);background:linear-gradient(180deg,#3a2410,#1c1008)}
 .tower-btn.no{opacity:.4}
-.tower-btn svg{width:26px;height:26px}
+.tower-btn svg{width:28px;height:28px}
 .tower-btn .tn{font-size:8px;color:#c0a8e8;text-align:center;line-height:1.05}
 .tower-btn .tc{font-size:9px;color:#ffe6a3;font-weight:bold}
-.ability-bar{display:flex;gap:7px;justify-content:center}
+.ability-bar{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
 .ability-btn{width:50px;height:50px;border-radius:12px;border:2px solid #7a1f38;background:linear-gradient(180deg,#2a0f1c,#150710);
   cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:.15s}
 .ability-btn svg{width:26px;height:26px}
@@ -134,14 +127,12 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .speed-btn{width:50px;height:50px;border-radius:12px;border:2px solid #4a2a7a;background:linear-gradient(180deg,#1d0f30,#0f0719);
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#c9a8ff;font-size:13px}
 
-/* ===== СЕТКА РАЗМЕЩЕНИЯ ===== */
 .tower-popup{position:absolute;z-index:6;background:rgba(12,6,22,.97);border:2px solid #7b3fbf;border-radius:14px;
   padding:10px;display:flex;flex-direction:column;gap:7px;min-width:150px;box-shadow:0 8px 30px rgba(0,0,0,.8)}
 .tower-popup .tinfo{font-size:11px;color:#c0a8e8;text-align:center}
 .tower-popup .row{display:flex;gap:6px}
 .tower-popup button{flex:1;font-size:11px;padding:7px 8px}
 
-/* ===== МОДАЛЬНЫЕ ОКНА ===== */
 #modal-root{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
   background:rgba(3,1,7,.85);backdrop-filter:blur(4px);padding:14px}
 #modal-root.active{display:flex}
@@ -153,30 +144,27 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .modal p{color:#a898c8;font-size:13px;line-height:1.5;margin-bottom:12px}
 .modal .row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 
-/* ===== СУНДУК ===== */
 .chest-view{width:150px;height:150px;margin:8px auto;animation:float 2.5s ease-in-out infinite}
 .chest-view.shake{animation:shakeAnim .5s ease-in-out infinite}
 @keyframes shakeAnim{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.05)}}
-.char-reveal{animation:revealPop .6s cubic-bezier(.2,1.6,.5,1);margin:8px auto}
+.char-reveal{animation:revealPop .6s cubic-bezier(.2,1.6,.5,1);margin:8px auto;display:flex;justify-content:center}
 @keyframes revealPop{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 .rarity-common{color:#a0a0b0}.rarity-epic{color:#b47bff;text-shadow:0 0 12px #b47bff}
 .rarity-legendary{color:#ffd766;text-shadow:0 0 14px #ffd766}
 .rarity-mythic{color:#00ffcc;text-shadow:0 0 16px #00ffcc}
 
-/* ===== ПЕРСОНАЖИ ===== */
-.chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:9px}
+.chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;margin-top:6px}
 .char-card{border:2px solid #3d2266;border-radius:14px;background:linear-gradient(180deg,#1c0f2e,#100821);
-  padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden}
+  padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;cursor:pointer}
 .char-card.owned{border-color:#7b3fbf;background:linear-gradient(180deg,#26143e,#150c24)}
 .char-card.epic.owned{border-color:#b47bff;box-shadow:0 0 14px rgba(180,123,255,.35)}
 .char-card.legendary.owned{border-color:#ffd766;box-shadow:0 0 14px rgba(255,215,102,.4)}
 .char-card.mythic.owned{border-color:#00ffcc;box-shadow:0 0 18px rgba(0,255,204,.5)}
 .char-card svg{width:44px;height:44px}
 .char-card .cn{font-size:10px;text-align:center;color:#c0a8e8;line-height:1.1}
-.char-card .cb{font-size:9px;color:#7ee6c0;text-align:center}
-.char-card.locked{filter:grayscale(1) brightness(.45)}
+.char-card .cb{font-size:9px;color:#7ee6c0;text-align:center;line-height:1.15}
+.char-card.locked{filter:grayscale(1) brightness(.45);cursor:not-allowed}
 
-/* ===== НАСТРОЙКИ ===== */
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;
   border-bottom:1px solid #24123c;font-size:14px;color:#cbb8ee}
 .switch{position:relative;width:54px;height:28px;border-radius:15px;background:#24123c;border:2px solid #4a2a7a;
@@ -193,7 +181,6 @@ input.promo{width:100%;padding:11px;border-radius:11px;border:2px solid #4a2a7a;
   font-family:inherit;font-size:14px;outline:none;margin-bottom:9px}
 input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)}
 
-/* ===== ЗАДАНИЯ ===== */
 .task{display:flex;align-items:center;gap:11px;padding:11px;border:2px solid #2c1748;border-radius:14px;
   background:linear-gradient(180deg,#180c28,#0e0618);margin-bottom:8px}
 .task.done{border-color:#1f7a68;background:linear-gradient(180deg,#0d2a24,#07160f)}
@@ -204,13 +191,11 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 .task .tfill{height:100%;background:linear-gradient(90deg,#4a1f80,#a765f0);transition:width .3s}
 .task .treward{font-size:11px;color:#ffe6a3;font-weight:bold;white-space:nowrap}
 
-/* ===== АФК / ЕЖЕДНЕВНАЯ ===== */
 .center-box{display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 14px;text-align:center}
 .big-ico{width:110px;height:110px;animation:float 3.5s ease-in-out infinite;filter:drop-shadow(0 0 22px #7b3fbf)}
 .timer-text{font-size:26px;font-weight:bold;color:#9ef7e0;text-shadow:0 0 16px #1f7a68;letter-spacing:2px}
 .hint{font-size:12px;color:#8f7bb0;line-height:1.55;max-width:340px}
 
-/* ===== РЕКЛАМА ===== */
 #adOverlay{position:absolute;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;
   justify-content:center;gap:20px;background:rgba(3,1,7,.96)}
 #adOverlay.active{display:flex}
@@ -219,40 +204,30 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 @keyframes spin{to{transform:rotate(360deg)}}
 #adOverlay p{color:#c0a8e8;font-size:14px;letter-spacing:1px}
 
-/* ===== БАННЕР ===== */
-#banner{position:absolute;bottom:0;left:0;right:0;height:0;z-index:150;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;background:#0a0512;transition:height .3s}
-#banner.active{height:52px;border-top:1px solid #2c1748}
-#banner .binner{font-size:11px;color:#5a4a7a;letter-spacing:2px}
-
-/* ===== ТОСТ ===== */
 #toast{position:absolute;left:50%;top:12%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;
   gap:7px;align-items:center;pointer-events:none}
 .toast-item{background:rgba(20,10,34,.96);border:2px solid #7b3fbf;border-radius:12px;padding:9px 16px;
   font-size:13px;color:#e0ccff;box-shadow:0 0 22px rgba(138,75,214,.5);animation:toastIn .3s ease-out;white-space:nowrap}
 @keyframes toastIn{0%{transform:translateY(-16px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
-/* ===== ОБУЧЕНИЕ ===== */
 #scr-tutorial{align-items:center;justify-content:center;padding:22px;text-align:center;gap:16px}
 #scr-tutorial h2{font-size:clamp(18px,5vw,26px);color:#d9b3ff;text-shadow:0 0 16px #7b3fbf}
 #scr-tutorial p{font-size:14px;color:#a898c8;line-height:1.6;max-width:420px}
 .tut-icon{width:90px;height:90px;filter:drop-shadow(0 0 20px #a765f0)}
 
-/* ===== ЗАГОЛОВОК ПАНЕЛИ ===== */
 .section-title{font-size:13px;color:#8f7bb0;letter-spacing:2px;margin:6px 0 10px;text-transform:uppercase}
 
 @media(max-width:420px){
   .tile{min-height:92px}
   .tile .ticon{width:36px;height:36px}
   .tile .tlabel{font-size:11.5px}
-  .tower-btn{width:56px;height:64px}
+  .tower-btn{width:58px;height:68px}
 }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- ЗАГРУЗКА -->
   <div class="screen active" id="scr-loading">
     <div class="logo-wrap">
       <svg class="logo-ghost" width="120" height="120" viewBox="0 0 64 64">
@@ -274,7 +249,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div style="font-size:12px;color:#5a4a7a" id="loadTxt">Загрузка данных...</div>
   </div>
 
-  <!-- ОБУЧЕНИЕ-ВОПРОС -->
   <div class="screen" id="scr-tutorial">
     <svg class="tut-icon" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="#7b3fbf"/><ellipse cx="24" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/></svg>
     <h2 id="tutQ">Хотите пройти обучение?</h2>
@@ -285,7 +259,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
-  <!-- ЛОББИ -->
   <div class="screen" id="scr-lobby">
     <div class="topbar">
       <div class="cur gem">
@@ -305,7 +278,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="lobby-body" id="lobbyBody"></div>
   </div>
 
-  <!-- УРОВНИ -->
   <div class="screen" id="scr-levels">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -315,7 +287,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="panel-body"><div class="lvl-grid" id="lvlGrid"></div></div>
   </div>
 
-  <!-- НАСТРОЙКИ -->
   <div class="screen" id="scr-settings">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -340,12 +311,11 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <button class="btn primary" id="promoBtn">Активировать</button>
       </div>
       <div style="margin-top:18px;font-size:11px;color:#5a4a7a;text-align:center;line-height:1.7">
-        Ghost House TD v1.0<br>Все сохранения хранятся в VK
+        Ghost House TD v2.0<br>Все сохранения хранятся в VK
       </div>
     </div>
   </div>
 
-  <!-- ЗАДАНИЯ -->
   <div class="screen" id="scr-tasks">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -355,7 +325,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="panel-body"><div id="taskList"></div></div>
   </div>
 
-  <!-- АФК -->
   <div class="screen" id="scr-afk">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -376,7 +345,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
-  <!-- ЕЖЕДНЕВНАЯ -->
   <div class="screen" id="scr-daily">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -397,7 +365,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
-  <!-- ПЕРСОНАЖИ -->
   <div class="screen" id="scr-chars">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -406,11 +373,11 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
     <div class="panel-body">
       <div id="charsSummary" style="font-size:12px;color:#8f7bb0;margin-bottom:12px;text-align:center"></div>
+      <div class="section-title" id="charsSlotsTitle">Боевой отряд (до 4)</div>
       <div class="chars-grid" id="charsGrid"></div>
     </div>
   </div>
 
-  <!-- СПОСОБНОСТИ -->
   <div class="screen" id="scr-abilities">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -420,7 +387,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="panel-body"><div id="abList"></div></div>
   </div>
 
-  <!-- БАШНЯ БЕСКОНЕЧНОСТИ -->
   <div class="screen" id="scr-tower">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -442,7 +408,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
-  <!-- ИГРА -->
   <div class="screen" id="scr-game">
     <canvas id="gameCanvas"></canvas>
     <div class="game-hud" id="gameHud"></div>
@@ -454,30 +419,26 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="spinner"></div>
     <p id="adText">Загрузка рекламы...</p>
   </div>
-  <div id="banner"><div class="binner">РЕКЛАМА</div></div>
   <div id="toast"></div>
 </div>
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2
    ============================================================ */
 
-/* ---------- SVG-БИБЛИОТЕКА ---------- */
+/* ---------- БАЗОВЫЕ SVG ---------- */
 const SVG = {
   gem:'<svg viewBox="0 0 24 24"><path d="M12 2L4 9l8 13 8-13-8-7z" fill="#00ffcc"/><path d="M12 2L4 9h16l-8-7z" fill="#7ef7dd"/></svg>',
   coin:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffd766"/><circle cx="12" cy="12" r="7" fill="#e0b23c"/><path d="M12 7v10M9 9.5h5a2 2 0 010 4H9" stroke="#7a5b12" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>',
   heart:'<svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.6 4.6 0 018-3 4.6 4.6 0 018 3c0 5.7-8 11-8 11z" fill="#ff5f7e"/></svg>',
-  skull:'<svg viewBox="0 0 24 24"><path d="M12 2C7 2 4 5.5 4 10v5l2 2v3h3v-2h6v2h3v-3l2-2v-5c0-4.5-3-8-8-8z" fill="#e8e0f5"/><circle cx="9" cy="11" r="2.2" fill="#1a0f2a"/><circle cx="15" cy="11" r="2.2" fill="#1a0f2a"/><path d="M10 16h4l-1 3h-2z" fill="#1a0f2a"/></svg>',
   wave:'<svg viewBox="0 0 24 24"><path d="M2 14c3 0 3-4 6-4s3 4 6 4 3-4 6-4" stroke="#a765f0" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M2 19c3 0 3-4 6-4s3 4 6 4 3-4 6-4" stroke="#7b3fbf" stroke-width="2" fill="none" stroke-linecap="round" opacity=".6"/></svg>',
-  clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#9ef7e0" stroke-width="2" fill="none"/><path d="M12 7v5l3.5 2" stroke="#9ef7e0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   star:'<svg viewBox="0 0 24 24"><path d="M12 2l3 6 6 1-4.5 4.5 1 6.5L12 17l-5.5 3 1-6.5L3 9l6-1 3-6z" fill="#ffd766"/></svg>',
   gift:'<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2" fill="#a765f0"/><rect x="3" y="8" width="18" height="4" fill="#c9a8ff"/><rect x="10" y="8" width="4" height="13" fill="#ffd766"/><path d="M12 8c-3 0-5-1.5-5-3.5S8.5 2 10 3s2 5 2 5zm0 0c3 0 5-1.5 5-3.5S15.5 2 14 3s-2 5-2 5z" fill="#ffd766"/></svg>',
   gear:'<svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z" fill="#a898c8"/><path d="M19.4 13a7.5 7.5 0 000-2l2-1.5-2-3.4-2.4 1a7.6 7.6 0 00-1.7-1L14.9 3h-4l-.4 2.6a7.6 7.6 0 00-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 000 2l-2 1.5 2 3.4 2.4-1a7.6 7.6 0 001.7 1l.4 2.6h4l.4-2.6a7.6 7.6 0 001.7-1l2.4 1 2-3.4-2-1.5z" fill="#a898c8" opacity=".55"/></svg>',
   scroll:'<svg viewBox="0 0 24 24"><path d="M5 3h12a3 3 0 013 3v12a3 3 0 01-3 3H7a2 2 0 01-2-2V3z" fill="#c9a8ff"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#33145c" stroke-width="1.7" stroke-linecap="round"/></svg>',
   bed:'<svg viewBox="0 0 24 24"><path d="M3 18v-8h13a4 4 0 014 4v4" fill="#7b3fbf"/><path d="M3 18h18v2H3z" fill="#4a1f80"/><circle cx="7" cy="12" r="2" fill="#e0ccff"/></svg>',
   users:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="#a765f0"/><path d="M2.5 20a6.5 6.5 0 0113 0z" fill="#a765f0"/><circle cx="17" cy="9" r="2.6" fill="#7b3fbf"/><path d="M13.5 20a5 5 0 017-4.6" fill="none" stroke="#7b3fbf" stroke-width="2"/></svg>',
-  sword:'<svg viewBox="0 0 24 24"><path d="M4 20l3-1 11-11 1-4-4 1L4 16l-1 3z" fill="#c9a8ff"/><path d="M3 21l2-2" stroke="#7b3fbf" stroke-width="2.5" stroke-linecap="round"/><path d="M15 5l4-1-1 4" fill="#7b3fbf"/></svg>',
   fire:'<svg viewBox="0 0 24 24"><path d="M12 2s5 6 5 11a5 5 0 01-10 0c0-2 1-3 1-5 2 1 3 3 3 5 0-4 1-8 1-11z" fill="#ff8a3d"/><path d="M12 9s2.5 3 2.5 6a2.5 2.5 0 01-5 0c0-1.5 1-2.5 1-4 1 1 1.5 2 1.5 3 0-2 0-4 0-5z" fill="#ffd766"/></svg>',
   snow:'<svg viewBox="0 0 24 24"><path d="M12 2v20M4 6l16 12M20 6L4 18" stroke="#7fd8ff" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="#7fd8ff"/></svg>',
   bolt:'<svg viewBox="0 0 24 24"><path d="M13 2L5 13h5l-2 9 9-12h-5l1-8z" fill="#c39bff"/></svg>',
@@ -485,27 +446,33 @@ const SVG = {
   soul:'<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6" fill="#00ffcc" opacity=".85"/><circle cx="12" cy="10" r="3" fill="#0b0614"/><path d="M12 16v6M8 20l4-2 4 2" stroke="#00ffcc" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   chest:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="2" fill="#8a6a1f"/><path d="M3 9h18l-2-5H5L3 9z" fill="#c9a23a"/><rect x="10" y="12" width="4" height="5" rx="1" fill="#ffd766"/></svg>',
   lock:'<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" fill="#5a4a7a"/><path d="M8 10V7a4 4 0 018 0v3" stroke="#5a4a7a" stroke-width="2.5" fill="none"/><circle cx="12" cy="15" r="2" fill="#2c1748"/></svg>',
-  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>',
-  play:'<svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="#a765f0"/></svg>',
-  tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>',
   meteor:'<svg viewBox="0 0 24 24"><circle cx="16" cy="8" r="5" fill="#ff8a3d"/><path d="M2 22l10-10" stroke="#ffd766" stroke-width="2.5" stroke-linecap="round"/><path d="M5 19l7-7" stroke="#ff5f7e" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>',
   freeze:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#7fd8ff" opacity=".35"/><path d="M12 3v18M4 7l16 10M20 7L4 17" stroke="#7fd8ff" stroke-width="1.8"/></svg>',
   gold:'<svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="6" fill="#ffd766"/><circle cx="16" cy="9" r="5" fill="#e0b23c"/><circle cx="9" cy="14" r="3" fill="#e0b23c"/></svg>',
-  rage:'<svg viewBox="0 0 24 24"><path d="M12 2l2 6 6 1-5 4 1 7-4-3-4 3 1-7-5-4 6-1z" fill="#ff5f7e"/></svg>'
+  rage:'<svg viewBox="0 0 24 24"><path d="M12 2l2 6 6 1-5 4 1 7-4-3-4 3 1-7-5-4 6-1z" fill="#ff5f7e"/></svg>',
+  tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>'
 };
 
-function ghostSVG(color, opts){
-  opts = opts || {};
-  const eye = opts.eye || '#0b0614';
-  const angry = opts.angry;
-  return `<svg viewBox="0 0 64 64">
-    <path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/>
-    <ellipse cx="24" cy="27" rx="4.5" ry="${angry?4:5.5}" fill="${eye}"/>
-    <ellipse cx="40" cy="27" rx="4.5" ry="${angry?4:5.5}" fill="${eye}"/>
-    ${angry?'<path d="M18 20l8 3M46 20l-8 3" stroke="'+eye+'" stroke-width="2" stroke-linecap="round"/>':''}
-    <ellipse cx="32" cy="41" rx="4.5" ry="6" fill="${eye}" opacity=".65"/>
-  </svg>`;
-}
+/* ---------- SVG-ИКОНКИ ПЕРСОНАЖЕЙ ---------- */
+function icoGhost(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/></svg>`; }
+function icoSkull(color){ return `<svg viewBox="0 0 64 64"><path d="M32 8c-11 0-19 8-19 18v10l4 4v6h6v-4h18v4h6v-6l4-4V26c0-10-8-18-19-18z" fill="${color}"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/><path d="M29 42h6l-3 6z" fill="#0b0614"/></svg>`; }
+function icoBat(color){ return `<svg viewBox="0 0 64 64"><path d="M32 18c-4 0-6 3-6 6v4c-8-5-16-9-20-7 4 4 6 10 6 14s4 6 8 4l6-4 6 4c4 2 8 0 8-4s2-10 6-14c-4-2-12 2-20 7v-4c0-3-2-6-6-6z" fill="${color}"/><circle cx="29" cy="26" r="1.4" fill="#ff5f7e"/><circle cx="35" cy="26" r="1.4" fill="#ff5f7e"/></svg>`; }
+function icoSpider(color){ return `<svg viewBox="0 0 64 64"><circle cx="32" cy="28" r="9" fill="${color}"/><circle cx="32" cy="42" r="6" fill="${color}"/><path d="M23 22l-10-6M23 28h-12M23 34l-10 6M41 22l10-6M41 28h12M41 34l10 6" stroke="${color}" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="28" cy="26" r="1.6" fill="#ff2a5a"/><circle cx="36" cy="26" r="1.6" fill="#ff2a5a"/></svg>`; }
+function icoCat(color){ return `<svg viewBox="0 0 64 64"><path d="M16 20l4 12c-4 4-6 10-6 16 0 8 8 12 18 12s18-4 18-12c0-6-2-12-6-16l4-12-10 6c-2-1-4-1-6-1s-4 0-6 1z" fill="${color}"/><circle cx="25" cy="34" r="2" fill="#ffd766"/><circle cx="39" cy="34" r="2" fill="#ffd766"/><path d="M30 42l2 2 2-2" stroke="#ffd766" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`; }
+function icoRaven(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-6 0-10 4-10 10 0 3 1 5 2 7-6 2-12 6-14 12 6 0 10-2 14-6 2 6 6 12 8 14 2-2 6-8 8-14 4 4 8 6 14 6-2-6-8-10-14-12 1-2 2-4 2-7 0-6-4-10-10-10z" fill="${color}"/><circle cx="29" cy="20" r="1.5" fill="#ffd766"/><circle cx="35" cy="20" r="1.5" fill="#ffd766"/></svg>`; }
+function icoPumpkin(color){ return `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="38" rx="22" ry="18" fill="${color}"/><ellipse cx="32" cy="38" rx="10" ry="18" fill="#e07020" opacity=".5"/><rect x="29" y="14" width="6" height="8" fill="#4a8a3a"/><path d="M22 32l4 4-4 4M42 32l-4 4 4 4M26 44l6 4 6-4" stroke="#2a1000" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>`; }
+function icoFlame(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-2 10-10 14-10 24 0 10 6 18 10 22 4-4 10-12 10-22 0-10-8-14-10-24z" fill="${color}"/><path d="M32 22c-1 6-5 8-5 14 0 5 3 9 5 11 2-2 5-6 5-11 0-6-4-8-5-14z" fill="#ffeeb8" opacity=".8"/></svg>`; }
+function icoWolf(color){ return `<svg viewBox="0 0 64 64"><path d="M10 22l8 4c4-6 10-10 14-10s10 4 14 10l8-4-2 12c2 4 2 10 0 14-4 6-12 10-20 10s-16-4-20-10c-2-4-2-10 0-14z" fill="${color}"/><circle cx="24" cy="30" r="2" fill="#ff5f7e"/><circle cx="40" cy="30" r="2" fill="#ff5f7e"/><path d="M28 42l4 4 4-4" stroke="#0b0614" stroke-width="2" fill="none"/></svg>`; }
+function icoVampire(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><circle cx="24" cy="25" r="1.5" fill="#ff2a5a"/><circle cx="40" cy="25" r="1.5" fill="#ff2a5a"/><path d="M28 42l2 6 2-6M34 42l2 6 2-6" fill="#fff"/></svg>`; }
+function icoCrown(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V33c0-13-8-23-21-23z" fill="${color}"/><path d="M18 12l4 8 6-8 4 8 4-8 6 8 4-8" stroke="#ffd766" stroke-width="3" fill="none" stroke-linejoin="round"/><ellipse cx="24" cy="30" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="30" rx="4" ry="5" fill="#0b0614"/></svg>`; }
+function icoMummy(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><path d="M12 20l40 6M12 32l40 4M12 44l40 4" stroke="#8a7a5a" stroke-width="2" opacity=".6"/><ellipse cx="24" cy="26" rx="4" ry="5" fill="#7a1a1a"/><ellipse cx="40" cy="26" rx="4" ry="5" fill="#7a1a1a"/></svg>`; }
+function icoBanshee(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4c-14 0-22 11-22 24v29l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 4 32 4z" fill="${color}" opacity=".85"/><ellipse cx="24" cy="26" rx="4.5" ry="6" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="6" fill="#0b0614"/><ellipse cx="32" cy="42" rx="5" ry="8" fill="#0b0614" opacity=".7"/></svg>`; }
+function icoReaper(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-14 0-22 12-22 26v22h44V32c0-14-8-26-22-26z" fill="#1a0f2a"/><path d="M32 6c-14 0-22 12-22 26v4c4-8 12-12 22-12s18 4 22 12v-4c0-14-8-26-22-26z" fill="${color}"/><circle cx="24" cy="30" r="3" fill="#ff5f7e"/><circle cx="40" cy="30" r="3" fill="#ff5f7e"/><circle cx="24" cy="30" r="1.2" fill="#fff"/><circle cx="40" cy="30" r="1.2" fill="#fff"/></svg>`; }
+function icoLich(color){ return `<svg viewBox="0 0 64 64"><path d="M32 8c-11 0-19 8-19 18v10l4 4v6h6v-4h18v4h6v-6l4-4V26c0-10-8-18-19-18z" fill="${color}"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/><path d="M29 42h6l-3 6z" fill="#0b0614"/><path d="M20 6l4 6 4-6 4 6 4-6 4 6 4-6" stroke="#00ffcc" stroke-width="2" fill="none"/></svg>`; }
+function icoSlime(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-14 0-22 12-22 24s10 20 22 20 22-8 22-20S46 10 32 10z" fill="${color}"/><circle cx="24" cy="34" r="2.5" fill="#0b0614"/><circle cx="40" cy="34" r="2.5" fill="#0b0614"/><ellipse cx="20" cy="20" rx="4" ry="3" fill="#fff" opacity=".4"/></svg>`; }
+function icoBloody(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><path d="M14 40q6 4 12 0t12 0 12 0" stroke="#7a0a1a" stroke-width="2.5" fill="none" opacity=".7"/></svg>`; }
+function icoGrave(color){ return `<svg viewBox="0 0 64 64"><path d="M14 58V28c0-10 8-18 18-18s18 8 18 18v30z" fill="${color}"/><path d="M32 18v20M24 28h16" stroke="#2a1a2a" stroke-width="3" stroke-linecap="round"/><path d="M10 58h44" stroke="#2a1a2a" stroke-width="3"/></svg>`; }
+function icoWitch(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4l-18 24h36L32 4z" fill="#33145c"/><path d="M32 10l-10 14h20L32 10z" fill="${color}"/><circle cx="32" cy="40" r="14" fill="#8fd14f"/><circle cx="27" cy="38" r="2" fill="#0b0614"/><circle cx="37" cy="38" r="2" fill="#0b0614"/><path d="M27 46q5 4 10 0" stroke="#0b0614" stroke-width="2" fill="none"/></svg>`; }
 
 /* ---------- ЛОКАЛИЗАЦИЯ ---------- */
 const I18N = {
@@ -534,24 +501,29 @@ const I18N = {
     twFloor:'Этаж', twStart:'Начать этаж', twHint:'Каждый этаж сложнее предыдущего. Чем выше — тем больше награда.',
     buy:'Купить', bought:'Куплено', notEnough:'Недостаточно кристаллов',
     selectTower:'Выберите башню', upgrade:'Улучшить', sell:'Продать',
-    startWave:'Волна', speed:'x1', nextWave:'След. волна',
-    tut1T:'Обучение: башни', tut1D:'Выберите башню внизу и поставьте её на свободную клетку пола. Башни атакуют призраков.',
+    speed:'x1', 
+    tut1T:'Обучение: башни', tut1D:'Выберите персонажа внизу и поставьте его на свободную клетку пола. Каждый персонаж атакует призраков по-своему.',
     tut2T:'Обучение: волны', tut2D:'Призраки идут по дороге к выходу. Если они дойдут — вы теряете жизнь. Уничтожьте всех!',
-    tut3T:'Обучение: улучшения', tut3D:'Нажмите на поставленную башню, чтобы улучшить её за монеты. Монеты падают с монстров.',
-    tut4T:'Обучение: способности', tut4D:'Суперспособности покупаются за кристаллы душ и помогают в бою. Удачи!',
+    tut3T:'Обучение: улучшения', tut3D:'Нажмите на поставленного персонажа, чтобы улучшить его за монеты. Монеты падают с монстров.',
+    tut4T:'Обучение: отряд', tut4D:'В коллекции вы можете выбрать до 4 персонажей — их вы и сможете ставить в бою. Удачи!',
     tutNext:'Далее', tutFinish:'Начать игру', tutSkip:'Пропустить обучение',
     waveClear:'Волна пройдена!', bossIncoming:'БОСС!',
     tasksRefresh:'Задания обновятся через', hours:'ч', minutes:'м',
-    noTasks:'Нет заданий', refresh:'Обновить',
+    noTasks:'Нет заданий',
     playtimeReward:'Награда за игру!', claim:'Забрать',
-    welcome:'Добро пожаловать в Дом с привидениями!',
     promoOk:'Промокод активирован!', promoBad:'Неверный промокод',
     dataCleared:'Все данные удалены',
     invited:'Приглашение отправлено',
-    saveOk:'Сохранено', afkLeave:'Вы вышли из комнаты АФК',
-    bonusDmg:'Урон', bonusRange:'Радиус', bonusGold:'Монеты', bonusSpeed:'Скорость',
+    bonusDmg:'Урон', bonusRange:'Радиус', bonusGold:'Монеты',
     allChars:'Собрано персонажей',
-    lvlDone:'Пройден', bestFloor:'Лучший этаж'
+    lvlDone:'Пройден', bestFloor:'Лучший этаж',
+    squadTitle:'Боевой отряд (до 4 персонажей)',
+    squadHint:'Нажмите на персонажа ниже, чтобы добавить/убрать из отряда',
+    claimAndLobby:'Забрать и в лобби',
+    retry:'Повторить',
+    quitTitle:'Выйти из уровня?',
+    quitText:'Прогресс уровня будет потерян.',
+    quitYes:'Выйти', quitStay:'Остаться'
   },
   en:{
     loading:'Loading data...', tutQ:'Would you like a tutorial?',
@@ -578,24 +550,29 @@ const I18N = {
     twFloor:'Floor', twStart:'Start floor', twHint:'Each floor is harder. The higher — the bigger the reward.',
     buy:'Buy', bought:'Owned', notEnough:'Not enough crystals',
     selectTower:'Select tower', upgrade:'Upgrade', sell:'Sell',
-    startWave:'Wave', speed:'x1', nextWave:'Next wave',
-    tut1T:'Tutorial: towers', tut1D:'Pick a tower below and place it on a free floor tile. Towers attack ghosts.',
+    speed:'x1',
+    tut1T:'Tutorial: towers', tut1D:'Pick a character below and place him on a free floor tile. Each character attacks ghosts differently.',
     tut2T:'Tutorial: waves', tut2D:'Ghosts walk along the path to the exit. If they reach it — you lose a life. Destroy them all!',
-    tut3T:'Tutorial: upgrades', tut3D:'Tap a placed tower to upgrade it with coins. Coins drop from monsters.',
-    tut4T:'Tutorial: abilities', tut4D:'Super abilities are bought with soul crystals and help in battle. Good luck!',
+    tut3T:'Tutorial: upgrades', tut3D:'Tap a placed character to upgrade him with coins. Coins drop from monsters.',
+    tut4T:'Tutorial: squad', tut4D:'In the collection you can select up to 4 characters — those will be available in battle. Good luck!',
     tutNext:'Next', tutFinish:'Start game', tutSkip:'Skip tutorial',
     waveClear:'Wave cleared!', bossIncoming:'BOSS!',
     tasksRefresh:'Tasks refresh in', hours:'h', minutes:'m',
-    noTasks:'No tasks', refresh:'Refresh',
+    noTasks:'No tasks',
     playtimeReward:'Playtime reward!', claim:'Claim',
-    welcome:'Welcome to the Ghost House!',
     promoOk:'Promo activated!', promoBad:'Invalid promo code',
     dataCleared:'All data cleared',
     invited:'Invite sent',
-    saveOk:'Saved', afkLeave:'You left the AFK room',
-    bonusDmg:'Damage', bonusRange:'Range', bonusGold:'Coins', bonusSpeed:'Speed',
+    bonusDmg:'Damage', bonusRange:'Range', bonusGold:'Coins',
     allChars:'Characters collected',
-    lvlDone:'Cleared', bestFloor:'Best floor'
+    lvlDone:'Cleared', bestFloor:'Best floor',
+    squadTitle:'Battle squad (up to 4)',
+    squadHint:'Tap a character below to add/remove from squad',
+    claimAndLobby:'Claim & to lobby',
+    retry:'Retry',
+    quitTitle:'Quit level?',
+    quitText:'Level progress will be lost.',
+    quitYes:'Quit', quitStay:'Stay'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -614,49 +591,37 @@ const PATH_BLOCK = new Set();
   }
 })();
 
-/* ---------- БАШНИ ---------- */
-const TOWERS = {
-  candle:{ ru:'Свеча', en:'Candle', cost:50, dmg:11, range:82, rate:0.85, proj:'fire', color:'#ffb347',
-    icon:SVG.fire, unlock:1, desc:{ru:'Базовая огненная башня',en:'Basic fire tower'} },
-  frost:{ ru:'Ледяной дух', en:'Frost Spirit', cost:85, dmg:7, range:74, rate:1.1, slow:0.45, slowDur:2, proj:'ice', color:'#7fd8ff',
-    icon:SVG.snow, unlock:3, desc:{ru:'Замедляет врагов',en:'Slows enemies'} },
-  bones:{ ru:'Костомёт', en:'Bone Thrower', cost:130, dmg:26, range:92, rate:1.5, splash:34, proj:'bone', color:'#e8e0c0',
-    icon:SVG.skull, unlock:6, desc:{ru:'Урон по площади',en:'Splash damage'} },
-  witch:{ ru:'Котёл ведьмы', en:'Witch Cauldron', cost:210, dmg:16, range:88, rate:1.3, poison:14, poisonDur:3, proj:'poison', color:'#8fd14f',
-    icon:SVG.sword, unlock:12, rarity:'epic', desc:{ru:'Отравляет врагов',en:'Poisons enemies'} },
-  storm:{ ru:'Грозовая башня', en:'Storm Tower', cost:300, dmg:44, range:112, rate:1.9, chain:3, proj:'bolt', color:'#c39bff',
-    icon:SVG.bolt, unlock:20, rarity:'epic', desc:{ru:'Цепная молния',en:'Chain lightning'} },
-  crypt:{ ru:'Склеп', en:'Crypt', cost:420, dmg:60, range:96, rate:1.6, aura:true, proj:'soul', color:'#ff9bb0',
-    icon:SVG.reaper, unlock:30, rarity:'epic', desc:{ru:'Усиливает соседние башни',en:'Buffs nearby towers'} },
-  reaper:{ ru:'Жнец', en:'Reaper', cost:620, dmg:105, range:126, rate:1.7, instakill:0.06, proj:'soul', color:'#ff5f7e',
-    icon:SVG.reaper, unlock:45, rarity:'legendary', desc:{ru:'Шанс мгновенной смерти',en:'Chance to instant-kill'} },
-  soul:{ ru:'Пожиратель душ', en:'Soul Eater', cost:950, dmg:170, range:142, rate:1.4, drain:true, proj:'void', color:'#00ffcc',
-    icon:SVG.soul, unlock:70, rarity:'mythic', desc:{ru:'Восстанавливает кристаллы за убийства',en:'Grants crystals per kill'} }
-};
-
-/* ---------- ПЕРСОНАЖИ ---------- */
+/* ---------- ПЕРСОНАЖИ (20) ---------- */
 const CHARS = [
-  {id:'g1',  ru:'Мелкий призрак', en:'Little Ghost', r:'common', color:'#b8c8ff', bonus:{dmg:2}},
-  {id:'g2',  ru:'Скелет',         en:'Skeleton',     r:'common', color:'#e8e0c0', bonus:{dmg:2}},
-  {id:'g3',  ru:'Летучая мышь',   en:'Bat',          r:'common', color:'#8a6fae', bonus:{range:3}},
-  {id:'g4',  ru:'Паук',           en:'Spider',       r:'common', color:'#5a4a7a', bonus:{dmg:2}},
-  {id:'g5',  ru:'Зомби',          en:'Zombie',       r:'common', color:'#7fa87f', bonus:{gold:4}},
-  {id:'g6',  ru:'Свечка',         en:'Candle',       r:'common', color:'#ffd766', bonus:{dmg:3}},
-  {id:'g7',  ru:'Тыква',          en:'Pumpkin',      r:'common', color:'#ff8a3d', bonus:{gold:4}},
-  {id:'g8',  ru:'Ворон',          en:'Raven',        r:'common', color:'#3a2f4a', bonus:{range:4}},
-  {id:'g9',  ru:'Крыса',          en:'Rat',          r:'common', color:'#8a7a6a', bonus:{gold:5}},
-  {id:'g10', ru:'Слизь',          en:'Slime',        r:'common', color:'#6fd88f', bonus:{dmg:3}},
-  {id:'g11', ru:'Гоблин',         en:'Goblin',       r:'common', color:'#8fbf4f', bonus:{gold:5}},
-  {id:'g12', ru:'Мотылёк',        en:'Moth',         r:'common', color:'#d8c8a0', bonus:{range:5}},
-  {id:'e1',  ru:'Ведьма',         en:'Witch',        r:'epic',   color:'#8fd14f', bonus:{dmg:8, gold:8}},
-  {id:'e2',  ru:'Вампир',         en:'Vampire',      r:'epic',   color:'#c2243c', bonus:{dmg:10}},
-  {id:'e3',  ru:'Оборотень',      en:'Werewolf',     r:'epic',   color:'#a08060', bonus:{dmg:7, range:7}},
-  {id:'e4',  ru:'Лич',            en:'Lich',         r:'epic',   color:'#7fd8ff', bonus:{dmg:6, gold:12}},
-  {id:'e5',  ru:'Банши',          en:'Banshee',      r:'epic',   color:'#c39bff', bonus:{dmg:9, range:9}},
-  {id:'l1',  ru:'Жнец',           en:'Reaper',       r:'legendary', color:'#ff5f7e', bonus:{dmg:22, range:14}},
-  {id:'l2',  ru:'Кровавая Мэри',  en:'Bloody Mary',  r:'legendary', color:'#ff2a5a', bonus:{dmg:26, gold:30}},
-  {id:'m1',  ru:'Повелитель Дома',en:'House Lord',   r:'mythic', color:'#00ffcc', bonus:{dmg:55, range:30, gold:60}}
+  // COMMON (12)
+  {id:'ghost',     ru:'Призрак',        en:'Ghost',        r:'common',    color:'#b8c8ff', cost:50,   dmg:13,  range:85,  rate:0.85, icon:icoGhost('#b8c8ff'),     desc:{ru:'Стреляет эктоплазмой',en:'Fires ectoplasm'}},
+  {id:'skeleton',  ru:'Скелет',         en:'Skeleton',     r:'common',    color:'#e8e0c0', cost:90,   dmg:24,  range:88,  rate:1.5,  splash:32, icon:icoSkull('#e8e0c0'),   desc:{ru:'Кости по площади',en:'Bone splash'}},
+  {id:'zombie',    ru:'Зомби',          en:'Zombie',       r:'common',    color:'#7fa87f', cost:75,   dmg:15,  range:82,  rate:1.2,  poison:14, poisonDur:3, icon:icoSlime('#7fa87f'), desc:{ru:'Отравляет призраков',en:'Poisons ghosts'}},
+  {id:'bat',       ru:'Летучая мышь',   en:'Bat',          r:'common',    color:'#8a6fae', cost:60,   dmg:7,   range:80,  rate:0.35, icon:icoBat('#8a6fae'),      desc:{ru:'Очень быстрые атаки',en:'Very fast attacks'}},
+  {id:'spider',    ru:'Паук',           en:'Spider',       r:'common',    color:'#5a4a7a', cost:80,   dmg:10,  range:78,  rate:0.9,  slow:0.4, slowDur:2, icon:icoSpider('#5a4a7a'), desc:{ru:'Замедляет паутиной',en:'Slows with webs'}},
+  {id:'witch',     ru:'Ведьма',         en:'Witch',        r:'common',    color:'#8fd14f', cost:110,  dmg:17,  range:90,  rate:1.1,  poison:18, poisonDur:4, icon:icoWitch('#8fd14f'), desc:{ru:'Сильный яд из котла',en:'Strong poison'}},
+  {id:'cat',       ru:'Чёрный кот',     en:'Black Cat',    r:'common',    color:'#3a2f4a', cost:95,   dmg:26,  range:84,  rate:1.0,  icon:icoCat('#3a2f4a'),      desc:{ru:'Проклятие усиливает урон',en:'Cursed damage'}},
+  {id:'raven',     ru:'Ворон',          en:'Raven',        r:'common',    color:'#2c2538', cost:105,  dmg:18,  range:120, rate:1.2,  icon:icoRaven('#2c2538'),    desc:{ru:'Дальний обзор',en:'Long range'}},
+  {id:'slime',     ru:'Слизь',          en:'Slime',        r:'common',    color:'#6fd88f', cost:70,   dmg:16,  range:80,  rate:1.3,  splash:26, icon:icoSlime('#6fd88f'),  desc:{ru:'Брызги слизи',en:'Slime splash'}},
+  {id:'pumpkin',   ru:'Тыква',          en:'Pumpkin',      r:'common',    color:'#ff8a3d', cost:85,   dmg:20,  range:82,  rate:1.0,  icon:icoPumpkin('#ff8a3d'),  desc:{ru:'Горящие тыквы',en:'Burning pumpkins'}},
+  {id:'candle',    ru:'Свеча',          en:'Candle',       r:'common',    color:'#ffd766', cost:55,   dmg:11,  range:80,  rate:0.9,  icon:icoFlame('#ffd766'),    desc:{ru:'Огонь свечи',en:'Candle flame'}},
+  {id:'gravedigger',ru:'Могильщик',     en:'Gravedigger',  r:'common',    color:'#8a7a6a', cost:120,  dmg:16,  range:86,  rate:1.3,  goldBonus:20, icon:icoGrave('#8a7a6a'), desc:{ru:'+20% монет с убийств',en:'+20% coins'}},
+
+  // EPIC (5)
+  {id:'vampire',   ru:'Вампир',         en:'Vampire',      r:'epic',      color:'#c2243c', cost:280,  dmg:55,  range:100, rate:1.1,  drain:true, icon:icoVampire('#c2243c'), desc:{ru:'Даёт кристаллы за убийства',en:'Crystals per kill'}},
+  {id:'werewolf',  ru:'Оборотень',      en:'Werewolf',     r:'epic',      color:'#a08060', cost:240,  dmg:32,  range:92,  rate:0.5,  icon:icoWolf('#a08060'),     desc:{ru:'Свирепые быстрые атаки',en:'Ferocious fast attacks'}},
+  {id:'banshee',   ru:'Банши',          en:'Banshee',      r:'epic',      color:'#c39bff', cost:300,  dmg:48,  range:105, rate:1.5,  chain:3, icon:icoBanshee('#c39bff'), desc:{ru:'Цепной вопль',en:'Chain scream'}},
+  {id:'mummy',     ru:'Мумия',          en:'Mummy',        r:'epic',      color:'#d8c8a0', cost:260,  dmg:42,  range:98,  rate:1.2,  slow:0.5, slowDur:3, icon:icoMummy('#d8c8a0'), desc:{ru:'Проклятие фараона замедляет',en:'Pharaoh curse slows'}},
+  {id:'lich',      ru:'Лич',            en:'Lich',         r:'epic',      color:'#7fd8ff', cost:340,  dmg:60,  range:112, rate:1.6,  chain:4, poison:20, poisonDur:3, icon:icoLich('#7fd8ff'), desc:{ru:'Цепная некротическая молния',en:'Chain necro lightning'}},
+
+  // LEGENDARY (2)
+  {id:'reaper',    ru:'Жнец',           en:'Reaper',       r:'legendary', color:'#ff5f7e', cost:600,  dmg:120, range:130, rate:1.5,  instakill:0.07, icon:icoReaper('#ff5f7e'), desc:{ru:'Шанс мгновенной смерти',en:'Chance to instant-kill'}},
+  {id:'bloodyMary',ru:'Кровавая Мэри',  en:'Bloody Mary',  r:'legendary', color:'#ff2a5a', cost:700,  dmg:180, range:125, rate:1.8,  splash:55, icon:icoBloody('#ff2a5a'), desc:{ru:'Кровавая волна по площади',en:'Blood wave AoE'}},
+
+  // MYTHIC (1)
+  {id:'houseLord', ru:'Повелитель Дома',en:'House Lord',   r:'mythic',    color:'#00ffcc', cost:1000, dmg:220, range:150, rate:1.4,  aura:true, icon:icoCrown('#00ffcc'), desc:{ru:'Усиливает союзные башни рядом',en:'Buffs nearby towers'}}
 ];
+const STARTER_CHARS = ['ghost'];
 const RARITY_WEIGHT = {common:70, epic:22, legendary:6, mythic:2};
 
 /* ---------- СПОСОБНОСТИ ---------- */
@@ -673,19 +638,21 @@ const ABILITIES = [
 
 /* ---------- СОСТОЯНИЕ ---------- */
 const DEFAULT_STATE = {
-  v:1, gems:0, chests:0, level:1, completed:0,
-  chars:[], abilities:[],
+  v:2, gems:0, chests:0, level:1, completed:0,
+  chars: [],
+  selectedChars: [],
+  abilities: [],
   music:true, lang:'ru',
   lastDaily:0, lastTasks:0, tasks:[],
   lastAFK:0, afkPending:0,
   playtimeClaimed:[], totalPlaytime:0,
   tutorialDone:false, tutorialSeen:false,
   towerFloor:1, towerBest:1,
-  kills:0, levelsWon:0, towersBuilt:0, abilitiesUsed:0
+  kills:0, levelsWon:0, towersBuilt:0, abilitiesUsed:0,
+  starterGiven:false
 };
 let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let vkAvailable = false;
-let loaded = false;
 
 /* ---------- УТИЛИТЫ ---------- */
 const SUF = ['','K','M','B','T','aa','ab','ac','ad','ae','af','ag','ah','ai','aj','ak','al','am','an','ao','ap','aq','ar','as','at','au','av','aw','ax','ay','az'];
@@ -699,13 +666,13 @@ function $(s){ return document.querySelector(s); }
 function $$(s){ return Array.from(document.querySelectorAll(s)); }
 function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
 function now(){ return Date.now(); }
-function dayKey(){ const d=new Date(); return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate(); }
 function toast(msg, ms){
   const box = $('#toast');
   const item = el('div','toast-item', msg);
   box.appendChild(item);
   setTimeout(()=>{ item.style.transition='opacity .3s, transform .3s'; item.style.opacity='0'; item.style.transform='translateY(-12px)'; setTimeout(()=>item.remove(),320); }, ms||1800);
 }
+function charTowerDef(charId){ return CHARS.find(x=>x.id===charId); }
 
 /* ---------- VK ---------- */
 function vkSend(method, params){
@@ -738,7 +705,6 @@ function showInterstitial(cb){
   vkSend('VKWebAppShowNativeAds', {ad_format:'interstitial'})
     .then(()=>{ hideAdOverlay(); cb&&cb(); })
     .catch(()=>{ hideAdOverlay(); cb&&cb(); });
-  // страховка
   setTimeout(()=>{ if($('#adOverlay').classList.contains('active')){ hideAdOverlay(); cb&&cb(); } }, 12000);
 }
 function showRewardAd(onReward, onFail){
@@ -752,7 +718,7 @@ function showRewardAd(onReward, onFail){
 function showBanner(){
   try{
     vkSend('VKWebAppGetLaunchParams').then(()=>{
-      vkSend('VKWebAppShowBannerAd').then(()=>{ $('#banner').classList.add('active'); }).catch(()=>{});
+      vkSend('VKWebAppShowBannerAd').catch(()=>{});
     }).catch(()=>{});
   }catch(e){}
 }
@@ -779,6 +745,7 @@ function loadGame(){
             const parsed = JSON.parse(keys[0].value);
             state = Object.assign({}, DEFAULT_STATE, parsed);
             if(!Array.isArray(state.chars)) state.chars=[];
+            if(!Array.isArray(state.selectedChars)) state.selectedChars=[];
             if(!Array.isArray(state.abilities)) state.abilities=[];
             if(!Array.isArray(state.tasks)) state.tasks=[];
             if(!Array.isArray(state.playtimeClaimed)) state.playtimeClaimed=[];
@@ -789,6 +756,21 @@ function loadGame(){
       .catch(()=>resolve());
     setTimeout(()=>resolve(), 5000);
   });
+}
+function ensureStarter(){
+  state.chars = state.chars.filter(id=>CHARS.some(c=>c.id===id));
+  state.selectedChars = state.selectedChars.filter(id=>state.chars.includes(id));
+  if(!state.starterGiven){
+    STARTER_CHARS.forEach(id=>{ if(!state.chars.includes(id)) state.chars.push(id); });
+    state.starterGiven = true;
+  }
+  if(state.selectedChars.length===0 && state.chars.length){
+    state.selectedChars = state.chars.slice(0,4);
+  }
+  if(state.selectedChars.length===0){
+    STARTER_CHARS.forEach(id=>{ if(!state.chars.includes(id)) state.chars.push(id); });
+    state.selectedChars = STARTER_CHARS.slice();
+  }
 }
 
 /* ---------- АУДИО ---------- */
@@ -842,8 +824,64 @@ function pauseMusic(){
   try{ musicGain.gain.cancelScheduledValues(audioCtx.currentTime); musicGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime+0.4); }catch(e){}
   musicOn=false;
 }
-function stopMusic(){
-  pauseMusic();
+function playClick(){
+  if(!audioCtx || !state.music) return;
+  try{
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type='sine'; o.frequency.value = 620;
+    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
+    o.connect(g); g.connect(musicGain);
+    o.start(); o.stop(audioCtx.currentTime+0.12);
+  }catch(e){}
+}
+function playCoin(){
+  if(!audioCtx || !state.music) return;
+  try{
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type='square'; o.frequency.setValueAtTime(880, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime+0.1);
+    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.18);
+    o.connect(g); g.connect(musicGain);
+    o.start(); o.stop(audioCtx.currentTime+0.2);
+  }catch(e){}
+}
+function playHitSound(){
+  if(!audioCtx || !state.music) return;
+  try{
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(180, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime+0.25);
+    g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.3);
+    o.connect(g); g.connect(musicGain);
+    o.start(); o.stop(audioCtx.currentTime+0.32);
+  }catch(e){}
+}
+function playBossDeath(){
+  if(!audioCtx || !state.music) return;
+  try{
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type='sawtooth'; o.frequency.setValueAtTime(300, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime+0.7);
+    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8);
+    o.connect(g); g.connect(musicGain);
+    o.start(); o.stop(audioCtx.currentTime+0.85);
+  }catch(e){}
+}
+function playChestSound(){
+  if(!audioCtx || !state.music) return;
+  try{
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type='triangle'; o.frequency.setValueAtTime(440, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.25);
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.4);
+    o.connect(g); g.connect(musicGain);
+    o.start(); o.stop(audioCtx.currentTime+0.45);
+  }catch(e){}
 }
 
 /* ---------- ЭКРАНЫ ---------- */
@@ -908,14 +946,12 @@ function renderLobby(){
   });
   body.appendChild(grid);
 
-  // Кнопка пригласить друзей
   const inv = el('button','btn primary', SVG.users.replace('<svg','<svg style="width:18px;height:18px;vertical-align:-4px;margin-right:8px"') + t('invite'));
   inv.style.width='100%';
   inv.style.padding='14px';
   inv.onclick = ()=>{ playClick(); inviteFriends(); };
   body.appendChild(inv);
 
-  // Прогресс
   const prog = el('div', '', `
     <div style="margin-top:6px;background:linear-gradient(180deg,#1a0e2c,#0e0618);border:2px solid #33195c;border-radius:14px;padding:12px">
       <div style="display:flex;justify-content:space-between;font-size:12px;color:#a898c8;margin-bottom:7px">
@@ -932,8 +968,6 @@ function renderLobby(){
     </div>
   `);
   body.appendChild(prog);
-
-  updateBannerSpace();
 }
 function handleTile(id){
   switch(id){
@@ -946,11 +980,6 @@ function handleTile(id){
     case 'daily': openDaily(); break;
     case 'settings': openSettings(); break;
   }
-}
-function updateBannerSpace(){
-  document.querySelectorAll('.lobby-body,.panel-body').forEach(b=>{
-    b.style.paddingBottom = $('#banner').classList.contains('active') ? '64px' : '';
-  });
 }
 function hasClaimableTask(){
   return state.tasks.some(tk=> tk && tk.progress>=tk.target && !tk.claimed);
@@ -1017,14 +1046,18 @@ $('#promoBtn').onclick = ()=>{
   const v = $('#promoInput').value.trim().toLowerCase();
   if(v==='clear12'){
     state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    ensureStarter();
     saveGame(true);
     toast(t('dataCleared'));
     setTimeout(()=>location.reload(), 900);
   } else if(v==='admin17'){
     state.gems += 1000000;
     state.chests += 50;
+    CHARS.forEach(c=>{ if(!state.chars.includes(c.id)) state.chars.push(c.id); });
+    if(state.selectedChars.length===0) state.selectedChars = state.chars.slice(0,4);
+    state.starterGiven = true;
     saveGame(true);
-    toast(t('promoOk')+' +1 000 000 💎');
+    toast(t('promoOk')+' +1 000 000 💎 + ' + CHARS.length + ' chars');
     renderLobby();
   } else {
     toast(t('promoBad'));
@@ -1043,9 +1076,8 @@ const TASK_TEMPLATES = [
 ];
 function genTasks(){
   const arr = [];
-  const pool = TASK_TEMPLATES.slice();
   for(let i=0;i<10;i++){
-    const tpl = pool[i % pool.length];
+    const tpl = TASK_TEMPLATES[i % TASK_TEMPLATES.length];
     const tier = 1 + Math.floor(i/ TASK_TEMPLATES.length);
     const n = Math.max(1, Math.round(tpl.base * Math.pow(tpl.mult, tier) * (1 + state.level*0.05)));
     arr.push({
@@ -1093,10 +1125,9 @@ function openTasks(){
   const head = el('div','', `<div style="text-align:center;font-size:12px;color:#8f7bb0;margin-bottom:14px">${t('tasksRefresh')} ${hh}${t('hours')} ${mm}${t('minutes')}</div>`);
   list.appendChild(head);
 
-  state.tasks.forEach((tk, idx)=>{
+  state.tasks.forEach((tk)=>{
     const done = tk.progress>=tk.target;
     const div = el('div','task'+(done&&!tk.claimed?' done':''));
-    const tpl = TASK_TEMPLATES.find(x=>x.id===tk.tid);
     div.innerHTML = `
       <div class="ti" style="color:#c9a8ff">${SVG.scroll}</div>
       <div class="tinfo2">
@@ -1175,7 +1206,7 @@ function openDaily(){
     const hh = Math.floor(left/3600000), mm = Math.floor((left%3600000)/60000);
     hint.textContent = t('dailyWait') + ' ' + hh + t('hours') + ' ' + mm + t('minutes');
   } else {
-    hint.textContent = t('dailyHint');
+    hint.textContent = state.lang==='ru'?'Заходите каждый день и получайте кристаллы душ и сундук!':'Log in daily for soul crystals and a chest!';
   }
 }
 $('#dailyClaim').onclick = ()=>{
@@ -1189,44 +1220,107 @@ $('#dailyClaim').onclick = ()=>{
   openChestModal(()=>{ openDaily(); renderLobby(); });
 };
 
-/* ---------- ПЕРСОНАЖИ ---------- */
+/* ---------- ПЕРСОНАЖИ (с выбором отряда) ---------- */
 function openChars(){
   showScreen('scr-chars');
   $('#charsTitle').textContent = t('chars');
+  $('#charsSlotsTitle').textContent = t('squadTitle');
   const sum = charBonus();
   $('#charsSummary').innerHTML = `${t('allChars')}: <b style="color:#ffd766">${state.chars.length}/${CHARS.length}</b> &nbsp;|&nbsp;
     ${t('bonusDmg')}: <b style="color:#ff9bb0">+${sum.dmg}%</b> &nbsp;
     ${t('bonusRange')}: <b style="color:#7fd8ff">+${sum.range}%</b> &nbsp;
-    ${t('bonusGold')}: <b style="color:#ffd766">+${sum.gold}%</b>`;
+    ${t('bonusGold')}: <b style="color:#ffd766">+${sum.gold}%</b>
+    <div style="font-size:11px;color:#5a4a7a;margin-top:6px">${t('squadHint')}</div>`;
+
+  const body = $('#scr-chars .panel-body');
+  let slots = body.querySelector('.slots-row');
+  if(!slots){
+    slots = el('div','slots-row');
+    slots.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;';
+    const title = body.querySelector('#charsSlotsTitle');
+    if(title) title.after(slots); else body.insertBefore(slots, body.firstChild);
+  }
+  slots.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const cid = state.selectedChars[i];
+    const c = cid ? charTowerDef(cid) : null;
+    const slot = el('div','slot');
+    slot.style.cssText=`aspect-ratio:1;border:2px dashed ${c?'#b47bff':'#3d2266'};border-radius:14px;background:${c?'linear-gradient(180deg,#26143e,#150c24)':'#100821'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;position:relative;cursor:${c?'pointer':'default'}`;
+    if(c){
+      slot.innerHTML = `<div style="width:44px;height:44px;color:${c.color}">${c.icon}</div>
+        <div style="font-size:9px;color:#c0a8e8;text-align:center;line-height:1.05">${state.lang==='ru'?c.ru:c.en}</div>`;
+      slot.onclick = ()=>{
+        state.selectedChars = state.selectedChars.filter(id=>id!==c.id);
+        if(state.selectedChars.length===0) state.selectedChars=[c.id];
+        saveGame(true); openChars();
+      };
+    } else {
+      slot.innerHTML = `<div style="font-size:22px;color:#3d2266">+</div><div style="font-size:9px;color:#5a4a7a">${state.lang==='ru'?'свободно':'free'}</div>`;
+    }
+    slots.appendChild(slot);
+  }
+
   const grid = $('#charsGrid');
   grid.innerHTML='';
   const order = {common:0, epic:1, legendary:2, mythic:3};
   const sorted = CHARS.slice().sort((a,b)=> order[a.r]-order[b.r]);
   sorted.forEach(c=>{
     const owned = state.chars.includes(c.id);
+    const selected = state.selectedChars.includes(c.id);
     const card = el('div','char-card '+c.r+(owned?' owned':' locked'));
-    const b = c.bonus;
+    if(selected){ card.style.outline='2px solid #ffd766'; card.style.boxShadow='0 0 18px rgba(255,215,102,.6)'; }
     const bl = [];
-    if(b.dmg) bl.push('+'+b.dmg+'% '+t('bonusDmg'));
-    if(b.range) bl.push('+'+b.range+'% '+t('bonusRange'));
-    if(b.gold) bl.push('+'+b.gold+'% '+t('bonusGold'));
+    bl.push('⚔ '+c.dmg);
+    if(c.splash) bl.push('✦ '+c.splash);
+    if(c.slow) bl.push('❄ '+(c.slow*100|0)+'%');
+    if(c.poison) bl.push('☣ '+c.poison);
+    if(c.chain) bl.push('⚡ '+c.chain);
+    if(c.instakill) bl.push('☠ '+(c.instakill*100|0)+'%');
+    if(c.drain) bl.push('💧');
+    if(c.goldBonus) bl.push('🪙 +'+c.goldBonus+'%');
+    if(c.aura) bl.push('✨ aura');
     card.innerHTML = `
-      ${owned? ghostSVG(c.color, {angry:c.r==='mythic'||c.r==='legendary'}) : SVG.lock}
+      ${owned? `<div style="width:44px;height:44px;color:${c.color}">${c.icon}</div>` : SVG.lock}
       <div class="cn">${owned? (state.lang==='ru'?c.ru:c.en) : '???'}</div>
       <div class="cb">${owned? bl.join(' · ') : t('notOwned')}</div>
+      ${selected?'<div style="position:absolute;top:4px;right:4px;font-size:14px;color:#ffd766">✓</div>':''}
     `;
     card.style.color = c.color;
+    if(owned){
+      card.onclick = ()=>{
+        const i = state.selectedChars.indexOf(c.id);
+        if(i>=0){
+          if(state.selectedChars.length>1){ state.selectedChars.splice(i,1); }
+        } else {
+          if(state.selectedChars.length>=4){ state.selectedChars.shift(); }
+          state.selectedChars.push(c.id);
+        }
+        saveGame(true); openChars(); renderLobby();
+      };
+    }
     grid.appendChild(card);
   });
 }
 function charBonus(){
   let dmg=0, range=0, gold=0;
   state.chars.forEach(id=>{
-    const c = CHARS.find(x=>x.id===id);
+    const c = charTowerDef(id);
     if(!c) return;
-    dmg += c.bonus.dmg||0;
-    range += c.bonus.range||0;
-    gold += c.bonus.gold||0;
+    if(c.rarityBonus){ dmg+=c.rarityBonus; }
+  });
+  // Бонус от редкости: epic +5% dmg, legendary +12% dmg +5% range, mythic +25% dmg +15% range +20% gold
+  state.chars.forEach(id=>{
+    const c = charTowerDef(id);
+    if(!c) return;
+    if(c.r==='epic'){ dmg+=5; }
+    if(c.r==='legendary'){ dmg+=12; range+=5; }
+    if(c.r==='mythic'){ dmg+=25; range+=15; gold+=20; }
+  });
+  // Бонус от выбранных
+  state.selectedChars.forEach(id=>{
+    const c = charTowerDef(id);
+    if(!c) return;
+    if(c.goldBonus) gold += c.goldBonus;
   });
   return {dmg, range, gold};
 }
@@ -1280,7 +1374,6 @@ $('#twStart').onclick = ()=>{ playClick(); startLevel(state.towerFloor, true); }
 
 /* ---------- СУНДУК ---------- */
 function pickRandomChar(){
-  // взвешенный выбор по редкости
   const byRarity = {common:[],epic:[],legendary:[],mythic:[]};
   CHARS.forEach(c=>byRarity[c.r].push(c));
   const roll = Math.random()*100;
@@ -1292,11 +1385,20 @@ function pickRandomChar(){
   const pool = byRarity[rarity];
   return pool[Math.floor(Math.random()*pool.length)];
 }
+function chestSVG(){
+  return `<svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f"/>
+    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a"/>
+    <rect x="27" y="34" width="10" height="16" rx="3" fill="#ffd766"/>
+    <circle cx="32" cy="42" r="3" fill="#5c3a00"/>
+    <circle cx="32" cy="14" r="3" fill="#ffeeb8" opacity=".9"/>
+  </svg>`;
+}
 function openChestModal(after){
   if(state.chests<=0){
-    openModal(`<h3>${t('chests')}</h3><p>${state.lang==='ru'?'У вас нет сундуков. Побеждайте на уровнях!':'You have no chests. Win levels!'}</p>
+    const m = openModal(`<h3>${t('chests')}</h3><p>${state.lang==='ru'?'У вас нет сундуков. Побеждайте на уровнях!':'You have no chests. Win levels!'}</p>
       <div class="row"><button class="btn primary" id="mOk">OK</button></div>`);
-    $('#mOk').onclick = ()=>{ closeModal(); after&&after(); };
+    m.querySelector('#mOk').onclick = ()=>{ closeModal(); after&&after(); };
     return;
   }
   state.chests--;
@@ -1324,6 +1426,9 @@ function openChestModal(after){
       state.gems += bonusGems;
     } else {
       state.chars.push(c.id);
+      if(state.selectedChars.length<4){
+        state.selectedChars.push(c.id);
+      }
     }
     saveGame(true);
 
@@ -1333,11 +1438,11 @@ function openChestModal(after){
     setTimeout(()=>{
       const m2 = openModal(`
         <h3 style="color:${color}">${isNew? t('newChar') : rarName}</h3>
-        <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${ghostSVG(c.color,{angry:c.r==='legendary'||c.r==='mythic'})}</div>
+        <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${c.icon}</div>
         <div style="font-size:17px;font-weight:bold;color:${color};margin-bottom:6px">${state.lang==='ru'?c.ru:c.en}</div>
         <div style="font-size:12px;color:${color};letter-spacing:2px;margin-bottom:12px">${rarName.toUpperCase()}</div>
         ${isNew
-          ? `<p>${t('youGot')}: ${c.bonus.dmg?('+'+c.bonus.dmg+'% '+t('bonusDmg')+' '):''}${c.bonus.range?('+'+c.bonus.range+'% '+t('bonusRange')+' '):''}${c.bonus.gold?('+'+c.bonus.gold+'% '+t('bonusGold')):''}</p>`
+          ? `<p>${t('youGot')}: ${c.desc[state.lang==='ru'?'ru':'en']}</p>`
           : `<p style="color:#ffd766">${t('duplicate').replace('{n}', fmt(bonusGems))}</p>`}
         <div class="row">
           <button class="btn primary" id="mOk">OK</button>
@@ -1349,52 +1454,6 @@ function openChestModal(after){
   chestView.onclick = doOpen;
   m.querySelector('#chestMsg').onclick = doOpen;
 }
-function chestSVG(){
-  return `<svg viewBox="0 0 64 64" width="100%" height="100%">
-    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f"/>
-    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a"/>
-    <rect x="27" y="34" width="10" height="16" rx="3" fill="#ffd766"/>
-    <circle cx="32" cy="42" r="3" fill="#5c3a00"/>
-    <circle cx="32" cy="14" r="3" fill="#ffeeb8" opacity=".9"/>
-  </svg>`;
-}
-function playChestSound(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='triangle'; o.frequency.setValueAtTime(440, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.25);
-    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.4);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.45);
-  }catch(e){}
-}
-
-/* ---------- ЗВУКИ ---------- */
-function playClick(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sine'; o.frequency.value = 620;
-    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.12);
-  }catch(e){}
-}
-function playCoin(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='square'; o.frequency.setValueAtTime(880, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime+0.1);
-    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.18);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.2);
-  }catch(e){}
-}
 
 /* ============================================================
    ИГРОВОЙ ДВИЖОК
@@ -1403,7 +1462,6 @@ let canvas, ctx;
 let game = null;
 let lastTs = 0;
 let rafId = null;
-let globalPaused = false;
 
 function initCanvas(){
   canvas = $('#gameCanvas');
@@ -1427,7 +1485,41 @@ function resizeCanvas(){
   canvas.style.top = ((h-ch)/2)+'px';
 }
 
+function buildLevelConfig(L, isTower){
+  const ecoScale = Math.pow(1.075, Math.min(L,500)-1);
+  const hpScale  = Math.pow(1.081, Math.min(L,500)-1) * (1 + Math.min(L,500)/220);
+  const waves = Math.min(16, 4 + Math.floor(L/22) + (isTower? 2:0));
+  const perWave = Math.min(22, 5 + Math.floor(L/16));
+  const enemySpeed = Math.min(78, 30 + L*0.11);
+  const isBossLevel = (!isTower) && (L % 5 === 0);
+  const lives = isTower ? 10 : 20;
+  const startCoins = Math.floor(160 * ecoScale);
+  const rewardPerKill = Math.max(3, Math.floor((4 + L*0.5) * ecoScale));
+  const gemReward = Math.floor((12 + L*2.2) * (1 + Math.min(L,500)/160));
+  return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
+}
+
+function genDecorations(){
+  const types = ['grave','tree','pumpkin','candle','cobweb','bones','skull','candle','tree','grave'];
+  const deco = [];
+  for(let y=0;y<GRID_H;y++){
+    for(let x=0;x<GRID_W;x++){
+      if(PATH_BLOCK.has(x+','+y)) continue;
+      let nearPath=false;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+        if(PATH_BLOCK.has((x+dx)+','+(y+dy))) nearPath=true;
+      }
+      if(nearPath) continue;
+      if(Math.random() < 0.16){
+        deco.push({x, y, type: types[Math.floor(Math.random()*types.length)]});
+      }
+    }
+  }
+  return deco;
+}
+
 function startLevel(levelNum, isTower){
+  ensureStarter();
   const cfg = buildLevelConfig(levelNum, isTower);
   game = {
     level: levelNum,
@@ -1443,6 +1535,7 @@ function startLevel(levelNum, isTower){
     towers: [],
     projectiles: [],
     particles: [],
+    decorations: genDecorations(),
     selectedTowerType: null,
     selectedTower: null,
     spawnQueue: [],
@@ -1458,9 +1551,7 @@ function startLevel(levelNum, isTower){
     builtCount: 0,
     bossKilled: 0,
     time: 0,
-    hoverCell: null,
-    tutorialStep: 0,
-    isTutorial: false
+    hoverCell: null
   };
   ABILITIES.forEach(a=>{ if(state.abilities.includes(a.id)) game.abilityCd[a.id]=0; });
 
@@ -1470,28 +1561,12 @@ function startLevel(levelNum, isTower){
   renderGameHud();
   playClick();
 
-  // Пауза + реклама перед началом
   game.paused = true;
   showInterstitial(()=>{
     if(game) game.paused = false;
     lastTs = 0;
     startLoop();
   });
-}
-
-function buildLevelConfig(L, isTower){
-  const ecoScale = Math.pow(1.075, Math.min(L,500)-1);
-  const hpScale  = Math.pow(1.081, Math.min(L,500)-1) * (1 + Math.min(L,500)/220);
-  const waves = Math.min(16, 4 + Math.floor(L/22) + (isTower? 2:0));
-  const perWave = Math.min(22, 5 + Math.floor(L/16));
-  const enemySpeed = Math.min(78, 30 + L*0.11);
-  const isBossLevel = (!isTower) && (L % 5 === 0);
-  const lives = isTower ? 10 : 20;
-  const startCoins = Math.floor(160 * ecoScale);
-  const rewardPerKill = Math.max(3, Math.floor((4 + L*0.5) * ecoScale));
-  const gemReward = Math.floor((12 + L*2.2) * (1 + Math.min(L,500)/160));
-
-  return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
 }
 
 function startLoop(){
@@ -1505,35 +1580,27 @@ function loop(ts){
   let dt = (ts - lastTs)/1000;
   lastTs = ts;
   dt = Math.min(dt, 0.05);
-  if(!game.paused && !globalPaused && !game.finished){
+  if(!game.paused && !game.finished){
     update(dt * game.speedMul);
   }
   render();
   rafId = requestAnimationFrame(loop);
 }
 
-/* ---------- ОБНОВЛЕНИЕ ---------- */
 function update(dt){
   game.time += dt;
-
-  // Баффы
   if(game.buffs.gold>0) game.buffs.gold = Math.max(0, game.buffs.gold-dt);
   if(game.buffs.rage>0) game.buffs.rage = Math.max(0, game.buffs.rage-dt);
 
-  // Способности КД
   ABILITIES.forEach(a=>{
     if(game.abilityCd[a.id]>0) game.abilityCd[a.id] = Math.max(0, game.abilityCd[a.id]-dt);
   });
 
-  // Спавн волн
   if(!game.waveActive && !game.spawnQueue.length && game.wave < game.totalWaves){
     game.waveDelay -= dt;
-    if(game.waveDelay<=0){
-      startWave();
-    }
+    if(game.waveDelay<=0) startWave();
   }
 
-  // Спавн врагов
   if(game.spawnQueue.length){
     game.spawnTimer -= dt;
     if(game.spawnTimer<=0){
@@ -1544,7 +1611,6 @@ function update(dt){
     }
   }
 
-  // Проверка завершения волны
   if(game.waveActive && !game.spawnQueue.length && game.enemies.length===0){
     game.waveActive = false;
     game.waveDelay = 2.2;
@@ -1556,24 +1622,20 @@ function update(dt){
     }
   }
 
-  // Враги
   const bonus = charBonus();
   for(let i=game.enemies.length-1;i>=0;i--){
     const e = game.enemies[i];
-    // замедление
     let spd = e.speed;
     if(e.slowT>0){ e.slowT -= dt; spd *= (1 - (e.slowAmt||0)); }
     if(e.freezeT>0){ e.freezeT -= dt; spd = 0; }
-    // яд
     if(e.poisonT>0){
       e.poisonT -= dt;
       e.hp -= e.poisonDps*dt;
       if(Math.random()<0.15) spawnParticle(e.x, e.y, '#8fd14f', 1);
     }
 
-    // движение
     const tgt = PATH_PX[e.pathIdx+1];
-    if(!tgt){ // дошли до конца
+    if(!tgt){
       game.enemies.splice(i,1);
       game.lives -= (e.boss?5:1);
       playHitSound();
@@ -1590,45 +1652,40 @@ function update(dt){
     }
 
     if(e.hp<=0){
-      // смерть
       game.enemies.splice(i,1);
       const mult = 1 + (game.buffs.gold>0?1:0);
-      const goldBonus = 1 + (bonus.gold/100);
+      let goldBonus = 1 + (bonus.gold/100);
       const gold = Math.floor(game.cfg.rewardPerKill * (e.boss?14:1) * mult * goldBonus);
       game.coins += gold;
       game.killCount++;
       if(e.boss) game.bossKilled++;
       for(let k=0;k<(e.boss?22:6);k++) spawnParticle(e.x,e.y, e.color, 1);
-      if(e.boss){ playBossDeath(); toast(t('bossIncoming')+' ✔', 1200); }
+      if(e.boss){ playBossDeath(); }
       addTaskProgress('kill', 1);
       if(e.boss) addTaskProgress('boss', 1);
       continue;
     }
   }
 
-  // Башни
   for(const tower of game.towers){
     if(tower.cd>0){ tower.cd -= dt; continue; }
-    const tdef = TOWERS[tower.type];
     const stats = getTowerStats(tower);
-    // поиск цели
     let target = null, bestDist = -1;
     for(const e of game.enemies){
       const d = Math.hypot(e.x-tower.x, e.y-tower.y);
       if(d <= stats.range){
-        // приоритет — дальше по пути
         const score = e.pathIdx*1000 + d;
         if(score > bestDist){ bestDist = score; target = e; }
       }
     }
     if(target){
       tower.cd = stats.rate;
+      tower.maxCd = stats.rate;
       tower.angle = Math.atan2(target.y-tower.y, target.x-tower.x);
       fireTower(tower, target, stats);
     }
   }
 
-  // Снаряды
   for(let i=game.projectiles.length-1;i>=0;i--){
     const p = game.projectiles[i];
     p.life -= dt;
@@ -1645,7 +1702,6 @@ function update(dt){
     }
   }
 
-  // Частицы
   for(let i=game.particles.length-1;i>=0;i--){
     const pa = game.particles[i];
     pa.life -= dt;
@@ -1684,7 +1740,7 @@ function makeEnemy(type, cfg, boss){
                 zombie:{hp:1.7, speed:0.72, color:'#7fa87f', size:16},
                 boss:{hp:22, speed:0.62, color:'#c2243c', size:26}}[type];
   const L = cfg.L;
-  const hp = Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012) * (boss?1:1));
+  const hp = Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012));
   return {
     x: PATH_PX[0].x, y: PATH_PX[0].y,
     pathIdx: 0,
@@ -1700,50 +1756,48 @@ function makeEnemy(type, cfg, boss){
 }
 
 function getTowerStats(tower){
-  const def = TOWERS[tower.type];
+  const c = charTowerDef(tower.type);
+  if(!c) return {dmg:0, range:0, rate:1};
   const lvl = tower.level;
   const lvlMul = 1 + (lvl-1)*0.42;
   const bonus = charBonus();
   const rage = game.buffs.rage>0 ? 2 : 1;
   const auraBonus = 1 + (tower.auraBuff||0)/100;
   return {
-    dmg: def.dmg * lvlMul * (1 + bonus.dmg/100) * rage * auraBonus * game.cfg.ecoScale,
-    range: def.range * (1 + (lvl-1)*0.06) * (1 + bonus.range/100),
-    rate: def.rate / (1 + (lvl-1)*0.08),
-    splash: def.splash || 0,
-    slow: def.slow || 0,
-    slowDur: def.slowDur || 0,
-    poison: def.poison || 0,
-    poisonDur: def.poisonDur || 0,
-    chain: def.chain || 0,
-    instakill: def.instakill || 0,
-    drain: def.drain || false,
-    aura: def.aura || false
+    dmg: c.dmg * lvlMul * (1 + bonus.dmg/100) * rage * auraBonus * game.cfg.ecoScale,
+    range: c.range * (1 + (lvl-1)*0.06) * (1 + bonus.range/100),
+    rate: c.rate / (1 + (lvl-1)*0.08),
+    splash: c.splash || 0,
+    slow: c.slow || 0,
+    slowDur: c.slowDur || 0,
+    poison: c.poison || 0,
+    poisonDur: c.poisonDur || 0,
+    chain: c.chain || 0,
+    instakill: c.instakill || 0,
+    drain: c.drain || false,
+    aura: c.aura || false
   };
 }
 
 function fireTower(tower, target, stats){
-  const def = TOWERS[tower.type];
-  const color = def.color;
+  const c = charTowerDef(tower.type);
+  if(!c) return;
+  const color = c.color;
 
-  if(tower.type==='storm' && stats.chain>1){
-    // цепная молния — мгновенно
+  if(c.chain && c.chain>1){
     let hit = [target];
     let cur = target;
-    for(let i=1;i<stats.chain;i++){
+    for(let i=1;i<c.chain;i++){
       let best=null, bd=1e9;
       for(const e of game.enemies){
         if(hit.includes(e)) continue;
         const d = Math.hypot(e.x-cur.x, e.y-cur.y);
-        if(d<110 && d<bd){ bd=d; best=e; }
+        if(d<115 && d<bd){ bd=d; best=e; }
       }
       if(!best) break;
       hit.push(best); cur=best;
     }
-    hit.forEach((e,idx)=>{
-      damageEnemy(e, stats.dmg*(idx===0?1:0.7), tower);
-    });
-    // визуал молнии
+    hit.forEach((e,idx)=>damageEnemy(e, stats.dmg*(idx===0?1:0.7), tower));
     let prev = {x:tower.x, y:tower.y};
     hit.forEach(e=>{
       game.projectiles.push({x:e.x, y:e.y, life:0.12, homing:false, vx:0, vy:0, speed:0,
@@ -1753,7 +1807,6 @@ function fireTower(tower, target, stats){
     return;
   }
 
-  // обычный снаряд
   const dx = target.x - tower.x, dy = target.y - tower.y;
   const d = Math.hypot(dx,dy) || 1;
   const speed = 420;
@@ -1767,7 +1820,7 @@ function fireTower(tower, target, stats){
     slow: stats.slow, slowDur: stats.slowDur,
     poison: stats.poison, poisonDur: stats.poisonDur,
     instakill: stats.instakill, drain: stats.drain,
-    type: def.proj, color, tower
+    type: 'proj', color, tower
   });
 }
 
@@ -1788,16 +1841,19 @@ function onProjectileHit(p){
 }
 
 function damageEnemy(e, dmg, tower){
-  if(e.dead) return;
-  if(tower && tower.type==='reaper' && Math.random() < (TOWERS.reaper.instakill||0)){
-    dmg = e.hp + 1;
-    spawnParticle(e.x,e.y,'#ff5f7e',2.4);
+  if(!e || e.dead) return;
+  if(tower){
+    const c = charTowerDef(tower.type);
+    if(c && c.instakill && Math.random() < c.instakill){
+      dmg = e.hp + 1;
+      spawnParticle(e.x,e.y,'#ff5f7e',2.4);
+    }
   }
   e.hp -= dmg;
   spawnParticle(e.x, e.y, '#ff9bb0', 0.8);
-  if(e.hp<=0 && tower && tower.type==='soul' && TOWERS.soul.drain){
-    state.gems += 1;
-    game.gemsEarned += 1;
+  if(e.hp<=0 && tower){
+    const c = charTowerDef(tower.type);
+    if(c && c.drain){ state.gems += 1; game.gemsEarned += 1; }
   }
 }
 
@@ -1813,40 +1869,14 @@ function spawnParticle(x,y,color,scale){
     size: 2 + Math.random()*2.5*scale
   });
 }
-function playHitSound(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sawtooth'; o.frequency.setValueAtTime(180, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime+0.25);
-    g.gain.setValueAtTime(0.08, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.3);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.32);
-  }catch(e){}
-}
-function playBossDeath(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sawtooth'; o.frequency.setValueAtTime(300, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime+0.7);
-    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.85);
-  }catch(e){}
-}
 
 /* ---------- ОТРИСОВКА ---------- */
 function render(){
   if(!ctx || !game) return;
 
-  // Фон
   ctx.fillStyle = '#0a0512';
   ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
-  // Пол — плитка
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
       const isPath = PATH_BLOCK.has(x+','+y);
@@ -1863,7 +1893,10 @@ function render(){
     }
   }
 
-  // Дорожка — светящаяся линия
+  // Декорации
+  drawDecorations();
+
+  // Дорожка
   ctx.strokeStyle = 'rgba(138,75,214,0.14)';
   ctx.lineWidth = 30;
   ctx.lineCap = 'round';
@@ -1873,7 +1906,6 @@ function render(){
   for(let i=1;i<PATH_PX.length;i++) ctx.lineTo(PATH_PX[i].x, PATH_PX[i].y);
   ctx.stroke();
 
-  // Свечение финиша
   const exitP = PATH_PX[PATH_PX.length-1];
   const grad = ctx.createRadialGradient(exitP.x, exitP.y, 0, exitP.x, exitP.y, 60);
   grad.addColorStop(0, 'rgba(255,95,126,0.35)');
@@ -1881,7 +1913,6 @@ function render(){
   ctx.fillStyle = grad;
   ctx.fillRect(exitP.x-60, exitP.y-60, 120, 120);
 
-  // Подсветка выбранной клетки
   if(game.hoverCell && game.selectedTowerType){
     const {x,y} = game.hoverCell;
     const canBuild = canBuildAt(x,y);
@@ -1892,10 +1923,8 @@ function render(){
     ctx.strokeRect(x*CELL+2, y*CELL+2, CELL-4, CELL-4);
   }
 
-  // Башни
   for(const tower of game.towers) drawTower(tower);
 
-  // Радиус выделенной башни
   if(game.selectedTower){
     const st = getTowerStats(game.selectedTower);
     ctx.beginPath();
@@ -1907,13 +1936,9 @@ function render(){
     ctx.setLineDash([]);
   }
 
-  // Враги
   for(const e of game.enemies) drawEnemy(e);
-
-  // Снаряды
   for(const p of game.projectiles) drawProjectile(p);
 
-  // Частицы
   for(const pa of game.particles){
     const a = Math.max(0, pa.life / pa.maxLife);
     ctx.globalAlpha = a;
@@ -1924,7 +1949,6 @@ function render(){
   }
   ctx.globalAlpha = 1;
 
-  // Индикатор паузы
   if(game.paused && !game.finished){
     ctx.fillStyle = 'rgba(5,2,10,0.6)';
     ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
@@ -1935,39 +1959,108 @@ function render(){
   }
 }
 
+function drawDecorations(){
+  if(!game || !game.decorations) return;
+  for(const d of game.decorations){
+    const cx=d.x*CELL+CELL/2, cy=d.y*CELL+CELL/2;
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    if(d.type==='grave'){
+      ctx.fillStyle='#4a4a5a';
+      ctx.beginPath();
+      ctx.moveTo(cx-11, cy+13);
+      ctx.lineTo(cx-11, cy-4);
+      ctx.arc(cx, cy-4, 11, Math.PI, 0);
+      ctx.lineTo(cx+11, cy+13);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle='#7a7a8a'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.strokeStyle='#2a2a3a'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(cx,cy-8); ctx.lineTo(cx,cy+6);
+      ctx.moveTo(cx-5,cy-2); ctx.lineTo(cx+5,cy-2); ctx.stroke();
+    } else if(d.type==='tree'){
+      ctx.fillStyle='#2a1a2a';
+      ctx.fillRect(cx-3, cy-6, 6, 20);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy-22); ctx.lineTo(cx-14, cy-2); ctx.lineTo(cx+14, cy-2);
+      ctx.closePath(); ctx.fillStyle='#1a2a1a'; ctx.fill();
+      ctx.strokeStyle='#3a4a3a'; ctx.lineWidth=1.5; ctx.stroke();
+    } else if(d.type==='pumpkin'){
+      ctx.fillStyle='#c25a15';
+      ctx.beginPath(); ctx.ellipse(cx,cy+2,10,8,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#3a7a2a'; ctx.fillRect(cx-2, cy-12, 4, 5);
+      ctx.fillStyle='#2a1000';
+      ctx.beginPath(); ctx.moveTo(cx-5,cy); ctx.lineTo(cx-1,cy+2); ctx.lineTo(cx-5,cy+4); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx+5,cy); ctx.lineTo(cx+1,cy+2); ctx.lineTo(cx+5,cy+4); ctx.closePath(); ctx.fill();
+    } else if(d.type==='candle'){
+      ctx.fillStyle='#ffe8b0'; ctx.fillRect(cx-3, cy-4, 6, 14);
+      ctx.fillStyle='#ffb347';
+      ctx.beginPath(); ctx.ellipse(cx, cy-7, 3, 5, 0, 0, Math.PI*2); ctx.fill();
+      const g = ctx.createRadialGradient(cx,cy-7,0,cx,cy-7,16);
+      g.addColorStop(0,'rgba(255,180,80,0.35)'); g.addColorStop(1,'rgba(255,180,80,0)');
+      ctx.fillStyle=g; ctx.fillRect(cx-16,cy-23,32,32);
+    } else if(d.type==='cobweb'){
+      ctx.strokeStyle='rgba(200,200,220,0.4)'; ctx.lineWidth=1;
+      for(let i=0;i<4;i++){
+        ctx.beginPath();
+        const a = i*Math.PI/2;
+        ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*14, cy+Math.sin(a)*14);
+        ctx.stroke();
+      }
+      for(let r=4;r<=14;r+=5){
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.stroke();
+      }
+    } else if(d.type==='bones'){
+      ctx.fillStyle='#d8d0c0';
+      ctx.fillRect(cx-10,cy,14,3);
+      ctx.beginPath(); ctx.arc(cx-12,cy+1.5,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+6,cy+1.5,3,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+6,cy-4,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#0b0614';
+      ctx.beginPath(); ctx.arc(cx+5,cy-5,1,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+8,cy-5,1,0,Math.PI*2); ctx.fill();
+    } else if(d.type==='skull'){
+      ctx.fillStyle='#d8d0c0';
+      ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#0b0614';
+      ctx.beginPath(); ctx.arc(cx-3,cy-1,2,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+3,cy-1,2,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(cx-4,cy+4,2,3); ctx.fillRect(cx-1,cy+4,2,3); ctx.fillRect(cx+2,cy+4,2,3);
+    }
+    ctx.restore();
+  }
+}
+
 function drawTower(tower){
-  const def = TOWERS[tower.type];
+  const c = charTowerDef(tower.type);
+  if(!c) return;
   const x = tower.x, y = tower.y;
   const s = 16;
 
-  // основание
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
   ctx.ellipse(x, y+7, s*0.85, s*0.4, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // платформа
   ctx.fillStyle = '#2a1a42';
   ctx.beginPath();
   ctx.ellipse(x, y+4, s*0.8, s*0.38, 0, 0, Math.PI*2);
   ctx.fill();
-  ctx.strokeStyle = def.color;
+  ctx.strokeStyle = c.color;
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // тело башни
   ctx.save();
   ctx.translate(x,y);
   ctx.rotate(tower.angle || 0);
-  // ствол
-  ctx.fillStyle = def.color;
+  ctx.fillStyle = c.color;
   ctx.fillRect(0, -3, s*0.9, 6);
   ctx.restore();
 
-  // купол
   ctx.beginPath();
   ctx.arc(x, y-2, s*0.55, 0, Math.PI*2);
-  ctx.fillStyle = def.color;
+  ctx.fillStyle = c.color;
   ctx.fill();
   ctx.globalAlpha = 0.35;
   ctx.beginPath();
@@ -1976,13 +2069,12 @@ function drawTower(tower){
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  // уровень
   if(tower.level>1){
     ctx.fillStyle = '#0b0614';
     ctx.beginPath();
     ctx.arc(x+s*0.7, y-s*0.7, 7, 0, Math.PI*2);
     ctx.fill();
-    ctx.strokeStyle = def.color;
+    ctx.strokeStyle = c.color;
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.fillStyle = '#ffe6a3';
@@ -1991,7 +2083,6 @@ function drawTower(tower){
     ctx.fillText(tower.level, x+s*0.7, y-s*0.7+0.5);
   }
 
-  // индикатор кулдауна
   if(tower.cd>0 && tower.maxCd>0){
     const p = 1 - tower.cd/tower.maxCd;
     ctx.strokeStyle = 'rgba(255,215,102,0.7)';
@@ -2005,13 +2096,11 @@ function drawTower(tower){
 function drawEnemy(e){
   const x = e.x, y = e.y;
   const s = e.size;
-  // тень
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
   ctx.beginPath();
   ctx.ellipse(x, y+s*0.85, s*0.8, s*0.3, 0,0,Math.PI*2);
   ctx.fill();
 
-  // тело призрака
   ctx.beginPath();
   ctx.moveTo(x-s, y+s*0.6);
   ctx.quadraticCurveTo(x-s, y-s*0.9, x, y-s*0.9);
@@ -2022,8 +2111,7 @@ function drawEnemy(e){
   ctx.lineTo(x-s*0.6, y+s*0.6);
   ctx.closePath();
 
-  const isBoss = e.boss;
-  if(isBoss){
+  if(e.boss){
     const g = ctx.createRadialGradient(x,y-s*0.3,0,x,y, s*2);
     g.addColorStop(0, '#ff5f7e');
     g.addColorStop(1, 'rgba(194,36,60,0)');
@@ -2036,7 +2124,7 @@ function drawEnemy(e){
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  if(isBoss){
+  if(e.boss){
     ctx.strokeStyle = '#ffd766';
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -2052,19 +2140,17 @@ function drawEnemy(e){
     ctx.stroke();
   }
 
-  // глаза
-  ctx.fillStyle = isBoss ? '#ffd766' : '#0b0614';
+  ctx.fillStyle = e.boss ? '#ffd766' : '#0b0614';
   ctx.beginPath(); ctx.arc(x-s*0.32, y-s*0.28, s*0.16, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(x+s*0.32, y-s*0.28, s*0.16, 0, Math.PI*2); ctx.fill();
 
-  // HP-бар
   if(e.hp < e.maxHp){
     const w = s*2.2, h = 4;
     const hx = x-w/2, hy = y - s*1.35;
     ctx.fillStyle = 'rgba(0,0,0,0.65)';
     ctx.fillRect(hx-1, hy-1, w+2, h+2);
     const ratio = Math.max(0, e.hp/e.maxHp);
-    ctx.fillStyle = isBoss ? '#ff5f7e' : (ratio>0.5 ? '#7ee6c0' : (ratio>0.25 ? '#ffd766' : '#ff5f7e'));
+    ctx.fillStyle = e.boss ? '#ff5f7e' : (ratio>0.5 ? '#7ee6c0' : (ratio>0.25 ? '#ffd766' : '#ff5f7e'));
     ctx.fillRect(hx, hy, w*ratio, h);
   }
 }
@@ -2081,13 +2167,11 @@ function drawProjectile(p){
     ctx.globalAlpha = 1;
     return;
   }
-  const colors = {fire:'#ffb347', ice:'#7fd8ff', bone:'#e8e0c0', poison:'#8fd14f', soul:'#ff5f7e', void:'#00ffcc', bolt:'#c39bff'};
-  const c = p.color || colors[p.type] || '#fff';
   ctx.beginPath();
   ctx.arc(p.x, p.y, p.splash>0 ? 7 : 4.5, 0, Math.PI*2);
-  ctx.fillStyle = c;
+  ctx.fillStyle = p.color;
   ctx.shadowBlur = 10;
-  ctx.shadowColor = c;
+  ctx.shadowColor = p.color;
   ctx.fill();
   ctx.shadowBlur = 0;
 }
@@ -2097,32 +2181,23 @@ function onCanvasPointer(ev){
   if(!game || game.paused || game.finished) return;
   ev.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const clientX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] ? ev.touches[0].clientX : 0);
-  const clientY = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] ? ev.touches[0].clientY : 0);
+  const clientX = ev.clientX != null ? ev.clientX : 0;
+  const clientY = ev.clientY != null ? ev.clientY : 0;
   const px = (clientX - rect.left) * (CANVAS_W / rect.width);
   const py = (clientY - rect.top) * (CANVAS_H / rect.height);
   const cx = Math.floor(px / CELL), cy = Math.floor(py / CELL);
   if(cx<0||cy<0||cx>=GRID_W||cy>=GRID_H) return;
 
-  // режим способности
   if(pendingAbility){
     useAbilityAt(pendingAbility, px, py);
     return;
   }
 
-  // проверка на существующую башню
   const existing = game.towers.find(tw => tw.cx===cx && tw.cy===cy);
-  if(existing){
-    selectTower(existing);
-    return;
-  }
+  if(existing){ selectTower(existing); return; }
 
-  // размещение
-  if(game.selectedTowerType){
-    placeTower(cx, cy);
-    return;
-  }
-  // просто снять выделение
+  if(game.selectedTowerType){ placeTower(cx, cy); return; }
+
   game.selectedTower = null;
   hideTowerPopup();
 }
@@ -2132,28 +2207,30 @@ function canBuildAt(cx, cy){
   if(game.towers.some(tw=>tw.cx===cx && tw.cy===cy)) return false;
   return true;
 }
-function towerCost(type){
-  return Math.floor(TOWERS[type].cost * game.cfg.ecoScale);
+function towerCost(charId){
+  const c = charTowerDef(charId);
+  return c ? Math.floor(c.cost * game.cfg.ecoScale) : 50;
 }
 function placeTower(cx, cy){
   if(!canBuildAt(cx,cy)){ toast(state.lang==='ru'?'Здесь нельзя строить':'Cannot build here'); return; }
   const type = game.selectedTowerType;
+  const c = charTowerDef(type);
+  if(!c) return;
   const cost = towerCost(type);
   if(game.coins < cost){ toast(state.lang==='ru'?'Недостаточно монет':'Not enough coins'); return; }
   game.coins -= cost;
-  const def = TOWERS[type];
   const tower = {
     cx, cy,
     x: cx*CELL + CELL/2,
     y: cy*CELL + CELL/2,
-    type, level: 1, cd: 0, maxCd: def.rate, angle: -Math.PI/2,
+    type, level: 1, cd: 0, maxCd: c.rate, angle: -Math.PI/2,
     auraBuff: 0
   };
   game.towers.push(tower);
   game.builtCount++;
   addTaskProgress('build', 1);
   playClick();
-  for(let i=0;i<8;i++) spawnParticle(tower.x, tower.y, def.color, 1);
+  for(let i=0;i<8;i++) spawnParticle(tower.x, tower.y, c.color, 1);
   applyAuras();
   renderGameTools();
 }
@@ -2165,14 +2242,15 @@ function selectTower(tower){
 }
 function showTowerPopup(tower){
   hideTowerPopup();
-  const def = TOWERS[tower.type];
-  const popup = el('div','tower-popup');
-  const upCost = Math.floor(def.cost * game.cfg.ecoScale * Math.pow(1.55, tower.level));
-  const sellVal = Math.floor(game.coins*0 + def.cost * game.cfg.ecoScale * Math.pow(1.4, tower.level-1) * 0.6);
+  const c = charTowerDef(tower.type);
+  if(!c) return;
+  const upCost = Math.floor(c.cost * game.cfg.ecoScale * Math.pow(1.55, tower.level));
+  const sellVal = Math.floor(c.cost * game.cfg.ecoScale * Math.pow(1.4, tower.level-1) * 0.6);
   const st = getTowerStats(tower);
+  const popup = el('div','tower-popup');
   popup.innerHTML = `
-    <div class="tinfo" style="color:${def.color};font-weight:bold">${state.lang==='ru'?def.ru:def.en} · Lv.${tower.level}</div>
-    <div class="tinfo">${state.lang==='ru'?def.desc.ru:def.desc.en}</div>
+    <div class="tinfo" style="color:${c.color};font-weight:bold">${state.lang==='ru'?c.ru:c.en} · Lv.${tower.level}</div>
+    <div class="tinfo">${c.desc[state.lang==='ru'?'ru':'en']}</div>
     <div class="tinfo">⚔ ${fmt(st.dmg)} · ◎ ${Math.round(st.range)} · ⏱ ${st.rate.toFixed(2)}s</div>
     <div class="row">
       <button class="btn gold" id="popUp">${t('upgrade')} (${fmt(upCost)})</button>
@@ -2183,8 +2261,12 @@ function showTowerPopup(tower){
     </div>
   `;
   $('#scr-game').appendChild(popup);
-  popup.style.left = Math.min(window.innerWidth - 170, Math.max(6, tower.x / CANVAS_W * canvas.clientWidth + canvas.offsetLeft - 75)) + 'px';
-  popup.style.top = Math.max(60, tower.y / CANVAS_H * canvas.clientHeight + canvas.offsetTop - 150) + 'px';
+  const wrap = $('#scr-game');
+  const cw = canvas.clientWidth, chh = canvas.clientHeight;
+  const left = canvas.offsetLeft + (tower.x/CANVAS_W)*cw;
+  const top = canvas.offsetTop + (tower.y/CANVAS_H)*chh;
+  popup.style.left = Math.min(wrap.clientWidth - 170, Math.max(6, left - 75)) + 'px';
+  popup.style.top = Math.max(60, top - 160) + 'px';
   popup.dataset.popup = '1';
 
   popup.querySelector('#popUp').onclick = ()=>{
@@ -2213,8 +2295,8 @@ function hideTowerPopup(){
 function applyAuras(){
   game.towers.forEach(tw=>tw.auraBuff=0);
   game.towers.forEach(src=>{
-    if(src.type!=='crypt') return;
-    const st = getTowerStats(src);
+    const c = charTowerDef(src.type);
+    if(!c || !c.aura) return;
     game.towers.forEach(tw=>{
       if(tw===src) return;
       if(Math.hypot(tw.x-src.x, tw.y-src.y) < 100){
@@ -2231,20 +2313,20 @@ function renderGameTools(){
   tools.innerHTML = '';
 
   const bar = el('div','tower-bar');
-  Object.keys(TOWERS).forEach(type=>{
-    const def = TOWERS[type];
-    if(game.level < def.unlock && !game.isTower) return;
-    const cost = towerCost(type);
+  state.selectedChars.forEach(cid=>{
+    const c = charTowerDef(cid);
+    if(!c) return;
+    const cost = towerCost(cid);
     const canAfford = game.coins >= cost;
-    const btn = el('button','tower-btn'+(game.selectedTowerType===type?' sel':'')+(canAfford?'':' no'));
+    const btn = el('button','tower-btn'+(game.selectedTowerType===cid?' sel':'')+(canAfford?'':' no'));
     btn.innerHTML = `
-      <div style="color:${def.color};width:26px;height:26px">${def.icon}</div>
-      <div class="tn">${state.lang==='ru'?def.ru:def.en}</div>
+      <div style="color:${c.color};width:28px;height:28px">${c.icon}</div>
+      <div class="tn">${state.lang==='ru'?c.ru:c.en}</div>
       <div class="tc">${fmt(cost)}</div>
     `;
     btn.onclick = ()=>{
       if(!canAfford){ toast(state.lang==='ru'?'Недостаточно монет':'Not enough coins'); return; }
-      game.selectedTowerType = (game.selectedTowerType===type) ? null : type;
+      game.selectedTowerType = (game.selectedTowerType===cid) ? null : cid;
       game.selectedTower = null;
       hideTowerPopup();
       renderGameTools();
@@ -2266,23 +2348,21 @@ function renderGameTools(){
     }
     btn.onclick = ()=>{
       if(cd>0) return;
-      pendingAbility = a.id;
       if(a.id==='freeze' || a.id==='gold' || a.id==='rage'){
-        // мгновенные
         activateAbility(a.id);
-        pendingAbility = null;
+      } else {
+        pendingAbility = a.id;
+        toast(state.lang==='ru'?'Выберите цель':'Select target');
       }
     };
     abRow.appendChild(btn);
   });
 
-  // пауза
   const pauseBtn = el('button','speed-btn');
   pauseBtn.textContent = game.paused ? '▶' : '❚❚';
   pauseBtn.onclick = ()=>{ game.paused = !game.paused; renderGameTools(); };
   abRow.appendChild(pauseBtn);
 
-  // скорость
   const spBtn = el('button','speed-btn');
   spBtn.textContent = 'x'+game.speedMul;
   spBtn.onclick = ()=>{
@@ -2291,7 +2371,6 @@ function renderGameTools(){
   };
   abRow.appendChild(spBtn);
 
-  // выход
   const exitBtn = el('button','speed-btn');
   exitBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px" fill="none" stroke="#ff9bb0" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>';
   exitBtn.onclick = ()=>{ quitLevel(); };
@@ -2365,20 +2444,20 @@ function renderGameHud(){
 function quitLevel(){
   game.finished = true;
   game.paused = true;
-  const g = game;
-  openModal(`
-    <h3>${state.lang==='ru'?'Выйти из уровня?':'Quit level?'}</h3>
-    <p>${state.lang==='ru'?'Прогресс уровня будет потерян.':'Level progress will be lost.'}</p>
+  const m = openModal(`
+    <h3>${t('quitTitle')}</h3>
+    <p>${t('quitText')}</p>
     <div class="row">
-      <button class="btn danger" id="qYes">${state.lang==='ru'?'Выйти':'Quit'}</button>
-      <button class="btn primary" id="qNo">${state.lang==='ru'?'Остаться':'Stay'}</button>
+      <button class="btn danger" id="qYes">${t('quitYes')}</button>
+      <button class="btn primary" id="qNo">${t('quitStay')}</button>
     </div>
-  `).querySelector('#qYes').onclick = ()=>{
+  `);
+  m.querySelector('#qYes').onclick = ()=>{
     closeModal();
     cleanupGame();
     backToLobby();
   };
-  $('#qNo').onclick = ()=>{ closeModal(); game.finished=false; game.paused=false; };
+  m.querySelector('#qNo').onclick = ()=>{ closeModal(); game.finished=false; game.paused=false; };
 }
 
 function finishLevel(win){
@@ -2419,12 +2498,12 @@ function finishLevel(win){
         </div>`:''}
       </div>
       <div class="row" style="flex-direction:column;gap:9px">
-        <button class="btn gold" id="dblBtn" style="width:100%">📺 ${t('doubleReward')}</button>
-        <button class="btn primary" id="contBtn" style="width:100%">${t('continueBtn')}</button>
+        <button class="btn gold" id="claimBtn" style="width:100%">📥 ${state.lang==='ru'?'Забрать награду':'Claim reward'}</button>
+        <button class="btn primary" id="dblBtn" style="width:100%">📺 ${t('doubleReward')}</button>
       </div>
     `, {dismissable:false});
 
-    const finishUp = (mult)=>{
+    const giveAndReturn = (mult)=>{
       state.gems += gems*mult;
       if(chests>0) state.chests += chests;
       saveGame(true);
@@ -2432,36 +2511,25 @@ function finishLevel(win){
       if(chests>0 && state.chests>0){
         openChestModal(()=>{ cleanupGame(); backToLobby(); });
       } else {
-        cleanupGame();
-        backToLobby();
+        cleanupGame(); backToLobby();
       }
     };
 
+    m.querySelector('#claimBtn').onclick = ()=>{ giveAndReturn(1); };
     m.querySelector('#dblBtn').onclick = ()=>{
-      showRewardAd(()=>{ finishUp(2); }, ()=>{ toast(state.lang==='ru'?'Реклама недоступна':'Ad unavailable'); });
+      showRewardAd(()=>{ giveAndReturn(2); }, ()=>{ toast(state.lang==='ru'?'Реклама недоступна':'Ad unavailable'); });
     };
-    m.querySelector('#contBtn').onclick = ()=>{ finishUp(1); };
-
   } else {
     const m = openModal(`
       <h3 style="color:#ff5f7e">${t('defeat')}</h3>
       <p>${state.lang==='ru'?'Призраки прорвались в дом... Попробуйте ещё раз!':'The ghosts broke into the house... Try again!'}</p>
       <div class="row" style="flex-direction:column;gap:9px">
-        <button class="btn primary" id="retryBtn" style="width:100%">${state.lang==='ru'?'Повторить':'Retry'}</button>
-        <button class="btn" id="exitBtn2" style="width:100%">${t('continueBtn')}</button>
+        <button class="btn primary" id="backLobby" style="width:100%">${t('claimAndLobby')}</button>
+        <button class="btn" id="retryBtn" style="width:100%">${t('retry')}</button>
       </div>
     `, {dismissable:false});
-    m.querySelector('#retryBtn').onclick = ()=>{
-      closeModal();
-      const lvl = g.level, tw = g.isTower;
-      cleanupGame();
-      startLevel(lvl, tw);
-    };
-    m.querySelector('#exitBtn2').onclick = ()=>{
-      closeModal();
-      cleanupGame();
-      backToLobby();
-    };
+    m.querySelector('#backLobby').onclick = ()=>{ closeModal(); cleanupGame(); backToLobby(); };
+    m.querySelector('#retryBtn').onclick = ()=>{ closeModal(); const lvl=g.level, tw=g.isTower; cleanupGame(); startLevel(lvl, tw); };
   }
 }
 
@@ -2525,10 +2593,11 @@ let hiddenPause = false;
 function handleVisibility(hidden){
   if(hidden){
     pauseMusic();
-    if(game && !game.finished){ game.paused = true; hiddenPause = true; renderGameTools && renderGameTools(); }
+    if(game && !game.finished){ game.paused = true; hiddenPause = true; }
   } else {
     if(state.music) startMusic();
-    if(hiddenPause && game){ game.paused = false; hiddenPause = false; if(renderGameTools) renderGameTools(); }
+    if(hiddenPause && game){ game.paused = false; hiddenPause = false; }
+    if(currentScreen==='scr-game') renderGameTools();
   }
 }
 document.addEventListener('visibilitychange', ()=>{ handleVisibility(document.hidden); });
@@ -2587,11 +2656,6 @@ function showPlaytimeReward(r){
   };
 }
 
-/* ---------- ОБНОВЛЕНИЕ AFK В ФОНЕ ---------- */
-setInterval(()=>{
-  if(currentScreen!=='scr-afk') return;
-}, 60000);
-
 /* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
 async function boot(){
   const fill = $('#loadFill');
@@ -2614,18 +2678,16 @@ async function boot(){
 
   await tick(20, 'VK Bridge...');
   await initVK();
-  await tick(50, state.lang==='ru'?'Загрузка сохранения...':'Loading save...');
+  await tick(50, 'Loading save...');
   await loadGame();
-  await tick(75, state.lang==='ru'?'Подготовка дома...':'Preparing house...');
+  await tick(75, 'Preparing house...');
 
+  ensureStarter();
   checkTaskRefresh();
   document.documentElement.lang = state.lang;
   refreshStaticText();
 
-  // Ежедневный вход
-  if(!state.welcomeShown){ /* noop */ }
-
-  await tick(100, state.lang==='ru'?'Готово!':'Ready!');
+  await tick(100, 'Ready!');
   await new Promise(r=>setTimeout(r, 260));
 
   initCanvas();
@@ -2637,7 +2699,6 @@ async function boot(){
 
   showBanner();
 
-  // Экран обучения или лобби
   if(!state.tutorialDone && !state.tutorialSeen){
     state.tutorialSeen = true;
     saveGame(true);
@@ -2646,15 +2707,11 @@ async function boot(){
     showScreen('scr-lobby');
     renderLobby();
   }
-
-  // Обработка наград АФК при возврате
-  if(state.afkPending>0){ /* награда остаётся на кнопке */ }
 }
 
 $('#tutYes').onclick = ()=>{ playClick(); state.tutorialDone=false; saveGame(true); showTutorial(0); };
 $('#tutNo').onclick  = ()=>{ playClick(); state.tutorialDone=true; saveGame(true); backToLobby(); };
 
-/* Навигация назад */
 document.addEventListener('click', (e)=>{
   const b = e.target.closest('[data-back]');
   if(b){
@@ -2664,11 +2721,9 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-/* Сохранение при выходе */
 window.addEventListener('beforeunload', ()=>{ saveGame(true); });
 setInterval(()=>{ saveGame(); }, 30000);
 
-/* Автосохранение времени игры */
 setInterval(()=>{
   if(game && !game.finished){ state.totalPlaytime += 5; }
 }, 5000);
