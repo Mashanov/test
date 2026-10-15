@@ -57,10 +57,13 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#0e1219;
   background:linear-gradient(0deg,rgba(14,18,25,.98),rgba(14,18,25,.7));z-index:20}
 .botbtn{flex:1;height:52px;border-radius:14px;border:1px solid #2b3648;background:#1b2330;color:#dce8f8;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;
-  font-weight:600;cursor:pointer;transition:.15s;padding:0}
+  font-weight:600;cursor:pointer;transition:.15s;padding:0;position:relative}
 .botbtn svg{width:22px;height:22px}
 .botbtn:active{transform:scale(.95);background:#243044}
 .botbtn.primary{background:linear-gradient(180deg,#2e7d5b,#1f5f44);border-color:#3aa477;color:#eafff4}
+.botbtn .dot{position:absolute;top:6px;right:10px;width:9px;height:9px;border-radius:50%;background:#ff4d5e;
+  box-shadow:0 0 8px rgba(255,80,90,.9);display:none;animation:dotPulse 1.4s ease-in-out infinite}
+@keyframes dotPulse{50%{transform:scale(1.3)}}
 
 body.tutorial-on .botbtn,body.tutorial-on .iconbtn{pointer-events:none;opacity:.35;filter:grayscale(.4)}
 body.tutorial-on .botbtn.tutorial-active,body.tutorial-on .iconbtn.tutorial-active{
@@ -190,7 +193,7 @@ input[type=text]:focus{border-color:#4a89ff}
       <span id="moneyVal">0</span>
     </div>
     <div class="stat" id="lvlChip">
-      <div class="ln"><span>Ур.</span><b id="lvlVal">1</b></div>
+      <div class="ln"><span data-i18n="lvlShort">Ур.</span><b id="lvlVal">1</b></div>
       <div class="lvlXP"><i id="lvlBar" style="width:0%"></i></div>
     </div>
     <div class="stat" id="bonusChip">
@@ -227,6 +230,11 @@ input[type=text]:focus{border-color:#4a89ff}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>
       <span data-i18n="warehouse">Склад</span>
     </button>
+    <button class="botbtn" id="btnTimeRewards">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span data-i18n="rewards">Награды</span>
+      <span class="dot" id="timeRewardDot"></span>
+    </button>
     <button class="botbtn" id="btnInvite">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M18 8v6M15 11h6"/></svg>
       <span data-i18n="friends">Друзья</span>
@@ -247,17 +255,20 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН v5
+   МАГАЗИН v6
    ========================================================================= */
 'use strict';
 
 /* ------------------------- 1. КОНСТАНТЫ И ДАННЫЕ ------------------------- */
 const GW = 11, GH = 10;
 const DOOR = {x: 0, y: 5};
-const OUT_MARGIN = 90;
+const OUT_MARGIN = 100;
 const TRUCK_CYCLE = 180;
 const TRUCK_OFFER = 120;
 const TRUCK_BONUS = 120;
+// Наценка. Чем меньше — тем дольше игра. Раньше было 10%, теперь 4%.
+const MARKUP = 1.04;
+const MIN_MARKUP = 1; // минимум +1 монета
 
 const CATS = {
   dairy:    {ru:'Молочное',   en:'Dairy',      c:'#8fd3ff'},
@@ -378,14 +389,14 @@ const P_RAW = [
 ['Порошок','Detergent','household','box',200]
 ];
 
-// Наценка ~10% (минимум +1 монета к цене покупки)
+// Наценка 4% (минимум +1 монета)
 const PRODUCTS = P_RAW.map((p, i) => ({
   id: i + 1,
   ru: p[0], en: p[1],
   cat: p[2],
   shape: p[3],
   cost: p[4],
-  sell: Math.max(p[4] + 1, Math.round(p[4] * 1.10)),
+  sell: Math.max(p[4] + MIN_MARKUP, Math.round(p[4] * MARKUP)),
   color: CATS[p[2]].c
 }));
 const PROD_BY_ID = {};
@@ -435,7 +446,8 @@ const TIME_REWARDS = [
 ];
 
 const STR = {
-  ru:{ shop:'Магазин', warehouse:'Склад', friends:'Друзья', settings:'Настройки',
+  ru:{
+    shop:'Магазин', warehouse:'Склад', friends:'Друзья', settings:'Настройки', rewards:'Награды',
     tasks:'Задания', daily:'Ежедневная награда', close:'Закрыть', buy:'Купить',
     cancel:'Отмена', place:'Разместить', money:'Монеты', music:'Музыка', language:'Язык',
     promo:'Промокод', apply:'Применить', tutorialQ:'Хотите пройти обучение?',
@@ -443,7 +455,7 @@ const STR = {
     decor:'Оформление', autoStock:'Разложить всё',
     nothing:'Пусто', reward:'Награда', claim:'Забрать', claimed:'Получено', take:'Получить',
     remove:'Убрать', done:'Готово', adLoading:'Загрузка рекламы...', onlineReward:'Награда за игру',
-    walls:'Стены', windows:'Окна',
+    walls:'Стены', windows:'Окна', lvlShort:'Ур.', apply2:'Применить',
     promoOk:'Промокод активирован!', promoBad:'Неверный промокод',
     noMoney:'Недостаточно монет', placed:'Установлено',
     bought:'Куплено', expandHint:'Нажмите на тёмную клетку рядом',
@@ -465,9 +477,38 @@ const STR = {
     truckDecline:'Прогнать',
     dirtClean:'+опыт за уборку!',
     bonusActive:'x2 доход!',
-    returnedGoods:'Товар возвращён на склад'
+    returnedGoods:'Товар возвращён на склад',
+    occupied:'Занято',
+    tooFar:'Слишком далеко',
+    adNotAvailable:'Реклама недоступна',
+    noCashierReturn:'Нет кассы — товар возвращён',
+    truckArrived:'🚚 Приехал грузовик с акцией! Нажмите!',
+    truckLeft:'🚚 Грузовик уехал',
+    tapEmptyCell:'Нажмите на свободную клетку',
+    tutorialComplete:'Обучение завершено!',
+    cellAdded:'+1 клетка',
+    stocked:'Разложено',
+    noSlots:'Нет свободных мест',
+    shelfFull:'Полка заполнена',
+    inviteSent:'Приглашение отправлено!',
+    inviteUnavailable:'Приглашение недоступно',
+    confirmReset:'Вы точно хотите сбросить весь прогресс? Это действие нельзя отменить!',
+    yesReset:'Да, сбросить',
+    progressReset:'Прогресс сброшен',
+    // Награды за время
+    timeRewards:'Награды за время',
+    timeRewardsDesc:'Играйте и получайте награды за проведённое время',
+    timePlayed:'Вы играете',
+    minShort:'мин',
+    secShort:'сек',
+    rewardAvailable:'Доступна награда за игру!',
+    notYet:'Ещё не достигнуто',
+    needMore:'Нужно ещё',
+    x2BonusLeft:'x2 осталось',
+    sellAt:'Продажа за'
   },
-  en:{ shop:'Shop', warehouse:'Storage', friends:'Friends', settings:'Settings',
+  en:{
+    shop:'Shop', warehouse:'Storage', friends:'Friends', settings:'Settings', rewards:'Rewards',
     tasks:'Tasks', daily:'Daily reward', close:'Close', buy:'Buy',
     cancel:'Cancel', place:'Place', money:'Coins', music:'Music', language:'Language',
     promo:'Promo code', apply:'Apply', tutorialQ:'Would you like a tutorial?',
@@ -475,11 +516,11 @@ const STR = {
     decor:'Decor', autoStock:'Auto-stock',
     nothing:'Empty', reward:'Reward', claim:'Claim', claimed:'Claimed', take:'Get',
     remove:'Remove', done:'Done', adLoading:'Loading ad...', onlineReward:'Playtime reward',
-    walls:'Walls', windows:'Windows',
+    walls:'Walls', windows:'Windows', lvlShort:'Lv.', apply2:'Apply',
     promoOk:'Promo code activated!', promoBad:'Invalid promo code',
     noMoney:'Not enough coins', placed:'Placed',
     bought:'Purchased', expandHint:'Tap a dark cell nearby',
-    streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty',
+    streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty — buy goods in the Shop',
     tapShelf:'Tap a shelf to place goods', adDone:'Ad reward received!',
     shelfInfo:'Shelf info', total:'Total', slots:'slots', onMap:'On map',
     tutorial1:'Welcome! This is your shop. Tap Next to continue.',
@@ -497,7 +538,35 @@ const STR = {
     truckDecline:'Drive away',
     dirtClean:'+XP for cleaning!',
     bonusActive:'x2 income!',
-    returnedGoods:'Goods returned to storage'
+    returnedGoods:'Goods returned to storage',
+    occupied:'Occupied',
+    tooFar:'Too far',
+    adNotAvailable:'Ad not available',
+    noCashierReturn:'No cashier — goods returned',
+    truckArrived:'🚚 Sale truck arrived! Tap it!',
+    truckLeft:'🚚 Truck left',
+    tapEmptyCell:'Tap an empty cell',
+    tutorialComplete:'Tutorial complete!',
+    cellAdded:'+1 cell',
+    stocked:'Stocked',
+    noSlots:'No free slots',
+    shelfFull:'Shelf full',
+    inviteSent:'Invite sent!',
+    inviteUnavailable:'Invite unavailable',
+    confirmReset:'Are you sure you want to reset all progress? This cannot be undone!',
+    yesReset:'Yes, reset',
+    progressReset:'Progress reset',
+    // Time rewards
+    timeRewards:'Time rewards',
+    timeRewardsDesc:'Play and earn rewards for the time spent',
+    timePlayed:'You have played',
+    minShort:'min',
+    secShort:'sec',
+    rewardAvailable:'Time reward available!',
+    notYet:'Not reached yet',
+    needMore:'Need more',
+    x2BonusLeft:'x2 left',
+    sellAt:'Sells for'
   }
 };
 
@@ -515,7 +584,6 @@ function rnd(a, b){ return a + Math.random() * (b - a); }
 function randInt(a, b){ return Math.floor(rnd(a, b + 1)); }
 function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 function clamp(v, a, b){ return v < a ? a : (v > b ? b : v); }
-
 function hexToRgb(h){
   h = h.replace('#', '');
   if(h.length === 3) h = h.split('').map(c => c + c).join('');
@@ -541,6 +609,11 @@ function lerpAngle(a, b, k){
   let d = ((b - a + Math.PI) % (Math.PI*2)) - Math.PI;
   if(d < -Math.PI) d += Math.PI*2;
   return a + d * k;
+}
+function fmtTime(sec){
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return m + ' ' + t('minShort') + ' ' + s + ' ' + t('secShort');
 }
 
 /* --------------------- 2b. УРОВНИ И БОНУСЫ -------------------------------- */
@@ -775,8 +848,10 @@ function newState(){
     lastDaily: 0, streak: 0,
     tasks: [], tasksDate: '',
     ds: {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0},
-    playtime: 0, lastRewardIdx: 0,
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 5,
+    playtime: 0,
+    claimedTimeRewards: [],
+    notifiedTimeRewards: [],
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 6,
     dirt: [],
     truckTimer: TRUCK_CYCLE,
     truckState: 'away',
@@ -950,7 +1025,9 @@ function serialize(){
     ow: state.owned.wall, on: state.owned.window,
     ld: state.lastDaily, sk: state.streak,
     tk: state.tasks, tkd: state.tasksDate, ds: state.ds,
-    pt: Math.floor(state.playtime), lr: state.lastRewardIdx,
+    pt: Math.floor(state.playtime),
+    ctr: state.claimedTimeRewards.join(','),
+    ntr: state.notifiedTimeRewards.join(','),
     ts: state.totalServed, te: Math.floor(state.totalEarned), ac: state.adCount,
     tt: state.truckTimer, ts2: state.truckState, tot: state.truckOfferTimer,
     bu: state.bonusUntil
@@ -973,7 +1050,8 @@ function deserialize(o){
   state.tasksDate = o.tkd || '';
   state.ds = o.ds || {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0};
   state.playtime = o.pt || 0;
-  state.lastRewardIdx = o.lr || 0;
+  state.claimedTimeRewards = o.ctr ? o.ctr.split(',').filter(s=>s!=='').map(Number) : [];
+  state.notifiedTimeRewards = o.ntr ? o.ntr.split(',').filter(s=>s!=='').map(Number) : [];
   state.totalServed = o.ts || 0;
   state.totalEarned = o.te || 0;
   state.adCount = o.ac || 0;
@@ -1072,7 +1150,6 @@ class Customer {
     this.x = DOOR.x + 0.5;
     this.y = DOOR.y + 0.5;
     this.alpha = 0;
-    // Замедленная скорость ходьбы
     this.speed = rnd(0.65, 1.0);
     this.shirt = pick(SHIRT);
     this.skin = pick(SKIN);
@@ -1097,7 +1174,6 @@ class Customer {
     this.returnNotified = false;
   }
 
-  // Мгновенный возврат корзины на склад. Возвращает true, если что-то вернули.
   returnCart(){
     if(!this.cart.length) return false;
     for(const it of this.cart){
@@ -1127,7 +1203,6 @@ class Customer {
     }
 
     if(this.state === 'gone'){
-      // ГАРАНТИРОВАННЫЙ возврат товара, если что-то осталось
       this.returnCart();
       this.alpha -= dt * 1.3;
       this.x -= dt * 1.2;
@@ -1228,10 +1303,10 @@ class Customer {
       state.ds.serve += 1;
       state.ds.sell += this.cart.length;
       state.totalServed += 1;
-      addXP(total);
+      addXP(Math.max(1, Math.round(total * 0.5)));
       if(this.spot) busySpots.delete(this.spot);
       this.spot = null;
-      this.cart = [];  // оплачено — товары уходят
+      this.cart = [];
       toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x2!' : ''), mult > 1 ? '#ffd257' : '#7fd07f');
       updateHUD();
       scheduleSave();
@@ -1247,10 +1322,8 @@ class Customer {
     const target = pick(pool);
     const spots = adjacentWalkable(target.x, target.y);
     if(!spots.length){
-      // помечаем клетку как недостижимую и пытаемся снова
       const key = target.x + ',' + target.y;
       if(this.visited.indexOf(key) < 0) this.visited.push(key);
-      // защита от вечного цикла
       if(this.visited.length > shelves.length + 3){ this.returnCart(); this.leave(); return; }
       this.planShopping();
       return;
@@ -1266,7 +1339,7 @@ class Customer {
   goToCashier(){
     if(!this.cart.length){ this.leave(); return; }
     if(!counterCells().length){
-      toast(state.lang === 'en' ? 'No cashier — returning goods' : 'Нет кассы — товар возвращён', '#e0575b');
+      toast(t('noCashierReturn'), '#e0575b');
       this.returnCart();
       this.leave();
       return;
@@ -1299,7 +1372,6 @@ class Customer {
 
   leave(){
     if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
-    // Всегда возвращаем товар при уходе (никакого воровства)
     this.returnCart();
     this.state = 'leaving';
     if(!this.moveTo(DOOR.x, DOOR.y)){ this.state = 'gone'; }
@@ -1390,7 +1462,7 @@ const cashier = {
 
 /* --------------------------- 6c. ГРУЗОВИК -------------------------------- */
 const truck = {
-  x: -8,
+  x: -12,
   targetX: 0,
   baseY: GH + 0.6,
   arrived: false,
@@ -1407,7 +1479,7 @@ const truck = {
         this.arrived = true;
       }
     } else if(state.truckState === 'away'){
-      if(this.x > -10) this.x = -10;
+      if(this.x > -12) this.x = -12;
       this.arrived = false;
     }
   },
@@ -1480,10 +1552,10 @@ const truck = {
 function startTruckCycle(){
   state.truckState = 'offering';
   state.truckOfferTimer = TRUCK_OFFER;
-  truck.x = -8;
+  truck.x = -12;
   truck.arrived = false;
   truck.targetX = (DOOR.x - 1.2);
-  toast(state.lang === 'en' ? '🚚 Sale truck arrived! Tap it!' : '🚚 Приехал грузовик с акцией! Нажмите!', '#ffb070');
+  toast(t('truckArrived'), '#ffb070');
 }
 function endTruckCycle(){
   state.truckState = 'away';
@@ -1679,112 +1751,114 @@ function draw(){
 function drawOutside(){
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
-  const roadWidth = MB;
-  const sideWidth = MB;
+  // Ключевые размеры колец
+  const sidewalkW = 34;   // тротуар вокруг магазина
+  const roadW = 46;       // проезжая часть
+  const sidewalkOuter = MB; // внешний тротуар
+  const buildingGap = 12;
 
-  const roadInner = MB;
-  const roadOuter = MB + roadWidth;
-  const buildingZone = roadOuter + 6;
+  const ring1 = sidewalkW;                  // тротуар вокруг магазина
+  const ring2 = sidewalkW + roadW;          // внешний край дороги
+  const ring3 = ring2 + sidewalkOuter;      // внешний тротуар
+  const buildingStart = ring3 + buildingGap;
+  const bgPad = buildingStart + 120;
 
-  // 1) Крупный фон
-  ctx.fillStyle = '#1c222c';
-  const bgPad = (buildingZone + 90);
+  // 1) Фон
+  ctx.fillStyle = '#171d26';
   ctx.fillRect(-bgPad, -bgPad, totalW + bgPad * 2, totalH + bgPad * 2);
 
-  // 2) Дальние силуэты домов (совсем фон) — сверху
-  drawBgSkyline(-bgPad, -bgPad, totalW + bgPad * 2, buildingZone - 6, true);
-  // И снизу
-  drawBgSkyline(-bgPad, totalH + roadOuter, totalW + bgPad * 2, 90, false);
+  // 2) Дальний силуэт (совсем фон)
+  drawBgSkyline(-bgPad, -bgPad, totalW + bgPad * 2, bgPad, true);
+  drawBgSkyline(-bgPad, totalH + ring3, totalW + bgPad * 2, bgPad, false);
+  drawSideBg(-bgPad, 0, bgPad, totalH);
+  drawSideBg(totalW + ring3, 0, bgPad, totalH);
 
-  // 3) Дорога (кольцо вокруг тротуара)
+  // 3) ЕДИНЫЙ СЛОЙ ДОРОГИ (единый цвет, кольцо)
   ctx.fillStyle = '#2b2f37';
-  ctx.fillRect(-roadOuter, -roadOuter, totalW + roadOuter * 2, totalH + roadOuter * 2);
+  ctx.fillRect(-ring2, -ring2, totalW + ring2 * 2, totalH + ring2 * 2);
 
-  // 4) Разметка дороги
-  ctx.strokeStyle = 'rgba(255,240,150,.75)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([16, 14]);
-  // Верхняя и нижняя линии
-  const lineTopY = -(roadInner + roadWidth / 2);
-  const lineBotY = totalH + roadInner + roadWidth / 2;
-  const lineLeftX = -(roadInner + roadWidth / 2);
-  const lineRightX = totalW + roadInner + roadWidth / 2;
-  ctx.beginPath();
-  ctx.moveTo(-roadOuter, lineTopY); ctx.lineTo(totalW + roadOuter, lineTopY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-roadOuter, lineBotY); ctx.lineTo(totalW + roadOuter, lineBotY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(lineLeftX, -roadOuter); ctx.lineTo(lineLeftX, totalH + roadOuter);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(lineRightX, -roadOuter); ctx.lineTo(lineRightX, totalH + roadOuter);
-  ctx.stroke();
+  // 4) Разметка дороги (единый слой, рисуется ПОВЕРХ дороги)
+  ctx.strokeStyle = 'rgba(255,240,150,.7)';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([18, 16]);
+  const midTopY = -(sidewalkW + roadW / 2);
+  const midBotY = totalH + sidewalkW + roadW / 2;
+  const midLeftX = -(sidewalkW + roadW / 2);
+  const midRightX = totalW + sidewalkW + roadW / 2;
+  ctx.beginPath(); ctx.moveTo(-ring2, midTopY); ctx.lineTo(totalW + ring2, midTopY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-ring2, midBotY); ctx.lineTo(totalW + ring2, midBotY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(midLeftX, -ring2); ctx.lineTo(midLeftX, totalH + ring2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(midRightX, -ring2); ctx.lineTo(midRightX, totalH + ring2); ctx.stroke();
   ctx.setLineDash([]);
 
-  // Тротуар (внутреннее кольцо)
+  // 5) ВНУТРЕННИЙ ТРОТУАР (вокруг магазина)
   ctx.fillStyle = '#5a6470';
-  ctx.fillRect(-roadInner, -roadInner, totalW + roadInner * 2, totalH + roadInner * 2);
-  // Чуть темнее отступ между тротуаром и дорогой
-  ctx.fillStyle = '#4a525c';
-  ctx.fillRect(-roadOuter, -roadOuter, totalW + roadOuter * 2, roadWidth);
-  ctx.fillRect(-roadOuter, totalH + roadInner, totalW + roadOuter * 2, roadWidth);
-  ctx.fillRect(-roadOuter, 0, roadWidth, totalH);
-  ctx.fillRect(totalW + roadInner, 0, roadWidth, totalH);
+  ctx.fillRect(-ring1, -ring1, totalW + ring1 * 2, totalH + ring1 * 2);
 
-  // Плитка тротуара
+  // 6) ВНЕШНИЙ ТРОТУАР (вокруг дороги)
+  ctx.fillStyle = '#4f5864';
+  ctx.fillRect(-ring3, -ring3, totalW + ring3 * 2, ring3 - ring2); // сверху
+  ctx.fillRect(-ring3, totalH + ring2, totalW + ring3 * 2, ring3 - ring2); // снизу
+  ctx.fillRect(-ring3, -ring2, ring3 - ring2, totalH + ring2 * 2); // слева
+  ctx.fillRect(totalW + ring2, -ring2, ring3 - ring2, totalH + ring2 * 2); // справа
+
+  // Плитка на тротуарах
   ctx.strokeStyle = 'rgba(0,0,0,.2)';
   ctx.lineWidth = 1;
-  const tile = 15;
-  for(let x = -roadInner; x <= totalW + roadInner; x += tile){
-    ctx.beginPath(); ctx.moveTo(x, -roadInner); ctx.lineTo(x, 0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + roadInner); ctx.stroke();
+  const tile = 16;
+  // Внутренний
+  for(let x = -ring1; x <= totalW + ring1; x += tile){
+    ctx.beginPath(); ctx.moveTo(x, -ring1); ctx.lineTo(x, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + ring1); ctx.stroke();
   }
-  for(let y = -roadInner; y <= totalH + roadInner; y += tile){
-    ctx.beginPath(); ctx.moveTo(-roadInner, y); ctx.lineTo(0, y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + roadInner, y); ctx.stroke();
+  for(let y = -ring1; y <= totalH + ring1; y += tile){
+    ctx.beginPath(); ctx.moveTo(-ring1, y); ctx.lineTo(0, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + ring1, y); ctx.stroke();
+  }
+  // Внешний
+  for(let x = -ring3; x <= totalW + ring3; x += tile){
+    ctx.beginPath(); ctx.moveTo(x, -ring3); ctx.lineTo(x, -ring2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, totalH + ring2); ctx.lineTo(x, totalH + ring3); ctx.stroke();
+  }
+  for(let y = -ring3; y <= totalH + ring3; y += tile){
+    ctx.beginPath(); ctx.moveTo(-ring3, y); ctx.lineTo(-ring2, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW + ring2, y); ctx.lineTo(totalW + ring3, y); ctx.stroke();
   }
 
-  // Дорожка ко входу
+  // 7) Дорожка ко входу
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
-  ctx.fillRect(doorX - 3, doorY, CS + 6, roadInner);
+  ctx.fillRect(doorX - 3, doorY, CS + 6, ring1);
   ctx.strokeStyle = 'rgba(0,0,0,.3)';
-  ctx.strokeRect(doorX - 3, doorY, CS + 6, roadInner);
+  ctx.strokeRect(doorX - 3, doorY, CS + 6, ring1);
   ctx.strokeStyle = 'rgba(255,255,255,.35)';
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
   ctx.moveTo(doorX + CS / 2, doorY + 2);
-  ctx.lineTo(doorX + CS / 2, doorY + roadInner - 2);
+  ctx.lineTo(doorX + CS / 2, doorY + ring1 - 2);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // 5) ДОМА — ЗА дорогой, чтобы не стояли на ней
-  // Верхний ряд (между дорогой и фоном) — но за дорогой
-  drawBuildingRow(-bgPad, -buildingZone - 60, totalW + bgPad * 2, 60, true);
-  // Нижний ряд домов — тоже за дорогой
-  drawBuildingRow(-bgPad, totalH + buildingZone, totalW + bgPad * 2, 60, false);
-  // Левый и правый ряды
-  drawBuildingColumn(-buildingZone - 60, -bgPad, 60, totalH + bgPad * 2, true);
-  drawBuildingColumn(totalW + buildingZone, -bgPad, 60, totalH + bgPad * 2, false);
+  // 8) ДОМА — за внешним тротуаром
+  drawBuildingRow(-bgPad, -buildingStart - 70, totalW + bgPad * 2, 70, true);
+  drawBuildingRow(-bgPad, totalH + buildingStart, totalW + bgPad * 2, 70, false);
+  drawBuildingColumn(-buildingStart - 70, -bgPad, 70, totalH + bgPad * 2, true);
+  drawBuildingColumn(totalW + buildingStart, -bgPad, 70, totalH + bgPad * 2, false);
 
-  // 6) Мелкие детали на тротуаре
-  drawBench(totalW + roadInner - 6, totalH / 2);
-  drawBench(-roadInner + 6, totalH / 2);
-  drawLamp(-roadInner + 10, doorY + roadInner / 2);
-
-  drawTreeCtx(-roadInner + 12, -roadInner + 12);
-  drawTreeCtx(totalW - 12, -roadInner + 12);
-  drawTreeCtx(totalW / 2, -roadInner + 10);
-  drawTreeCtx(-roadInner + 20, totalH + roadInner - 12);
-  drawTreeCtx(totalW - 20, totalH + roadInner - 12);
-  drawBush(-roadInner - 4, totalH - roadInner / 2);
-  drawBush(totalW + roadInner + 4, -roadInner / 2);
+  // 9) Детали на тротуарах
+  drawBench(totalW + ring1 - 8, totalH / 2);
+  drawBench(-ring1 + 8, totalH / 2);
+  drawLamp(-ring1 + 10, doorY + ring1 / 2);
+  drawTreeCtx(-ring1 + 14, -ring1 + 14);
+  drawTreeCtx(totalW - 14, -ring1 + 14);
+  drawTreeCtx(totalW / 2, -ring1 + 12);
+  drawTreeCtx(-ring1 + 22, totalH + ring1 - 14);
+  drawTreeCtx(totalW - 22, totalH + ring1 - 14);
+  drawBush(-ring1 - 4, totalH - ring1 / 2);
+  drawBush(totalW + ring1 + 4, -ring1 / 2);
 }
 
-// Ряд домов с окнами
 function drawBuildingRow(x, y, w, h, isTop){
   const colors = ['#2a3a4d', '#3a4a5d', '#2f4050', '#354a5c', '#28425c'];
   const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f', '#2f4a3d'];
@@ -1799,12 +1873,8 @@ function drawBuildingRow(x, y, w, h, isTop){
     ctx.fillStyle = col;
     ctx.fillRect(cx, yBase, bw, bh);
     ctx.fillStyle = roofCol;
-    if(isTop){
-      ctx.fillRect(cx - 3, yBase - 6, bw + 6, 7);
-    } else {
-      ctx.fillRect(cx - 3, yBase + bh - 1, bw + 6, 6);
-    }
-    // окна
+    if(isTop) ctx.fillRect(cx - 3, yBase - 6, bw + 6, 7);
+    else ctx.fillRect(cx - 3, yBase + bh - 1, bw + 6, 6);
     ctx.fillStyle = 'rgba(255,225,130,.6)';
     const cols = Math.max(2, Math.floor(bw / 18));
     for(let i = 0; i < cols; i++){
@@ -1821,7 +1891,6 @@ function drawBuildingRow(x, y, w, h, isTop){
   }
 }
 
-// Колонка домов (левая/правая сторона)
 function drawBuildingColumn(x, y, w, h, isLeft){
   const colors = ['#2a3a4d', '#3a4a5d', '#354a5c'];
   const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f'];
@@ -1835,12 +1904,8 @@ function drawBuildingColumn(x, y, w, h, isLeft){
     ctx.fillStyle = col;
     ctx.fillRect(xBase, cy, bw, bh);
     ctx.fillStyle = roofColors[idx % roofColors.length];
-    if(isLeft){
-      ctx.fillRect(xBase - 6, cy - 3, 7, bh + 6);
-    } else {
-      ctx.fillRect(xBase + bw - 1, cy - 3, 6, bh + 6);
-    }
-    // окна
+    if(isLeft) ctx.fillRect(xBase - 6, cy - 3, 7, bh + 6);
+    else ctx.fillRect(xBase + bw - 1, cy - 3, 6, bh + 6);
     ctx.fillStyle = 'rgba(255,225,130,.55)';
     for(let i = 0; i < 2; i++){
       for(let j = 0; j < 3; j++){
@@ -1856,7 +1921,6 @@ function drawBuildingColumn(x, y, w, h, isLeft){
   }
 }
 
-// Дальний силуэт (фон)
 function drawBgSkyline(x, y, w, h, isTop){
   ctx.fillStyle = '#20262f';
   let cx = x;
@@ -1872,6 +1936,22 @@ function drawBgSkyline(x, y, w, h, isTop){
     }
     ctx.fillStyle = '#20262f';
     cx += bw + 6;
+    idx++;
+  }
+}
+function drawSideBg(x, y, w, h){
+  ctx.fillStyle = '#20262f';
+  let cy = y;
+  let idx = 0;
+  while(cy < y + h){
+    const bh = 60 + ((idx * 17) % 40);
+    ctx.fillRect(x, cy, w - 10, bh);
+    ctx.fillStyle = 'rgba(255,220,120,.2)';
+    for(let j = 0; j < Math.floor(bh / 24); j++){
+      ctx.fillRect(x + 6, cy + 8 + j * 22, 8, 10);
+    }
+    ctx.fillStyle = '#20262f';
+    cy += bh + 8;
     idx++;
   }
 }
@@ -2266,7 +2346,6 @@ function updateWorld(dt){
 
   spawnTimer -= dt;
   if(spawnTimer <= 0){
-    // Замедленный спавн
     spawnTimer = Math.max(5, 18 - shelves.length * 0.6);
     if(customers.length < maxCust && shelves.length > 0 && counters.length > 0){
       customers.push(new Customer());
@@ -2275,29 +2354,23 @@ function updateWorld(dt){
 
   if(state.truckState === 'away'){
     state.truckTimer -= dt;
-    if(state.truckTimer <= 0){
-      startTruckCycle();
-    }
+    if(state.truckTimer <= 0) startTruckCycle();
   } else if(state.truckState === 'offering'){
     state.truckOfferTimer -= dt;
     if(state.truckOfferTimer <= 0){
       endTruckCycle();
-      toast(state.lang === 'en' ? '🚚 Truck left' : '🚚 Грузовик уехал');
+      toast(t('truckLeft'));
     }
   }
 }
 
 /* -------------------- 10b. ОПЫТ / LEVEL UP -------------------------------- */
-let lastKnownLevel = 1;
-
 function addXP(amount){
   if(amount <= 0) return;
   const before = getLevel();
   state.xp += amount;
   const after = getLevel();
-  if(after > before){
-    showLevelUp(after);
-  }
+  if(after > before) showLevelUp(after);
   updateHUD();
 }
 
@@ -2360,11 +2433,11 @@ function openTruckModal(){
           toast(t('bonusActive') + ' +2\u00D7 (' + TRUCK_BONUS + 's)', '#ffd257');
           if(state.music) Music.note(880, 0.6, 0.15, 'triangle');
         } else {
-          toast(state.lang === 'en' ? 'Ad not available' : 'Реклама недоступна');
+          toast(t('adNotAvailable'));
         }
       } catch(e){
         hideAdOverlay();
-        toast(state.lang === 'en' ? 'Ad not available' : 'Реклама недоступна');
+        toast(t('adNotAvailable'));
       }
     };
 
@@ -2375,12 +2448,93 @@ function openTruckModal(){
     decline.onclick = () => {
       closeModal();
       endTruckCycle();
-      toast(state.lang === 'en' ? '🚚 Truck drove away' : '🚚 Грузовик уехал');
+      toast(t('truckLeft'));
     };
 
     row.appendChild(accept);
     row.appendChild(decline);
     el.appendChild(row);
+  });
+}
+
+/* -------------------- 10d. НАГРАДЫ ЗА ВРЕМЯ ------------------------------- */
+function checkTimeRewards(){
+  const mins = state.playtime / 60;
+  for(let i = 0; i < TIME_REWARDS.length; i++){
+    if(state.claimedTimeRewards.indexOf(i) >= 0) continue;
+    const r = TIME_REWARDS[i];
+    if(mins >= r.min && state.notifiedTimeRewards.indexOf(i) < 0){
+      state.notifiedTimeRewards.push(i);
+      toast(t('rewardAvailable'), '#7fd07f');
+      if(state.music) Music.note(660, 0.4, 0.12, 'triangle');
+    }
+  }
+}
+function hasClaimableTimeReward(){
+  const mins = state.playtime / 60;
+  for(let i = 0; i < TIME_REWARDS.length; i++){
+    if(state.claimedTimeRewards.indexOf(i) >= 0) continue;
+    if(mins >= TIME_REWARDS[i].min) return true;
+  }
+  return false;
+}
+function claimTimeReward(idx){
+  if(state.claimedTimeRewards.indexOf(idx) >= 0) return;
+  const r = TIME_REWARDS[idx];
+  const mins = state.playtime / 60;
+  if(mins < r.min) return;
+  state.claimedTimeRewards.push(idx);
+  state.money += r.amount;
+  addXP(Math.max(1, Math.round(r.amount * 0.5)));
+  updateHUD();
+  scheduleSave();
+  toast('+' + fmt(r.amount) + ' \u20BF', '#ffd257');
+}
+
+function openTimeRewards(){
+  openModal(t('timeRewards'), el => {
+    const info = document.createElement('div');
+    info.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px';
+    info.innerHTML = `
+      <div class="chip">${t('timePlayed')}: ${fmtTime(state.playtime)}</div>
+    `;
+    el.appendChild(info);
+
+    const desc = document.createElement('div');
+    desc.style.cssText = 'font-size:12.5px;color:#8798ad;padding:2px 4px 10px';
+    desc.textContent = t('timeRewardsDesc');
+    el.appendChild(desc);
+
+    const mins = state.playtime / 60;
+    TIME_REWARDS.forEach((r, i) => {
+      const claimed = state.claimedTimeRewards.indexOf(i) >= 0;
+      const reached = mins >= r.min;
+      const row = document.createElement('div');
+      row.className = 'row' + (claimed ? '' : (reached ? '' : ' locked'));
+      const ic = document.createElement('div');
+      ic.className = 'ic';
+      ic.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffd257" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
+      const nm = document.createElement('div');
+      nm.className = 'nm';
+      nm.innerHTML = `<b>${r.min} ${t('minShort')}</b><span>${reached ? '+' + fmt(r.amount) + ' \u20BF' : t('needMore') + ' ' + Math.max(0, Math.ceil(r.min - mins)) + ' ' + t('minShort')}</span>`;
+      const b = document.createElement('button');
+      b.className = 'btn' + (claimed ? ' ghost' : (reached ? '' : ' ghost'));
+      b.textContent = claimed ? t('claimed') : t('claim');
+      b.disabled = claimed || !reached;
+      b.onclick = () => {
+        claimTimeReward(i);
+        closeModal();
+        openTimeRewards();
+      };
+      row.appendChild(ic); row.appendChild(nm); row.appendChild(b);
+      el.appendChild(row);
+    });
+
+    // Кнопка назад к обычным наградам не нужна. Низ модалки — просто индикатор.
+    const foot = document.createElement('div');
+    foot.style.cssText = 'margin-top:12px;color:#8798ad;font-size:11.5px;text-align:center';
+    foot.textContent = state.lang === 'en' ? 'New rewards unlock as you play' : 'Новые награды открываются со временем игры';
+    el.appendChild(foot);
   });
 }
 
@@ -2417,7 +2571,7 @@ function onCellClick(gx, gy){
 
   if(placeMode && placeMode.kind === 'furniture'){
     if(!c.u){ toast(t('noMoney')); return; }
-    if(c.t || c.door){ toast('Занято'); return; }
+    if(c.t || c.door){ toast(t('occupied')); return; }
     c.t = placeMode.type;
     c.stock = [];
     state.ds.place++;
@@ -2450,7 +2604,7 @@ function onCellClick(gx, gy){
         showTutorialHint();
       }
     } else {
-      toast(state.lang === 'en' ? 'Shelf full' : 'Полка заполнена');
+      toast(t('shelfFull'));
       return;
     }
     if(!state.warehouse[placeMode.pid]){
@@ -2461,7 +2615,7 @@ function onCellClick(gx, gy){
   }
 
   if(!c.u){
-    if(!isAdjacentToUnlocked(gx, gy)){ toast('Слишком далеко'); return; }
+    if(!isAdjacentToUnlocked(gx, gy)){ toast(t('tooFar')); return; }
     const maxCells = maxCellsForLevel(getLevel());
     if(unlockedCount() >= maxCells){
       toast(t('maxCells'), '#e0575b');
@@ -2474,7 +2628,7 @@ function onCellClick(gx, gy){
     state.ds.expand++;
     scheduleSave();
     updateHUD();
-    toast('+1 ' + (state.lang === 'en' ? 'cell' : 'клетка'), '#7fd07f');
+    toast(t('cellAdded'), '#7fd07f');
     return;
   }
 
@@ -2559,14 +2713,20 @@ function updateHUD(){
   const canDaily = state.lastDaily !== todayStr();
   $('#dailyBadge').style.display = canDaily ? 'block' : 'none';
 
+  // Бонус x2
   const bonusChip = $('#bonusChip');
   if(hasIncomeBonus()){
     const left = Math.ceil((state.bonusUntil - Date.now()) / 1000);
     bonusChip.style.display = 'flex';
-    $('#bonusTime').textContent = 'x2 ' + left + 'с';
+    $('#bonusTime').textContent = 'x2 ' + left + (state.lang === 'en' ? 's' : 'с');
   } else {
     bonusChip.style.display = 'none';
   }
+
+  // Точка на кнопке наград за время
+  const dot = $('#timeRewardDot');
+  if(hasClaimableTimeReward()) dot.style.display = 'block';
+  else dot.style.display = 'none';
 }
 
 function updatePlaceBar(){
@@ -2648,7 +2808,6 @@ function openShop(){
       else renderExpand();
     }
 
-    // ГЛАВНОЕ: очистка контента в самом начале, чтобы при смене категории ничего не добавлялось в конец
     function renderItems(){
       content.innerHTML = '';
       catSel.style.display = 'flex';
@@ -2663,17 +2822,15 @@ function openShop(){
         chip.textContent = ck === 'all' ? (state.lang === 'en' ? 'All' : 'Все') : catName(ck);
         chip.onclick = () => {
           shopCurCat = ck;
-          renderItems();  // очищает content внутри себя
+          renderItems();
         };
         catSel.appendChild(chip);
       });
 
       const lvl = getLevel();
-      const filterFn = p => shopCurCat === 'all' || p.cat === shopCurCat;
-      const list = PRODUCTS.filter(filterFn);
+      const list = PRODUCTS.filter(p => shopCurCat === 'all' || p.cat === shopCurCat);
 
       if(shopCurCat === 'all'){
-        // группировка по категориям
         const byCat = {};
         Object.keys(CATS).forEach(ck => byCat[ck] = []);
         list.forEach(p => { if(byCat[p.cat]) byCat[p.cat].push(p); });
@@ -2796,7 +2953,7 @@ function openShop(){
           placeMode = {kind: 'furniture', type: k};
           updatePlaceBar();
           closeModal();
-          toast(state.lang === 'en' ? 'Tap an empty cell' : 'Нажмите на свободную клетку');
+          toast(t('tapEmptyCell'));
         };
         row.appendChild(ic); row.appendChild(nm); row.appendChild(pr); row.appendChild(b);
         content.appendChild(row);
@@ -2823,7 +2980,7 @@ function openShop(){
         nm.innerHTML = `<b>${state.lang === 'en' ? w.en : w.ru}</b><span>${owned ? t('bought') : fmt(w.cost) + ' \u20BF'}</span>`;
         const b = document.createElement('button');
         b.className = 'btn' + (active ? ' ghost' : '');
-        b.textContent = active ? '\u2713' : (owned ? (state.lang === 'en' ? 'Apply' : 'Применить') : t('buy'));
+        b.textContent = active ? '\u2713' : (owned ? t('apply2') : t('buy'));
         b.disabled = active;
         b.onclick = () => {
           if(owned){ state.decor.wall = i; }
@@ -2856,7 +3013,7 @@ function openShop(){
         nm.innerHTML = `<b>${state.lang === 'en' ? w.en : w.ru}</b><span>${owned ? t('bought') : fmt(w.cost) + ' \u20BF'}</span>`;
         const b = document.createElement('button');
         b.className = 'btn' + (active ? ' ghost' : '');
-        b.textContent = active ? '\u2713' : (owned ? (state.lang === 'en' ? 'Apply' : 'Применить') : t('buy'));
+        b.textContent = active ? '\u2713' : (owned ? t('apply2') : t('buy'));
         b.disabled = active;
         b.onclick = () => {
           if(owned){ state.decor.window = i; }
@@ -3003,11 +3160,11 @@ function autoStock(){
   }
   if(moved > 0){
     state.ds.stock += moved;
-    toast((state.lang === 'en' ? 'Stocked' : 'Разложено') + ': ' + moved, '#7fd07f');
+    toast(t('stocked') + ': ' + moved, '#7fd07f');
     updateHUD();
     scheduleSave();
   } else {
-    toast(state.lang === 'en' ? 'No free slots' : 'Нет свободных мест');
+    toast(t('noSlots'));
   }
 }
 
@@ -3041,7 +3198,7 @@ function openShelfInfo(gx, gy){
         ic.appendChild(im);
         const nm = document.createElement('div');
         nm.className = 'nm';
-        nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${state.lang === 'en' ? 'Sell' : 'Продажа'} ${p.sell} \u20BF</span>`;
+        nm.innerHTML = `<b>${pname(p)}</b><span>${catName(p.cat)} \u00B7 ${t('sellAt')} ${p.sell} \u20BF</span>`;
         const qty = document.createElement('div');
         qty.className = 'pr';
         qty.textContent = '\u00D7' + s.n;
@@ -3085,79 +3242,119 @@ function openShelfInfo(gx, gy){
 
 function openSettings(){
   openModal(t('settings'), el => {
-    const r1 = document.createElement('div');
-    r1.className = 'row';
-    r1.innerHTML = `<div class="nm"><b>${t('music')}</b><span>${state.lang === 'en' ? 'Background music' : 'Фоновая музыка'}</span></div>`;
-    const sw = document.createElement('div');
-    sw.className = 'switch' + (state.music ? ' on' : '');
-    sw.innerHTML = '<i></i>';
-    sw.onclick = () => {
-      state.music = !state.music;
-      sw.classList.toggle('on', state.music);
-      Music.setEnabled(state.music);
-      scheduleSave();
-    };
-    r1.appendChild(sw);
-    el.appendChild(r1);
-
-    const r2 = document.createElement('div');
-    r2.className = 'row';
-    r2.innerHTML = `<div class="nm"><b>${t('language')}</b><span>${state.lang === 'ru' ? 'Русский' : 'English'}</span></div>`;
-    const lg = document.createElement('div');
-    lg.style.display = 'flex'; lg.style.gap = '6px';
-    ['ru', 'en'].forEach(code => {
-      const b = document.createElement('button');
-      b.className = 'btn sm' + (state.lang === code ? '' : ' ghost');
-      b.textContent = code.toUpperCase();
-      b.onclick = () => {
-        state.lang = code;
+    // ==== Рендер основной страницы настроек ====
+    function renderMain(){
+      el.innerHTML = '';
+      const r1 = document.createElement('div');
+      r1.className = 'row';
+      r1.innerHTML = `<div class="nm"><b>${t('music')}</b><span>${state.lang === 'en' ? 'Background music' : 'Фоновая музыка'}</span></div>`;
+      const sw = document.createElement('div');
+      sw.className = 'switch' + (state.music ? ' on' : '');
+      sw.innerHTML = '<i></i>';
+      sw.onclick = () => {
+        state.music = !state.music;
+        sw.classList.toggle('on', state.music);
+        Music.setEnabled(state.music);
         scheduleSave();
-        applyLang();
-        closeModal();
-        openSettings();
       };
-      lg.appendChild(b);
-    });
-    r2.appendChild(lg);
-    el.appendChild(r2);
+      r1.appendChild(sw);
+      el.appendChild(r1);
 
-    const tt = document.createElement('div');
-    tt.className = 'sec-title'; tt.textContent = t('promo');
-    el.appendChild(tt);
+      const r2 = document.createElement('div');
+      r2.className = 'row';
+      r2.innerHTML = `<div class="nm"><b>${t('language')}</b><span>${state.lang === 'ru' ? 'Русский' : 'English'}</span></div>`;
+      const lg = document.createElement('div');
+      lg.style.display = 'flex'; lg.style.gap = '6px';
+      ['ru', 'en'].forEach(code => {
+        const b = document.createElement('button');
+        b.className = 'btn sm' + (state.lang === code ? '' : ' ghost');
+        b.textContent = code.toUpperCase();
+        b.onclick = () => {
+          state.lang = code;
+          scheduleSave();
+          applyLang();
+          closeModal();
+          openSettings();
+        };
+        lg.appendChild(b);
+      });
+      r2.appendChild(lg);
+      el.appendChild(r2);
 
-    const box = document.createElement('div');
-    box.style.cssText = 'display:flex;gap:7px';
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.placeholder = '...'; inp.maxLength = 20;
-    const ab = document.createElement('button');
-    ab.className = 'btn';
-    ab.textContent = t('apply');
-    ab.onclick = async () => {
-      const code = inp.value.trim().toLowerCase();
-      if(code === 'clear12'){
+      const tt = document.createElement('div');
+      tt.className = 'sec-title'; tt.textContent = t('promo');
+      el.appendChild(tt);
+
+      const box = document.createElement('div');
+      box.style.cssText = 'display:flex;gap:7px';
+      const inp = document.createElement('input');
+      inp.type = 'text'; inp.placeholder = '...'; inp.maxLength = 20;
+      const ab = document.createElement('button');
+      ab.className = 'btn';
+      ab.textContent = t('apply');
+      ab.onclick = async () => {
+        const code = inp.value.trim().toLowerCase();
+        if(code === 'clear12'){
+          await wipeSave();
+          closeModal();
+          toast(t('promoOk'), '#7fd07f');
+          setTimeout(() => location.reload(), 900);
+        } else if(code === 'admin17'){
+          state.money += 1000000;
+          state.xp += 1000000;
+          updateHUD(); scheduleSave();
+          inp.value = '';
+          toast(t('promoOk') + ' +1 000 000 \u20BF', '#ffd257');
+        } else {
+          toast(t('promoBad'), '#e0575b');
+        }
+      };
+      box.appendChild(inp); box.appendChild(ab);
+      el.appendChild(box);
+
+      const rb = document.createElement('button');
+      rb.className = 'btn r';
+      rb.style.cssText = 'width:100%;padding:11px;margin-top:16px';
+      rb.textContent = state.lang === 'en' ? 'Reset progress' : 'Сбросить прогресс';
+      rb.onclick = () => renderConfirm();
+      el.appendChild(rb);
+    }
+
+    // ==== Страница подтверждения сброса ====
+    function renderConfirm(){
+      el.innerHTML = '';
+      const q = document.createElement('div');
+      q.style.cssText = 'text-align:center;padding:22px 10px;font-size:15px;font-weight:600;line-height:1.5';
+      q.textContent = t('confirmReset');
+      el.appendChild(q);
+
+      const icon = document.createElement('div');
+      icon.style.cssText = 'text-align:center;font-size:52px;padding-bottom:6px';
+      icon.textContent = '⚠️';
+      el.insertBefore(icon, q);
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+      const yes = document.createElement('button');
+      yes.className = 'btn r';
+      yes.style.cssText = 'flex:1;padding:13px;font-size:14px';
+      yes.textContent = t('yesReset');
+      yes.onclick = async () => {
         await wipeSave();
         closeModal();
-        toast(t('promoOk'), '#7fd07f');
-        setTimeout(() => location.reload(), 900);
-      } else if(code === 'admin17'){
-        state.money += 1000000;
-        state.xp += 1000000;
-        updateHUD(); scheduleSave();
-        inp.value = '';
-        toast(t('promoOk') + ' +1 000 000 \u20BF', '#ffd257');
-      } else {
-        toast(t('promoBad'), '#e0575b');
-      }
-    };
-    box.appendChild(inp); box.appendChild(ab);
-    el.appendChild(box);
+        toast(t('progressReset'), '#e0575b');
+        updateHUD();
+      };
+      const no = document.createElement('button');
+      no.className = 'btn ghost';
+      no.style.cssText = 'flex:1;padding:13px;font-size:14px';
+      no.textContent = t('cancel');
+      no.onclick = () => renderMain();
+      row.appendChild(yes); row.appendChild(no);
+      el.appendChild(row);
+    }
 
-    const rb = document.createElement('button');
-    rb.className = 'btn r';
-    rb.style.cssText = 'width:100%;padding:11px;margin-top:16px';
-    rb.textContent = state.lang === 'en' ? 'Reset progress' : 'Сбросить прогресс';
-    rb.onclick = async () => { await wipeSave(); closeModal(); };
-    el.appendChild(rb);
+    renderMain();
   });
 }
 
@@ -3188,7 +3385,7 @@ function openTasks(){
         if(tk.claimed || !done) return;
         tk.claimed = true;
         state.money += tk.reward;
-        addXP(Math.round(tk.reward * 0.5));
+        addXP(Math.max(1, Math.round(tk.reward * 0.5)));
         updateHUD(); scheduleSave();
         toast('+' + fmt(tk.reward) + ' \u20BF', '#ffd257');
         closeModal(); openTasks();
@@ -3232,7 +3429,7 @@ function openDaily(){
     btn.onclick = () => {
       if(!canTake) return;
       state.money += amounts[dayIdx];
-      addXP(Math.round(amounts[dayIdx] * 0.5));
+      addXP(Math.max(1, Math.round(amounts[dayIdx] * 0.5)));
       state.lastDaily = today;
       state.streak++;
       updateHUD(); scheduleSave();
@@ -3241,19 +3438,6 @@ function openDaily(){
     };
     el.appendChild(btn);
   });
-}
-
-function checkTimeRewards(){
-  const mins = state.playtime / 60;
-  const next = TIME_REWARDS[state.lastRewardIdx];
-  if(!next) return;
-  if(mins >= next.min){
-    state.lastRewardIdx++;
-    state.money += next.amount;
-    addXP(Math.round(next.amount * 0.5));
-    updateHUD(); scheduleSave();
-    toast(t('onlineReward') + ': +' + fmt(next.amount) + ' \u20BF', '#ffd257');
-  }
 }
 
 function showAdOverlay(text){
@@ -3317,7 +3501,7 @@ function showTutorialHint(){
       updateTutorialBlock();
       hint.style.display = 'none';
       scheduleSave();
-      toast(state.lang === 'en' ? 'Tutorial complete!' : 'Обучение завершено!', '#7fd07f');
+      toast(t('tutorialComplete'), '#7fd07f');
     };
     row.appendChild(b);
     hint.appendChild(row);
@@ -3418,7 +3602,6 @@ async function boot(){
     initGrid();
   }
   checkDailyReset();
-  lastKnownLevel = getLevel();
   applyLang();
   resize();
 
@@ -3474,15 +3657,16 @@ $('#btnStock').onclick = () => {
   if(isTutorialBlocking() && tutorialStep !== 3) return;
   openWarehouse();
 };
+$('#btnTimeRewards').onclick = () => { if(!paused && !isTutorialBlocking()) openTimeRewards(); };
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
 $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(); };
 $('#btnSettings').onclick = () => { if(!paused && !isTutorialBlocking()) openSettings(); };
 $('#btnInvite').onclick = () => {
   if(paused || isTutorialBlocking()) return;
   vkSend('VKWebAppShowInviteBox').then(() => {
-    toast(state.lang === 'en' ? 'Invite sent!' : 'Приглашение отправлено!', '#7fd07f');
+    toast(t('inviteSent'), '#7fd07f');
   }).catch(() => {
-    toast(state.lang === 'en' ? 'Invite unavailable' : 'Приглашение недоступно');
+    toast(t('inviteUnavailable'));
   });
 };
 
