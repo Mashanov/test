@@ -227,10 +227,6 @@ input[type=text]:focus{border-color:#4a89ff}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>
       <span data-i18n="warehouse">Склад</span>
     </button>
-    <button class="botbtn" id="btnExpand">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20V8"/></svg>
-      <span data-i18n="expand">Расширить</span>
-    </button>
     <button class="botbtn" id="btnInvite">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M18 8v6M15 11h6"/></svg>
       <span data-i18n="friends">Друзья</span>
@@ -251,7 +247,7 @@ input[type=text]:focus{border-color:#4a89ff}
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <script>
 /* =========================================================================
-   МАГАЗИН v4 — городок, уборка, грузовик с бонусом
+   МАГАЗИН v5
    ========================================================================= */
 'use strict';
 
@@ -259,9 +255,9 @@ input[type=text]:focus{border-color:#4a89ff}
 const GW = 11, GH = 10;
 const DOOR = {x: 0, y: 5};
 const OUT_MARGIN = 90;
-const TRUCK_CYCLE = 180;   // сек между приездами
-const TRUCK_OFFER = 120;   // сек на раздумье
-const TRUCK_BONUS = 120;   // длительность бонуса x2
+const TRUCK_CYCLE = 180;
+const TRUCK_OFFER = 120;
+const TRUCK_BONUS = 120;
 
 const CATS = {
   dairy:    {ru:'Молочное',   en:'Dairy',      c:'#8fd3ff'},
@@ -382,13 +378,14 @@ const P_RAW = [
 ['Порошок','Detergent','household','box',200]
 ];
 
+// Наценка ~10% (минимум +1 монета к цене покупки)
 const PRODUCTS = P_RAW.map((p, i) => ({
   id: i + 1,
   ru: p[0], en: p[1],
   cat: p[2],
   shape: p[3],
   cost: p[4],
-  sell: Math.max(2, Math.round(p[4] * 1.85)),
+  sell: Math.max(p[4] + 1, Math.round(p[4] * 1.10)),
   color: CATS[p[2]].c
 }));
 const PROD_BY_ID = {};
@@ -438,7 +435,7 @@ const TIME_REWARDS = [
 ];
 
 const STR = {
-  ru:{ shop:'Магазин', warehouse:'Склад', expand:'Расширить', friends:'Друзья', settings:'Настройки',
+  ru:{ shop:'Магазин', warehouse:'Склад', friends:'Друзья', settings:'Настройки',
     tasks:'Задания', daily:'Ежедневная награда', close:'Закрыть', buy:'Купить',
     cancel:'Отмена', place:'Разместить', money:'Монеты', music:'Музыка', language:'Язык',
     promo:'Промокод', apply:'Применить', tutorialQ:'Хотите пройти обучение?',
@@ -466,12 +463,11 @@ const STR = {
     truckDesc:'Смотрите рекламу и получите x2 доход с продаж на 2 минуты!',
     truckAccept:'Смотреть рекламу',
     truckDecline:'Прогнать',
-    truckSoon:'Грузовик приедет через',
-    truckLeft:'Акция активна',
     dirtClean:'+опыт за уборку!',
-    bonusActive:'x2 доход!'
+    bonusActive:'x2 доход!',
+    returnedGoods:'Товар возвращён на склад'
   },
-  en:{ shop:'Shop', warehouse:'Storage', expand:'Expand', friends:'Friends', settings:'Settings',
+  en:{ shop:'Shop', warehouse:'Storage', friends:'Friends', settings:'Settings',
     tasks:'Tasks', daily:'Daily reward', close:'Close', buy:'Buy',
     cancel:'Cancel', place:'Place', money:'Coins', music:'Music', language:'Language',
     promo:'Promo code', apply:'Apply', tutorialQ:'Would you like a tutorial?',
@@ -483,7 +479,7 @@ const STR = {
     promoOk:'Promo code activated!', promoBad:'Invalid promo code',
     noMoney:'Not enough coins', placed:'Placed',
     bought:'Purchased', expandHint:'Tap a dark cell nearby',
-    streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty — buy goods in the Shop',
+    streak:'Day streak', dailyTaken:'Already claimed today', stockEmpty:'Storage is empty',
     tapShelf:'Tap a shelf to place goods', adDone:'Ad reward received!',
     shelfInfo:'Shelf info', total:'Total', slots:'slots', onMap:'On map',
     tutorial1:'Welcome! This is your shop. Tap Next to continue.',
@@ -499,10 +495,9 @@ const STR = {
     truckDesc:'Watch an ad and get x2 income for 2 minutes!',
     truckAccept:'Watch ad',
     truckDecline:'Drive away',
-    truckSoon:'Truck arrives in',
-    truckLeft:'Bonus active',
     dirtClean:'+XP for cleaning!',
-    bonusActive:'x2 income!'
+    bonusActive:'x2 income!',
+    returnedGoods:'Goods returned to storage'
   }
 };
 
@@ -781,7 +776,7 @@ function newState(){
     tasks: [], tasksDate: '',
     ds: {sell:0, earn:0, serve:0, buy:0, place:0, stock:0, expand:0},
     playtime: 0, lastRewardIdx: 0,
-    totalServed: 0, totalEarned: 0, adCount: 0, v: 4,
+    totalServed: 0, totalEarned: 0, adCount: 0, v: 5,
     dirt: [],
     truckTimer: TRUCK_CYCLE,
     truckState: 'away',
@@ -882,7 +877,6 @@ function dropDirt(x, y){
   const cx = Math.floor(x), cy = Math.floor(y);
   const c = cellAt(cx, cy);
   if(!c || !c.u) return;
-  // не больше одной грязи на клетку
   if(state.dirt.find(d => d.x === cx && d.y === cy)) return;
   const type = randInt(0, 2);
   state.dirt.push({x: cx, y: cy, type, t: Date.now()});
@@ -1078,7 +1072,8 @@ class Customer {
     this.x = DOOR.x + 0.5;
     this.y = DOOR.y + 0.5;
     this.alpha = 0;
-    this.speed = rnd(1.5, 2.2);
+    // Замедленная скорость ходьбы
+    this.speed = rnd(0.65, 1.0);
     this.shirt = pick(SHIRT);
     this.skin = pick(SKIN);
     this.hair = pick(HAIR);
@@ -1096,10 +1091,25 @@ class Customer {
     this.bubbleT = 0;
     this.spot = null;
     this.dead = false;
-    this.patience = 45;
+    this.patience = 60;
     this.dirtDropped = false;
-    // шанс 20% оставить грязь при уходе
     this.willDropDirt = Math.random() < 0.2;
+    this.returnNotified = false;
+  }
+
+  // Мгновенный возврат корзины на склад. Возвращает true, если что-то вернули.
+  returnCart(){
+    if(!this.cart.length) return false;
+    for(const it of this.cart){
+      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
+    }
+    this.cart = [];
+    if(!this.returnNotified){
+      this.returnNotified = true;
+      toast(t('returnedGoods'), '#8fd3ff');
+    }
+    scheduleSave();
+    return true;
   }
 
   moveTo(gx, gy){
@@ -1117,13 +1127,14 @@ class Customer {
     }
 
     if(this.state === 'gone'){
+      // ГАРАНТИРОВАННЫЙ возврат товара, если что-то осталось
+      this.returnCart();
       this.alpha -= dt * 1.3;
       this.x -= dt * 1.2;
       this.bob = Math.sin(this.walk) * 0.045;
-      this.walk += dt * 9;
+      this.walk += dt * 7;
       this.targetDir = Math.PI;
       this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 8));
-      // Оставляем грязь возле выхода — один раз
       if(this.willDropDirt && !this.dirtDropped && this.alpha < 0.85){
         this.dirtDropped = true;
         dropDirt(DOOR.x + 1 + Math.random() * 1.5, DOOR.y + (Math.random() - 0.5) * 1.2);
@@ -1160,7 +1171,7 @@ class Customer {
       }
       if(d > 0.01) this.targetDir = Math.atan2(dy, dx);
       this.dir = lerpAngle(this.dir, this.targetDir, Math.min(1, dt * 10));
-      this.walk += dt * 11;
+      this.walk += dt * 8;
       this.bob = Math.sin(this.walk) * 0.045;
     } else {
       this.bob *= 0.85;
@@ -1198,10 +1209,10 @@ class Customer {
           const p = PROD_BY_ID[s.id];
           this.cart.push({id: s.id, price: p.sell});
         }
-        this.visited.push(this.targetX + ',' + this.targetY);
       }
+      if(this.targetX !== undefined) this.visited.push(this.targetX + ',' + this.targetY);
       this.state = 'idle';
-      if(this.cart.length >= this.wants || this.visited.length > 3){
+      if(this.cart.length >= this.wants || this.visited.length > 4){
         this.goToCashier();
       } else {
         this.planShopping();
@@ -1220,7 +1231,7 @@ class Customer {
       addXP(total);
       if(this.spot) busySpots.delete(this.spot);
       this.spot = null;
-      this.cart = [];
+      this.cart = [];  // оплачено — товары уходят
       toast('+' + fmt(total) + ' \u20BF' + (mult > 1 ? ' x2!' : ''), mult > 1 ? '#ffd257' : '#7fd07f');
       updateHUD();
       scheduleSave();
@@ -1230,26 +1241,34 @@ class Customer {
 
   planShopping(){
     const shelves = shelfCells().filter(s => s.c.stock.length > 0);
+    if(!shelves.length){ this.returnCart(); this.leave(); return; }
     const fresh = shelves.filter(s => this.visited.indexOf(s.x + ',' + s.y) < 0);
     const pool = fresh.length ? fresh : shelves;
-    if(!pool.length){ this.returnCartAndLeave(); return; }
     const target = pick(pool);
     const spots = adjacentWalkable(target.x, target.y);
-    if(!spots.length){ this.visited.push(target.x + ',' + target.y); this.planShopping(); return; }
+    if(!spots.length){
+      // помечаем клетку как недостижимую и пытаемся снова
+      const key = target.x + ',' + target.y;
+      if(this.visited.indexOf(key) < 0) this.visited.push(key);
+      // защита от вечного цикла
+      if(this.visited.length > shelves.length + 3){ this.returnCart(); this.leave(); return; }
+      this.planShopping();
+      return;
+    }
     const spot = pick(spots);
     this.targetCell = target.c;
     this.targetX = target.x;
     this.targetY = target.y;
     this.state = 'toShelf';
-    if(!this.moveTo(spot.x, spot.y)){ this.returnCartAndLeave(); }
+    if(!this.moveTo(spot.x, spot.y)){ this.returnCart(); this.leave(); }
   }
 
   goToCashier(){
     if(!this.cart.length){ this.leave(); return; }
     if(!counterCells().length){
-      // нет кассы — вернуть всё на склад и уйти (без воровства)
-      toast(state.lang === 'en' ? 'Customer left — no cashier!' : 'Нужна касса! Клиент вернул товар', '#e0575b');
-      this.returnCartAndLeave();
+      toast(state.lang === 'en' ? 'No cashier — returning goods' : 'Нет кассы — товар возвращён', '#e0575b');
+      this.returnCart();
+      this.leave();
       return;
     }
     this.tryCashier();
@@ -1273,28 +1292,15 @@ class Customer {
     if(!this.moveTo(best.x, best.y)){
       busySpots.delete(best.x + ',' + best.y);
       this.spot = null;
-      this.returnCartAndLeave();
+      this.returnCart();
+      this.leave();
     }
-  }
-
-  // Возврат товаров из корзины на склад (никакого воровства)
-  returnCartAndLeave(){
-    if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
-    for(const it of this.cart){
-      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
-    }
-    this.cart = [];
-    scheduleSave();
-    this.leave();
   }
 
   leave(){
     if(this.spot){ busySpots.delete(this.spot); this.spot = null; }
-    // На всякий случай вернём, если что-то осталось
-    for(const it of this.cart){
-      state.warehouse[it.id] = (state.warehouse[it.id] || 0) + 1;
-    }
-    this.cart = [];
+    // Всегда возвращаем товар при уходе (никакого воровства)
+    this.returnCart();
     this.state = 'leaving';
     if(!this.moveTo(DOOR.x, DOOR.y)){ this.state = 'gone'; }
   }
@@ -1357,7 +1363,7 @@ function findPath(sx, sy, gx, gy){
   return path;
 }
 
-/* ------------------------ 6b. КАССИР (NPC) ------------------------------- */
+/* ------------------------ 6b. КАССИР ------------------------------- */
 const cashier = {
   x: 5.5, y: 5.15,
   skin: '#e0aa7a', hair: '#4a2f1c', shirt: '#2b5fae',
@@ -1384,14 +1390,13 @@ const cashier = {
 
 /* --------------------------- 6c. ГРУЗОВИК -------------------------------- */
 const truck = {
-  x: -8,           // позиция по горизонтали (в клетках)
-  targetX: 0,      // где остановится
-  baseY: GH + 0.6, // чуть ниже магазина
+  x: -8,
+  targetX: 0,
+  baseY: GH + 0.6,
   arrived: false,
   wheels: 0,
 
   update(dt){
-    // в состоянии offering едет к позиции, потом стоит
     if(state.truckState === 'offering'){
       const dx = this.targetX - this.x;
       if(Math.abs(dx) > 0.1){
@@ -1402,7 +1407,6 @@ const truck = {
         this.arrived = true;
       }
     } else if(state.truckState === 'away'){
-      // уехал далеко
       if(this.x > -10) this.x = -10;
       this.arrived = false;
     }
@@ -1413,13 +1417,11 @@ const truck = {
     const px = this.x;
     const py = this.baseY;
 
-    // тень
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath();
     ctx.ellipse(px, py + 0.55, 1.7, 0.22, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // колёса
     ctx.fillStyle = '#1b1b1b';
     ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.24, 0, Math.PI * 2); ctx.fill();
@@ -1427,7 +1429,6 @@ const truck = {
     ctx.beginPath(); ctx.arc(px - 1.05, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(px + 0.85, py + 0.5, 0.11, 0, Math.PI * 2); ctx.fill();
 
-    // кабина (справа, смотрит вправо)
     ctx.fillStyle = '#e63c3c';
     ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.55);
     ctx.fillStyle = '#8fd3ff';
@@ -1435,13 +1436,11 @@ const truck = {
     ctx.fillStyle = '#c92a2a';
     ctx.fillRect(px + 0.55, py - 0.05, 0.75, 0.06);
 
-    // кузов
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(px - 1.3, py - 0.15, 1.8, 0.65);
     ctx.fillStyle = '#dcdcdc';
     ctx.fillRect(px - 1.3, py + 0.3, 1.8, 0.2);
 
-    // надпись "SALE" x2
     ctx.save();
     ctx.translate(px - 0.4, py + 0.15);
     ctx.fillStyle = '#e63c3c';
@@ -1454,20 +1453,14 @@ const truck = {
     ctx.fillText('x2', 0, 0.34);
     ctx.restore();
 
-    // мигающий огонёк
     const blink = Math.sin(Date.now() / 200) > 0;
     if(blink){
       ctx.fillStyle = '#ffd257';
-      ctx.beginPath();
-      ctx.arc(px + 1.3, py - 0.05, 0.1, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px + 1.3, py - 0.05, 0.1, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = 'rgba(255,210,87,.4)';
-      ctx.beginPath();
-      ctx.arc(px + 1.3, py - 0.05, 0.22, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px + 1.3, py - 0.05, 0.22, 0, Math.PI * 2); ctx.fill();
     }
 
-    // восклицательный знак над машиной
     const bob = Math.sin(Date.now() / 300) * 0.05;
     ctx.fillStyle = '#ffd257';
     ctx.font = 'bold 0.7px system-ui';
@@ -1478,7 +1471,6 @@ const truck = {
 
   hitTest(worldX, worldY){
     if(state.truckState !== 'offering') return false;
-    // прямоугольная область вокруг грузовика
     if(worldX < this.x - 1.5 || worldX > this.x + 1.5) return false;
     if(worldY < this.baseY - 0.7 || worldY > this.baseY + 0.9) return false;
     return true;
@@ -1639,7 +1631,6 @@ function draw(){
   drawDirt();
   drawWindows();
 
-  // Грузовик рисуем ДО магазина — он за домом
   ctx.save();
   ctx.scale(CS, CS);
   truck.draw();
@@ -1649,10 +1640,8 @@ function draw(){
   ctx.scale(CS, CS);
   ctx.lineJoin = 'round';
 
-  // Кассир (рисуется первым, чтобы прилавок перекрывал)
   drawCashier();
 
-  // Мебель
   for(let y = 0; y < GH; y++){
     for(let x = 0; x < GW; x++){
       const c = state.grid[y][x];
@@ -1660,7 +1649,6 @@ function draw(){
     }
   }
 
-  // Подсветка размещения
   if(placeMode){
     ctx.lineWidth = 0.06;
     for(let y = 0; y < GH; y++) for(let x = 0; x < GW; x++){
@@ -1677,161 +1665,213 @@ function draw(){
     }
   }
 
-  // Клиенты поверх мебели
   for(const c of customers) drawCustomer(c);
 
   ctx.restore();
   ctx.restore();
 
-  // Рамка вокруг сетки
   ctx.strokeStyle = '#2b3648';
   ctx.lineWidth = 2;
   ctx.strokeRect(getOX() - 1, getOY() - 1, GW * CS + 2, GH * CS + 2);
 }
 
-/* --------- 9a. МИР ЗА МАГАЗИНОМ (ГОРОДОК) --------- */
+/* --------- 9a. ГОРОДОК ЗА МАГАЗИНОМ --------- */
 function drawOutside(){
   const MB = OUT_MARGIN;
   const totalW = GW * CS, totalH = GH * CS;
+  const roadWidth = MB;
+  const sideWidth = MB;
 
-  // Дорога — ободок вокруг
-  ctx.fillStyle = '#2a2f38';
-  ctx.fillRect(-MB * 2, -MB * 2, totalW + MB * 4, totalH + MB * 4);
+  const roadInner = MB;
+  const roadOuter = MB + roadWidth;
+  const buildingZone = roadOuter + 6;
 
-  // Тротуар
+  // 1) Крупный фон
+  ctx.fillStyle = '#1c222c';
+  const bgPad = (buildingZone + 90);
+  ctx.fillRect(-bgPad, -bgPad, totalW + bgPad * 2, totalH + bgPad * 2);
+
+  // 2) Дальние силуэты домов (совсем фон) — сверху
+  drawBgSkyline(-bgPad, -bgPad, totalW + bgPad * 2, buildingZone - 6, true);
+  // И снизу
+  drawBgSkyline(-bgPad, totalH + roadOuter, totalW + bgPad * 2, 90, false);
+
+  // 3) Дорога (кольцо вокруг тротуара)
+  ctx.fillStyle = '#2b2f37';
+  ctx.fillRect(-roadOuter, -roadOuter, totalW + roadOuter * 2, totalH + roadOuter * 2);
+
+  // 4) Разметка дороги
+  ctx.strokeStyle = 'rgba(255,240,150,.75)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([16, 14]);
+  // Верхняя и нижняя линии
+  const lineTopY = -(roadInner + roadWidth / 2);
+  const lineBotY = totalH + roadInner + roadWidth / 2;
+  const lineLeftX = -(roadInner + roadWidth / 2);
+  const lineRightX = totalW + roadInner + roadWidth / 2;
+  ctx.beginPath();
+  ctx.moveTo(-roadOuter, lineTopY); ctx.lineTo(totalW + roadOuter, lineTopY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-roadOuter, lineBotY); ctx.lineTo(totalW + roadOuter, lineBotY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(lineLeftX, -roadOuter); ctx.lineTo(lineLeftX, totalH + roadOuter);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(lineRightX, -roadOuter); ctx.lineTo(lineRightX, totalH + roadOuter);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Тротуар (внутреннее кольцо)
   ctx.fillStyle = '#5a6470';
-  ctx.fillRect(-MB, -MB, totalW + MB * 2, totalH + MB * 2);
+  ctx.fillRect(-roadInner, -roadInner, totalW + roadInner * 2, totalH + roadInner * 2);
+  // Чуть темнее отступ между тротуаром и дорогой
+  ctx.fillStyle = '#4a525c';
+  ctx.fillRect(-roadOuter, -roadOuter, totalW + roadOuter * 2, roadWidth);
+  ctx.fillRect(-roadOuter, totalH + roadInner, totalW + roadOuter * 2, roadWidth);
+  ctx.fillRect(-roadOuter, 0, roadWidth, totalH);
+  ctx.fillRect(totalW + roadInner, 0, roadWidth, totalH);
 
-  // Здания вокруг (силуэты)
-  drawTownBuildings(-MB - 60, -MB - 60, totalW + MB * 2 + 120, 45, true);  // задний фон сверху
-  drawTownBuildings(-MB - 55, totalH + MB + 5, totalW + MB * 2 + 110, 50, false); // нижний ряд
-  // Слева и справа — вертикальные дома
-  drawSideBuildings(-MB - 55, 0, totalH);
-  drawSideBuildings(totalW + MB + 5, 0, totalH);
-
-  // Внутренняя плитка тротуара
-  ctx.strokeStyle = 'rgba(0,0,0,.18)';
+  // Плитка тротуара
+  ctx.strokeStyle = 'rgba(0,0,0,.2)';
   ctx.lineWidth = 1;
-  for(let x = -MB; x <= totalW + MB; x += 14){
-    ctx.beginPath(); ctx.moveTo(x, -MB); ctx.lineTo(x, 0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + MB); ctx.stroke();
+  const tile = 15;
+  for(let x = -roadInner; x <= totalW + roadInner; x += tile){
+    ctx.beginPath(); ctx.moveTo(x, -roadInner); ctx.lineTo(x, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x, totalH); ctx.lineTo(x, totalH + roadInner); ctx.stroke();
   }
-  for(let y = -MB; y <= totalH + MB; y += 14){
-    ctx.beginPath(); ctx.moveTo(-MB, y); ctx.lineTo(0, y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + MB, y); ctx.stroke();
+  for(let y = -roadInner; y <= totalH + roadInner; y += tile){
+    ctx.beginPath(); ctx.moveTo(-roadInner, y); ctx.lineTo(0, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(totalW, y); ctx.lineTo(totalW + roadInner, y); ctx.stroke();
   }
 
   // Дорожка ко входу
   const doorX = DOOR.x * CS;
   const doorY = (DOOR.y + 1) * CS;
   ctx.fillStyle = '#7f8a96';
-  ctx.fillRect(doorX - 3, doorY, CS + 6, MB);
-  ctx.strokeStyle = 'rgba(0,0,0,.28)';
-  ctx.strokeRect(doorX - 3, doorY, CS + 6, MB);
+  ctx.fillRect(doorX - 3, doorY, CS + 6, roadInner);
+  ctx.strokeStyle = 'rgba(0,0,0,.3)';
+  ctx.strokeRect(doorX - 3, doorY, CS + 6, roadInner);
   ctx.strokeStyle = 'rgba(255,255,255,.35)';
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
   ctx.moveTo(doorX + CS / 2, doorY + 2);
-  ctx.lineTo(doorX + CS / 2, doorY + MB - 2);
+  ctx.lineTo(doorX + CS / 2, doorY + roadInner - 2);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Разметка дороги вокруг
-  ctx.strokeStyle = 'rgba(255,240,150,.7)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([14, 12]);
-  ctx.beginPath();
-  ctx.moveTo(-MB * 2 + 4, -MB * 1.5);
-  ctx.lineTo(totalW + MB * 2 - 4, -MB * 1.5);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-MB * 2 + 4, totalH + MB * 1.5);
-  ctx.lineTo(totalW + MB * 2 - 4, totalH + MB * 1.5);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-MB * 1.5, -MB * 2 + 4);
-  ctx.lineTo(-MB * 1.5, totalH + MB * 2 - 4);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(totalW + MB * 1.5, -MB * 2 + 4);
-  ctx.lineTo(totalW + MB * 1.5, totalH + MB * 2 - 4);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // 5) ДОМА — ЗА дорогой, чтобы не стояли на ней
+  // Верхний ряд (между дорогой и фоном) — но за дорогой
+  drawBuildingRow(-bgPad, -buildingZone - 60, totalW + bgPad * 2, 60, true);
+  // Нижний ряд домов — тоже за дорогой
+  drawBuildingRow(-bgPad, totalH + buildingZone, totalW + bgPad * 2, 60, false);
+  // Левый и правый ряды
+  drawBuildingColumn(-buildingZone - 60, -bgPad, 60, totalH + bgPad * 2, true);
+  drawBuildingColumn(totalW + buildingZone, -bgPad, 60, totalH + bgPad * 2, false);
 
-  // Скамейка справа от двери
-  drawBench(totalW + MB / 2, totalH / 2);
-  // Скамейка слева
-  drawBench(-MB / 2, totalH / 2);
-  // Фонарь у входа
-  drawLamp(-MB + 10, doorY + MB / 2);
+  // 6) Мелкие детали на тротуаре
+  drawBench(totalW + roadInner - 6, totalH / 2);
+  drawBench(-roadInner + 6, totalH / 2);
+  drawLamp(-roadInner + 10, doorY + roadInner / 2);
 
-  // Деревья и кусты по периметру
-  drawTreeCtx(-MB + 12, -MB + 12);
-  drawTreeCtx(totalW - 12, -MB + 12);
-  drawTreeCtx(totalW / 2, -MB + 10);
-  drawTreeCtx(-MB + 20, totalH + MB - 12);
-  drawTreeCtx(totalW - 20, totalH + MB - 12);
-  drawBush(-MB - 4, totalH - MB / 2);
-  drawBush(totalW + MB + 4, -MB / 2);
-  drawBush(-MB - 6, -MB - 4);
-  drawBush(totalW + MB + 6, totalH + MB + 4);
+  drawTreeCtx(-roadInner + 12, -roadInner + 12);
+  drawTreeCtx(totalW - 12, -roadInner + 12);
+  drawTreeCtx(totalW / 2, -roadInner + 10);
+  drawTreeCtx(-roadInner + 20, totalH + roadInner - 12);
+  drawTreeCtx(totalW - 20, totalH + roadInner - 12);
+  drawBush(-roadInner - 4, totalH - roadInner / 2);
+  drawBush(totalW + roadInner + 4, -roadInner / 2);
 }
 
-// Полоса дальних домов (фон)
-function drawTownBuildings(x, y, w, h, tall){
+// Ряд домов с окнами
+function drawBuildingRow(x, y, w, h, isTop){
   const colors = ['#2a3a4d', '#3a4a5d', '#2f4050', '#354a5c', '#28425c'];
   const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f', '#2f4a3d'];
   let cx = x;
   let idx = 0;
   while(cx < x + w){
-    const bw = 40 + ((idx * 17) % 30);
-    const bh = h + ((idx * 13) % 20);
+    const bw = 55 + ((idx * 17) % 35);
+    const bh = h + ((idx * 13) % 25);
     const col = colors[idx % colors.length];
     const roofCol = roofColors[idx % roofColors.length];
-    // стена
+    const yBase = isTop ? (y + (h - bh)) : y;
     ctx.fillStyle = col;
-    ctx.fillRect(cx, y + (h - bh), bw, bh);
-    // крыша
+    ctx.fillRect(cx, yBase, bw, bh);
     ctx.fillStyle = roofCol;
-    ctx.fillRect(cx - 3, y + (h - bh) - 5, bw + 6, 6);
+    if(isTop){
+      ctx.fillRect(cx - 3, yBase - 6, bw + 6, 7);
+    } else {
+      ctx.fillRect(cx - 3, yBase + bh - 1, bw + 6, 6);
+    }
     // окна
-    ctx.fillStyle = 'rgba(255,225,130,.55)';
-    const winCount = Math.max(2, Math.floor(bw / 15));
-    for(let i = 0; i < winCount; i++){
+    ctx.fillStyle = 'rgba(255,225,130,.6)';
+    const cols = Math.max(2, Math.floor(bw / 18));
+    for(let i = 0; i < cols; i++){
       for(let j = 0; j < 2; j++){
-        const wx = cx + 6 + i * 14;
-        const wy = y + (h - bh) + 10 + j * 18;
-        if(wx + 8 < cx + bw - 4 && wy + 10 < y + h - 4){
-          ctx.fillRect(wx, wy, 8, 10);
+        const wx = cx + 6 + i * 16;
+        const wy = yBase + 10 + j * 20;
+        if(wx + 9 < cx + bw - 4 && wy + 12 < yBase + bh - 4){
+          ctx.fillRect(wx, wy, 9, 12);
         }
       }
     }
-    cx += bw + 6;
+    cx += bw + 8;
     idx++;
   }
 }
 
-function drawSideBuildings(x, y, h){
+// Колонка домов (левая/правая сторона)
+function drawBuildingColumn(x, y, w, h, isLeft){
   const colors = ['#2a3a4d', '#3a4a5d', '#354a5c'];
   const roofColors = ['#4a2f2f', '#3d3d55', '#4a3d2f'];
   let cy = y;
   let idx = 0;
   while(cy < y + h){
-    const bh = 50 + ((idx * 21) % 40);
-    const bw = 45 + ((idx * 11) % 20);
+    const bh = 60 + ((idx * 21) % 40);
+    const bw = w + ((idx * 11) % 20);
     const col = colors[idx % colors.length];
+    const xBase = isLeft ? (x + (w - bw)) : x;
     ctx.fillStyle = col;
-    ctx.fillRect(x, cy, bw, bh);
+    ctx.fillRect(xBase, cy, bw, bh);
     ctx.fillStyle = roofColors[idx % roofColors.length];
-    ctx.fillRect(x - 4, cy - 3, bw + 8, 6);
+    if(isLeft){
+      ctx.fillRect(xBase - 6, cy - 3, 7, bh + 6);
+    } else {
+      ctx.fillRect(xBase + bw - 1, cy - 3, 6, bh + 6);
+    }
     // окна
-    ctx.fillStyle = 'rgba(255,225,130,.5)';
+    ctx.fillStyle = 'rgba(255,225,130,.55)';
     for(let i = 0; i < 2; i++){
       for(let j = 0; j < 3; j++){
-        ctx.fillRect(x + 6 + i * 18, cy + 10 + j * 16, 10, 10);
+        const wx = xBase + 8 + i * 20;
+        const wy = cy + 12 + j * 22;
+        if(wx + 10 < xBase + bw - 4 && wy + 12 < cy + bh - 4){
+          ctx.fillRect(wx, wy, 10, 12);
+        }
       }
     }
-    cy += bh + 8;
+    cy += bh + 10;
+    idx++;
+  }
+}
+
+// Дальний силуэт (фон)
+function drawBgSkyline(x, y, w, h, isTop){
+  ctx.fillStyle = '#20262f';
+  let cx = x;
+  let idx = 0;
+  while(cx < x + w){
+    const bw = 40 + ((idx * 19) % 45);
+    const bh = h - 10 - ((idx * 11) % 25);
+    const yBase = isTop ? (y + h - bh) : y;
+    ctx.fillRect(cx, yBase, bw, bh);
+    ctx.fillStyle = 'rgba(255,220,120,.25)';
+    for(let i = 0; i < Math.floor(bw / 20); i++){
+      ctx.fillRect(cx + 6 + i * 20, yBase + 8 + (idx % 3) * 10, 6, 8);
+    }
+    ctx.fillStyle = '#20262f';
+    cx += bw + 6;
     idx++;
   }
 }
@@ -1948,10 +1988,7 @@ function drawDirt(){
   for(const d of state.dirt){
     const px = d.x * CS, py = d.y * CS;
     const seed = (d.x * 31 + d.y * 17) % 100;
-    const r1 = 4 + (seed % 4);
-    const r2 = 3 + ((seed * 3) % 5);
     if(d.type === 0){
-      // коричневая лужа
       ctx.fillStyle = 'rgba(90,60,30,.55)';
       ctx.beginPath();
       ctx.ellipse(px + CS * 0.35, py + CS * 0.55, CS * 0.22, CS * 0.16, 0.4, 0, Math.PI * 2);
@@ -1964,7 +2001,6 @@ function drawDirt(){
       ctx.arc(px + CS * 0.25, py + CS * 0.45, CS * 0.06, 0, Math.PI * 2);
       ctx.fill();
     } else if(d.type === 1){
-      // грязные следы
       ctx.fillStyle = 'rgba(50,40,30,.5)';
       ctx.beginPath();
       ctx.ellipse(px + CS * 0.3, py + CS * 0.4, CS * 0.09, CS * 0.13, -0.4, 0, Math.PI * 2);
@@ -1976,7 +2012,6 @@ function drawDirt(){
       ctx.ellipse(px + CS * 0.4, py + CS * 0.7, CS * 0.08, CS * 0.11, -0.4, 0, Math.PI * 2);
       ctx.fill();
     } else {
-      // мусор (бумажки, крошки)
       ctx.fillStyle = 'rgba(230,220,180,.85)';
       ctx.fillRect(px + CS * 0.3, py + CS * 0.4, CS * 0.16, CS * 0.12);
       ctx.fillStyle = 'rgba(180,150,100,.7)';
@@ -1987,12 +2022,9 @@ function drawDirt(){
       for(let i = 0; i < 4; i++){
         const rx = px + CS * (0.3 + (i * 13 + seed) % 40 / 100);
         const ry = py + CS * (0.5 + (i * 7 + seed) % 40 / 100);
-        ctx.beginPath();
-        ctx.arc(rx, ry, 1.2, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(rx, ry, 1.2, 0, Math.PI * 2); ctx.fill();
       }
     }
-    // значок "протри"
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 350);
     ctx.strokeStyle = `rgba(143,211,255,${0.3 + pulse * 0.5})`;
     ctx.lineWidth = 1.5;
@@ -2218,7 +2250,7 @@ function drawCashier(){
 
 /* ------------------------------ 10. ЛОГИКА -------------------------------- */
 const customers = [];
-let spawnTimer = 3;
+let spawnTimer = 8;
 
 function updateWorld(dt){
   cashier.update(dt);
@@ -2230,17 +2262,17 @@ function updateWorld(dt){
 
   const shelves = shelfCells().filter(s => s.c.stock.length > 0);
   const counters = counterCells();
-  const maxCust = Math.min(12, 3 + Math.floor(shelves.length / 2));
+  const maxCust = Math.min(8, 2 + Math.floor(shelves.length / 3));
 
   spawnTimer -= dt;
   if(spawnTimer <= 0){
-    spawnTimer = Math.max(2.2, 8.5 - shelves.length * 0.35);
+    // Замедленный спавн
+    spawnTimer = Math.max(5, 18 - shelves.length * 0.6);
     if(customers.length < maxCust && shelves.length > 0 && counters.length > 0){
       customers.push(new Customer());
     }
   }
 
-  // Грузовик: цикл
   if(state.truckState === 'away'){
     state.truckTimer -= dt;
     if(state.truckTimer <= 0){
@@ -2375,7 +2407,6 @@ let placeMode = null;
 function onCellClick(gx, gy){
   if(isTutorialBlocking() && tutorialStep <= 2) return;
 
-  // 1) Уборка грязи — в приоритете
   if(dirtAtCell(gx, gy)){
     cleanDirtAt(gx, gy);
     return;
@@ -2484,7 +2515,6 @@ function endDrag(e){
   canvas.classList.remove('dragging');
   try { canvas.releasePointerCapture(e.pointerId); } catch(_){}
   if(!wasMoved){
-    // клик — проверяем грузовик в мировых координатах, потом клетку
     const wld = screenToWorld(e.clientX, e.clientY);
     if(truck.hitTest(wld.x, wld.y)){
       openTruckModal();
@@ -2529,7 +2559,6 @@ function updateHUD(){
   const canDaily = state.lastDaily !== todayStr();
   $('#dailyBadge').style.display = canDaily ? 'block' : 'none';
 
-  // Бонус x2
   const bonusChip = $('#bonusChip');
   if(hasIncomeBonus()){
     const left = Math.ceil((state.bonusUntil - Date.now()) / 1000);
@@ -2619,9 +2648,12 @@ function openShop(){
       else renderExpand();
     }
 
+    // ГЛАВНОЕ: очистка контента в самом начале, чтобы при смене категории ничего не добавлялось в конец
     function renderItems(){
+      content.innerHTML = '';
       catSel.style.display = 'flex';
       catSel.innerHTML = '';
+
       const cats = ['all'].concat(Object.keys(CATS));
       cats.forEach(ck => {
         const chip = document.createElement('div');
@@ -2629,28 +2661,35 @@ function openShop(){
         chip.style.padding = '6px 11px';
         chip.style.fontSize = '12px';
         chip.textContent = ck === 'all' ? (state.lang === 'en' ? 'All' : 'Все') : catName(ck);
-        chip.onclick = () => { shopCurCat = ck; renderItems(); };
+        chip.onclick = () => {
+          shopCurCat = ck;
+          renderItems();  // очищает content внутри себя
+        };
         catSel.appendChild(chip);
       });
 
       const lvl = getLevel();
+      const filterFn = p => shopCurCat === 'all' || p.cat === shopCurCat;
+      const list = PRODUCTS.filter(filterFn);
 
-      // Если "Все" — группируем по категориям, иначе один плоский список
       if(shopCurCat === 'all'){
+        // группировка по категориям
+        const byCat = {};
+        Object.keys(CATS).forEach(ck => byCat[ck] = []);
+        list.forEach(p => { if(byCat[p.cat]) byCat[p.cat].push(p); });
         Object.keys(CATS).forEach(ck => {
-          const list = PRODUCTS.filter(p => p.cat === ck);
-          if(!list.length) return;
+          const arr = byCat[ck];
+          if(!arr.length) return;
           const hdr = document.createElement('div');
           hdr.className = 'cat-header';
           hdr.textContent = catName(ck);
           content.appendChild(hdr);
           const grid = document.createElement('div');
           grid.className = 'grid2';
-          list.forEach(p => grid.appendChild(makeProductRow(p, lvl)));
+          arr.forEach(p => grid.appendChild(makeProductRow(p, lvl)));
           content.appendChild(grid);
         });
       } else {
-        const list = PRODUCTS.filter(p => p.cat === shopCurCat);
         const grid = document.createElement('div');
         grid.className = 'grid2';
         list.forEach(p => grid.appendChild(makeProductRow(p, lvl)));
@@ -2728,6 +2767,7 @@ function openShop(){
     }
 
     function renderFurniture(){
+      content.innerHTML = '';
       catSel.style.display = 'none';
       Object.keys(FURNITURE).forEach(k => {
         const f = FURNITURE[k];
@@ -2764,6 +2804,7 @@ function openShop(){
     }
 
     function renderDecor(){
+      content.innerHTML = '';
       catSel.style.display = 'none';
       const tw = document.createElement('div');
       tw.className = 'sec-title'; tw.textContent = t('walls');
@@ -2834,6 +2875,7 @@ function openShop(){
     }
 
     function renderExpand(){
+      content.innerHTML = '';
       catSel.style.display = 'none';
       const lvl = getLevel();
       const maxCells = maxCellsForLevel(lvl);
@@ -3361,8 +3403,6 @@ function loop(ts){
       checkDailyReset();
       updateHUD();
     }
-    // Обновляем HUD для счётчика бонуса
-    if(hasIncomeBonus() && Math.floor(ts / 1000) % 1 === 0) updateHUD();
   }
   if(state) draw();
 }
@@ -3433,10 +3473,6 @@ $('#btnStock').onclick = () => {
   if(paused) return;
   if(isTutorialBlocking() && tutorialStep !== 3) return;
   openWarehouse();
-};
-$('#btnExpand').onclick = () => {
-  if(paused || isTutorialBlocking()) return;
-  openShop();
 };
 $('#btnTasks').onclick = () => { if(!paused && !isTutorialBlocking()) openTasks(); };
 $('#btnDaily').onclick = () => { if(!paused && !isTutorialBlocking()) openDaily(); };
