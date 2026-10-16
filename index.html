@@ -12,7 +12,7 @@
 html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet MS','Georgia',serif;color:#e8dfff;user-select:none;overscroll-behavior:none}
 #app{position:relative;width:100vw;height:100vh;overflow:hidden;background:
   radial-gradient(ellipse at 50% 0%, #2a1140 0%, #12071f 45%, #06030b 100%)}
-#app::before{content:'';position:absolute;inset:0;pointer-events:none;
+#app::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
   background:
    radial-gradient(circle at 12% 18%, rgba(120,60,200,.18), transparent 40%),
    radial-gradient(circle at 88% 72%, rgba(0,220,180,.10), transparent 45%),
@@ -29,15 +29,26 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;z-index:2}
 .screen.active{display:flex}
 
-#scr-loading{align-items:center;justify-content:center;gap:22px}
-.logo-wrap{text-align:center;animation:float 4s ease-in-out infinite}
+/* ========== ЗАГРУЗКА ========== */
+#scr-loading{align-items:center;justify-content:center;gap:22px;position:relative;overflow:hidden}
+#scr-loading::before,#scr-loading::after{
+  content:'';position:absolute;width:180px;height:180px;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M2 2 L50 50 M2 2 L2 40 M2 2 L40 2 M98 2 L50 50 M98 2 L98 40 M98 2 L60 2 M2 98 L50 50 M2 98 L2 60 M2 98 L40 98 M98 98 L50 50 M98 98 L98 60 M98 98 L60 98' stroke='rgba(200,200,220,0.35)' stroke-width='0.7' fill='none'/></svg>");
+  background-size:contain;animation:webSway 5s ease-in-out infinite alternate;opacity:.6;
+}
+#scr-loading::before{top:-30px;left:-30px}
+#scr-loading::after{bottom:-30px;right:-30px;transform:scaleX(-1)}
+@keyframes webSway{0%{transform:rotate(-4deg)}100%{transform:rotate(4deg)}}
+
+.logo-wrap{text-align:center;animation:float 4s ease-in-out infinite;position:relative;z-index:2}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 .logo-title{font-size:clamp(22px,6vw,40px);letter-spacing:2px;color:#d9b3ff;
   text-shadow:0 0 18px #8a4bd6,0 0 40px #4a1f80;font-weight:bold}
 .logo-sub{font-size:clamp(11px,3vw,15px);color:#8f7bb0;letter-spacing:4px;margin-top:6px}
-.load-bar{width:min(70vw,320px);height:14px;border:2px solid #5c2a9c;border-radius:10px;background:#140a22;overflow:hidden;box-shadow:0 0 20px rgba(138,75,214,.5)}
+.load-bar{width:min(70vw,320px);height:14px;border:2px solid #5c2a9c;border-radius:10px;background:#140a22;overflow:hidden;box-shadow:0 0 20px rgba(138,75,214,.5);position:relative;z-index:2}
 #loadFill{height:100%;width:0%;background:linear-gradient(90deg,#4a1f80,#a765f0,#00ffcc);transition:width .3s;box-shadow:0 0 14px #a765f0}
 
+/* ========== КНОПКИ ========== */
 .btn{position:relative;border:2px solid #6b3fb0;background:linear-gradient(180deg,#2a1440,#170a28);
   color:#e0ccff;padding:11px 16px;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;
   transition:.15s;letter-spacing:.5px;box-shadow:0 3px 0 #0d0618,0 0 14px rgba(107,63,176,.3) inset}
@@ -52,6 +63,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .btn.danger{border-color:#c23c5c;background:linear-gradient(180deg,#4a1024,#2a0a15);color:#ffb8c8}
 .btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
 
+/* ========== ВЕРХНЯЯ ПАНЕЛЬ ========== */
 .topbar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:linear-gradient(180deg,rgba(20,10,34,.95),rgba(12,6,22,.75));
   border-bottom:2px solid #33195c;flex-shrink:0;z-index:5}
 .cur{display:flex;align-items:center;gap:5px;background:#180c2a;border:2px solid #4a2a7a;border-radius:20px;
@@ -60,7 +72,29 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .cur svg{width:16px;height:16px}
 .spacer{flex:1}
 
-.lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px}
+/* ========== ЛОББИ ========== */
+.lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:3}
+
+/* Декор лобби */
+.lobby-hero{position:relative;height:120px;margin:-4px 0 4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;
+  background:radial-gradient(ellipse at 50% 100%, rgba(138,75,214,.25), transparent 70%),linear-gradient(180deg,rgba(20,8,35,.4),rgba(8,3,16,.1));}
+.lobby-hero .hero-house{width:90px;height:90px;filter:drop-shadow(0 0 12px #7b3fbf);}
+.lobby-hero .hero-text{position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  font-size:11px;letter-spacing:3px;color:#8f7bb0;text-transform:uppercase;opacity:.9}
+.lobby-hero .hero-ghost{position:absolute;width:44px;height:44px;opacity:.85;filter:drop-shadow(0 0 10px currentColor)}
+.lobby-hero .hero-ghost.g1{top:16px;left:14%;color:#b8c8ff;animation:ghostFloat1 6s ease-in-out infinite}
+.lobby-hero .hero-ghost.g2{top:22px;right:16%;color:#c39bff;animation:ghostFloat2 7s ease-in-out infinite}
+.lobby-hero .hero-ghost.g3{top:56px;left:8%;color:#ffb8c8;animation:ghostFloat3 5.5s ease-in-out infinite;width:34px;height:34px}
+@keyframes ghostFloat1{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-14px)}}
+@keyframes ghostFloat2{0%,100%{transform:translate(0,0)}50%{transform:translate(-12px,-10px)}}
+@keyframes ghostFloat3{0%,100%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(8px,-8px) rotate(6deg)}}
+.lobby-hero .hero-candle{position:absolute;bottom:0;width:14px;height:34px}
+.lobby-hero .hero-candle.l{left:6%}
+.lobby-hero .hero-candle.r{right:6%}
+.lobby-hero .hero-candle .cbody{width:8px;height:18px;background:#ffe8b0;border-radius:2px;margin:16px auto 0;box-shadow:0 0 8px rgba(255,220,150,.6)}
+.lobby-hero .hero-candle .cflame{width:8px;height:12px;background:radial-gradient(circle at 50% 70%,#fff,#ffb347 50%,transparent 80%);border-radius:50%;margin:-4px auto 0;animation:flame 0.7s ease-in-out infinite alternate}
+@keyframes flame{0%{transform:scale(1) translateY(0)}100%{transform:scale(1.1) translateY(-1px)}}
+
 .lobby-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   min-height:104px;border:2px solid #522c8c;border-radius:16px;background:
@@ -69,21 +103,28 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
   cursor:pointer;transition:.18s;padding:12px 8px;overflow:hidden}
 .tile:hover{border-color:#b47bff;transform:translateY(-3px);box-shadow:0 8px 24px rgba(138,75,214,.35)}
 .tile:active{transform:translateY(0)}
+.tile::before{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  background:radial-gradient(circle at 50% 0%, rgba(180,123,255,.15), transparent 60%);opacity:0;transition:.2s}
+.tile:hover::before{opacity:1}
 .tile .ticon{width:44px;height:44px;filter:drop-shadow(0 0 8px currentColor)}
 .tile .tlabel{font-size:13px;text-align:center;color:#d5c2ff;letter-spacing:.5px}
 .tile .badge{position:absolute;top:6px;right:6px;background:#c2243c;color:#fff;font-size:10px;font-weight:bold;
   padding:2px 7px;border-radius:10px;box-shadow:0 0 10px #c2243c;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
+/* ========== ПАНЕЛИ ========== */
 .panel-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:2px solid #33195c;
-  background:linear-gradient(180deg,rgba(30,15,50,.98),rgba(15,8,26,.9));flex-shrink:0}
+  background:linear-gradient(180deg,rgba(30,15,50,.98),rgba(15,8,26,.9));flex-shrink:0;position:relative;overflow:hidden}
+.panel-head::after{content:'';position:absolute;left:0;right:0;bottom:-2px;height:2px;
+  background:linear-gradient(90deg,transparent,#a765f0,#7b3fbf,#a765f0,transparent);opacity:.7}
 .panel-head h2{font-size:16px;color:#d9b3ff;letter-spacing:1px;flex:1;text-align:center}
 .back-btn{width:38px;height:38px;border-radius:10px;border:2px solid #6b3fb0;background:#1b0e2c;color:#d9b3ff;
   cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
 .back-btn:hover{background:#2c1548;border-color:#b47bff}
 .back-btn svg{width:20px;height:20px}
-.panel-body{flex:1;overflow-y:auto;padding:12px}
+.panel-body{flex:1;overflow-y:auto;padding:12px;position:relative;z-index:3}
 
+/* ========== УРОВНИ ========== */
 .lvl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
 .lvl-btn{aspect-ratio:1;border-radius:12px;border:2px solid #3d2266;background:linear-gradient(180deg,#1c0f2e,#100821);
   color:#8a76ad;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -96,6 +137,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .lvl-btn.boss.unlocked{background:linear-gradient(180deg,#4a1024,#2a0a15);color:#ffb8c8}
 .lvl-btn.done::after{content:'';position:absolute;inset:0;border-radius:10px;background:rgba(0,255,180,.07)}
 
+/* ========== ИГРА ========== */
 #scr-game{background:#05030a}
 #gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .game-hud{position:absolute;top:0;left:0;right:0;display:flex;gap:6px;padding:6px;pointer-events:none;z-index:3;flex-wrap:wrap}
@@ -133,6 +175,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .tower-popup .row{display:flex;gap:6px}
 .tower-popup button{flex:1;font-size:11px;padding:7px 8px}
 
+/* ========== МОДАЛЬНЫЕ ОКНА ========== */
 #modal-root{position:absolute;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
   background:rgba(3,1,7,.85);backdrop-filter:blur(4px);padding:14px}
 #modal-root.active{display:flex}
@@ -153,18 +196,88 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .rarity-legendary{color:#ffd766;text-shadow:0 0 14px #ffd766}
 .rarity-mythic{color:#00ffcc;text-shadow:0 0 16px #00ffcc}
 
+/* ========== КОЛЛЕКЦИЯ ПЕРСОНАЖЕЙ ========== */
 .chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;margin-top:6px}
 .char-card{border:2px solid #3d2266;border-radius:14px;background:linear-gradient(180deg,#1c0f2e,#100821);
-  padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;cursor:pointer}
-.char-card.owned{border-color:#7b3fbf;background:linear-gradient(180deg,#26143e,#150c24)}
-.char-card.epic.owned{border-color:#b47bff;box-shadow:0 0 14px rgba(180,123,255,.35)}
-.char-card.legendary.owned{border-color:#ffd766;box-shadow:0 0 14px rgba(255,215,102,.4)}
-.char-card.mythic.owned{border-color:#00ffcc;box-shadow:0 0 18px rgba(0,255,204,.5)}
-.char-card svg{width:44px;height:44px}
-.char-card .cn{font-size:10px;text-align:center;color:#c0a8e8;line-height:1.1}
-.char-card .cb{font-size:9px;color:#7ee6c0;text-align:center;line-height:1.15}
+  padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;cursor:pointer;
+  transition:transform .15s}
+.char-card.owned:hover{transform:translateY(-2px)}
+.char-card svg{width:44px;height:44px;position:relative;z-index:1}
+.char-card .cn{font-size:10px;text-align:center;color:#c0a8e8;line-height:1.1;position:relative;z-index:1}
+.char-card .cb{font-size:9px;color:#7ee6c0;text-align:center;line-height:1.15;position:relative;z-index:1}
 .char-card.locked{filter:grayscale(1) brightness(.45);cursor:not-allowed}
 
+/* Простые — серый ободок */
+.char-card.common.owned{
+  border-color:#6a6a7a;
+  background:linear-gradient(180deg,#1a1a24,#0e0e16);
+  box-shadow:0 0 8px rgba(120,120,140,.35);
+}
+/* Эпические — оставляем фиолетовый */
+.char-card.epic.owned{
+  border-color:#b47bff;
+  box-shadow:0 0 14px rgba(180,123,255,.4);
+  background:linear-gradient(180deg,#26143e,#150c24);
+}
+/* Легендарные — золотое свечение + золотой фон */
+.char-card.legendary.owned{
+  border-color:#ffd766;
+  background:linear-gradient(180deg,#3a2810,#1a1208);
+  box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12);
+  animation:legendPulse 3s ease-in-out infinite;
+}
+.char-card.legendary.owned::before{
+  content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,215,102,.3) 50%,transparent 70%);
+  background-size:250% 100%;animation:shimmer 3s infinite;
+}
+@keyframes legendPulse{
+  0%,100%{box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12)}
+  50%{box-shadow:0 0 34px rgba(255,215,102,1), inset 0 0 32px rgba(255,215,102,.22)}
+}
+@keyframes shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-100% 0}
+}
+/* Мифические — красный ободок + мерцание/блеск */
+.char-card.mythic.owned{
+  border-color:#ff2a5a;
+  background:linear-gradient(135deg,#2a0a1a,#1a0508,#2a0a1a,#1a0508);
+  background-size:300% 300%;
+  animation:mythicGlow 2.5s ease-in-out infinite, mythicBg 5s linear infinite, mythicShake 4s ease-in-out infinite;
+  position:relative;
+}
+.char-card.mythic.owned::before{
+  content:'';position:absolute;inset:-2px;border-radius:16px;pointer-events:none;z-index:0;
+  background:linear-gradient(120deg,transparent 15%,rgba(255,215,102,.5) 35%,rgba(255,42,90,.5) 50%,rgba(0,255,204,.5) 65%,transparent 85%);
+  background-size:300% 100%;animation:shimmer 1.8s linear infinite;
+}
+.char-card.mythic.owned::after{
+  content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;
+  box-shadow:inset 0 0 18px rgba(255,42,90,.5), inset 0 0 30px rgba(0,255,204,.25);
+}
+@keyframes mythicGlow{
+  0%,100%{box-shadow:0 0 20px rgba(255,42,90,.7), 0 0 32px rgba(255,215,102,.35)}
+  50%{box-shadow:0 0 34px rgba(255,42,90,1), 0 0 56px rgba(255,215,102,.7), 0 0 24px rgba(0,255,204,.55)}
+}
+@keyframes mythicBg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes mythicShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-0.6px)}
+  75%{transform:translateX(0.6px)}
+}
+.char-card.mythic.owned .cn{color:#ffd1dd;font-weight:bold;text-shadow:0 0 8px #ff2a5a}
+.char-card.legendary.owned .cn{color:#ffeeb8;font-weight:bold}
+
+/* Слоты отряда */
+.slots-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.slot{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;position:relative;transition:.15s}
+
+/* ========== НАСТРОЙКИ ========== */
 .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;
   border-bottom:1px solid #24123c;font-size:14px;color:#cbb8ee}
 .switch{position:relative;width:54px;height:28px;border-radius:15px;background:#24123c;border:2px solid #4a2a7a;
@@ -181,6 +294,7 @@ input.promo{width:100%;padding:11px;border-radius:11px;border:2px solid #4a2a7a;
   font-family:inherit;font-size:14px;outline:none;margin-bottom:9px}
 input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)}
 
+/* ========== ЗАДАНИЯ ========== */
 .task{display:flex;align-items:center;gap:11px;padding:11px;border:2px solid #2c1748;border-radius:14px;
   background:linear-gradient(180deg,#180c28,#0e0618);margin-bottom:8px}
 .task.done{border-color:#1f7a68;background:linear-gradient(180deg,#0d2a24,#07160f)}
@@ -191,11 +305,13 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 .task .tfill{height:100%;background:linear-gradient(90deg,#4a1f80,#a765f0);transition:width .3s}
 .task .treward{font-size:11px;color:#ffe6a3;font-weight:bold;white-space:nowrap}
 
+/* ========== ЦЕНТР ========== */
 .center-box{display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 14px;text-align:center}
 .big-ico{width:110px;height:110px;animation:float 3.5s ease-in-out infinite;filter:drop-shadow(0 0 22px #7b3fbf)}
 .timer-text{font-size:26px;font-weight:bold;color:#9ef7e0;text-shadow:0 0 16px #1f7a68;letter-spacing:2px}
 .hint{font-size:12px;color:#8f7bb0;line-height:1.55;max-width:340px}
 
+/* ========== РЕКЛАМА ========== */
 #adOverlay{position:absolute;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;
   justify-content:center;gap:20px;background:rgba(3,1,7,.96)}
 #adOverlay.active{display:flex}
@@ -204,12 +320,14 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 @keyframes spin{to{transform:rotate(360deg)}}
 #adOverlay p{color:#c0a8e8;font-size:14px;letter-spacing:1px}
 
+/* ========== ТОСТ ========== */
 #toast{position:absolute;left:50%;top:12%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;
   gap:7px;align-items:center;pointer-events:none}
 .toast-item{background:rgba(20,10,34,.96);border:2px solid #7b3fbf;border-radius:12px;padding:9px 16px;
   font-size:13px;color:#e0ccff;box-shadow:0 0 22px rgba(138,75,214,.5);animation:toastIn .3s ease-out;white-space:nowrap}
 @keyframes toastIn{0%{transform:translateY(-16px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
+/* ========== ОБУЧЕНИЕ ========== */
 #scr-tutorial{align-items:center;justify-content:center;padding:22px;text-align:center;gap:16px}
 #scr-tutorial h2{font-size:clamp(18px,5vw,26px);color:#d9b3ff;text-shadow:0 0 16px #7b3fbf}
 #scr-tutorial p{font-size:14px;color:#a898c8;line-height:1.6;max-width:420px}
@@ -222,6 +340,8 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
   .tile .ticon{width:36px;height:36px}
   .tile .tlabel{font-size:11.5px}
   .tower-btn{width:58px;height:68px}
+  .lobby-hero{height:100px}
+  .lobby-hero .hero-house{width:74px;height:74px}
 }
 </style>
 </head>
@@ -242,11 +362,11 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <circle cx="25.5" cy="25.5" r="1.6" fill="#fff"/><circle cx="41.5" cy="25.5" r="1.6" fill="#fff"/>
         <ellipse cx="32" cy="40" rx="5" ry="7" fill="#0b0614" opacity=".7"/>
       </svg>
-      <div class="logo-title">ДОМ С ПРИВИДЕНИЯМИ</div>
-      <div class="logo-sub">GHOST HOUSE TD</div>
+      <div class="logo-title" id="loadTitle">ДОМ С ПРИВИДЕНИЯМИ</div>
+      <div class="logo-sub" id="loadSub">GHOST HOUSE TD</div>
     </div>
     <div class="load-bar"><div id="loadFill"></div></div>
-    <div style="font-size:12px;color:#5a4a7a" id="loadTxt">Загрузка данных...</div>
+    <div style="font-size:12px;color:#5a4a7a;position:relative;z-index:2" id="loadTxt">Загрузка данных...</div>
   </div>
 
   <div class="screen" id="scr-tutorial">
@@ -311,7 +431,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <button class="btn primary" id="promoBtn">Активировать</button>
       </div>
       <div style="margin-top:18px;font-size:11px;color:#5a4a7a;text-align:center;line-height:1.7">
-        Ghost House TD v2.0<br>Все сохранения хранятся в VK
+        Ghost House TD v2.1<br>Все сохранения хранятся в VK
       </div>
     </div>
   </div>
@@ -424,7 +544,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.1
    ============================================================ */
 
 /* ---------- БАЗОВЫЕ SVG ---------- */
@@ -471,12 +591,14 @@ function icoReaper(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-14 0
 function icoLich(color){ return `<svg viewBox="0 0 64 64"><path d="M32 8c-11 0-19 8-19 18v10l4 4v6h6v-4h18v4h6v-6l4-4V26c0-10-8-18-19-18z" fill="${color}"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/><path d="M29 42h6l-3 6z" fill="#0b0614"/><path d="M20 6l4 6 4-6 4 6 4-6 4 6 4-6" stroke="#00ffcc" stroke-width="2" fill="none"/></svg>`; }
 function icoSlime(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-14 0-22 12-22 24s10 20 22 20 22-8 22-20S46 10 32 10z" fill="${color}"/><circle cx="24" cy="34" r="2.5" fill="#0b0614"/><circle cx="40" cy="34" r="2.5" fill="#0b0614"/><ellipse cx="20" cy="20" rx="4" ry="3" fill="#fff" opacity=".4"/></svg>`; }
 function icoBloody(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><path d="M14 40q6 4 12 0t12 0 12 0" stroke="#7a0a1a" stroke-width="2.5" fill="none" opacity=".7"/></svg>`; }
-function icoGrave(color){ return `<svg viewBox="0 0 64 64"><path d="M14 58V28c0-10 8-18 18-18s18 8 18 18v30z" fill="${color}"/><path d="M32 18v20M24 28h16" stroke="#2a1a2a" stroke-width="3" stroke-linecap="round"/><path d="M10 58h44" stroke="#2a1a2a" stroke-width="3"/></svg>`; }
+function icoStone(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4c-13 0-21 10-21 23v27h42V29c0-13-9-25-21-25z" fill="${color}"/><path d="M12 22h42" stroke="#2a2a3a" stroke-width="2" opacity=".5"/></svg>`; }
 function icoWitch(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4l-18 24h36L32 4z" fill="#33145c"/><path d="M32 10l-10 14h20L32 10z" fill="${color}"/><circle cx="32" cy="40" r="14" fill="#8fd14f"/><circle cx="27" cy="38" r="2" fill="#0b0614"/><circle cx="37" cy="38" r="2" fill="#0b0614"/><path d="M27 46q5 4 10 0" stroke="#0b0614" stroke-width="2" fill="none"/></svg>`; }
 
 /* ---------- ЛОКАЛИЗАЦИЯ ---------- */
 const I18N = {
   ru:{
+    loadVK:'Подключение к VK...', loadSave:'Загрузка сохранения...',
+    loadHouse:'Подготовка дома...', loadReady:'Готово!',
     loading:'Загрузка данных...', tutQ:'Хотите пройти обучение?',
     tutD:'Короткий гайд научит вас защищать дом от духов и строить башни.',
     tutYes:'Пройти обучение', tutNo:'Пропустить',
@@ -501,7 +623,6 @@ const I18N = {
     twFloor:'Этаж', twStart:'Начать этаж', twHint:'Каждый этаж сложнее предыдущего. Чем выше — тем больше награда.',
     buy:'Купить', bought:'Куплено', notEnough:'Недостаточно кристаллов',
     selectTower:'Выберите башню', upgrade:'Улучшить', sell:'Продать',
-    speed:'x1', 
     tut1T:'Обучение: башни', tut1D:'Выберите персонажа внизу и поставьте его на свободную клетку пола. Каждый персонаж атакует призраков по-своему.',
     tut2T:'Обучение: волны', tut2D:'Призраки идут по дороге к выходу. Если они дойдут — вы теряете жизнь. Уничтожьте всех!',
     tut3T:'Обучение: улучшения', tut3D:'Нажмите на поставленного персонажа, чтобы улучшить его за монеты. Монеты падают с монстров.',
@@ -509,7 +630,6 @@ const I18N = {
     tutNext:'Далее', tutFinish:'Начать игру', tutSkip:'Пропустить обучение',
     waveClear:'Волна пройдена!', bossIncoming:'БОСС!',
     tasksRefresh:'Задания обновятся через', hours:'ч', minutes:'м',
-    noTasks:'Нет заданий',
     playtimeReward:'Награда за игру!', claim:'Забрать',
     promoOk:'Промокод активирован!', promoBad:'Неверный промокод',
     dataCleared:'Все данные удалены',
@@ -523,9 +643,12 @@ const I18N = {
     retry:'Повторить',
     quitTitle:'Выйти из уровня?',
     quitText:'Прогресс уровня будет потерян.',
-    quitYes:'Выйти', quitStay:'Остаться'
+    quitYes:'Выйти', quitStay:'Остаться',
+    heroTag:'Добро пожаловать в дом'
   },
   en:{
+    loadVK:'Connecting to VK...', loadSave:'Loading save...',
+    loadHouse:'Preparing house...', loadReady:'Ready!',
     loading:'Loading data...', tutQ:'Would you like a tutorial?',
     tutD:'A short guide will teach you to defend the house from ghosts and build towers.',
     tutYes:'Start tutorial', tutNo:'Skip',
@@ -550,7 +673,6 @@ const I18N = {
     twFloor:'Floor', twStart:'Start floor', twHint:'Each floor is harder. The higher — the bigger the reward.',
     buy:'Buy', bought:'Owned', notEnough:'Not enough crystals',
     selectTower:'Select tower', upgrade:'Upgrade', sell:'Sell',
-    speed:'x1',
     tut1T:'Tutorial: towers', tut1D:'Pick a character below and place him on a free floor tile. Each character attacks ghosts differently.',
     tut2T:'Tutorial: waves', tut2D:'Ghosts walk along the path to the exit. If they reach it — you lose a life. Destroy them all!',
     tut3T:'Tutorial: upgrades', tut3D:'Tap a placed character to upgrade him with coins. Coins drop from monsters.',
@@ -558,7 +680,6 @@ const I18N = {
     tutNext:'Next', tutFinish:'Start game', tutSkip:'Skip tutorial',
     waveClear:'Wave cleared!', bossIncoming:'BOSS!',
     tasksRefresh:'Tasks refresh in', hours:'h', minutes:'m',
-    noTasks:'No tasks',
     playtimeReward:'Playtime reward!', claim:'Claim',
     promoOk:'Promo activated!', promoBad:'Invalid promo code',
     dataCleared:'All data cleared',
@@ -572,7 +693,8 @@ const I18N = {
     retry:'Retry',
     quitTitle:'Quit level?',
     quitText:'Level progress will be lost.',
-    quitYes:'Quit', quitStay:'Stay'
+    quitYes:'Quit', quitStay:'Stay',
+    heroTag:'Welcome to the house'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -593,7 +715,6 @@ const PATH_BLOCK = new Set();
 
 /* ---------- ПЕРСОНАЖИ (20) ---------- */
 const CHARS = [
-  // COMMON (12)
   {id:'ghost',     ru:'Призрак',        en:'Ghost',        r:'common',    color:'#b8c8ff', cost:50,   dmg:13,  range:85,  rate:0.85, icon:icoGhost('#b8c8ff'),     desc:{ru:'Стреляет эктоплазмой',en:'Fires ectoplasm'}},
   {id:'skeleton',  ru:'Скелет',         en:'Skeleton',     r:'common',    color:'#e8e0c0', cost:90,   dmg:24,  range:88,  rate:1.5,  splash:32, icon:icoSkull('#e8e0c0'),   desc:{ru:'Кости по площади',en:'Bone splash'}},
   {id:'zombie',    ru:'Зомби',          en:'Zombie',       r:'common',    color:'#7fa87f', cost:75,   dmg:15,  range:82,  rate:1.2,  poison:14, poisonDur:3, icon:icoSlime('#7fa87f'), desc:{ru:'Отравляет призраков',en:'Poisons ghosts'}},
@@ -605,20 +726,14 @@ const CHARS = [
   {id:'slime',     ru:'Слизь',          en:'Slime',        r:'common',    color:'#6fd88f', cost:70,   dmg:16,  range:80,  rate:1.3,  splash:26, icon:icoSlime('#6fd88f'),  desc:{ru:'Брызги слизи',en:'Slime splash'}},
   {id:'pumpkin',   ru:'Тыква',          en:'Pumpkin',      r:'common',    color:'#ff8a3d', cost:85,   dmg:20,  range:82,  rate:1.0,  icon:icoPumpkin('#ff8a3d'),  desc:{ru:'Горящие тыквы',en:'Burning pumpkins'}},
   {id:'candle',    ru:'Свеча',          en:'Candle',       r:'common',    color:'#ffd766', cost:55,   dmg:11,  range:80,  rate:0.9,  icon:icoFlame('#ffd766'),    desc:{ru:'Огонь свечи',en:'Candle flame'}},
-  {id:'gravedigger',ru:'Могильщик',     en:'Gravedigger',  r:'common',    color:'#8a7a6a', cost:120,  dmg:16,  range:86,  rate:1.3,  goldBonus:20, icon:icoGrave('#8a7a6a'), desc:{ru:'+20% монет с убийств',en:'+20% coins'}},
-
-  // EPIC (5)
+  {id:'stone',     ru:'Каменный идол',  en:'Stone Idol',   r:'common',    color:'#8a7a6a', cost:120,  dmg:16,  range:86,  rate:1.3,  goldBonus:20, icon:icoStone('#8a7a6a'), desc:{ru:'+20% монет с убийств',en:'+20% coins'}},
   {id:'vampire',   ru:'Вампир',         en:'Vampire',      r:'epic',      color:'#c2243c', cost:280,  dmg:55,  range:100, rate:1.1,  drain:true, icon:icoVampire('#c2243c'), desc:{ru:'Даёт кристаллы за убийства',en:'Crystals per kill'}},
   {id:'werewolf',  ru:'Оборотень',      en:'Werewolf',     r:'epic',      color:'#a08060', cost:240,  dmg:32,  range:92,  rate:0.5,  icon:icoWolf('#a08060'),     desc:{ru:'Свирепые быстрые атаки',en:'Ferocious fast attacks'}},
   {id:'banshee',   ru:'Банши',          en:'Banshee',      r:'epic',      color:'#c39bff', cost:300,  dmg:48,  range:105, rate:1.5,  chain:3, icon:icoBanshee('#c39bff'), desc:{ru:'Цепной вопль',en:'Chain scream'}},
   {id:'mummy',     ru:'Мумия',          en:'Mummy',        r:'epic',      color:'#d8c8a0', cost:260,  dmg:42,  range:98,  rate:1.2,  slow:0.5, slowDur:3, icon:icoMummy('#d8c8a0'), desc:{ru:'Проклятие фараона замедляет',en:'Pharaoh curse slows'}},
   {id:'lich',      ru:'Лич',            en:'Lich',         r:'epic',      color:'#7fd8ff', cost:340,  dmg:60,  range:112, rate:1.6,  chain:4, poison:20, poisonDur:3, icon:icoLich('#7fd8ff'), desc:{ru:'Цепная некротическая молния',en:'Chain necro lightning'}},
-
-  // LEGENDARY (2)
   {id:'reaper',    ru:'Жнец',           en:'Reaper',       r:'legendary', color:'#ff5f7e', cost:600,  dmg:120, range:130, rate:1.5,  instakill:0.07, icon:icoReaper('#ff5f7e'), desc:{ru:'Шанс мгновенной смерти',en:'Chance to instant-kill'}},
   {id:'bloodyMary',ru:'Кровавая Мэри',  en:'Bloody Mary',  r:'legendary', color:'#ff2a5a', cost:700,  dmg:180, range:125, rate:1.8,  splash:55, icon:icoBloody('#ff2a5a'), desc:{ru:'Кровавая волна по площади',en:'Blood wave AoE'}},
-
-  // MYTHIC (1)
   {id:'houseLord', ru:'Повелитель Дома',en:'House Lord',   r:'mythic',    color:'#00ffcc', cost:1000, dmg:220, range:150, rate:1.4,  aura:true, icon:icoCrown('#00ffcc'), desc:{ru:'Усиливает союзные башни рядом',en:'Buffs nearby towers'}}
 ];
 const STARTER_CHARS = ['ghost'];
@@ -639,9 +754,7 @@ const ABILITIES = [
 /* ---------- СОСТОЯНИЕ ---------- */
 const DEFAULT_STATE = {
   v:2, gems:0, chests:0, level:1, completed:0,
-  chars: [],
-  selectedChars: [],
-  abilities: [],
+  chars: [], selectedChars: [], abilities: [],
   music:true, lang:'ru',
   lastDaily:0, lastTasks:0, tasks:[],
   lastAFK:0, afkPending:0,
@@ -698,7 +811,6 @@ function showAdOverlay(text){
   $('#adOverlay').classList.add('active');
 }
 function hideAdOverlay(){ $('#adOverlay').classList.remove('active'); }
-
 function showInterstitial(cb){
   if(!vkAvailable){ cb&&cb(); return; }
   showAdOverlay(t('adLoading'));
@@ -925,8 +1037,37 @@ function renderLobby(){
 
   const body = $('#lobbyBody');
   body.innerHTML = '';
-  const grid = el('div','lobby-grid');
 
+  // Hero-блок с декором
+  const hero = el('div','lobby-hero');
+  hero.innerHTML = `
+    <div class="hero-text">${t('heroTag')}</div>
+    <svg class="hero-ghost g1" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="currentColor"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/></svg>
+    <svg class="hero-ghost g2" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="currentColor"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/></svg>
+    <svg class="hero-ghost g3" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="currentColor"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/></svg>
+    <svg class="hero-house" viewBox="0 0 64 64">
+      <defs>
+        <radialGradient id="roofG" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#7b3fbf"/><stop offset="100%" stop-color="#2a1440"/>
+        </radialGradient>
+        <radialGradient id="winG" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#ffd766"/><stop offset="100%" stop-color="#8a6a1f"/>
+        </radialGradient>
+      </defs>
+      <path d="M8 30 L32 8 L56 30 L56 58 L8 58 Z" fill="#1a0f2a" stroke="#4a1f80" stroke-width="2"/>
+      <path d="M4 32 L32 6 L60 32 L54 32 L32 12 L10 32 Z" fill="url(#roofG)" stroke="#a765f0" stroke-width="1.5"/>
+      <rect x="24" y="44" width="16" height="14" rx="1" fill="#2a1a42" stroke="#4a1f80"/>
+      <circle cx="37" cy="51" r="1" fill="#ffd766"/>
+      <rect x="14" y="36" width="8" height="8" fill="url(#winG)" opacity=".9"/>
+      <rect x="42" y="36" width="8" height="8" fill="url(#winG)" opacity=".9"/>
+      <path d="M14 40h8M42 40h8M18 36v8M46 36v8" stroke="#2a1440" stroke-width="1"/>
+    </svg>
+    <div class="hero-candle l"><div class="cbody"></div><div class="cflame"></div></div>
+    <div class="hero-candle r"><div class="cbody"></div><div class="cflame"></div></div>
+  `;
+  body.appendChild(hero);
+
+  const grid = el('div','lobby-grid');
   const tiles = [
     {id:'levels', icon:SVG.tower, label:t('levels'), badge: state.level, color:'#a765f0'},
     {id:'tasks', icon:SVG.scroll, label:t('tasks'), color:'#c9a8ff', badge: hasClaimableTask()?1:0},
@@ -1081,10 +1222,7 @@ function genTasks(){
     const tier = 1 + Math.floor(i/ TASK_TEMPLATES.length);
     const n = Math.max(1, Math.round(tpl.base * Math.pow(tpl.mult, tier) * (1 + state.level*0.05)));
     arr.push({
-      tid: tpl.id,
-      n: n,
-      target: n,
-      progress: 0,
+      tid: tpl.id, n, target: n, progress: 0,
       reward: Math.round(tpl.rew * (1 + i*0.35) * (1 + state.level*0.08)),
       claimed: false
     });
@@ -1220,7 +1358,7 @@ $('#dailyClaim').onclick = ()=>{
   openChestModal(()=>{ openDaily(); renderLobby(); });
 };
 
-/* ---------- ПЕРСОНАЖИ (с выбором отряда) ---------- */
+/* ---------- КОЛЛЕКЦИЯ ---------- */
 function openChars(){
   showScreen('scr-chars');
   $('#charsTitle').textContent = t('chars');
@@ -1236,7 +1374,6 @@ function openChars(){
   let slots = body.querySelector('.slots-row');
   if(!slots){
     slots = el('div','slots-row');
-    slots.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;';
     const title = body.querySelector('#charsSlotsTitle');
     if(title) title.after(slots); else body.insertBefore(slots, body.firstChild);
   }
@@ -1245,14 +1382,21 @@ function openChars(){
     const cid = state.selectedChars[i];
     const c = cid ? charTowerDef(cid) : null;
     const slot = el('div','slot');
-    slot.style.cssText=`aspect-ratio:1;border:2px dashed ${c?'#b47bff':'#3d2266'};border-radius:14px;background:${c?'linear-gradient(180deg,#26143e,#150c24)':'#100821'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;position:relative;cursor:${c?'pointer':'default'}`;
+    let bc = '#3d2266', bg = '#100821', glow = 'none';
+    if(c){
+      if(c.r==='common'){ bc='#6a6a7a'; bg='linear-gradient(180deg,#1a1a24,#0e0e16)'; }
+      else if(c.r==='epic'){ bc='#b47bff'; bg='linear-gradient(180deg,#26143e,#150c24)'; glow='0 0 10px rgba(180,123,255,.5)'; }
+      else if(c.r==='legendary'){ bc='#ffd766'; bg='linear-gradient(180deg,#3a2810,#1a1208)'; glow='0 0 14px rgba(255,215,102,.7)'; }
+      else if(c.r==='mythic'){ bc='#ff2a5a'; bg='linear-gradient(135deg,#2a0a1a,#1a0508)'; glow='0 0 16px rgba(255,42,90,.8), 0 0 26px rgba(0,255,204,.4)'; }
+    }
+    slot.style.cssText=`aspect-ratio:1;border:2px dashed ${c?bc:'#3d2266'};border-radius:14px;background:${c?bg:'#100821'};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;position:relative;cursor:${c?'pointer':'default'};box-shadow:${glow}`;
     if(c){
       slot.innerHTML = `<div style="width:44px;height:44px;color:${c.color}">${c.icon}</div>
         <div style="font-size:9px;color:#c0a8e8;text-align:center;line-height:1.05">${state.lang==='ru'?c.ru:c.en}</div>`;
       slot.onclick = ()=>{
         state.selectedChars = state.selectedChars.filter(id=>id!==c.id);
         if(state.selectedChars.length===0) state.selectedChars=[c.id];
-        saveGame(true); openChars();
+        saveGame(true); openChars(); renderLobby();
       };
     } else {
       slot.innerHTML = `<div style="font-size:22px;color:#3d2266">+</div><div style="font-size:9px;color:#5a4a7a">${state.lang==='ru'?'свободно':'free'}</div>`;
@@ -1268,7 +1412,7 @@ function openChars(){
     const owned = state.chars.includes(c.id);
     const selected = state.selectedChars.includes(c.id);
     const card = el('div','char-card '+c.r+(owned?' owned':' locked'));
-    if(selected){ card.style.outline='2px solid #ffd766'; card.style.boxShadow='0 0 18px rgba(255,215,102,.6)'; }
+    if(selected){ card.style.outline='2px solid #ffd766'; }
     const bl = [];
     bl.push('⚔ '+c.dmg);
     if(c.splash) bl.push('✦ '+c.splash);
@@ -1280,10 +1424,10 @@ function openChars(){
     if(c.goldBonus) bl.push('🪙 +'+c.goldBonus+'%');
     if(c.aura) bl.push('✨ aura');
     card.innerHTML = `
-      ${owned? `<div style="width:44px;height:44px;color:${c.color}">${c.icon}</div>` : SVG.lock}
+      ${owned? `<div style="width:44px;height:44px;color:${c.color};position:relative;z-index:1">${c.icon}</div>` : SVG.lock}
       <div class="cn">${owned? (state.lang==='ru'?c.ru:c.en) : '???'}</div>
       <div class="cb">${owned? bl.join(' · ') : t('notOwned')}</div>
-      ${selected?'<div style="position:absolute;top:4px;right:4px;font-size:14px;color:#ffd766">✓</div>':''}
+      ${selected?'<div style="position:absolute;top:4px;right:4px;font-size:14px;color:#ffd766;z-index:2;text-shadow:0 0 6px #000">✓</div>':''}
     `;
     card.style.color = c.color;
     if(owned){
@@ -1306,17 +1450,10 @@ function charBonus(){
   state.chars.forEach(id=>{
     const c = charTowerDef(id);
     if(!c) return;
-    if(c.rarityBonus){ dmg+=c.rarityBonus; }
-  });
-  // Бонус от редкости: epic +5% dmg, legendary +12% dmg +5% range, mythic +25% dmg +15% range +20% gold
-  state.chars.forEach(id=>{
-    const c = charTowerDef(id);
-    if(!c) return;
     if(c.r==='epic'){ dmg+=5; }
     if(c.r==='legendary'){ dmg+=12; range+=5; }
     if(c.r==='mythic'){ dmg+=25; range+=15; gold+=20; }
   });
-  // Бонус от выбранных
   state.selectedChars.forEach(id=>{
     const c = charTowerDef(id);
     if(!c) return;
@@ -1426,14 +1563,12 @@ function openChestModal(after){
       state.gems += bonusGems;
     } else {
       state.chars.push(c.id);
-      if(state.selectedChars.length<4){
-        state.selectedChars.push(c.id);
-      }
+      if(state.selectedChars.length<4){ state.selectedChars.push(c.id); }
     }
     saveGame(true);
 
     const rarName = {common:t('common'),epic:t('epic'),legendary:t('legendary'),mythic:t('mythic')}[c.r];
-    const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#00ffcc'}[c.r];
+    const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#ff2a5a'}[c.r];
 
     setTimeout(()=>{
       const m2 = openModal(`
@@ -1462,6 +1597,18 @@ let canvas, ctx;
 let game = null;
 let lastTs = 0;
 let rafId = null;
+
+/* Кэш изображений персонажей для canvas */
+const charImages = {};
+function preloadCharImages(){
+  return Promise.all(CHARS.map(c => new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(c.icon);
+    charImages[c.id] = img;
+  })));
+}
 
 function initCanvas(){
   canvas = $('#gameCanvas');
@@ -1499,8 +1646,9 @@ function buildLevelConfig(L, isTower){
   return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
 }
 
+/* Нейтральные декорации — без надгробий и черепов */
 function genDecorations(){
-  const types = ['grave','tree','pumpkin','candle','cobweb','bones','skull','candle','tree','grave'];
+  const types = ['tree','pumpkin','candle','cobweb','stone','bush','lantern','mushroom','tree','candle'];
   const deco = [];
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
@@ -1893,10 +2041,8 @@ function render(){
     }
   }
 
-  // Декорации
   drawDecorations();
 
-  // Дорожка
   ctx.strokeStyle = 'rgba(138,75,214,0.14)';
   ctx.lineWidth = 30;
   ctx.lineCap = 'round';
@@ -1965,19 +2111,7 @@ function drawDecorations(){
     const cx=d.x*CELL+CELL/2, cy=d.y*CELL+CELL/2;
     ctx.save();
     ctx.globalAlpha = 0.85;
-    if(d.type==='grave'){
-      ctx.fillStyle='#4a4a5a';
-      ctx.beginPath();
-      ctx.moveTo(cx-11, cy+13);
-      ctx.lineTo(cx-11, cy-4);
-      ctx.arc(cx, cy-4, 11, Math.PI, 0);
-      ctx.lineTo(cx+11, cy+13);
-      ctx.closePath(); ctx.fill();
-      ctx.strokeStyle='#7a7a8a'; ctx.lineWidth=1.5; ctx.stroke();
-      ctx.strokeStyle='#2a2a3a'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(cx,cy-8); ctx.lineTo(cx,cy+6);
-      ctx.moveTo(cx-5,cy-2); ctx.lineTo(cx+5,cy-2); ctx.stroke();
-    } else if(d.type==='tree'){
+    if(d.type==='tree'){
       ctx.fillStyle='#2a1a2a';
       ctx.fillRect(cx-3, cy-6, 6, 20);
       ctx.beginPath();
@@ -1999,7 +2133,7 @@ function drawDecorations(){
       g.addColorStop(0,'rgba(255,180,80,0.35)'); g.addColorStop(1,'rgba(255,180,80,0)');
       ctx.fillStyle=g; ctx.fillRect(cx-16,cy-23,32,32);
     } else if(d.type==='cobweb'){
-      ctx.strokeStyle='rgba(200,200,220,0.4)'; ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(200,200,220,0.45)'; ctx.lineWidth=1;
       for(let i=0;i<4;i++){
         ctx.beginPath();
         const a = i*Math.PI/2;
@@ -2011,84 +2145,113 @@ function drawDecorations(){
         ctx.arc(cx,cy,r,0,Math.PI*2);
         ctx.stroke();
       }
-    } else if(d.type==='bones'){
-      ctx.fillStyle='#d8d0c0';
-      ctx.fillRect(cx-10,cy,14,3);
-      ctx.beginPath(); ctx.arc(cx-12,cy+1.5,3,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx+6,cy+1.5,3,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx+6,cy-4,4,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='#0b0614';
-      ctx.beginPath(); ctx.arc(cx+5,cy-5,1,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx+8,cy-5,1,0,Math.PI*2); ctx.fill();
-    } else if(d.type==='skull'){
-      ctx.fillStyle='#d8d0c0';
-      ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='#0b0614';
-      ctx.beginPath(); ctx.arc(cx-3,cy-1,2,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx+3,cy-1,2,0,Math.PI*2); ctx.fill();
-      ctx.fillRect(cx-4,cy+4,2,3); ctx.fillRect(cx-1,cy+4,2,3); ctx.fillRect(cx+2,cy+4,2,3);
+    } else if(d.type==='stone'){
+      ctx.fillStyle='#4a4a5a';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy+6, 12, 6, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle='#6a6a7a';
+      ctx.beginPath();
+      ctx.ellipse(cx-2, cy+2, 9, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle='#2a2a3a'; ctx.lineWidth=1; ctx.stroke();
+    } else if(d.type==='bush'){
+      ctx.fillStyle='#2a3a2a';
+      ctx.beginPath();
+      ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2);
+      ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2);
+      ctx.arc(cx, cy-4, 9, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle='#3a5a3a'; ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2);
+      ctx.stroke();
+    } else if(d.type==='lantern'){
+      ctx.strokeStyle='#4a4a5a'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(cx, cy-14); ctx.lineTo(cx, cy-6); ctx.stroke();
+      ctx.fillStyle='#3a2a1a';
+      ctx.fillRect(cx-6, cy-6, 12, 14);
+      ctx.fillStyle='#ffd766';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy+1, 4, 5, 0, 0, Math.PI*2);
+      ctx.fill();
+      const g = ctx.createRadialGradient(cx,cy+1,0,cx,cy+1,20);
+      g.addColorStop(0,'rgba(255,215,102,0.4)'); g.addColorStop(1,'rgba(255,215,102,0)');
+      ctx.fillStyle=g; ctx.fillRect(cx-20,cy-19,40,40);
+      ctx.strokeStyle='#7a5a2a'; ctx.lineWidth=1.5;
+      ctx.strokeRect(cx-6, cy-6, 12, 14);
+    } else if(d.type==='mushroom'){
+      ctx.fillStyle='#c8b8a8'; ctx.fillRect(cx-2, cy, 4, 10);
+      ctx.fillStyle='#c23c5c';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 10, 6, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(cx-4, cy-2, 1.5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx+3, cy-1, 1.5, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
 }
 
+/* Отрисовка башни как персонажа */
 function drawTower(tower){
   const c = charTowerDef(tower.type);
   if(!c) return;
   const x = tower.x, y = tower.y;
-  const s = 16;
+  const size = 36;
+  const bob = Math.sin(game.time*2 + x*0.05 + y*0.05) * 1.6;
 
+  // тень
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
-  ctx.ellipse(x, y+7, s*0.85, s*0.4, 0, 0, Math.PI*2);
+  ctx.ellipse(x, y+14, size*0.42, size*0.18, 0, 0, Math.PI*2);
   ctx.fill();
 
-  ctx.fillStyle = '#2a1a42';
-  ctx.beginPath();
-  ctx.ellipse(x, y+4, s*0.8, s*0.38, 0, 0, Math.PI*2);
-  ctx.fill();
-  ctx.strokeStyle = c.color;
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // свечение под башней в цвет персонажа
+  const grad = ctx.createRadialGradient(x, y+8, 0, x, y+8, size*0.9);
+  grad.addColorStop(0, c.color+'55');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(x-size, y-size, size*2, size*2);
 
-  ctx.save();
-  ctx.translate(x,y);
-  ctx.rotate(tower.angle || 0);
-  ctx.fillStyle = c.color;
-  ctx.fillRect(0, -3, s*0.9, 6);
-  ctx.restore();
+  // сам персонаж
+  const img = charImages[tower.type];
+  if(img && img.complete && img.naturalWidth > 0){
+    ctx.drawImage(img, x - size/2, y - size/2 + bob, size, size);
+  } else {
+    // fallback — простой силуэт
+    ctx.fillStyle = c.color;
+    ctx.beginPath();
+    ctx.arc(x, y+bob, size*0.35, 0, Math.PI*2);
+    ctx.fill();
+  }
 
-  ctx.beginPath();
-  ctx.arc(x, y-2, s*0.55, 0, Math.PI*2);
-  ctx.fillStyle = c.color;
-  ctx.fill();
-  ctx.globalAlpha = 0.35;
-  ctx.beginPath();
-  ctx.arc(x-3, y-5, s*0.24, 0, Math.PI*2);
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
+  // уровень
   if(tower.level>1){
     ctx.fillStyle = '#0b0614';
     ctx.beginPath();
-    ctx.arc(x+s*0.7, y-s*0.7, 7, 0, Math.PI*2);
+    ctx.arc(x+13, y-13+bob, 8, 0, Math.PI*2);
     ctx.fill();
     ctx.strokeStyle = c.color;
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.fillStyle = '#ffe6a3';
-    ctx.font = 'bold 9px Trebuchet MS';
+    ctx.font = 'bold 10px Trebuchet MS';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(tower.level, x+s*0.7, y-s*0.7+0.5);
+    ctx.fillText(tower.level, x+13, y-13+bob+0.5);
   }
 
+  // индикатор кулдауна
   if(tower.cd>0 && tower.maxCd>0){
     const p = 1 - tower.cd/tower.maxCd;
     ctx.strokeStyle = 'rgba(255,215,102,0.7)';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.arc(x, y, s+3, -Math.PI/2, -Math.PI/2 + Math.PI*2*p);
+    ctx.arc(x, y+bob, size*0.5, -Math.PI/2, -Math.PI/2 + Math.PI*2*p);
     ctx.stroke();
   }
 }
@@ -2572,6 +2735,8 @@ function showTutorial(idx){
 /* ---------- СТАТИЧНЫЕ ТЕКСТЫ ---------- */
 function refreshStaticText(){
   $('#loadTxt').textContent = t('loading');
+  $('#loadTitle').textContent = state.lang==='ru' ? 'ДОМ С ПРИВИДЕНИЯМИ' : 'GHOST HOUSE';
+  $('#loadSub').textContent = 'GHOST HOUSE TD';
   $('#tutQ').textContent = t('tutQ');
   $('#tutD').textContent = t('tutD');
   $('#tutYes').textContent = t('tutYes');
@@ -2676,18 +2841,25 @@ async function boot(){
     });
   };
 
-  await tick(20, 'VK Bridge...');
+  // Устанавливаем язык по умолчанию ДО показа экрана загрузки
+  document.documentElement.lang = state.lang;
+
+  await tick(20, t('loadVK'));
   await initVK();
-  await tick(50, 'Loading save...');
+  await tick(50, t('loadSave'));
   await loadGame();
-  await tick(75, 'Preparing house...');
+  await tick(75, t('loadHouse'));
 
   ensureStarter();
   checkTaskRefresh();
   document.documentElement.lang = state.lang;
   refreshStaticText();
 
-  await tick(100, 'Ready!');
+  // Предзагрузка SVG-иконок персонажей для canvas
+  await preloadCharImages();
+  await tick(95, t('loadHouse'));
+
+  await tick(100, t('loadReady'));
   await new Promise(r=>setTimeout(r, 260));
 
   initCanvas();
