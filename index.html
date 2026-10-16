@@ -44,7 +44,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 .logo-title{font-size:clamp(22px,6vw,40px);letter-spacing:2px;color:#d9b3ff;
   text-shadow:0 0 18px #8a4bd6,0 0 40px #4a1f80;font-weight:bold}
-.logo-sub{font-size:clamp(11px,3vw,15px);color:#8f7bb0;letter-spacing:4px;margin-top:6px}
 .load-bar{width:min(70vw,320px);height:14px;border:2px solid #5c2a9c;border-radius:10px;background:#140a22;overflow:hidden;box-shadow:0 0 20px rgba(138,75,214,.5);position:relative;z-index:2}
 #loadFill{height:100%;width:0%;background:linear-gradient(90deg,#4a1f80,#a765f0,#00ffcc);transition:width .3s;box-shadow:0 0 14px #a765f0}
 
@@ -74,8 +73,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 
 /* ========== ЛОББИ ========== */
 .lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:3}
-
-/* Декор лобби */
 .lobby-hero{position:relative;height:120px;margin:-4px 0 4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;
   background:radial-gradient(ellipse at 50% 100%, rgba(138,75,214,.25), transparent 70%),linear-gradient(180deg,rgba(20,8,35,.4),rgba(8,3,16,.1));}
 .lobby-hero .hero-house{width:90px;height:90px;filter:drop-shadow(0 0 12px #7b3fbf);}
@@ -110,6 +107,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .tile .tlabel{font-size:13px;text-align:center;color:#d5c2ff;letter-spacing:.5px}
 .tile .badge{position:absolute;top:6px;right:6px;background:#c2243c;color:#fff;font-size:10px;font-weight:bold;
   padding:2px 7px;border-radius:10px;box-shadow:0 0 10px #c2243c;animation:pulse 1.4s infinite}
+.tile .badge.gold{background:#8a6a1f;box-shadow:0 0 10px #ffd766;color:#ffeeb8}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
 /* ========== ПАНЕЛИ ========== */
@@ -192,9 +190,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 @keyframes shakeAnim{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.05)}}
 .char-reveal{animation:revealPop .6s cubic-bezier(.2,1.6,.5,1);margin:8px auto;display:flex;justify-content:center}
 @keyframes revealPop{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-.rarity-common{color:#a0a0b0}.rarity-epic{color:#b47bff;text-shadow:0 0 12px #b47bff}
-.rarity-legendary{color:#ffd766;text-shadow:0 0 14px #ffd766}
-.rarity-mythic{color:#00ffcc;text-shadow:0 0 16px #00ffcc}
 
 /* ========== КОЛЛЕКЦИЯ ПЕРСОНАЖЕЙ ========== */
 .chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;margin-top:6px}
@@ -206,97 +201,36 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .char-card .cn{font-size:10px;text-align:center;color:#c0a8e8;line-height:1.1;position:relative;z-index:1}
 .char-card .cb{font-size:9px;color:#7ee6c0;text-align:center;line-height:1.15;position:relative;z-index:1}
 .char-card.locked{filter:grayscale(1) brightness(.45);cursor:not-allowed}
-
-/* Простые — серый ободок */
-.char-card.common.owned{
-  border-color:#6a6a7a;
-  background:linear-gradient(180deg,#1a1a24,#0e0e16);
-  box-shadow:0 0 8px rgba(120,120,140,.35);
-}
-/* Эпические — оставляем фиолетовый */
-.char-card.epic.owned{
-  border-color:#b47bff;
-  box-shadow:0 0 14px rgba(180,123,255,.4);
-  background:linear-gradient(180deg,#26143e,#150c24);
-}
-/* Легендарные — золотое свечение + золотой фон */
-.char-card.legendary.owned{
-  border-color:#ffd766;
-  background:linear-gradient(180deg,#3a2810,#1a1208);
-  box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12);
-  animation:legendPulse 3s ease-in-out infinite;
-}
-.char-card.legendary.owned::before{
-  content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;
-  background:linear-gradient(120deg,transparent 30%,rgba(255,215,102,.3) 50%,transparent 70%);
-  background-size:250% 100%;animation:shimmer 3s infinite;
-}
-@keyframes legendPulse{
-  0%,100%{box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12)}
-  50%{box-shadow:0 0 34px rgba(255,215,102,1), inset 0 0 32px rgba(255,215,102,.22)}
-}
-@keyframes shimmer{
-  0%{background-position:200% 0}
-  100%{background-position:-100% 0}
-}
-/* Мифические — красный ободок + мерцание/блеск */
-.char-card.mythic.owned{
-  border-color:#ff2a5a;
-  background:linear-gradient(135deg,#2a0a1a,#1a0508,#2a0a1a,#1a0508);
-  background-size:300% 300%;
-  animation:mythicGlow 2.5s ease-in-out infinite, mythicBg 5s linear infinite, mythicShake 4s ease-in-out infinite;
-  position:relative;
-}
-.char-card.mythic.owned::before{
-  content:'';position:absolute;inset:-2px;border-radius:16px;pointer-events:none;z-index:0;
-  background:linear-gradient(120deg,transparent 15%,rgba(255,215,102,.5) 35%,rgba(255,42,90,.5) 50%,rgba(0,255,204,.5) 65%,transparent 85%);
-  background-size:300% 100%;animation:shimmer 1.8s linear infinite;
-}
-.char-card.mythic.owned::after{
-  content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;
-  box-shadow:inset 0 0 18px rgba(255,42,90,.5), inset 0 0 30px rgba(0,255,204,.25);
-}
-@keyframes mythicGlow{
-  0%,100%{box-shadow:0 0 20px rgba(255,42,90,.7), 0 0 32px rgba(255,215,102,.35)}
-  50%{box-shadow:0 0 34px rgba(255,42,90,1), 0 0 56px rgba(255,215,102,.7), 0 0 24px rgba(0,255,204,.55)}
-}
-@keyframes mythicBg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
-}
-@keyframes mythicShake{
-  0%,100%{transform:translateX(0)}
-  25%{transform:translateX(-0.6px)}
-  75%{transform:translateX(0.6px)}
-}
+.char-card.common.owned{border-color:#6a6a7a;background:linear-gradient(180deg,#1a1a24,#0e0e16);box-shadow:0 0 8px rgba(120,120,140,.35)}
+.char-card.epic.owned{border-color:#b47bff;box-shadow:0 0 14px rgba(180,123,255,.4);background:linear-gradient(180deg,#26143e,#150c24)}
+.char-card.legendary.owned{border-color:#ffd766;background:linear-gradient(180deg,#3a2810,#1a1208);box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12);animation:legendPulse 3s ease-in-out infinite}
+.char-card.legendary.owned::before{content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;background:linear-gradient(120deg,transparent 30%,rgba(255,215,102,.3) 50%,transparent 70%);background-size:250% 100%;animation:shimmer 3s infinite}
+@keyframes legendPulse{0%,100%{box-shadow:0 0 22px rgba(255,215,102,.7), inset 0 0 24px rgba(255,215,102,.12)}50%{box-shadow:0 0 34px rgba(255,215,102,1), inset 0 0 32px rgba(255,215,102,.22)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-100% 0}}
+.char-card.mythic.owned{border-color:#ff2a5a;background:linear-gradient(135deg,#2a0a1a,#1a0508,#2a0a1a,#1a0508);background-size:300% 300%;animation:mythicGlow 2.5s ease-in-out infinite, mythicBg 5s linear infinite;position:relative}
+.char-card.mythic.owned::before{content:'';position:absolute;inset:-2px;border-radius:16px;pointer-events:none;z-index:0;background:linear-gradient(120deg,transparent 15%,rgba(255,215,102,.5) 35%,rgba(255,42,90,.5) 50%,rgba(0,255,204,.5) 65%,transparent 85%);background-size:300% 100%;animation:shimmer 1.8s linear infinite}
+.char-card.mythic.owned::after{content:'';position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;box-shadow:inset 0 0 18px rgba(255,42,90,.5), inset 0 0 30px rgba(0,255,204,.25)}
+@keyframes mythicGlow{0%,100%{box-shadow:0 0 20px rgba(255,42,90,.7), 0 0 32px rgba(255,215,102,.35)}50%{box-shadow:0 0 34px rgba(255,42,90,1), 0 0 56px rgba(255,215,102,.7), 0 0 24px rgba(0,255,204,.55)}}
+@keyframes mythicBg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 .char-card.mythic.owned .cn{color:#ffd1dd;font-weight:bold;text-shadow:0 0 8px #ff2a5a}
 .char-card.legendary.owned .cn{color:#ffeeb8;font-weight:bold}
-
-/* Слоты отряда */
 .slots-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .slot{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;position:relative;transition:.15s}
 
 /* ========== НАСТРОЙКИ ========== */
-.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;
-  border-bottom:1px solid #24123c;font-size:14px;color:#cbb8ee}
-.switch{position:relative;width:54px;height:28px;border-radius:15px;background:#24123c;border:2px solid #4a2a7a;
-  cursor:pointer;transition:.2s;flex-shrink:0}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;border-bottom:1px solid #24123c;font-size:14px;color:#cbb8ee}
+.switch{position:relative;width:54px;height:28px;border-radius:15px;background:#24123c;border:2px solid #4a2a7a;cursor:pointer;transition:.2s;flex-shrink:0}
 .switch.on{background:#4a1f80;border-color:#b47bff;box-shadow:0 0 14px rgba(180,123,255,.5)}
-.switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
-  background:#8f7bb0;transition:.2s}
+.switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#8f7bb0;transition:.2s}
 .switch.on::after{left:26px;background:#e0ccff;box-shadow:0 0 10px #fff}
 .lang-btns{display:flex;gap:7px}
-.lang-btn{padding:7px 14px;border-radius:10px;border:2px solid #4a2a7a;background:#180c2a;color:#a898c8;
-  cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
+.lang-btn{padding:7px 14px;border-radius:10px;border:2px solid #4a2a7a;background:#180c2a;color:#a898c8;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
 .lang-btn.active{border-color:#b47bff;color:#fff;background:#33145c;box-shadow:0 0 12px rgba(180,123,255,.5)}
-input.promo{width:100%;padding:11px;border-radius:11px;border:2px solid #4a2a7a;background:#140a22;color:#e0ccff;
-  font-family:inherit;font-size:14px;outline:none;margin-bottom:9px}
+input.promo{width:100%;padding:11px;border-radius:11px;border:2px solid #4a2a7a;background:#140a22;color:#e0ccff;font-family:inherit;font-size:14px;outline:none;margin-bottom:9px}
 input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)}
 
 /* ========== ЗАДАНИЯ ========== */
-.task{display:flex;align-items:center;gap:11px;padding:11px;border:2px solid #2c1748;border-radius:14px;
-  background:linear-gradient(180deg,#180c28,#0e0618);margin-bottom:8px}
+.task{display:flex;align-items:center;gap:11px;padding:11px;border:2px solid #2c1748;border-radius:14px;background:linear-gradient(180deg,#180c28,#0e0618);margin-bottom:8px}
 .task.done{border-color:#1f7a68;background:linear-gradient(180deg,#0d2a24,#07160f)}
 .task .ti{width:36px;height:36px;flex-shrink:0}
 .task .tinfo2{flex:1;min-width:0}
@@ -312,19 +246,15 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 .hint{font-size:12px;color:#8f7bb0;line-height:1.55;max-width:340px}
 
 /* ========== РЕКЛАМА ========== */
-#adOverlay{position:absolute;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;
-  justify-content:center;gap:20px;background:rgba(3,1,7,.96)}
+#adOverlay{position:absolute;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(3,1,7,.96)}
 #adOverlay.active{display:flex}
-.spinner{width:64px;height:64px;border:5px solid #2c1748;border-top-color:#a765f0;border-radius:50%;
-  animation:spin 1s linear infinite;box-shadow:0 0 26px rgba(167,101,240,.5)}
+.spinner{width:64px;height:64px;border:5px solid #2c1748;border-top-color:#a765f0;border-radius:50%;animation:spin 1s linear infinite;box-shadow:0 0 26px rgba(167,101,240,.5)}
 @keyframes spin{to{transform:rotate(360deg)}}
 #adOverlay p{color:#c0a8e8;font-size:14px;letter-spacing:1px}
 
 /* ========== ТОСТ ========== */
-#toast{position:absolute;left:50%;top:12%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;
-  gap:7px;align-items:center;pointer-events:none}
-.toast-item{background:rgba(20,10,34,.96);border:2px solid #7b3fbf;border-radius:12px;padding:9px 16px;
-  font-size:13px;color:#e0ccff;box-shadow:0 0 22px rgba(138,75,214,.5);animation:toastIn .3s ease-out;white-space:nowrap}
+#toast{position:absolute;left:50%;top:12%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:none}
+.toast-item{background:rgba(20,10,34,.96);border:2px solid #7b3fbf;border-radius:12px;padding:9px 16px;font-size:13px;color:#e0ccff;box-shadow:0 0 22px rgba(138,75,214,.5);animation:toastIn .3s ease-out;white-space:nowrap}
 @keyframes toastIn{0%{transform:translateY(-16px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
 /* ========== ОБУЧЕНИЕ ========== */
@@ -335,6 +265,30 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 
 .section-title{font-size:13px;color:#8f7bb0;letter-spacing:2px;margin:6px 0 10px;text-transform:uppercase}
 
+/* ========== ПРИЗЫВ ========== */
+.summon-chest-box{text-align:center;padding:14px;margin-bottom:14px;border:2px solid #7b3fbf;border-radius:16px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,215,102,.15),transparent 70%),linear-gradient(180deg,#1e0f34,#0d0618);
+  box-shadow:0 0 24px rgba(255,215,102,.2)}
+.summon-chest-box .chest-art{width:110px;height:110px;margin:0 auto 4px;animation:float 3s ease-in-out infinite;
+  filter:drop-shadow(0 0 18px rgba(255,215,102,.6))}
+.summon-chest-box .count{font-size:32px;color:#ffd766;font-weight:bold;text-shadow:0 0 14px #ffd766;line-height:1}
+.summon-chest-box .lbl{font-size:12px;color:#a898c8;letter-spacing:1px}
+.summon-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.preview-card{border:2px solid #3d2266;border-radius:14px;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:linear-gradient(180deg,#1c0f2e,#100821);position:relative;overflow:hidden;transition:.2s}
+.preview-card svg{width:52px;height:52px;position:relative;z-index:1}
+.preview-card .pcn{font-size:10px;text-align:center;line-height:1.1;position:relative;z-index:1;color:#c0a8e8}
+.preview-card .prar{font-size:8px;letter-spacing:1px;text-transform:uppercase;position:relative;z-index:1}
+.preview-card.common{border-color:#6a6a7a;background:linear-gradient(180deg,#1a1a24,#0e0e16)}
+.preview-card.epic{border-color:#b47bff;background:linear-gradient(180deg,#26143e,#150c24);box-shadow:0 0 14px rgba(180,123,255,.4)}
+.preview-card.legendary{border-color:#ffd766;background:linear-gradient(180deg,#3a2810,#1a1208);box-shadow:0 0 20px rgba(255,215,102,.6);animation:legendPulse 3s ease-in-out infinite}
+.preview-card.mythic{border-color:#ff2a5a;background:linear-gradient(135deg,#2a0a1a,#1a0508,#2a0a1a);background-size:300% 300%;box-shadow:0 0 24px rgba(255,42,90,.7), inset 0 0 18px rgba(0,255,204,.2);animation:mythicGlow 2.5s ease-in-out infinite, mythicBg 5s linear infinite}
+.chances-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.chance-row{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-radius:11px;background:linear-gradient(180deg,#180c28,#0e0618);border:2px solid #2c1748;font-size:13px}
+.chance-row .lbl{display:flex;align-items:center;gap:9px}
+.chance-row .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.chance-row .val{font-weight:bold;color:#ffe6a3}
+
 @media(max-width:420px){
   .tile{min-height:92px}
   .tile .ticon{width:36px;height:36px}
@@ -342,6 +296,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
   .tower-btn{width:58px;height:68px}
   .lobby-hero{height:100px}
   .lobby-hero .hero-house{width:74px;height:74px}
+  .preview-card svg{width:42px;height:42px}
 }
 </style>
 </head>
@@ -363,7 +318,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <ellipse cx="32" cy="40" rx="5" ry="7" fill="#0b0614" opacity=".7"/>
       </svg>
       <div class="logo-title" id="loadTitle">ДОМ С ПРИВИДЕНИЯМИ</div>
-      <div class="logo-sub" id="loadSub">GHOST HOUSE TD</div>
     </div>
     <div class="load-bar"><div id="loadFill"></div></div>
     <div style="font-size:12px;color:#5a4a7a;position:relative;z-index:2" id="loadTxt">Загрузка данных...</div>
@@ -414,10 +368,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
       <div style="width:38px"></div>
     </div>
     <div class="panel-body">
-      <div class="set-row">
-        <span id="setMusicLbl">Музыка</span>
-        <div class="switch" id="swMusic"></div>
-      </div>
+      <div class="set-row"><span id="setMusicLbl">Музыка</span><div class="switch" id="swMusic"></div></div>
       <div class="set-row">
         <span id="setLangLbl">Язык</span>
         <div class="lang-btns">
@@ -431,7 +382,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <button class="btn primary" id="promoBtn">Активировать</button>
       </div>
       <div style="margin-top:18px;font-size:11px;color:#5a4a7a;text-align:center;line-height:1.7">
-        Ghost House TD v2.1<br>Все сохранения хранятся в VK
+        Ghost House TD v2.2<br>Все сохранения хранятся в VK
       </div>
     </div>
   </div>
@@ -448,7 +399,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
   <div class="screen" id="scr-afk">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <h2 id="afkTitle">Комната АФК</h2>
+      <h2 id="afkTitle">Комната отдыха</h2>
       <div style="width:38px"></div>
     </div>
     <div class="panel-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
@@ -528,6 +479,26 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
+  <div class="screen" id="scr-summon">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="summonTitle">Призыв</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body">
+      <div class="summon-chest-box">
+        <div class="chest-art" id="summonChestIcon"></div>
+        <div class="lbl" id="summonChestLbl">Сундуков у вас</div>
+        <div class="count" id="summonChestCount">0</div>
+      </div>
+      <button class="btn gold" id="summonOpenBtn" style="width:100%;padding:14px;font-size:15px;margin-bottom:20px">Открыть сундук</button>
+      <div class="section-title" id="summonPrevTitle">Возможные герои</div>
+      <div class="summon-preview" id="summonPreview"></div>
+      <div class="section-title" id="summonChanceTitle">Шансы выпадения</div>
+      <div class="chances-list" id="summonChances"></div>
+    </div>
+  </div>
+
   <div class="screen" id="scr-game">
     <canvas id="gameCanvas"></canvas>
     <div class="game-hud" id="gameHud"></div>
@@ -535,16 +506,13 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
   </div>
 
   <div id="modal-root"></div>
-  <div id="adOverlay">
-    <div class="spinner"></div>
-    <p id="adText">Загрузка рекламы...</p>
-  </div>
+  <div id="adOverlay"><div class="spinner"></div><p id="adText">Загрузка рекламы...</p></div>
   <div id="toast"></div>
 </div>
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.1
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.2
    ============================================================ */
 
 /* ---------- БАЗОВЫЕ SVG ---------- */
@@ -560,8 +528,6 @@ const SVG = {
   bed:'<svg viewBox="0 0 24 24"><path d="M3 18v-8h13a4 4 0 014 4v4" fill="#7b3fbf"/><path d="M3 18h18v2H3z" fill="#4a1f80"/><circle cx="7" cy="12" r="2" fill="#e0ccff"/></svg>',
   users:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4" fill="#a765f0"/><path d="M2.5 20a6.5 6.5 0 0113 0z" fill="#a765f0"/><circle cx="17" cy="9" r="2.6" fill="#7b3fbf"/><path d="M13.5 20a5 5 0 017-4.6" fill="none" stroke="#7b3fbf" stroke-width="2"/></svg>',
   fire:'<svg viewBox="0 0 24 24"><path d="M12 2s5 6 5 11a5 5 0 01-10 0c0-2 1-3 1-5 2 1 3 3 3 5 0-4 1-8 1-11z" fill="#ff8a3d"/><path d="M12 9s2.5 3 2.5 6a2.5 2.5 0 01-5 0c0-1.5 1-2.5 1-4 1 1 1.5 2 1.5 3 0-2 0-4 0-5z" fill="#ffd766"/></svg>',
-  snow:'<svg viewBox="0 0 24 24"><path d="M12 2v20M4 6l16 12M20 6L4 18" stroke="#7fd8ff" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="#7fd8ff"/></svg>',
-  bolt:'<svg viewBox="0 0 24 24"><path d="M13 2L5 13h5l-2 9 9-12h-5l1-8z" fill="#c39bff"/></svg>',
   reaper:'<svg viewBox="0 0 24 24"><path d="M12 2c-4 0-6 3-6 7v6h12V9c0-4-2-7-6-7z" fill="#e8e0f5"/><circle cx="9.5" cy="10" r="1.9" fill="#1a0f2a"/><circle cx="14.5" cy="10" r="1.9" fill="#1a0f2a"/><path d="M10 15h4l-2 3z" fill="#1a0f2a"/><path d="M4 20c3-2 5 1 8-1s5 1 8-1" stroke="#a765f0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   soul:'<svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="6" fill="#00ffcc" opacity=".85"/><circle cx="12" cy="10" r="3" fill="#0b0614"/><path d="M12 16v6M8 20l4-2 4 2" stroke="#00ffcc" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   chest:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="2" fill="#8a6a1f"/><path d="M3 9h18l-2-5H5L3 9z" fill="#c9a23a"/><rect x="10" y="12" width="4" height="5" rx="1" fill="#ffd766"/></svg>',
@@ -573,26 +539,183 @@ const SVG = {
   tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>'
 };
 
-/* ---------- SVG-ИКОНКИ ПЕРСОНАЖЕЙ ---------- */
-function icoGhost(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/></svg>`; }
-function icoSkull(color){ return `<svg viewBox="0 0 64 64"><path d="M32 8c-11 0-19 8-19 18v10l4 4v6h6v-4h18v4h6v-6l4-4V26c0-10-8-18-19-18z" fill="${color}"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/><path d="M29 42h6l-3 6z" fill="#0b0614"/></svg>`; }
-function icoBat(color){ return `<svg viewBox="0 0 64 64"><path d="M32 18c-4 0-6 3-6 6v4c-8-5-16-9-20-7 4 4 6 10 6 14s4 6 8 4l6-4 6 4c4 2 8 0 8-4s2-10 6-14c-4-2-12 2-20 7v-4c0-3-2-6-6-6z" fill="${color}"/><circle cx="29" cy="26" r="1.4" fill="#ff5f7e"/><circle cx="35" cy="26" r="1.4" fill="#ff5f7e"/></svg>`; }
-function icoSpider(color){ return `<svg viewBox="0 0 64 64"><circle cx="32" cy="28" r="9" fill="${color}"/><circle cx="32" cy="42" r="6" fill="${color}"/><path d="M23 22l-10-6M23 28h-12M23 34l-10 6M41 22l10-6M41 28h12M41 34l10 6" stroke="${color}" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="28" cy="26" r="1.6" fill="#ff2a5a"/><circle cx="36" cy="26" r="1.6" fill="#ff2a5a"/></svg>`; }
-function icoCat(color){ return `<svg viewBox="0 0 64 64"><path d="M16 20l4 12c-4 4-6 10-6 16 0 8 8 12 18 12s18-4 18-12c0-6-2-12-6-16l4-12-10 6c-2-1-4-1-6-1s-4 0-6 1z" fill="${color}"/><circle cx="25" cy="34" r="2" fill="#ffd766"/><circle cx="39" cy="34" r="2" fill="#ffd766"/><path d="M30 42l2 2 2-2" stroke="#ffd766" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`; }
-function icoRaven(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-6 0-10 4-10 10 0 3 1 5 2 7-6 2-12 6-14 12 6 0 10-2 14-6 2 6 6 12 8 14 2-2 6-8 8-14 4 4 8 6 14 6-2-6-8-10-14-12 1-2 2-4 2-7 0-6-4-10-10-10z" fill="${color}"/><circle cx="29" cy="20" r="1.5" fill="#ffd766"/><circle cx="35" cy="20" r="1.5" fill="#ffd766"/></svg>`; }
-function icoPumpkin(color){ return `<svg viewBox="0 0 64 64"><ellipse cx="32" cy="38" rx="22" ry="18" fill="${color}"/><ellipse cx="32" cy="38" rx="10" ry="18" fill="#e07020" opacity=".5"/><rect x="29" y="14" width="6" height="8" fill="#4a8a3a"/><path d="M22 32l4 4-4 4M42 32l-4 4 4 4M26 44l6 4 6-4" stroke="#2a1000" stroke-width="2.4" fill="none" stroke-linejoin="round"/></svg>`; }
-function icoFlame(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-2 10-10 14-10 24 0 10 6 18 10 22 4-4 10-12 10-22 0-10-8-14-10-24z" fill="${color}"/><path d="M32 22c-1 6-5 8-5 14 0 5 3 9 5 11 2-2 5-6 5-11 0-6-4-8-5-14z" fill="#ffeeb8" opacity=".8"/></svg>`; }
-function icoWolf(color){ return `<svg viewBox="0 0 64 64"><path d="M10 22l8 4c4-6 10-10 14-10s10 4 14 10l8-4-2 12c2 4 2 10 0 14-4 6-12 10-20 10s-16-4-20-10c-2-4-2-10 0-14z" fill="${color}"/><circle cx="24" cy="30" r="2" fill="#ff5f7e"/><circle cx="40" cy="30" r="2" fill="#ff5f7e"/><path d="M28 42l4 4 4-4" stroke="#0b0614" stroke-width="2" fill="none"/></svg>`; }
-function icoVampire(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><circle cx="24" cy="25" r="1.5" fill="#ff2a5a"/><circle cx="40" cy="25" r="1.5" fill="#ff2a5a"/><path d="M28 42l2 6 2-6M34 42l2 6 2-6" fill="#fff"/></svg>`; }
-function icoCrown(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V33c0-13-8-23-21-23z" fill="${color}"/><path d="M18 12l4 8 6-8 4 8 4-8 6 8 4-8" stroke="#ffd766" stroke-width="3" fill="none" stroke-linejoin="round"/><ellipse cx="24" cy="30" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="30" rx="4" ry="5" fill="#0b0614"/></svg>`; }
-function icoMummy(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><path d="M12 20l40 6M12 32l40 4M12 44l40 4" stroke="#8a7a5a" stroke-width="2" opacity=".6"/><ellipse cx="24" cy="26" rx="4" ry="5" fill="#7a1a1a"/><ellipse cx="40" cy="26" rx="4" ry="5" fill="#7a1a1a"/></svg>`; }
-function icoBanshee(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4c-14 0-22 11-22 24v29l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 4 32 4z" fill="${color}" opacity=".85"/><ellipse cx="24" cy="26" rx="4.5" ry="6" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="6" fill="#0b0614"/><ellipse cx="32" cy="42" rx="5" ry="8" fill="#0b0614" opacity=".7"/></svg>`; }
-function icoReaper(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-14 0-22 12-22 26v22h44V32c0-14-8-26-22-26z" fill="#1a0f2a"/><path d="M32 6c-14 0-22 12-22 26v4c4-8 12-12 22-12s18 4 22 12v-4c0-14-8-26-22-26z" fill="${color}"/><circle cx="24" cy="30" r="3" fill="#ff5f7e"/><circle cx="40" cy="30" r="3" fill="#ff5f7e"/><circle cx="24" cy="30" r="1.2" fill="#fff"/><circle cx="40" cy="30" r="1.2" fill="#fff"/></svg>`; }
-function icoLich(color){ return `<svg viewBox="0 0 64 64"><path d="M32 8c-11 0-19 8-19 18v10l4 4v6h6v-4h18v4h6v-6l4-4V26c0-10-8-18-19-18z" fill="${color}"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/><path d="M29 42h6l-3 6z" fill="#0b0614"/><path d="M20 6l4 6 4-6 4 6 4-6 4 6 4-6" stroke="#00ffcc" stroke-width="2" fill="none"/></svg>`; }
-function icoSlime(color){ return `<svg viewBox="0 0 64 64"><path d="M32 10c-14 0-22 12-22 24s10 20 22 20 22-8 22-20S46 10 32 10z" fill="${color}"/><circle cx="24" cy="34" r="2.5" fill="#0b0614"/><circle cx="40" cy="34" r="2.5" fill="#0b0614"/><ellipse cx="20" cy="20" rx="4" ry="3" fill="#fff" opacity=".4"/></svg>`; }
-function icoBloody(color){ return `<svg viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="${color}"/><ellipse cx="24" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="26" rx="4.5" ry="5.5" fill="#0b0614"/><path d="M14 40q6 4 12 0t12 0 12 0" stroke="#7a0a1a" stroke-width="2.5" fill="none" opacity=".7"/></svg>`; }
-function icoStone(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4c-13 0-21 10-21 23v27h42V29c0-13-9-25-21-25z" fill="${color}"/><path d="M12 22h42" stroke="#2a2a3a" stroke-width="2" opacity=".5"/></svg>`; }
-function icoWitch(color){ return `<svg viewBox="0 0 64 64"><path d="M32 4l-18 24h36L32 4z" fill="#33145c"/><path d="M32 10l-10 14h20L32 10z" fill="${color}"/><circle cx="32" cy="40" r="14" fill="#8fd14f"/><circle cx="27" cy="38" r="2" fill="#0b0614"/><circle cx="37" cy="38" r="2" fill="#0b0614"/><path d="M27 46q5 4 10 0" stroke="#0b0614" stroke-width="2" fill="none"/></svg>`; }
+/* ============================================================
+   ИКОНКИ ПЕРСОНАЖЕЙ — детализированные
+   ============================================================ */
+function icoGhost(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 5C18 5 10 15 10 28v28l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 5 32 5z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+  <path d="M20 16q12-6 24 0" stroke="#fff" stroke-width="1.4" fill="none" opacity=".35" stroke-linecap="round"/>
+  <ellipse cx="23" cy="27" rx="5.5" ry="7" fill="#0b0614"/>
+  <ellipse cx="41" cy="27" rx="5.5" ry="7" fill="#0b0614"/>
+  <circle cx="24.5" cy="24.5" r="2" fill="#fff"/>
+  <circle cx="42.5" cy="24.5" r="2" fill="#fff"/>
+  <ellipse cx="32" cy="42" rx="5.5" ry="8" fill="#0b0614" opacity=".6"/>
+  <path d="M22 47q10 5 20 0" stroke="#0b0614" stroke-width="1.2" fill="none" opacity=".4"/>
+</svg>`;}
+function icoSkull(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 4C20 4 11 13 11 25v11c0 2 1 3 3 3h1v7c0 1 1 2 2 2h4v-4h4v4h4v-4h4v4h4v-4h4v4h4c1 0 2-1 2-2v-7h1c2 0 3-1 3-3V25C53 13 44 4 32 4z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <ellipse cx="22" cy="24" rx="6" ry="8" fill="#0b0614"/>
+  <ellipse cx="42" cy="24" rx="6" ry="8" fill="#0b0614"/>
+  <circle cx="23" cy="22" r="2" fill="#fff" opacity=".85"/>
+  <circle cx="43" cy="22" r="2" fill="#fff" opacity=".85"/>
+  <path d="M30 37l2 5 2-5z" fill="#0b0614"/>
+  <path d="M20 36h24v3H20z" fill="#0b0614"/>
+  <path d="M24 36v3M28 36v3M32 36v3M36 36v3M40 36v3" stroke="${c}" stroke-width="1.6"/>
+</svg>`;}
+function icoBat(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 22c-5 0-8 3-8 7v4c-6-5-12-9-18-9 2 4 3 10 5 14-4 0-8-1-11-3 2 5 7 9 13 9 5 0 8-3 9-6l6 4 6-4c1 3 4 6 9 6 6 0 11-4 13-9-3 2-7 3-11 3 2-4 3-10 5-14-6 0-12 4-18 9v-4c0-4-3-7-8-7z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+  <circle cx="27" cy="27" r="2" fill="#ff5f7e"/>
+  <circle cx="37" cy="27" r="2" fill="#ff5f7e"/>
+  <circle cx="27" cy="27" r="0.8" fill="#fff"/>
+  <circle cx="37" cy="27" r="0.8" fill="#fff"/>
+  <path d="M28 32l2 2 2-2M34 32l2 2 2-2" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>`;}
+function icoSpider(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M20 20l-12-8M22 26h-14M22 32l-12 8M44 20l12-8M42 26h14M42 32l12 8M18 40l-12 8M22 44l-10 12M46 40l12 8M42 44l10 12" stroke="${c}" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <circle cx="32" cy="30" r="12" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <circle cx="32" cy="46" r="8" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <circle cx="28" cy="27" r="2.6" fill="#ff2a5a"/>
+  <circle cx="36" cy="27" r="2.6" fill="#ff2a5a"/>
+  <circle cx="28" cy="27" r="1" fill="#fff"/>
+  <circle cx="36" cy="27" r="1" fill="#fff"/>
+  <circle cx="26" cy="32" r="1.6" fill="#ff2a5a"/>
+  <circle cx="38" cy="32" r="1.6" fill="#ff2a5a"/>
+</svg>`;}
+function icoCat(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 16l5 13c-4 4-7 9-7 15 0 9 8 14 18 14s18-5 18-14c0-6-3-11-7-15l5-13-11 6c-2-1-4-1-5-1s-3 0-5 1z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <circle cx="25" cy="33" r="2.6" fill="#7ee6a0"/>
+  <circle cx="39" cy="33" r="2.6" fill="#7ee6a0"/>
+  <ellipse cx="25" cy="33" rx="0.9" ry="2.4" fill="#0b0614"/>
+  <ellipse cx="39" cy="33" rx="0.9" ry="2.4" fill="#0b0614"/>
+  <path d="M30 41l2 2 2-2" stroke="#ffd766" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M16 30h-5M16 34h-5M48 30h5M48 34h5" stroke="#fff" stroke-width="1" opacity=".5"/>
+</svg>`;}
+function icoRaven(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 8c-7 0-11 5-11 11 0 3 1 5 2 7-7 2-13 7-15 14 6 1 11-1 15-6 2 7 6 13 9 16 3-3 7-9 9-16 4 5 9 7 15 6-2-7-8-12-15-14 1-2 2-4 2-7 0-6-4-11-11-11z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <circle cx="28" cy="19" r="2" fill="#ffd766"/>
+  <circle cx="36" cy="19" r="2" fill="#ffd766"/>
+  <circle cx="28" cy="19" r="0.8" fill="#0b0614"/>
+  <circle cx="36" cy="19" r="0.8" fill="#0b0614"/>
+  <path d="M30 26l2 4 2-4z" fill="#ffb347"/>
+  <path d="M20 14l-3-4M44 14l3-4" stroke="#fff" stroke-width="1" opacity=".35"/>
+</svg>`;}
+function icoPumpkin(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="32" cy="38" rx="23" ry="19" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <ellipse cx="32" cy="38" rx="10" ry="19" fill="#e07020" opacity=".4"/>
+  <ellipse cx="32" cy="38" rx="3" ry="19" fill="#b05010" opacity=".35"/>
+  <rect x="28" y="13" width="8" height="9" rx="1" fill="#4a8a3a"/>
+  <path d="M22 32l4 4-4 4M42 32l-4 4 4 4M25 44l7 5 7-5" stroke="#2a1000" stroke-width="2.4" fill="none" stroke-linejoin="round"/>
+</svg>`;}
+function icoFlame(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 6c-3 11-11 15-11 26 0 11 7 20 11 24 4-4 11-13 11-24 0-11-8-15-11-26z" fill="${c}" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+  <path d="M32 22c-2 6-6 9-6 15 0 5 3 10 6 12 3-2 6-7 6-12 0-6-4-9-6-15z" fill="#ffeeb8" opacity=".85"/>
+  <circle cx="32" cy="42" r="3" fill="#fff" opacity=".9"/>
+</svg>`;}
+function icoWolf(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 20l9 4c4-7 10-11 13-11s9 4 13 11l9-4-2 13c2 5 2 11 0 15-4 7-12 11-20 11s-16-4-20-11c-2-4-2-10 0-15z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <circle cx="24" cy="30" r="2.6" fill="#ff5f7e"/>
+  <circle cx="40" cy="30" r="2.6" fill="#ff5f7e"/>
+  <circle cx="24" cy="30" r="0.9" fill="#fff"/>
+  <circle cx="40" cy="30" r="0.9" fill="#fff"/>
+  <path d="M28 40l4 4 4-4" stroke="#0b0614" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M28 44l-2 2M36 44l2 2" stroke="#fff" stroke-width="1.5"/>
+</svg>`;}
+function icoVampire(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 5C18 5 10 15 10 28v28l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 5 32 5z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <path d="M18 18l6 4-6 5zM46 18l-6 4 6 5z" fill="#1a0510" opacity=".5"/>
+  <ellipse cx="23" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/>
+  <ellipse cx="41" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/>
+  <circle cx="24" cy="26" r="1.8" fill="#ff2a5a"/>
+  <circle cx="42" cy="26" r="1.8" fill="#ff2a5a"/>
+  <path d="M27 40l2 8 3-8M35 40l3 8 2-8" fill="#fff" stroke="#fff" stroke-width="0.4"/>
+</svg>`;}
+function icoCrown(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 10C19 10 11 20 11 33v23l7-6 7 6 8-6 8 6 7-6 7 6V33C55 20 45 10 32 10z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+  <path d="M16 14l5 10 7-10 4 10 8-10 8 10 4-10 7 10 5-10" fill="none" stroke="#ffd766" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="20" cy="16" r="2.2" fill="#ffd766"/>
+  <circle cx="32" cy="13" r="2.6" fill="#ffd766"/>
+  <circle cx="44" cy="16" r="2.2" fill="#ffd766"/>
+  <ellipse cx="23" cy="33" rx="4" ry="5" fill="#0b0614"/>
+  <ellipse cx="41" cy="33" rx="4" ry="5" fill="#0b0614"/>
+  <circle cx="24" cy="32" r="1.4" fill="#fff"/>
+  <circle cx="42" cy="32" r="1.4" fill="#fff"/>
+</svg>`;}
+function icoMummy(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 5C18 5 10 15 10 28v28l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 5 32 5z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <path d="M12 20l40 6M12 30l40 5M12 40l40 5M12 50l40 5" stroke="#8a7a5a" stroke-width="1.8" opacity=".55"/>
+  <ellipse cx="23" cy="27" rx="4.5" ry="5.5" fill="#7a1a1a"/>
+  <ellipse cx="41" cy="27" rx="4.5" ry="5.5" fill="#7a1a1a"/>
+  <circle cx="23" cy="26" r="1.4" fill="#ffe8b0"/>
+  <circle cx="41" cy="26" r="1.4" fill="#ffe8b0"/>
+  <path d="M27 42h10" stroke="#7a1a1a" stroke-width="2"/>
+</svg>`;}
+function icoBanshee(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 4c-15 0-23 12-23 25v29l7-6 7 6 9-6 9 6 7-6 7 6V29C55 16 47 4 32 4z" fill="${c}" opacity=".9" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+  <path d="M14 20q-6 10-4 22M50 20q6 10 4 22" stroke="${c}" stroke-width="2" fill="none" opacity=".7"/>
+  <ellipse cx="23" cy="27" rx="4.5" ry="6" fill="#0b0614"/>
+  <ellipse cx="41" cy="27" rx="4.5" ry="6" fill="#0b0614"/>
+  <circle cx="24" cy="25" r="1.6" fill="#fff" opacity=".85"/>
+  <circle cx="42" cy="25" r="1.6" fill="#fff" opacity=".85"/>
+  <ellipse cx="32" cy="43" rx="5" ry="9" fill="#0b0614" opacity=".75"/>
+</svg>`;}
+function icoReaper(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 4c-14 0-22 12-22 26v22h44V30C54 16 46 4 32 4z" fill="#1a0f2a" stroke="rgba(0,0,0,.5)" stroke-width="1"/>
+  <path d="M32 4c-14 0-22 12-22 26v3c4-9 12-13 22-13s18 4 22 13v-3C54 16 46 4 32 4z" fill="${c}" opacity=".9"/>
+  <circle cx="23" cy="30" r="3.5" fill="#ff2a5a"/>
+  <circle cx="41" cy="30" r="3.5" fill="#ff2a5a"/>
+  <circle cx="23" cy="30" r="1.4" fill="#fff"/>
+  <circle cx="41" cy="30" r="1.4" fill="#fff"/>
+  <path d="M26 44q6 3 12 0" stroke="#0b0614" stroke-width="2" fill="none" opacity=".6"/>
+  <path d="M48 18l8-8" stroke="#a765f0" stroke-width="2" stroke-linecap="round"/>
+</svg>`;}
+function icoLich(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 6C21 6 13 14 13 24v10c0 1 1 3 2 3l2 1v7c0 1 1 2 2 2h4v-4h4v4h4v-4h4v4h4v-4h4v4h4c1 0 2-1 2-2v-7l2-1c1 0 2-2 2-3V24C51 14 43 6 32 6z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <ellipse cx="23" cy="25" rx="4.5" ry="5.5" fill="#0b0614"/>
+  <ellipse cx="41" cy="25" rx="4.5" ry="5.5" fill="#0b0614"/>
+  <circle cx="23.5" cy="24" r="1.8" fill="#7fd8ff"/>
+  <circle cx="41.5" cy="24" r="1.8" fill="#7fd8ff"/>
+  <path d="M29 40l3 5 3-5z" fill="#0b0614"/>
+  <path d="M18 4l4 7 4-7 4 7 4-7 4 7 4-7 4 7 4-7" fill="none" stroke="#00ffcc" stroke-width="2" stroke-linejoin="round"/>
+</svg>`;}
+function icoSlime(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 10C17 10 9 22 9 34c0 12 10 20 23 20s23-8 23-20C55 22 47 10 32 10z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+  <ellipse cx="22" cy="20" rx="7" ry="4" fill="#fff" opacity=".45"/>
+  <circle cx="24" cy="34" r="3" fill="#0b0614"/>
+  <circle cx="40" cy="34" r="3" fill="#0b0614"/>
+  <circle cx="24.5" cy="33" r="1" fill="#fff"/>
+  <circle cx="40.5" cy="33" r="1" fill="#fff"/>
+  <path d="M26 44q6 5 12 0" stroke="#0b0614" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M20 48q-2 4 0 6M44 48q2 4 0 6" stroke="${c}" stroke-width="2" fill="none" opacity=".6"/>
+</svg>`;}
+function icoBloody(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 5C18 5 10 15 10 28v28l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 5 32 5z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <ellipse cx="23" cy="27" rx="4.5" ry="6" fill="#0b0614"/>
+  <ellipse cx="41" cy="27" rx="4.5" ry="6" fill="#0b0614"/>
+  <circle cx="24" cy="25" r="1.6" fill="#fff"/>
+  <circle cx="42" cy="25" r="1.6" fill="#fff"/>
+  <path d="M14 40q6 5 12 0t12 0 12 0" stroke="#7a0a1a" stroke-width="2.6" fill="none" opacity=".8"/>
+  <path d="M20 48l1 4M32 50l1 4M44 48l-1 4" stroke="#7a0a1a" stroke-width="2" stroke-linecap="round"/>
+</svg>`;}
+function icoStone(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 4C19 4 10 15 10 27v24c0 2 1 3 3 3h38c2 0 3-1 3-3V27C54 15 45 4 32 4z" fill="${c}" stroke="rgba(0,0,0,.5)" stroke-width="1.4"/>
+  <path d="M12 22h40M12 40h40" stroke="#2a2a3a" stroke-width="1.6" opacity=".5"/>
+  <path d="M22 26h20M22 44h20" stroke="#2a2a3a" stroke-width="1.2" opacity=".35"/>
+  <circle cx="23" cy="32" r="2.6" fill="#7fd8ff"/>
+  <circle cx="41" cy="32" r="2.6" fill="#7fd8ff"/>
+  <path d="M28 36l4 4 4-4" stroke="#2a2a3a" stroke-width="2" fill="none"/>
+</svg>`;}
+function icoWitch(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 3L12 28h40z" fill="#33145c" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+  <path d="M32 9L18 26h28z" fill="${c}"/>
+  <ellipse cx="32" cy="28" rx="26" ry="4" fill="#2a0f48"/>
+  <circle cx="32" cy="42" r="14" fill="#8fd14f" stroke="rgba(0,0,0,.3)" stroke-width="1"/>
+  <circle cx="27" cy="40" r="2.2" fill="#0b0614"/>
+  <circle cx="37" cy="40" r="2.2" fill="#0b0614"/>
+  <circle cx="27.5" cy="39.5" r="0.8" fill="#fff"/>
+  <circle cx="37.5" cy="39.5" r="0.8" fill="#fff"/>
+  <path d="M27 48q5 4 10 0" stroke="#0b0614" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M32 14l-2 4h4z" fill="#ffd766"/>
+</svg>`;}
 
 /* ---------- ЛОКАЛИЗАЦИЯ ---------- */
 const I18N = {
@@ -602,9 +725,12 @@ const I18N = {
     loading:'Загрузка данных...', tutQ:'Хотите пройти обучение?',
     tutD:'Короткий гайд научит вас защищать дом от духов и строить башни.',
     tutYes:'Пройти обучение', tutNo:'Пропустить',
-    levels:'Уровни', settings:'Настройки', tasks:'Задания', afk:'Комната АФК',
+    levels:'Уровни', settings:'Настройки', tasks:'Задания', afk:'Комната отдыха',
     daily:'Ежедневная награда', chars:'Коллекция', abilities:'Способности',
     tower:'Башня Бесконечности', invite:'Пригласить друзей',
+    summon:'Призыв', yourChests:'Сундуков у вас', possibleHeroes:'Возможные герои',
+    dropChances:'Шансы выпадения', noChests:'Нет сундуков для открытия',
+    openChestBtn:'Открыть сундук',
     music:'Музыка', lang:'Язык', promo:'Промокод', promoPh:'Введите промокод',
     activate:'Активировать', back:'Назад',
     locked:'Уровень закрыт', play:'Играть', level:'Уровень',
@@ -618,7 +744,7 @@ const I18N = {
     owned:'Получен', notOwned:'Не найден',
     taskDone:'Получить', taskClaimed:'Получено',
     dailyReady:'Награда доступна!', dailyWait:'Возвращайтесь через',
-    afkHint:'Каждую минуту вы получаете кристаллы душ. Оставайтесь в комнате, чтобы копить.',
+    afkHint:'Каждую минуту вы получаете кристаллы душ. Оставайтесь в комнате отдыха, чтобы копить.',
     afkClaim:'Забрать награду', afkEarned:'Накоплено',
     twFloor:'Этаж', twStart:'Начать этаж', twHint:'Каждый этаж сложнее предыдущего. Чем выше — тем больше награда.',
     buy:'Купить', bought:'Куплено', notEnough:'Недостаточно кристаллов',
@@ -644,7 +770,8 @@ const I18N = {
     quitTitle:'Выйти из уровня?',
     quitText:'Прогресс уровня будет потерян.',
     quitYes:'Выйти', quitStay:'Остаться',
-    heroTag:'Добро пожаловать в дом'
+    heroTag:'Добро пожаловать в дом',
+    chestAdded:'Сундук добавлен в меню «Призыв»'
   },
   en:{
     loadVK:'Connecting to VK...', loadSave:'Loading save...',
@@ -652,9 +779,12 @@ const I18N = {
     loading:'Loading data...', tutQ:'Would you like a tutorial?',
     tutD:'A short guide will teach you to defend the house from ghosts and build towers.',
     tutYes:'Start tutorial', tutNo:'Skip',
-    levels:'Levels', settings:'Settings', tasks:'Tasks', afk:'AFK Room',
+    levels:'Levels', settings:'Settings', tasks:'Tasks', afk:'Rest Room',
     daily:'Daily Reward', chars:'Collection', abilities:'Abilities',
     tower:'Endless Tower', invite:'Invite Friends',
+    summon:'Summon', yourChests:'Your chests', possibleHeroes:'Possible heroes',
+    dropChances:'Drop chances', noChests:'No chests to open',
+    openChestBtn:'Open chest',
     music:'Music', lang:'Language', promo:'Promo code', promoPh:'Enter promo code',
     activate:'Activate', back:'Back',
     locked:'Level locked', play:'Play', level:'Level',
@@ -668,7 +798,7 @@ const I18N = {
     owned:'Owned', notOwned:'Not found',
     taskDone:'Claim', taskClaimed:'Claimed',
     dailyReady:'Reward available!', dailyWait:'Come back in',
-    afkHint:'Every minute you earn soul crystals. Stay in the room to accumulate.',
+    afkHint:'Every minute you earn soul crystals. Stay in the Rest Room to accumulate.',
     afkClaim:'Claim reward', afkEarned:'Accumulated',
     twFloor:'Floor', twStart:'Start floor', twHint:'Each floor is harder. The higher — the bigger the reward.',
     buy:'Buy', bought:'Owned', notEnough:'Not enough crystals',
@@ -694,7 +824,8 @@ const I18N = {
     quitTitle:'Quit level?',
     quitText:'Level progress will be lost.',
     quitYes:'Quit', quitStay:'Stay',
-    heroTag:'Welcome to the house'
+    heroTag:'Welcome to the house',
+    chestAdded:'Chest added to the "Summon" menu'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -713,7 +844,7 @@ const PATH_BLOCK = new Set();
   }
 })();
 
-/* ---------- ПЕРСОНАЖИ (20) ---------- */
+/* ---------- ПЕРСОНАЖИ ---------- */
 const CHARS = [
   {id:'ghost',     ru:'Призрак',        en:'Ghost',        r:'common',    color:'#b8c8ff', cost:50,   dmg:13,  range:85,  rate:0.85, icon:icoGhost('#b8c8ff'),     desc:{ru:'Стреляет эктоплазмой',en:'Fires ectoplasm'}},
   {id:'skeleton',  ru:'Скелет',         en:'Skeleton',     r:'common',    color:'#e8e0c0', cost:90,   dmg:24,  range:88,  rate:1.5,  splash:32, icon:icoSkull('#e8e0c0'),   desc:{ru:'Кости по площади',en:'Bone splash'}},
@@ -741,19 +872,15 @@ const RARITY_WEIGHT = {common:70, epic:22, legendary:6, mythic:2};
 
 /* ---------- СПОСОБНОСТИ ---------- */
 const ABILITIES = [
-  {id:'meteor', ru:'Метеор', en:'Meteor', cost:300, icon:SVG.meteor, cd:40, color:'#ff8a3d',
-   desc:{ru:'Наносит огромный урон по области',en:'Massive AoE damage'}},
-  {id:'freeze', ru:'Ледяная волна', en:'Ice Wave', cost:250, icon:SVG.freeze, cd:35, color:'#7fd8ff',
-   desc:{ru:'Замораживает всех врагов на 5 сек',en:'Freezes all enemies for 5s'}},
-  {id:'gold',   ru:'Золотая жила', en:'Gold Rush', cost:200, icon:SVG.gold, cd:45, color:'#ffd766',
-   desc:{ru:'+100% монет на 20 секунд',en:'+100% coins for 20s'}},
-  {id:'rage',   ru:'Ярость духов', en:'Spirit Rage', cost:400, icon:SVG.rage, cd:50, color:'#ff5f7e',
-   desc:{ru:'+100% урона башен на 15 секунд',en:'+100% tower damage for 15s'}}
+  {id:'meteor', ru:'Метеор', en:'Meteor', cost:300, icon:SVG.meteor, cd:40, color:'#ff8a3d', desc:{ru:'Наносит огромный урон по области',en:'Massive AoE damage'}},
+  {id:'freeze', ru:'Ледяная волна', en:'Ice Wave', cost:250, icon:SVG.freeze, cd:35, color:'#7fd8ff', desc:{ru:'Замораживает всех врагов на 5 сек',en:'Freezes all enemies for 5s'}},
+  {id:'gold',   ru:'Золотая жила', en:'Gold Rush', cost:200, icon:SVG.gold, cd:45, color:'#ffd766', desc:{ru:'+100% монет на 20 секунд',en:'+100% coins for 20s'}},
+  {id:'rage',   ru:'Ярость духов', en:'Spirit Rage', cost:400, icon:SVG.rage, cd:50, color:'#ff5f7e', desc:{ru:'+100% урона башен на 15 секунд',en:'+100% tower damage for 15s'}}
 ];
 
 /* ---------- СОСТОЯНИЕ ---------- */
 const DEFAULT_STATE = {
-  v:2, gems:0, chests:0, level:1, completed:0,
+  v:3, gems:0, chests:0, level:1, completed:0,
   chars: [], selectedChars: [], abilities: [],
   music:true, lang:'ru',
   lastDaily:0, lastTasks:0, tasks:[],
@@ -806,10 +933,7 @@ function initVK(){
     }catch(e){ resolve(); }
   });
 }
-function showAdOverlay(text){
-  $('#adText').textContent = text || t('adLoading');
-  $('#adOverlay').classList.add('active');
-}
+function showAdOverlay(text){ $('#adText').textContent = text || t('adLoading'); $('#adOverlay').classList.add('active'); }
 function hideAdOverlay(){ $('#adOverlay').classList.remove('active'); }
 function showInterstitial(cb){
   if(!vkAvailable){ cb&&cb(); return; }
@@ -827,23 +951,13 @@ function showRewardAd(onReward, onFail){
     .catch(()=>{ hideAdOverlay(); onFail&&onFail(); });
   setTimeout(()=>{ if($('#adOverlay').classList.contains('active')){ hideAdOverlay(); onReward&&onReward(); } }, 15000);
 }
-function showBanner(){
-  try{
-    vkSend('VKWebAppGetLaunchParams').then(()=>{
-      vkSend('VKWebAppShowBannerAd').catch(()=>{});
-    }).catch(()=>{});
-  }catch(e){}
-}
+function showBanner(){ try{ vkSend('VKWebAppGetLaunchParams').then(()=>{ vkSend('VKWebAppShowBannerAd').catch(()=>{}); }).catch(()=>{}); }catch(e){} }
 
 /* ---------- СОХРАНЕНИЕ ---------- */
 let saveTimer = null;
 function saveGame(force){
   if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
-  const doSave = ()=>{
-    if(!vkAvailable) return;
-    const data = JSON.stringify(state);
-    vkSend('VKWebAppStorageSet', {key:'ghosthouse_save', value:data}).catch(()=>{});
-  };
+  const doSave = ()=>{ if(!vkAvailable) return; const data = JSON.stringify(state); vkSend('VKWebAppStorageSet', {key:'ghosthouse_save', value:data}).catch(()=>{}); };
   if(force) doSave(); else saveTimer = setTimeout(doSave, 900);
 }
 function loadGame(){
@@ -876,9 +990,7 @@ function ensureStarter(){
     STARTER_CHARS.forEach(id=>{ if(!state.chars.includes(id)) state.chars.push(id); });
     state.starterGiven = true;
   }
-  if(state.selectedChars.length===0 && state.chars.length){
-    state.selectedChars = state.chars.slice(0,4);
-  }
+  if(state.selectedChars.length===0 && state.chars.length) state.selectedChars = state.chars.slice(0,4);
   if(state.selectedChars.length===0){
     STARTER_CHARS.forEach(id=>{ if(!state.chars.includes(id)) state.chars.push(id); });
     state.selectedChars = STARTER_CHARS.slice();
@@ -889,27 +1001,16 @@ function ensureStarter(){
 let audioCtx=null, musicGain=null, droneNodes=[], musicTimer=null, musicOn=false;
 function initAudio(){
   if(audioCtx) return;
-  try{
-    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    musicGain = audioCtx.createGain();
-    musicGain.gain.value = 0;
-    musicGain.connect(audioCtx.destination);
-  }catch(e){ audioCtx=null; }
+  try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); musicGain = audioCtx.createGain(); musicGain.gain.value = 0; musicGain.connect(audioCtx.destination); }catch(e){ audioCtx=null; }
 }
 function startMusic(){
-  if(!state.music) return;
-  initAudio();
-  if(!audioCtx) return;
+  if(!state.music) return; initAudio(); if(!audioCtx) return;
   if(audioCtx.state==='suspended') audioCtx.resume();
   if(!droneNodes.length){
     [55, 82.5, 110, 164.81].forEach((f,i)=>{
-      const o = audioCtx.createOscillator();
-      o.type = i%2 ? 'triangle':'sine';
-      o.frequency.value = f;
-      const g = audioCtx.createGain();
-      g.gain.value = 0.22/(i+1);
-      o.connect(g); g.connect(musicGain); o.start();
-      droneNodes.push({o,g});
+      const o = audioCtx.createOscillator(); o.type = i%2 ? 'triangle':'sine'; o.frequency.value = f;
+      const g = audioCtx.createGain(); g.gain.value = 0.22/(i+1);
+      o.connect(g); g.connect(musicGain); o.start(); droneNodes.push({o,g});
     });
   }
   musicGain.gain.cancelScheduledValues(audioCtx.currentTime);
@@ -920,81 +1021,21 @@ function startMusic(){
       if(!musicOn || !audioCtx || !state.music) return;
       const notes = [220, 261.63, 293.66, 329.63, 392, 440, 523.25];
       const f = notes[Math.floor(Math.random()*notes.length)];
-      const o = audioCtx.createOscillator();
-      o.type='sine'; o.frequency.value=f;
+      const o = audioCtx.createOscillator(); o.type='sine'; o.frequency.value=f;
       const g = audioCtx.createGain();
       g.gain.setValueAtTime(0, audioCtx.currentTime);
       g.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime+0.05);
       g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+2.2);
-      o.connect(g); g.connect(musicGain);
-      o.start(); o.stop(audioCtx.currentTime+2.3);
+      o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+2.3);
     }, 3200);
   }
 }
-function pauseMusic(){
-  if(!audioCtx || !musicGain) return;
-  try{ musicGain.gain.cancelScheduledValues(audioCtx.currentTime); musicGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime+0.4); }catch(e){}
-  musicOn=false;
-}
-function playClick(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sine'; o.frequency.value = 620;
-    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.12);
-  }catch(e){}
-}
-function playCoin(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='square'; o.frequency.setValueAtTime(880, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime+0.1);
-    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.18);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.2);
-  }catch(e){}
-}
-function playHitSound(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sawtooth'; o.frequency.setValueAtTime(180, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime+0.25);
-    g.gain.setValueAtTime(0.08, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.3);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.32);
-  }catch(e){}
-}
-function playBossDeath(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='sawtooth'; o.frequency.setValueAtTime(300, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime+0.7);
-    g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.85);
-  }catch(e){}
-}
-function playChestSound(){
-  if(!audioCtx || !state.music) return;
-  try{
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type='triangle'; o.frequency.setValueAtTime(440, audioCtx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.25);
-    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.4);
-    o.connect(g); g.connect(musicGain);
-    o.start(); o.stop(audioCtx.currentTime+0.45);
-  }catch(e){}
-}
+function pauseMusic(){ if(!audioCtx || !musicGain) return; try{ musicGain.gain.cancelScheduledValues(audioCtx.currentTime); musicGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime+0.4); }catch(e){} musicOn=false; }
+function playClick(){ if(!audioCtx || !state.music) return; try{ const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.value=620; g.gain.setValueAtTime(0.06, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1); o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+0.12); }catch(e){} }
+function playCoin(){ if(!audioCtx || !state.music) return; try{ const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime+0.1); g.gain.setValueAtTime(0.05, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.18); o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+0.2); }catch(e){} }
+function playHitSound(){ if(!audioCtx || !state.music) return; try{ const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(180, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime+0.25); g.gain.setValueAtTime(0.08, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.3); o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+0.32); }catch(e){} }
+function playBossDeath(){ if(!audioCtx || !state.music) return; try{ const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(300, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime+0.7); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8); o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+0.85); }catch(e){} }
+function playChestSound(){ if(!audioCtx || !state.music) return; try{ const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(440, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.25); g.gain.setValueAtTime(0.12, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.4); o.connect(g); g.connect(musicGain); o.start(); o.stop(audioCtx.currentTime+0.45); }catch(e){} }
 
 /* ---------- ЭКРАНЫ ---------- */
 let currentScreen = 'scr-loading';
@@ -1004,11 +1045,7 @@ function showScreen(id){
   if(s) s.classList.add('active');
   currentScreen = id;
 }
-function backToLobby(){
-  showScreen('scr-lobby');
-  renderLobby();
-  saveGame();
-}
+function backToLobby(){ showScreen('scr-lobby'); renderLobby(); saveGame(); }
 
 /* ---------- МОДАЛЬНЫЕ ОКНА ---------- */
 function openModal(html, opts){
@@ -1023,9 +1060,7 @@ function openModal(html, opts){
 }
 function closeModal(){
   const root = $('#modal-root');
-  root.classList.remove('active');
-  root.innerHTML='';
-  root.onclick=null;
+  root.classList.remove('active'); root.innerHTML=''; root.onclick=null;
 }
 
 /* ---------- ЛОББИ ---------- */
@@ -1038,7 +1073,6 @@ function renderLobby(){
   const body = $('#lobbyBody');
   body.innerHTML = '';
 
-  // Hero-блок с декором
   const hero = el('div','lobby-hero');
   hero.innerHTML = `
     <div class="hero-text">${t('heroTag')}</div>
@@ -1047,12 +1081,8 @@ function renderLobby(){
     <svg class="hero-ghost g3" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="currentColor"/><ellipse cx="24" cy="27" rx="4" ry="5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4" ry="5" fill="#0b0614"/></svg>
     <svg class="hero-house" viewBox="0 0 64 64">
       <defs>
-        <radialGradient id="roofG" cx="50%" cy="40%">
-          <stop offset="0%" stop-color="#7b3fbf"/><stop offset="100%" stop-color="#2a1440"/>
-        </radialGradient>
-        <radialGradient id="winG" cx="50%" cy="50%">
-          <stop offset="0%" stop-color="#ffd766"/><stop offset="100%" stop-color="#8a6a1f"/>
-        </radialGradient>
+        <radialGradient id="roofG" cx="50%" cy="40%"><stop offset="0%" stop-color="#7b3fbf"/><stop offset="100%" stop-color="#2a1440"/></radialGradient>
+        <radialGradient id="winG" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffd766"/><stop offset="100%" stop-color="#8a6a1f"/></radialGradient>
       </defs>
       <path d="M8 30 L32 8 L56 30 L56 58 L8 58 Z" fill="#1a0f2a" stroke="#4a1f80" stroke-width="2"/>
       <path d="M4 32 L32 6 L60 32 L54 32 L32 12 L10 32 Z" fill="url(#roofG)" stroke="#a765f0" stroke-width="1.5"/>
@@ -1069,11 +1099,12 @@ function renderLobby(){
 
   const grid = el('div','lobby-grid');
   const tiles = [
-    {id:'levels', icon:SVG.tower, label:t('levels'), badge: state.level, color:'#a765f0'},
+    {id:'levels', icon:SVG.tower, label:t('levels'), badge: state.level, badgeClass:'', color:'#a765f0'},
     {id:'tasks', icon:SVG.scroll, label:t('tasks'), color:'#c9a8ff', badge: hasClaimableTask()?1:0},
     {id:'chars', icon:SVG.users, label:t('chars'), color:'#ffd766'},
     {id:'abilities', icon:SVG.fire, label:t('abilities'), color:'#ff8a3d'},
     {id:'tower', icon:SVG.star, label:t('tower'), color:'#00ffcc'},
+    {id:'summon', icon:SVG.chest, label:t('summon'), color:'#ffd766', badge: state.chests>0?state.chests:0, badgeClass:'gold'},
     {id:'afk', icon:SVG.bed, label:t('afk'), color:'#9ef7e0'},
     {id:'daily', icon:SVG.gift, label:t('daily'), color:'#ffd766', badge: canClaimDaily()?1:0},
     {id:'settings', icon:SVG.gear, label:t('settings'), color:'#a898c8'}
@@ -1081,15 +1112,14 @@ function renderLobby(){
   tiles.forEach(tl=>{
     const tile = el('div','tile');
     tile.innerHTML = `<div class="ticon" style="color:${tl.color}">${tl.icon}</div><div class="tlabel">${tl.label}</div>`;
-    if(tl.badge){ const b = el('div','badge','!'); tile.appendChild(b); }
+    if(tl.badge){ const b = el('div','badge'+(tl.badgeClass?' '+tl.badgeClass:''), tl.badge>1?tl.badge:'!'); tile.appendChild(b); }
     tile.onclick = ()=>{ playClick(); handleTile(tl.id); };
     grid.appendChild(tile);
   });
   body.appendChild(grid);
 
   const inv = el('button','btn primary', SVG.users.replace('<svg','<svg style="width:18px;height:18px;vertical-align:-4px;margin-right:8px"') + t('invite'));
-  inv.style.width='100%';
-  inv.style.padding='14px';
+  inv.style.width='100%'; inv.style.padding='14px';
   inv.onclick = ()=>{ playClick(); inviteFriends(); };
   body.appendChild(inv);
 
@@ -1117,17 +1147,14 @@ function handleTile(id){
     case 'chars': openChars(); break;
     case 'abilities': openAbilities(); break;
     case 'tower': openTower(); break;
+    case 'summon': openSummon(); break;
     case 'afk': openAFK(); break;
     case 'daily': openDaily(); break;
     case 'settings': openSettings(); break;
   }
 }
-function hasClaimableTask(){
-  return state.tasks.some(tk=> tk && tk.progress>=tk.target && !tk.claimed);
-}
-function canClaimDaily(){
-  return now() - (state.lastDaily||0) > 86400000;
-}
+function hasClaimableTask(){ return state.tasks.some(tk=> tk && tk.progress>=tk.target && !tk.claimed); }
+function canClaimDaily(){ return now() - (state.lastDaily||0) > 86400000; }
 function inviteFriends(){
   if(!vkAvailable){ toast(t('invited')); return; }
   vkSend('VKWebAppShowInviteBox').then(()=>{ toast(t('invited')); }).catch(()=>{ toast(t('invited')); });
@@ -1137,8 +1164,7 @@ function inviteFriends(){
 function openLevels(){
   showScreen('scr-levels');
   $('#lvlTitle').textContent = t('levels');
-  const grid = $('#lvlGrid');
-  grid.innerHTML='';
+  const grid = $('#lvlGrid'); grid.innerHTML='';
   const frag = document.createDocumentFragment();
   for(let i=1;i<=500;i++){
     const b = el('button','lvl-btn', String(i));
@@ -1146,11 +1172,8 @@ function openLevels(){
     if(i<=state.level) b.classList.add('unlocked');
     if(i===state.level) b.classList.add('current');
     if(i<state.level) b.classList.add('done');
-    if(i<=state.level){
-      b.onclick = ()=>{ playClick(); startLevel(i,false); };
-    } else {
-      b.onclick = ()=>{ toast(t('locked')); };
-    }
+    if(i<=state.level){ b.onclick = ()=>{ playClick(); startLevel(i,false); }; }
+    else { b.onclick = ()=>{ toast(t('locked')); }; }
     frag.appendChild(b);
   }
   grid.appendChild(frag);
@@ -1179,30 +1202,24 @@ $$('.lang-btn').forEach(b=>{
     state.lang = b.dataset.lang;
     $$('.lang-btn').forEach(x=>x.classList.toggle('active', x.dataset.lang===state.lang));
     document.documentElement.lang = state.lang;
-    refreshStaticText();
-    saveGame();
+    refreshStaticText(); saveGame();
   };
 });
 $('#promoBtn').onclick = ()=>{
   const v = $('#promoInput').value.trim().toLowerCase();
   if(v==='clear12'){
     state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-    ensureStarter();
-    saveGame(true);
+    ensureStarter(); saveGame(true);
     toast(t('dataCleared'));
     setTimeout(()=>location.reload(), 900);
   } else if(v==='admin17'){
-    state.gems += 1000000;
-    state.chests += 50;
+    state.gems += 1000000; state.chests += 50;
     CHARS.forEach(c=>{ if(!state.chars.includes(c.id)) state.chars.push(c.id); });
     if(state.selectedChars.length===0) state.selectedChars = state.chars.slice(0,4);
-    state.starterGiven = true;
-    saveGame(true);
+    state.starterGiven = true; saveGame(true);
     toast(t('promoOk')+' +1 000 000 💎 + ' + CHARS.length + ' chars');
     renderLobby();
-  } else {
-    toast(t('promoBad'));
-  }
+  } else { toast(t('promoBad')); }
   $('#promoInput').value='';
 };
 
@@ -1231,20 +1248,13 @@ function genTasks(){
 }
 function checkTaskRefresh(){
   if(!state.tasks || state.tasks.length!==10 || now() - (state.lastTasks||0) > 86400000){
-    state.tasks = genTasks();
-    state.lastTasks = now();
-    saveGame();
+    state.tasks = genTasks(); state.lastTasks = now(); saveGame();
   }
 }
 function addTaskProgress(tid, amount){
   if(!state.tasks) return;
   let changed=false;
-  state.tasks.forEach(tk=>{
-    if(tk.tid===tid && !tk.claimed){
-      tk.progress = Math.min(tk.target, (tk.progress||0) + amount);
-      changed=true;
-    }
-  });
+  state.tasks.forEach(tk=>{ if(tk.tid===tid && !tk.claimed){ tk.progress = Math.min(tk.target, (tk.progress||0) + amount); changed=true; } });
   if(changed) saveGame();
 }
 function taskText(tk){
@@ -1256,8 +1266,7 @@ function openTasks(){
   checkTaskRefresh();
   showScreen('scr-tasks');
   $('#taskTitle').textContent = t('tasks');
-  const list = $('#taskList');
-  list.innerHTML='';
+  const list = $('#taskList'); list.innerHTML='';
   const left = 86400000 - (now() - (state.lastTasks||0));
   const hh = Math.floor(left/3600000), mm = Math.floor((left%3600000)/60000);
   const head = el('div','', `<div style="text-align:center;font-size:12px;color:#8f7bb0;margin-bottom:14px">${t('tasksRefresh')} ${hh}${t('hours')} ${mm}${t('minutes')}</div>`);
@@ -1278,22 +1287,14 @@ function openTasks(){
     if(done && !tk.claimed){
       const btn = el('button','btn gold', t('taskDone'));
       btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{
-        tk.claimed = true;
-        state.gems += tk.reward;
-        playCoin();
-        toast('+' + fmt(tk.reward) + ' 💎');
-        saveGame(true); renderLobby(); openTasks();
-      };
+      btn.onclick = ()=>{ tk.claimed = true; state.gems += tk.reward; playCoin(); toast('+' + fmt(tk.reward) + ' 💎'); saveGame(true); renderLobby(); openTasks(); };
       div.appendChild(btn);
-    } else if(tk.claimed){
-      div.querySelector('.treward').style.color='#4a8a70';
-    }
+    } else if(tk.claimed){ div.querySelector('.treward').style.color='#4a8a70'; }
     list.appendChild(div);
   });
 }
 
-/* ---------- АФК ---------- */
+/* ---------- КОМНАТА ОТДЫХА (бывший AFK) ---------- */
 let afkTimerInterval = null, afkStart = 0, afkAccum = 0;
 function openAFK(){
   showScreen('scr-afk');
@@ -1322,11 +1323,8 @@ function closeAFK(){
 $('#afkClaim').onclick = ()=>{
   const earned = state.afkPending||0;
   if(earned<=0){ toast(t('afkEarned')+': 0'); return; }
-  state.gems += earned;
-  state.afkPending = 0;
-  afkStart = now();
-  playCoin();
-  toast('+' + fmt(earned) + ' 💎');
+  state.gems += earned; state.afkPending = 0; afkStart = now();
+  playCoin(); toast('+' + fmt(earned) + ' 💎');
   saveGame(true); renderLobby(); openAFK();
 };
 
@@ -1334,8 +1332,7 @@ $('#afkClaim').onclick = ()=>{
 function openDaily(){
   showScreen('scr-daily');
   $('#dailyTitle').textContent = t('daily');
-  const btn = $('#dailyClaim');
-  const hint = $('#dailyHint');
+  const btn = $('#dailyClaim'); const hint = $('#dailyHint');
   const ready = canClaimDaily();
   btn.disabled = !ready;
   btn.textContent = ready ? t('dailyClaim') : t('dailyWait');
@@ -1353,9 +1350,9 @@ $('#dailyClaim').onclick = ()=>{
   const gems = 150 + state.level*20;
   state.gems += gems;
   state.chests += 1;
-  playCoin();
-  saveGame(true);
-  openChestModal(()=>{ openDaily(); renderLobby(); });
+  playCoin(); saveGame(true);
+  toast('+ '+fmt(gems)+' 💎 +1 🎁');
+  renderLobby(); openDaily();
 };
 
 /* ---------- КОЛЛЕКЦИЯ ---------- */
@@ -1404,8 +1401,7 @@ function openChars(){
     slots.appendChild(slot);
   }
 
-  const grid = $('#charsGrid');
-  grid.innerHTML='';
+  const grid = $('#charsGrid'); grid.innerHTML='';
   const order = {common:0, epic:1, legendary:2, mythic:3};
   const sorted = CHARS.slice().sort((a,b)=> order[a.r]-order[b.r]);
   sorted.forEach(c=>{
@@ -1433,12 +1429,8 @@ function openChars(){
     if(owned){
       card.onclick = ()=>{
         const i = state.selectedChars.indexOf(c.id);
-        if(i>=0){
-          if(state.selectedChars.length>1){ state.selectedChars.splice(i,1); }
-        } else {
-          if(state.selectedChars.length>=4){ state.selectedChars.shift(); }
-          state.selectedChars.push(c.id);
-        }
+        if(i>=0){ if(state.selectedChars.length>1){ state.selectedChars.splice(i,1); } }
+        else { if(state.selectedChars.length>=4){ state.selectedChars.shift(); } state.selectedChars.push(c.id); }
         saveGame(true); openChars(); renderLobby();
       };
     }
@@ -1448,15 +1440,13 @@ function openChars(){
 function charBonus(){
   let dmg=0, range=0, gold=0;
   state.chars.forEach(id=>{
-    const c = charTowerDef(id);
-    if(!c) return;
+    const c = charTowerDef(id); if(!c) return;
     if(c.r==='epic'){ dmg+=5; }
     if(c.r==='legendary'){ dmg+=12; range+=5; }
     if(c.r==='mythic'){ dmg+=25; range+=15; gold+=20; }
   });
   state.selectedChars.forEach(id=>{
-    const c = charTowerDef(id);
-    if(!c) return;
+    const c = charTowerDef(id); if(!c) return;
     if(c.goldBonus) gold += c.goldBonus;
   });
   return {dmg, range, gold};
@@ -1466,8 +1456,7 @@ function charBonus(){
 function openAbilities(){
   showScreen('scr-abilities');
   $('#abTitle').textContent = t('abilities');
-  const list = $('#abList');
-  list.innerHTML='';
+  const list = $('#abList'); list.innerHTML='';
   ABILITIES.forEach(a=>{
     const owned = state.abilities.includes(a.id);
     const div = el('div','task');
@@ -1480,16 +1469,13 @@ function openAbilities(){
       </div>
     `;
     if(owned){
-      const s = el('div','treward', t('bought'));
-      s.style.color='#4a8a70';
-      div.appendChild(s);
+      const s = el('div','treward', t('bought')); s.style.color='#4a8a70'; div.appendChild(s);
     } else {
       const btn = el('button','btn gold', fmt(a.cost)+' 💎');
       btn.style.padding='7px 12px'; btn.style.fontSize='12px';
       btn.onclick = ()=>{
         if(state.gems < a.cost){ toast(t('notEnough')); return; }
-        state.gems -= a.cost;
-        state.abilities.push(a.id);
+        state.gems -= a.cost; state.abilities.push(a.id);
         playCoin(); saveGame(true); renderLobby(); openAbilities();
         toast(t('bought')+': '+(state.lang==='ru'?a.ru:a.en));
       };
@@ -1509,7 +1495,9 @@ function openTower(){
 }
 $('#twStart').onclick = ()=>{ playClick(); startLevel(state.towerFloor, true); };
 
-/* ---------- СУНДУК ---------- */
+/* ============================================================
+   ПРИЗЫВ (меню открытия сундуков)
+   ============================================================ */
 function pickRandomChar(){
   const byRarity = {common:[],epic:[],legendary:[],mythic:[]};
   CHARS.forEach(c=>byRarity[c.r].push(c));
@@ -1522,72 +1510,103 @@ function pickRandomChar(){
   const pool = byRarity[rarity];
   return pool[Math.floor(Math.random()*pool.length)];
 }
-function chestSVG(){
-  return `<svg viewBox="0 0 64 64" width="100%" height="100%">
-    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f"/>
-    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a"/>
+function pickRandomPreview(){
+  // 3 разных случайных героя с учётом веса редкости
+  const picks = []; const used = new Set(); let attempts = 0;
+  while(picks.length < 3 && attempts < 200){
+    attempts++;
+    const c = pickRandomChar();
+    if(!used.has(c.id)){ used.add(c.id); picks.push(c); }
+  }
+  return picks;
+}
+function openSummon(){
+  showScreen('scr-summon');
+  $('#summonTitle').textContent = t('summon');
+  $('#summonChestLbl').textContent = t('yourChests');
+  $('#summonOpenBtn').textContent = '📦 ' + t('openChestBtn');
+  $('#summonPrevTitle').textContent = t('possibleHeroes');
+  $('#summonChanceTitle').textContent = t('dropChances');
+
+  // Chest icon
+  $('#summonChestIcon').innerHTML = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f" stroke="#5c3a00" stroke-width="1.5"/>
+    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a" stroke="#5c3a00" stroke-width="1.5"/>
     <rect x="27" y="34" width="10" height="16" rx="3" fill="#ffd766"/>
     <circle cx="32" cy="42" r="3" fill="#5c3a00"/>
     <circle cx="32" cy="14" r="3" fill="#ffeeb8" opacity=".9"/>
   </svg>`;
+  $('#summonChestCount').textContent = state.chests;
+  $('#summonOpenBtn').disabled = state.chests <= 0;
+
+  // Preview 3 random
+  const preview = $('#summonPreview'); preview.innerHTML = '';
+  const picks = pickRandomPreview();
+  picks.forEach(c=>{
+    const card = el('div','preview-card '+c.r);
+    card.innerHTML = `
+      <div style="width:52px;height:52px;color:${c.color};position:relative;z-index:1">${c.icon}</div>
+      <div class="pcn">${state.lang==='ru'?c.ru:c.en}</div>
+      <div class="prar" style="color:${c.r==='common'?'#a0a0b0':c.r==='epic'?'#b47bff':c.r==='legendary'?'#ffd766':'#ff2a5a'}">${t(c.r)}</div>
+    `;
+    preview.appendChild(card);
+  });
+
+  // Chances
+  const chances = $('#summonChances'); chances.innerHTML = '';
+  const totalW = RARITY_WEIGHT.common + RARITY_WEIGHT.epic + RARITY_WEIGHT.legendary + RARITY_WEIGHT.mythic;
+  const rarList = [
+    {r:'common',    color:'#a0a0b0'},
+    {r:'epic',      color:'#b47bff'},
+    {r:'legendary', color:'#ffd766'},
+    {r:'mythic',    color:'#ff2a5a'}
+  ];
+  rarList.forEach(({r,color})=>{
+    const pct = (RARITY_WEIGHT[r] / totalW * 100).toFixed(1);
+    const row = el('div','chance-row');
+    row.innerHTML = `
+      <div class="lbl"><span class="dot" style="background:${color};box-shadow:0 0 8px ${color}"></span><span style="color:${color}">${t(r)}</span></div>
+      <div class="val">${pct}%</div>
+    `;
+    chances.appendChild(row);
+  });
 }
-function openChestModal(after){
-  if(state.chests<=0){
-    const m = openModal(`<h3>${t('chests')}</h3><p>${state.lang==='ru'?'У вас нет сундуков. Побеждайте на уровнях!':'You have no chests. Win levels!'}</p>
-      <div class="row"><button class="btn primary" id="mOk">OK</button></div>`);
-    m.querySelector('#mOk').onclick = ()=>{ closeModal(); after&&after(); };
-    return;
-  }
+$('#summonOpenBtn').onclick = ()=>{
+  if(state.chests <= 0){ toast(t('noChests')); return; }
+  openChestFromSummon();
+};
+function openChestFromSummon(){
   state.chests--;
   saveGame(true);
-  const m = openModal(`
-    <h3>${t('chestOpen')}</h3>
-    <div class="chest-view shake" id="chestView">${chestSVG()}</div>
-    <p id="chestMsg">${state.lang==='ru'?'Нажмите, чтобы открыть':'Tap to open'}</p>
+  playChestSound();
+
+  const c = pickRandomChar();
+  const isNew = !state.chars.includes(c.id);
+  let bonusGems = 0;
+  if(!isNew){
+    const dup = {common:15, epic:60, legendary:200, mythic:800};
+    bonusGems = dup[c.r]||10;
+    state.gems += bonusGems;
+  } else {
+    state.chars.push(c.id);
+    if(state.selectedChars.length<4){ state.selectedChars.push(c.id); }
+  }
+  saveGame(true);
+
+  const rarName = {common:t('common'),epic:t('epic'),legendary:t('legendary'),mythic:t('mythic')}[c.r];
+  const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#ff2a5a'}[c.r];
+
+  const m2 = openModal(`
+    <h3 style="color:${color}">${isNew? t('newChar') : rarName}</h3>
+    <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${c.icon}</div>
+    <div style="font-size:17px;font-weight:bold;color:${color};margin-bottom:6px">${state.lang==='ru'?c.ru:c.en}</div>
+    <div style="font-size:12px;color:${color};letter-spacing:2px;margin-bottom:12px">${rarName.toUpperCase()}</div>
+    ${isNew
+      ? `<p>${t('youGot')}: ${c.desc[state.lang==='ru'?'ru':'en']}</p>`
+      : `<p style="color:#ffd766">${t('duplicate').replace('{n}', fmt(bonusGems))}</p>`}
+    <div class="row"><button class="btn primary" id="mOk">OK</button></div>
   `, {dismissable:false});
-  const chestView = m.querySelector('#chestView');
-  let opened=false;
-  const doOpen = ()=>{
-    if(opened) return;
-    opened=true;
-    chestView.classList.remove('shake');
-    chestView.innerHTML = '';
-    playChestSound();
-
-    const c = pickRandomChar();
-    const isNew = !state.chars.includes(c.id);
-    let bonusGems = 0;
-    if(!isNew){
-      const dup = {common:15, epic:60, legendary:200, mythic:800};
-      bonusGems = dup[c.r]||10;
-      state.gems += bonusGems;
-    } else {
-      state.chars.push(c.id);
-      if(state.selectedChars.length<4){ state.selectedChars.push(c.id); }
-    }
-    saveGame(true);
-
-    const rarName = {common:t('common'),epic:t('epic'),legendary:t('legendary'),mythic:t('mythic')}[c.r];
-    const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#ff2a5a'}[c.r];
-
-    setTimeout(()=>{
-      const m2 = openModal(`
-        <h3 style="color:${color}">${isNew? t('newChar') : rarName}</h3>
-        <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${c.icon}</div>
-        <div style="font-size:17px;font-weight:bold;color:${color};margin-bottom:6px">${state.lang==='ru'?c.ru:c.en}</div>
-        <div style="font-size:12px;color:${color};letter-spacing:2px;margin-bottom:12px">${rarName.toUpperCase()}</div>
-        ${isNew
-          ? `<p>${t('youGot')}: ${c.desc[state.lang==='ru'?'ru':'en']}</p>`
-          : `<p style="color:#ffd766">${t('duplicate').replace('{n}', fmt(bonusGems))}</p>`}
-        <div class="row">
-          <button class="btn primary" id="mOk">OK</button>
-        </div>
-      `, {dismissable:false});
-      m2.querySelector('#mOk').onclick = ()=>{ closeModal(); after&&after(); renderLobby(); };
-    }, 650);
-  };
-  chestView.onclick = doOpen;
-  m.querySelector('#chestMsg').onclick = doOpen;
+  m2.querySelector('#mOk').onclick = ()=>{ closeModal(); openSummon(); renderLobby(); };
 }
 
 /* ============================================================
@@ -1598,14 +1617,16 @@ let game = null;
 let lastTs = 0;
 let rafId = null;
 
-/* Кэш изображений персонажей для canvas */
+/* Кэш изображений персонажей для canvas — добавлен xmlns, это важно! */
 const charImages = {};
 function preloadCharImages(){
   return Promise.all(CHARS.map(c => new Promise(resolve => {
     const img = new Image();
     img.onload = () => resolve();
     img.onerror = () => resolve();
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(c.icon);
+    let svg = c.icon;
+    if(!/xmlns=/.test(svg)) svg = svg.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     charImages[c.id] = img;
   })));
 }
@@ -1646,7 +1667,6 @@ function buildLevelConfig(L, isTower){
   return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
 }
 
-/* Нейтральные декорации — без надгробий и черепов */
 function genDecorations(){
   const types = ['tree','pumpkin','candle','cobweb','stone','bush','lantern','mushroom','tree','candle'];
   const deco = [];
@@ -1654,13 +1674,9 @@ function genDecorations(){
     for(let x=0;x<GRID_W;x++){
       if(PATH_BLOCK.has(x+','+y)) continue;
       let nearPath=false;
-      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-        if(PATH_BLOCK.has((x+dx)+','+(y+dy))) nearPath=true;
-      }
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ if(PATH_BLOCK.has((x+dx)+','+(y+dy))) nearPath=true; }
       if(nearPath) continue;
-      if(Math.random() < 0.16){
-        deco.push({x, y, type: types[Math.floor(Math.random()*types.length)]});
-      }
+      if(Math.random() < 0.16){ deco.push({x, y, type: types[Math.floor(Math.random()*types.length)]}); }
     }
   }
   return deco;
@@ -1670,36 +1686,17 @@ function startLevel(levelNum, isTower){
   ensureStarter();
   const cfg = buildLevelConfig(levelNum, isTower);
   game = {
-    level: levelNum,
-    isTower: !!isTower,
-    cfg: cfg,
-    coins: cfg.startCoins,
-    gemsEarned: 0,
-    lives: cfg.lives,
-    maxLives: cfg.lives,
-    wave: 0,
-    totalWaves: cfg.waves,
-    enemies: [],
-    towers: [],
-    projectiles: [],
-    particles: [],
+    level: levelNum, isTower: !!isTower, cfg: cfg,
+    coins: cfg.startCoins, gemsEarned: 0,
+    lives: cfg.lives, maxLives: cfg.lives,
+    wave: 0, totalWaves: cfg.waves,
+    enemies: [], towers: [], projectiles: [], particles: [],
     decorations: genDecorations(),
-    selectedTowerType: null,
-    selectedTower: null,
-    spawnQueue: [],
-    spawnTimer: 0,
-    waveActive: false,
-    waveDelay: 1.5,
-    speedMul: 1,
-    paused: false,
-    finished: false,
-    abilityCd: {},
-    buffs: {gold:0, rage:0},
-    killCount: 0,
-    builtCount: 0,
-    bossKilled: 0,
-    time: 0,
-    hoverCell: null
+    selectedTowerType: null, selectedTower: null,
+    spawnQueue: [], spawnTimer: 0, waveActive: false, waveDelay: 1.5,
+    speedMul: 1, paused: false, finished: false,
+    abilityCd: {}, buffs: {gold:0, rage:0},
+    killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null
   };
   ABILITIES.forEach(a=>{ if(state.abilities.includes(a.id)) game.abilityCd[a.id]=0; });
 
@@ -1717,20 +1714,14 @@ function startLevel(levelNum, isTower){
   });
 }
 
-function startLoop(){
-  if(rafId) cancelAnimationFrame(rafId);
-  lastTs = 0;
-  rafId = requestAnimationFrame(loop);
-}
+function startLoop(){ if(rafId) cancelAnimationFrame(rafId); lastTs = 0; rafId = requestAnimationFrame(loop); }
 function loop(ts){
   if(!game){ rafId = null; return; }
   if(!lastTs) lastTs = ts;
   let dt = (ts - lastTs)/1000;
   lastTs = ts;
   dt = Math.min(dt, 0.05);
-  if(!game.paused && !game.finished){
-    update(dt * game.speedMul);
-  }
+  if(!game.paused && !game.finished) update(dt * game.speedMul);
   render();
   rafId = requestAnimationFrame(loop);
 }
@@ -1739,10 +1730,7 @@ function update(dt){
   game.time += dt;
   if(game.buffs.gold>0) game.buffs.gold = Math.max(0, game.buffs.gold-dt);
   if(game.buffs.rage>0) game.buffs.rage = Math.max(0, game.buffs.rage-dt);
-
-  ABILITIES.forEach(a=>{
-    if(game.abilityCd[a.id]>0) game.abilityCd[a.id] = Math.max(0, game.abilityCd[a.id]-dt);
-  });
+  ABILITIES.forEach(a=>{ if(game.abilityCd[a.id]>0) game.abilityCd[a.id] = Math.max(0, game.abilityCd[a.id]-dt); });
 
   if(!game.waveActive && !game.spawnQueue.length && game.wave < game.totalWaves){
     game.waveDelay -= dt;
@@ -1762,12 +1750,8 @@ function update(dt){
   if(game.waveActive && !game.spawnQueue.length && game.enemies.length===0){
     game.waveActive = false;
     game.waveDelay = 2.2;
-    if(game.wave >= game.totalWaves){
-      finishLevel(true);
-      return;
-    } else {
-      toast(t('waveClear') + ' ' + game.wave + '/' + game.totalWaves, 1100);
-    }
+    if(game.wave >= game.totalWaves){ finishLevel(true); return; }
+    else { toast(t('waveClear') + ' ' + game.wave + '/' + game.totalWaves, 1100); }
   }
 
   const bonus = charBonus();
@@ -1777,11 +1761,9 @@ function update(dt){
     if(e.slowT>0){ e.slowT -= dt; spd *= (1 - (e.slowAmt||0)); }
     if(e.freezeT>0){ e.freezeT -= dt; spd = 0; }
     if(e.poisonT>0){
-      e.poisonT -= dt;
-      e.hp -= e.poisonDps*dt;
+      e.poisonT -= dt; e.hp -= e.poisonDps*dt;
       if(Math.random()<0.15) spawnParticle(e.x, e.y, '#8fd14f', 1);
     }
-
     const tgt = PATH_PX[e.pathIdx+1];
     if(!tgt){
       game.enemies.splice(i,1);
@@ -1793,11 +1775,7 @@ function update(dt){
     const dx = tgt.x - e.x, dy = tgt.y - e.y;
     const d = Math.hypot(dx,dy);
     if(d < 3){ e.pathIdx++; }
-    else {
-      e.x += (dx/d)*spd*dt;
-      e.y += (dy/d)*spd*dt;
-      e.angle = Math.atan2(dy,dx);
-    }
+    else { e.x += (dx/d)*spd*dt; e.y += (dy/d)*spd*dt; e.angle = Math.atan2(dy,dx); }
 
     if(e.hp<=0){
       game.enemies.splice(i,1);
@@ -1827,8 +1805,7 @@ function update(dt){
       }
     }
     if(target){
-      tower.cd = stats.rate;
-      tower.maxCd = stats.rate;
+      tower.cd = stats.rate; tower.maxCd = stats.rate;
       tower.angle = Math.atan2(target.y-tower.y, target.x-tower.x);
       fireTower(tower, target, stats);
     }
@@ -1844,16 +1821,13 @@ function update(dt){
       if(d < 8){ onProjectileHit(p); game.projectiles.splice(i,1); }
     } else {
       p.x += p.vx*dt; p.y += p.vy*dt;
-      if(p.life<=0 || p.x<-20||p.x>CANVAS_W+20||p.y<-20||p.y>CANVAS_H+20){
-        game.projectiles.splice(i,1);
-      }
+      if(p.life<=0 || p.x<-20||p.x>CANVAS_W+20||p.y<-20||p.y>CANVAS_H+20){ game.projectiles.splice(i,1); }
     }
   }
 
   for(let i=game.particles.length-1;i>=0;i--){
     const pa = game.particles[i];
-    pa.life -= dt;
-    pa.x += pa.vx*dt; pa.y += pa.vy*dt;
+    pa.life -= dt; pa.x += pa.vx*dt; pa.y += pa.vy*dt;
     pa.vx *= 0.94; pa.vy *= 0.94;
     if(pa.life<=0) game.particles.splice(i,1);
   }
@@ -1867,7 +1841,6 @@ function startWave(){
   const cfg = game.cfg;
   const isLast = game.wave >= game.totalWaves;
   const count = cfg.perWave + Math.floor(game.wave*1.2);
-
   for(let i=0;i<count;i++){
     const r = Math.random();
     let type = 'ghost';
@@ -1891,15 +1864,11 @@ function makeEnemy(type, cfg, boss){
   const hp = Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012));
   return {
     x: PATH_PX[0].x, y: PATH_PX[0].y,
-    pathIdx: 0,
-    hp, maxHp: hp,
+    pathIdx: 0, hp, maxHp: hp,
     speed: cfg.enemySpeed * base.speed * (boss?0.9:1),
-    color: base.color,
-    size: base.size,
-    boss: !!boss,
-    type,
-    slowT:0, slowAmt:0, poisonT:0, poisonDps:0, freezeT:0,
-    angle: 0
+    color: base.color, size: base.size,
+    boss: !!boss, type,
+    slowT:0, slowAmt:0, poisonT:0, poisonDps:0, freezeT:0, angle: 0
   };
 }
 
@@ -1915,15 +1884,10 @@ function getTowerStats(tower){
     dmg: c.dmg * lvlMul * (1 + bonus.dmg/100) * rage * auraBonus * game.cfg.ecoScale,
     range: c.range * (1 + (lvl-1)*0.06) * (1 + bonus.range/100),
     rate: c.rate / (1 + (lvl-1)*0.08),
-    splash: c.splash || 0,
-    slow: c.slow || 0,
-    slowDur: c.slowDur || 0,
-    poison: c.poison || 0,
-    poisonDur: c.poisonDur || 0,
-    chain: c.chain || 0,
-    instakill: c.instakill || 0,
-    drain: c.drain || false,
-    aura: c.aura || false
+    splash: c.splash || 0, slow: c.slow || 0, slowDur: c.slowDur || 0,
+    poison: c.poison || 0, poisonDur: c.poisonDur || 0,
+    chain: c.chain || 0, instakill: c.instakill || 0,
+    drain: c.drain || false, aura: c.aura || false
   };
 }
 
@@ -1948,8 +1912,7 @@ function fireTower(tower, target, stats){
     hit.forEach((e,idx)=>damageEnemy(e, stats.dmg*(idx===0?1:0.7), tower));
     let prev = {x:tower.x, y:tower.y};
     hit.forEach(e=>{
-      game.projectiles.push({x:e.x, y:e.y, life:0.12, homing:false, vx:0, vy:0, speed:0,
-        type:'zap', color, from:{x:prev.x,y:prev.y}});
+      game.projectiles.push({x:e.x, y:e.y, life:0.12, homing:false, vx:0, vy:0, speed:0, type:'zap', color, from:{x:prev.x,y:prev.y}});
       prev = e;
     });
     return;
@@ -1961,10 +1924,8 @@ function fireTower(tower, target, stats){
   game.projectiles.push({
     x: tower.x, y: tower.y,
     vx: (dx/d)*speed, vy: (dy/d)*speed,
-    speed, homing: true, target,
-    life: 2.5,
-    dmg: stats.dmg,
-    splash: stats.splash,
+    speed, homing: true, target, life: 2.5,
+    dmg: stats.dmg, splash: stats.splash,
     slow: stats.slow, slowDur: stats.slowDur,
     poison: stats.poison, poisonDur: stats.poisonDur,
     instakill: stats.instakill, drain: stats.drain,
@@ -1976,9 +1937,7 @@ function onProjectileHit(p){
   if(p.splash>0){
     for(const e of game.enemies){
       const d = Math.hypot(e.x-p.x, e.y-p.y);
-      if(d <= p.splash){
-        damageEnemy(e, p.dmg*(1 - d/p.splash*0.5), p.tower);
-      }
+      if(d <= p.splash) damageEnemy(e, p.dmg*(1 - d/p.splash*0.5), p.tower);
     }
     for(let i=0;i<10;i++) spawnParticle(p.x,p.y,p.color,1.6);
   } else if(p.target){
@@ -2012,8 +1971,7 @@ function spawnParticle(x,y,color,scale){
     vx: (Math.random()-0.5)*90*scale,
     vy: (Math.random()-0.5)*90*scale,
     life: 0.35 + Math.random()*0.35,
-    maxLife: 0.7,
-    color,
+    maxLife: 0.7, color,
     size: 2 + Math.random()*2.5*scale
   });
 }
@@ -2021,7 +1979,6 @@ function spawnParticle(x,y,color,scale){
 /* ---------- ОТРИСОВКА ---------- */
 function render(){
   if(!ctx || !game) return;
-
   ctx.fillStyle = '#0a0512';
   ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
@@ -2029,11 +1986,8 @@ function render(){
     for(let x=0;x<GRID_W;x++){
       const isPath = PATH_BLOCK.has(x+','+y);
       const px = x*CELL, py = y*CELL;
-      if(isPath){
-        ctx.fillStyle = ((x+y)%2===0) ? '#2a2038' : '#241a30';
-      } else {
-        ctx.fillStyle = ((x+y)%2===0) ? '#150c22' : '#120a1c';
-      }
+      if(isPath) ctx.fillStyle = ((x+y)%2===0) ? '#2a2038' : '#241a30';
+      else ctx.fillStyle = ((x+y)%2===0) ? '#150c22' : '#120a1c';
       ctx.fillRect(px,py,CELL,CELL);
       ctx.strokeStyle = 'rgba(0,0,0,0.35)';
       ctx.lineWidth = 1;
@@ -2044,9 +1998,7 @@ function render(){
   drawDecorations();
 
   ctx.strokeStyle = 'rgba(138,75,214,0.14)';
-  ctx.lineWidth = 30;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   ctx.beginPath();
   ctx.moveTo(PATH_PX[0].x, PATH_PX[0].y);
   for(let i=1;i<PATH_PX.length;i++) ctx.lineTo(PATH_PX[i].x, PATH_PX[i].y);
@@ -2077,9 +2029,7 @@ function render(){
     ctx.arc(game.selectedTower.x, game.selectedTower.y, st.range, 0, Math.PI*2);
     ctx.strokeStyle = 'rgba(255,215,102,0.55)';
     ctx.lineWidth = 2;
-    ctx.setLineDash([6,5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.setLineDash([6,5]); ctx.stroke(); ctx.setLineDash([]);
   }
 
   for(const e of game.enemies) drawEnemy(e);
@@ -2089,9 +2039,7 @@ function render(){
     const a = Math.max(0, pa.life / pa.maxLife);
     ctx.globalAlpha = a;
     ctx.fillStyle = pa.color;
-    ctx.beginPath();
-    ctx.arc(pa.x, pa.y, pa.size*a, 0, Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(pa.x, pa.y, pa.size*a, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
 
@@ -2109,140 +2057,101 @@ function drawDecorations(){
   if(!game || !game.decorations) return;
   for(const d of game.decorations){
     const cx=d.x*CELL+CELL/2, cy=d.y*CELL+CELL/2;
-    ctx.save();
-    ctx.globalAlpha = 0.85;
+    ctx.save(); ctx.globalAlpha = 0.85;
     if(d.type==='tree'){
-      ctx.fillStyle='#2a1a2a';
-      ctx.fillRect(cx-3, cy-6, 6, 20);
-      ctx.beginPath();
-      ctx.moveTo(cx, cy-22); ctx.lineTo(cx-14, cy-2); ctx.lineTo(cx+14, cy-2);
-      ctx.closePath(); ctx.fillStyle='#1a2a1a'; ctx.fill();
+      ctx.fillStyle='#2a1a2a'; ctx.fillRect(cx-3, cy-6, 6, 20);
+      ctx.beginPath(); ctx.moveTo(cx, cy-22); ctx.lineTo(cx-14, cy-2); ctx.lineTo(cx+14, cy-2); ctx.closePath();
+      ctx.fillStyle='#1a2a1a'; ctx.fill();
       ctx.strokeStyle='#3a4a3a'; ctx.lineWidth=1.5; ctx.stroke();
     } else if(d.type==='pumpkin'){
-      ctx.fillStyle='#c25a15';
-      ctx.beginPath(); ctx.ellipse(cx,cy+2,10,8,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#c25a15'; ctx.beginPath(); ctx.ellipse(cx,cy+2,10,8,0,0,Math.PI*2); ctx.fill();
       ctx.fillStyle='#3a7a2a'; ctx.fillRect(cx-2, cy-12, 4, 5);
       ctx.fillStyle='#2a1000';
       ctx.beginPath(); ctx.moveTo(cx-5,cy); ctx.lineTo(cx-1,cy+2); ctx.lineTo(cx-5,cy+4); ctx.closePath(); ctx.fill();
       ctx.beginPath(); ctx.moveTo(cx+5,cy); ctx.lineTo(cx+1,cy+2); ctx.lineTo(cx+5,cy+4); ctx.closePath(); ctx.fill();
     } else if(d.type==='candle'){
       ctx.fillStyle='#ffe8b0'; ctx.fillRect(cx-3, cy-4, 6, 14);
-      ctx.fillStyle='#ffb347';
-      ctx.beginPath(); ctx.ellipse(cx, cy-7, 3, 5, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ffb347'; ctx.beginPath(); ctx.ellipse(cx, cy-7, 3, 5, 0, 0, Math.PI*2); ctx.fill();
       const g = ctx.createRadialGradient(cx,cy-7,0,cx,cy-7,16);
       g.addColorStop(0,'rgba(255,180,80,0.35)'); g.addColorStop(1,'rgba(255,180,80,0)');
       ctx.fillStyle=g; ctx.fillRect(cx-16,cy-23,32,32);
     } else if(d.type==='cobweb'){
       ctx.strokeStyle='rgba(200,200,220,0.45)'; ctx.lineWidth=1;
-      for(let i=0;i<4;i++){
-        ctx.beginPath();
-        const a = i*Math.PI/2;
-        ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*14, cy+Math.sin(a)*14);
-        ctx.stroke();
-      }
-      for(let r=4;r<=14;r+=5){
-        ctx.beginPath();
-        ctx.arc(cx,cy,r,0,Math.PI*2);
-        ctx.stroke();
-      }
+      for(let i=0;i<4;i++){ ctx.beginPath(); const a = i*Math.PI/2; ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*14, cy+Math.sin(a)*14); ctx.stroke(); }
+      for(let r=4;r<=14;r+=5){ ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke(); }
     } else if(d.type==='stone'){
-      ctx.fillStyle='#4a4a5a';
-      ctx.beginPath();
-      ctx.ellipse(cx, cy+6, 12, 6, 0, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle='#6a6a7a';
-      ctx.beginPath();
-      ctx.ellipse(cx-2, cy+2, 9, 5, 0, 0, Math.PI*2);
-      ctx.fill();
+      ctx.fillStyle='#4a4a5a'; ctx.beginPath(); ctx.ellipse(cx, cy+6, 12, 6, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#6a6a7a'; ctx.beginPath(); ctx.ellipse(cx-2, cy+2, 9, 5, 0, 0, Math.PI*2); ctx.fill();
       ctx.strokeStyle='#2a2a3a'; ctx.lineWidth=1; ctx.stroke();
     } else if(d.type==='bush'){
       ctx.fillStyle='#2a3a2a';
-      ctx.beginPath();
-      ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2);
-      ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2);
-      ctx.arc(cx, cy-4, 9, 0, Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2); ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2); ctx.arc(cx, cy-4, 9, 0, Math.PI*2); ctx.fill();
       ctx.strokeStyle='#3a5a3a'; ctx.lineWidth=1.2;
-      ctx.beginPath();
-      ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx-6, cy+2, 8, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx+6, cy+2, 8, 0, Math.PI*2); ctx.stroke();
     } else if(d.type==='lantern'){
       ctx.strokeStyle='#4a4a5a'; ctx.lineWidth=1.5;
       ctx.beginPath(); ctx.moveTo(cx, cy-14); ctx.lineTo(cx, cy-6); ctx.stroke();
-      ctx.fillStyle='#3a2a1a';
-      ctx.fillRect(cx-6, cy-6, 12, 14);
-      ctx.fillStyle='#ffd766';
-      ctx.beginPath();
-      ctx.ellipse(cx, cy+1, 4, 5, 0, 0, Math.PI*2);
-      ctx.fill();
+      ctx.fillStyle='#3a2a1a'; ctx.fillRect(cx-6, cy-6, 12, 14);
+      ctx.fillStyle='#ffd766'; ctx.beginPath(); ctx.ellipse(cx, cy+1, 4, 5, 0, 0, Math.PI*2); ctx.fill();
       const g = ctx.createRadialGradient(cx,cy+1,0,cx,cy+1,20);
       g.addColorStop(0,'rgba(255,215,102,0.4)'); g.addColorStop(1,'rgba(255,215,102,0)');
       ctx.fillStyle=g; ctx.fillRect(cx-20,cy-19,40,40);
-      ctx.strokeStyle='#7a5a2a'; ctx.lineWidth=1.5;
-      ctx.strokeRect(cx-6, cy-6, 12, 14);
+      ctx.strokeStyle='#7a5a2a'; ctx.lineWidth=1.5; ctx.strokeRect(cx-6, cy-6, 12, 14);
     } else if(d.type==='mushroom'){
       ctx.fillStyle='#c8b8a8'; ctx.fillRect(cx-2, cy, 4, 10);
-      ctx.fillStyle='#c23c5c';
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, 10, 6, 0, Math.PI, 0);
-      ctx.fill();
-      ctx.fillStyle='#fff';
-      ctx.beginPath(); ctx.arc(cx-4, cy-2, 1.5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#c23c5c'; ctx.beginPath(); ctx.ellipse(cx, cy, 10, 6, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx-4, cy-2, 1.5, 0, Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(cx+3, cy-1, 1.5, 0, Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
 }
 
-/* Отрисовка башни как персонажа */
+/* Отрисовка башни: теперь рисуем реальную SVG-иконку персонажа */
 function drawTower(tower){
   const c = charTowerDef(tower.type);
   if(!c) return;
   const x = tower.x, y = tower.y;
-  const size = 36;
+  const size = 40;
   const bob = Math.sin(game.time*2 + x*0.05 + y*0.05) * 1.6;
 
   // тень
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
-  ctx.ellipse(x, y+14, size*0.42, size*0.18, 0, 0, Math.PI*2);
+  ctx.ellipse(x, y+16, size*0.42, size*0.18, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // свечение под башней в цвет персонажа
-  const grad = ctx.createRadialGradient(x, y+8, 0, x, y+8, size*0.9);
-  grad.addColorStop(0, c.color+'55');
+  // свечение под персонажем
+  const grad = ctx.createRadialGradient(x, y+8, 0, x, y+8, size*0.95);
+  grad.addColorStop(0, c.color+'66');
   grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
   ctx.fillRect(x-size, y-size, size*2, size*2);
 
-  // сам персонаж
+  // сам персонаж (SVG-картинка)
   const img = charImages[tower.type];
   if(img && img.complete && img.naturalWidth > 0){
     ctx.drawImage(img, x - size/2, y - size/2 + bob, size, size);
   } else {
-    // fallback — простой силуэт
+    // fallback — силуэт
     ctx.fillStyle = c.color;
     ctx.beginPath();
     ctx.arc(x, y+bob, size*0.35, 0, Math.PI*2);
     ctx.fill();
   }
 
-  // уровень
+  // индикатор уровня
   if(tower.level>1){
     ctx.fillStyle = '#0b0614';
     ctx.beginPath();
-    ctx.arc(x+13, y-13+bob, 8, 0, Math.PI*2);
+    ctx.arc(x+14, y-14+bob, 8.5, 0, Math.PI*2);
     ctx.fill();
-    ctx.strokeStyle = c.color;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    ctx.strokeStyle = c.color; ctx.lineWidth = 1.6; ctx.stroke();
     ctx.fillStyle = '#ffe6a3';
     ctx.font = 'bold 10px Trebuchet MS';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(tower.level, x+13, y-13+bob+0.5);
+    ctx.fillText(tower.level, x+14, y-14+bob+0.5);
   }
 
   // индикатор кулдауна
@@ -2251,7 +2160,7 @@ function drawTower(tower){
     ctx.strokeStyle = 'rgba(255,215,102,0.7)';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.arc(x, y+bob, size*0.5, -Math.PI/2, -Math.PI/2 + Math.PI*2*p);
+    ctx.arc(x, y+bob, size*0.52, -Math.PI/2, -Math.PI/2 + Math.PI*2*p);
     ctx.stroke();
   }
 }
@@ -2260,9 +2169,7 @@ function drawEnemy(e){
   const x = e.x, y = e.y;
   const s = e.size;
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.beginPath();
-  ctx.ellipse(x, y+s*0.85, s*0.8, s*0.3, 0,0,Math.PI*2);
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x, y+s*0.85, s*0.8, s*0.3, 0,0,Math.PI*2); ctx.fill();
 
   ctx.beginPath();
   ctx.moveTo(x-s, y+s*0.6);
@@ -2276,10 +2183,8 @@ function drawEnemy(e){
 
   if(e.boss){
     const g = ctx.createRadialGradient(x,y-s*0.3,0,x,y, s*2);
-    g.addColorStop(0, '#ff5f7e');
-    g.addColorStop(1, 'rgba(194,36,60,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(x-s*2, y-s*2, s*4, s*4);
+    g.addColorStop(0, '#ff5f7e'); g.addColorStop(1, 'rgba(194,36,60,0)');
+    ctx.fillStyle = g; ctx.fillRect(x-s*2, y-s*2, s*4, s*4);
   }
 
   ctx.fillStyle = e.color;
@@ -2287,21 +2192,9 @@ function drawEnemy(e){
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  if(e.boss){
-    ctx.strokeStyle = '#ffd766';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-  if(e.slowT>0){
-    ctx.strokeStyle = 'rgba(127,216,255,0.85)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-  if(e.poisonT>0){
-    ctx.strokeStyle = 'rgba(143,209,79,0.85)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
+  if(e.boss){ ctx.strokeStyle = '#ffd766'; ctx.lineWidth = 2; ctx.stroke(); }
+  if(e.slowT>0){ ctx.strokeStyle = 'rgba(127,216,255,0.85)'; ctx.lineWidth = 2; ctx.stroke(); }
+  if(e.poisonT>0){ ctx.strokeStyle = 'rgba(143,209,79,0.85)'; ctx.lineWidth = 2; ctx.stroke(); }
 
   ctx.fillStyle = e.boss ? '#ffd766' : '#0b0614';
   ctx.beginPath(); ctx.arc(x-s*0.32, y-s*0.28, s*0.16, 0, Math.PI*2); ctx.fill();
@@ -2323,18 +2216,14 @@ function drawProjectile(p){
     ctx.strokeStyle = p.color;
     ctx.lineWidth = 2.5;
     ctx.globalAlpha = Math.max(0, p.life/0.12);
-    ctx.beginPath();
-    ctx.moveTo(p.from.x, p.from.y);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p.from.x, p.from.y); ctx.lineTo(p.x, p.y); ctx.stroke();
     ctx.globalAlpha = 1;
     return;
   }
   ctx.beginPath();
   ctx.arc(p.x, p.y, p.splash>0 ? 7 : 4.5, 0, Math.PI*2);
   ctx.fillStyle = p.color;
-  ctx.shadowBlur = 10;
-  ctx.shadowColor = p.color;
+  ctx.shadowBlur = 10; ctx.shadowColor = p.color;
   ctx.fill();
   ctx.shadowBlur = 0;
 }
@@ -2351,14 +2240,10 @@ function onCanvasPointer(ev){
   const cx = Math.floor(px / CELL), cy = Math.floor(py / CELL);
   if(cx<0||cy<0||cx>=GRID_W||cy>=GRID_H) return;
 
-  if(pendingAbility){
-    useAbilityAt(pendingAbility, px, py);
-    return;
-  }
+  if(pendingAbility){ useAbilityAt(pendingAbility, px, py); return; }
 
   const existing = game.towers.find(tw => tw.cx===cx && tw.cy===cy);
   if(existing){ selectTower(existing); return; }
-
   if(game.selectedTowerType){ placeTower(cx, cy); return; }
 
   game.selectedTower = null;
@@ -2383,11 +2268,8 @@ function placeTower(cx, cy){
   if(game.coins < cost){ toast(state.lang==='ru'?'Недостаточно монет':'Not enough coins'); return; }
   game.coins -= cost;
   const tower = {
-    cx, cy,
-    x: cx*CELL + CELL/2,
-    y: cy*CELL + CELL/2,
-    type, level: 1, cd: 0, maxCd: c.rate, angle: -Math.PI/2,
-    auraBuff: 0
+    cx, cy, x: cx*CELL + CELL/2, y: cy*CELL + CELL/2,
+    type, level: 1, cd: 0, maxCd: c.rate, angle: -Math.PI/2, auraBuff: 0
   };
   game.towers.push(tower);
   game.builtCount++;
@@ -2415,9 +2297,7 @@ function showTowerPopup(tower){
     <div class="tinfo" style="color:${c.color};font-weight:bold">${state.lang==='ru'?c.ru:c.en} · Lv.${tower.level}</div>
     <div class="tinfo">${c.desc[state.lang==='ru'?'ru':'en']}</div>
     <div class="tinfo">⚔ ${fmt(st.dmg)} · ◎ ${Math.round(st.range)} · ⏱ ${st.rate.toFixed(2)}s</div>
-    <div class="row">
-      <button class="btn gold" id="popUp">${t('upgrade')} (${fmt(upCost)})</button>
-    </div>
+    <div class="row"><button class="btn gold" id="popUp">${t('upgrade')} (${fmt(upCost)})</button></div>
     <div class="row">
       <button class="btn danger" id="popSell">${t('sell')} +${fmt(sellVal)}</button>
       <button class="btn" id="popClose">✕</button>
@@ -2435,26 +2315,18 @@ function showTowerPopup(tower){
   popup.querySelector('#popUp').onclick = ()=>{
     if(tower.level >= 12){ toast(state.lang==='ru'?'Максимальный уровень':'Max level'); return; }
     if(game.coins < upCost){ toast(state.lang==='ru'?'Недостаточно монет':'Not enough coins'); return; }
-    game.coins -= upCost;
-    tower.level++;
-    playCoin();
-    applyAuras();
-    showTowerPopup(tower);
-    renderGameTools();
+    game.coins -= upCost; tower.level++;
+    playCoin(); applyAuras(); showTowerPopup(tower); renderGameTools();
   };
   popup.querySelector('#popSell').onclick = ()=>{
     game.coins += sellVal;
     game.towers = game.towers.filter(tw=>tw!==tower);
     game.selectedTower = null;
-    hideTowerPopup();
-    applyAuras();
-    renderGameTools();
+    hideTowerPopup(); applyAuras(); renderGameTools();
   };
   popup.querySelector('#popClose').onclick = ()=>{ game.selectedTower=null; hideTowerPopup(); };
 }
-function hideTowerPopup(){
-  $$('[data-popup]').forEach(p=>p.remove());
-}
+function hideTowerPopup(){ $$('[data-popup]').forEach(p=>p.remove()); }
 function applyAuras(){
   game.towers.forEach(tw=>tw.auraBuff=0);
   game.towers.forEach(src=>{
@@ -2462,9 +2334,7 @@ function applyAuras(){
     if(!c || !c.aura) return;
     game.towers.forEach(tw=>{
       if(tw===src) return;
-      if(Math.hypot(tw.x-src.x, tw.y-src.y) < 100){
-        tw.auraBuff = (tw.auraBuff||0) + 15;
-      }
+      if(Math.hypot(tw.x-src.x, tw.y-src.y) < 100) tw.auraBuff = (tw.auraBuff||0) + 15;
     });
   });
 }
@@ -2491,9 +2361,7 @@ function renderGameTools(){
       if(!canAfford){ toast(state.lang==='ru'?'Недостаточно монет':'Not enough coins'); return; }
       game.selectedTowerType = (game.selectedTowerType===cid) ? null : cid;
       game.selectedTower = null;
-      hideTowerPopup();
-      renderGameTools();
-      playClick();
+      hideTowerPopup(); renderGameTools(); playClick();
     };
     bar.appendChild(btn);
   });
@@ -2505,18 +2373,11 @@ function renderGameTools(){
     const cd = game.abilityCd[a.id]||0;
     const btn = el('button','ability-btn'+(cd>0?' cd':''));
     btn.innerHTML = `<div style="color:${a.color};width:26px;height:26px">${a.icon}</div>`;
-    if(cd>0){
-      const ct = el('div','cdtext', Math.ceil(cd));
-      btn.appendChild(ct);
-    }
+    if(cd>0){ const ct = el('div','cdtext', Math.ceil(cd)); btn.appendChild(ct); }
     btn.onclick = ()=>{
       if(cd>0) return;
-      if(a.id==='freeze' || a.id==='gold' || a.id==='rage'){
-        activateAbility(a.id);
-      } else {
-        pendingAbility = a.id;
-        toast(state.lang==='ru'?'Выберите цель':'Select target');
-      }
+      if(a.id==='freeze' || a.id==='gold' || a.id==='rage'){ activateAbility(a.id); }
+      else { pendingAbility = a.id; toast(state.lang==='ru'?'Выберите цель':'Select target'); }
     };
     abRow.appendChild(btn);
   });
@@ -2528,10 +2389,7 @@ function renderGameTools(){
 
   const spBtn = el('button','speed-btn');
   spBtn.textContent = 'x'+game.speedMul;
-  spBtn.onclick = ()=>{
-    game.speedMul = game.speedMul===1 ? 2 : (game.speedMul===2 ? 3 : 1);
-    renderGameTools();
-  };
+  spBtn.onclick = ()=>{ game.speedMul = game.speedMul===1 ? 2 : (game.speedMul===2 ? 3 : 1); renderGameTools(); };
   abRow.appendChild(spBtn);
 
   const exitBtn = el('button','speed-btn');
@@ -2605,8 +2463,7 @@ function renderGameHud(){
 
 /* ---------- ФИНАЛ УРОВНЯ ---------- */
 function quitLevel(){
-  game.finished = true;
-  game.paused = true;
+  game.finished = true; game.paused = true;
   const m = openModal(`
     <h3>${t('quitTitle')}</h3>
     <p>${t('quitText')}</p>
@@ -2615,18 +2472,13 @@ function quitLevel(){
       <button class="btn primary" id="qNo">${t('quitStay')}</button>
     </div>
   `);
-  m.querySelector('#qYes').onclick = ()=>{
-    closeModal();
-    cleanupGame();
-    backToLobby();
-  };
+  m.querySelector('#qYes').onclick = ()=>{ closeModal(); cleanupGame(); backToLobby(); };
   m.querySelector('#qNo').onclick = ()=>{ closeModal(); game.finished=false; game.paused=false; };
 }
 
 function finishLevel(win){
   if(!game || game.finished) return;
-  game.finished = true;
-  game.paused = true;
+  game.finished = true; game.paused = true;
   hideTowerPopup();
 
   const g = game;
@@ -2657,7 +2509,7 @@ function finishLevel(win){
           ${SVG.gem.replace('<svg','<svg style="width:22px;height:22px"')} +${fmt(gems)}
         </div>
         ${chests>0?`<div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;color:#ffd766">
-          ${SVG.chest.replace('<svg','<svg style="width:22px;height:22px"')} +1
+          ${SVG.chest.replace('<svg','<svg style="width:22px;height:22px"')} +${chests}
         </div>`:''}
       </div>
       <div class="row" style="flex-direction:column;gap:9px">
@@ -2671,11 +2523,9 @@ function finishLevel(win){
       if(chests>0) state.chests += chests;
       saveGame(true);
       closeModal();
-      if(chests>0 && state.chests>0){
-        openChestModal(()=>{ cleanupGame(); backToLobby(); });
-      } else {
-        cleanupGame(); backToLobby();
-      }
+      if(chests>0) toast('+' + chests + ' 🎁 — ' + t('chestAdded'), 2200);
+      cleanupGame();
+      backToLobby();
     };
 
     m.querySelector('#claimBtn').onclick = ()=>{ giveAndReturn(1); };
@@ -2711,12 +2561,7 @@ const TUT_STEPS = [
   {t:'tut4T', d:'tut4D', icon:'fire'}
 ];
 function showTutorial(idx){
-  if(idx >= TUT_STEPS.length){
-    state.tutorialDone = true;
-    saveGame(true);
-    backToLobby();
-    return;
-  }
+  if(idx >= TUT_STEPS.length){ state.tutorialDone = true; saveGame(true); backToLobby(); return; }
   const s = TUT_STEPS[idx];
   const iconMap = {tower:SVG.tower, wave:SVG.wave, coin:SVG.coin, fire:SVG.fire};
   const m = openModal(`
@@ -2736,7 +2581,6 @@ function showTutorial(idx){
 function refreshStaticText(){
   $('#loadTxt').textContent = t('loading');
   $('#loadTitle').textContent = state.lang==='ru' ? 'ДОМ С ПРИВИДЕНИЯМИ' : 'GHOST HOUSE';
-  $('#loadSub').textContent = 'GHOST HOUSE TD';
   $('#tutQ').textContent = t('tutQ');
   $('#tutD').textContent = t('tutD');
   $('#tutYes').textContent = t('tutYes');
@@ -2751,6 +2595,7 @@ function refreshStaticText(){
   if(currentScreen==='scr-tasks') openTasks();
   if(currentScreen==='scr-chars') openChars();
   if(currentScreen==='scr-abilities') openAbilities();
+  if(currentScreen==='scr-summon') openSummon();
 }
 
 /* ---------- ПАУЗА ПРИ СКРЫТИИ ---------- */
@@ -2811,14 +2656,11 @@ function showPlaytimeReward(r){
     <h3 style="color:#ffd766">${t('playtimeReward')}</h3>
     <div style="font-size:44px;margin:6px 0">${SVG.gift.replace('<svg','<svg style="width:60px;height:60px"')}</div>
     <p>${state.lang==='ru'?'Вы играете уже':'You have been playing for'} ${r.min} ${state.lang==='ru'?'минут':'min'}!</p>
-    <div style="font-size:16px;color:#9ef7e0;margin-bottom:12px">+${fmt(r.gems)} 💎 ${r.chest?' + 1 🎁':''}</div>
+    <div style="font-size:16px;color:#9ef7e0;margin-bottom:12px">+${fmt(r.gems)} 💎 ${r.chest?' + '+r.chest+' 🎁':''}</div>
+    ${r.chest?`<p style="font-size:11px;color:#8f7bb0;margin-bottom:10px">${t('chestAdded')}</p>`:''}
     <div class="row"><button class="btn gold" id="ptOk">${t('claim')}</button></div>
   `);
-  m.querySelector('#ptOk').onclick = ()=>{
-    closeModal();
-    if(r.chest) openChestModal(()=>renderLobby());
-    else renderLobby();
-  };
+  m.querySelector('#ptOk').onclick = ()=>{ closeModal(); renderLobby(); };
 }
 
 /* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
@@ -2827,21 +2669,18 @@ async function boot(){
   let p = 0;
   const tick = (to, txt)=>{
     return new Promise(res=>{
-      const start = p;
-      const startT = performance.now();
+      const start = p; const startT = performance.now();
       const step = ()=>{
         const k = Math.min(1, (performance.now()-startT)/260);
         p = start + (to-start)*k;
         fill.style.width = p+'%';
-        if(k<1) requestAnimationFrame(step);
-        else res();
+        if(k<1) requestAnimationFrame(step); else res();
       };
       if(txt) $('#loadTxt').textContent = txt;
       requestAnimationFrame(step);
     });
   };
 
-  // Устанавливаем язык по умолчанию ДО показа экрана загрузки
   document.documentElement.lang = state.lang;
 
   await tick(20, t('loadVK'));
@@ -2850,12 +2689,10 @@ async function boot(){
   await loadGame();
   await tick(75, t('loadHouse'));
 
-  ensureStarter();
-  checkTaskRefresh();
+  ensureStarter(); checkTaskRefresh();
   document.documentElement.lang = state.lang;
   refreshStaticText();
 
-  // Предзагрузка SVG-иконок персонажей для canvas
   await preloadCharImages();
   await tick(95, t('loadHouse'));
 
@@ -2868,12 +2705,10 @@ async function boot(){
 
   playtimeStart = now();
   startPlaytimeTracker();
-
   showBanner();
 
   if(!state.tutorialDone && !state.tutorialSeen){
-    state.tutorialSeen = true;
-    saveGame(true);
+    state.tutorialSeen = true; saveGame(true);
     showScreen('scr-tutorial');
   } else {
     showScreen('scr-lobby');
@@ -2895,10 +2730,7 @@ document.addEventListener('click', (e)=>{
 
 window.addEventListener('beforeunload', ()=>{ saveGame(true); });
 setInterval(()=>{ saveGame(); }, 30000);
-
-setInterval(()=>{
-  if(game && !game.finished){ state.totalPlaytime += 5; }
-}, 5000);
+setInterval(()=>{ if(game && !game.finished){ state.totalPlaytime += 5; } }, 5000);
 
 boot();
 </script>
