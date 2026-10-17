@@ -72,10 +72,13 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .spacer{flex:1}
 
 /* ========== ЛОББИ ========== */
-.lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:3}
-.lobby-hero{position:relative;height:120px;margin:-4px 0 4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;
+.lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:3;
+  -webkit-overflow-scrolling:touch}
+/* ВАЖНО: дети не сжимаются, иначе лобби не скроллится и дом обрезается */
+.lobby-body > *{flex-shrink:0}
+.lobby-hero{position:relative;height:130px;margin:-4px 0 4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;
   background:radial-gradient(ellipse at 50% 100%, rgba(138,75,214,.25), transparent 70%),linear-gradient(180deg,rgba(20,8,35,.4),rgba(8,3,16,.1));}
-.lobby-hero .hero-house{width:90px;height:90px;filter:drop-shadow(0 0 12px #7b3fbf);}
+.lobby-hero .hero-house{width:96px;height:96px;filter:drop-shadow(0 0 12px #7b3fbf);}
 .lobby-hero .hero-text{position:absolute;top:8px;left:50%;transform:translateX(-50%);
   font-size:11px;letter-spacing:3px;color:#8f7bb0;text-transform:uppercase;opacity:.9}
 .lobby-hero .hero-ghost{position:absolute;width:44px;height:44px;opacity:.85;filter:drop-shadow(0 0 10px currentColor)}
@@ -92,9 +95,9 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .lobby-hero .hero-candle .cflame{width:8px;height:12px;background:radial-gradient(circle at 50% 70%,#fff,#ffb347 50%,transparent 80%);border-radius:50%;margin:-4px auto 0;animation:flame 0.7s ease-in-out infinite alternate}
 @keyframes flame{0%{transform:scale(1) translateY(0)}100%{transform:scale(1.1) translateY(-1px)}}
 
-.lobby-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.lobby-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px}
 .tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  min-height:104px;border:2px solid #522c8c;border-radius:16px;background:
+  min-height:96px;border:2px solid #522c8c;border-radius:16px;background:
     radial-gradient(ellipse at 50% 0%,rgba(138,75,214,.22),transparent 70%),
     linear-gradient(180deg,#1d0f30,#0f0719);
   cursor:pointer;transition:.18s;padding:12px 8px;overflow:hidden}
@@ -103,8 +106,8 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .tile::before{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;
   background:radial-gradient(circle at 50% 0%, rgba(180,123,255,.15), transparent 60%);opacity:0;transition:.2s}
 .tile:hover::before{opacity:1}
-.tile .ticon{width:44px;height:44px;filter:drop-shadow(0 0 8px currentColor)}
-.tile .tlabel{font-size:13px;text-align:center;color:#d5c2ff;letter-spacing:.5px}
+.tile .ticon{width:40px;height:40px;filter:drop-shadow(0 0 8px currentColor)}
+.tile .tlabel{font-size:12px;text-align:center;color:#d5c2ff;letter-spacing:.5px}
 .tile .badge{position:absolute;top:6px;right:6px;background:#c2243c;color:#fff;font-size:10px;font-weight:bold;
   padding:2px 7px;border-radius:10px;box-shadow:0 0 10px #c2243c;animation:pulse 1.4s infinite}
 .tile .badge.gold{background:#8a6a1f;box-shadow:0 0 10px #ffd766;color:#ffeeb8}
@@ -149,13 +152,22 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .tower-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
 .tower-btn{flex:0 0 auto;width:64px;height:74px;border-radius:12px;border:2px solid #4a2a7a;
   background:linear-gradient(180deg,#1d0f30,#0f0719);cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;transition:.15s;padding:4px;font-family:inherit}
+  align-items:center;justify-content:center;gap:2px;transition:.15s;padding:4px;font-family:inherit;position:relative}
 .tower-btn:hover{border-color:#a765f0}
 .tower-btn.sel{border-color:#ffd766;box-shadow:0 0 16px rgba(255,215,102,.6);background:linear-gradient(180deg,#3a2410,#1c1008)}
 .tower-btn.no{opacity:.4}
+.tower-btn:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.7)}
 .tower-btn svg{width:28px;height:28px}
 .tower-btn .tn{font-size:8px;color:#c0a8e8;text-align:center;line-height:1.05}
 .tower-btn .tc{font-size:9px;color:#ffe6a3;font-weight:bold}
+.tut-pulse{border-color:#ffd766 !important;animation:tutPulse 1.4s ease-in-out infinite;transform:translateY(-2px)}
+@keyframes tutPulse{0%,100%{box-shadow:0 0 14px rgba(255,215,102,.5),0 0 0 0 rgba(255,215,102,.5)}
+  50%{box-shadow:0 0 28px rgba(255,215,102,1),0 0 0 8px rgba(255,215,102,0)}}
+#tutorialHint{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:6;
+  background:rgba(20,10,34,.96);border:2px solid #ffd766;border-radius:14px;
+  padding:10px 18px;font-size:13px;color:#ffeeb8;max-width:90%;text-align:center;
+  pointer-events:none;animation:tutorialGlow 2s ease-in-out infinite;line-height:1.4}
+@keyframes tutorialGlow{0%,100%{box-shadow:0 0 18px rgba(255,215,102,.5)}50%{box-shadow:0 0 32px rgba(255,215,102,.95)}}
 .ability-bar{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
 .ability-btn{width:50px;height:50px;border-radius:12px;border:2px solid #7a1f38;background:linear-gradient(180deg,#2a0f1c,#150710);
   cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:.15s}
@@ -292,14 +304,17 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 .chance-row .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .chance-row .val{font-weight:bold;color:#ffe6a3}
 
-@media(max-width:420px){
-  .tile{min-height:92px}
-  .tile .ticon{width:36px;height:36px}
-  .tile .tlabel{font-size:11.5px}
+@media(max-width:480px){
+  .lobby-body{padding:8px;gap:8px}
+  .lobby-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .tile{min-height:80px;padding:8px 4px}
+  .tile .ticon{width:30px;height:30px}
+  .tile .tlabel{font-size:10.5px;line-height:1.1}
+  .lobby-hero{height:96px}
+  .lobby-hero .hero-house{width:66px;height:66px}
   .tower-btn{width:58px;height:68px}
-  .lobby-hero{height:100px}
-  .lobby-hero .hero-house{width:74px;height:74px}
   .preview-card svg{width:42px;height:42px}
+  #tutorialHint{font-size:12px;padding:8px 12px;top:50px}
 }
 </style>
 </head>
@@ -329,7 +344,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
   <div class="screen" id="scr-tutorial">
     <svg class="tut-icon" viewBox="0 0 64 64"><path d="M32 6c-13 0-21 10-21 23v27l7-6 7 6 7-6 7 6 7-6V29C46 16 45 6 32 6z" fill="#7b3fbf"/><ellipse cx="24" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/><ellipse cx="40" cy="27" rx="4.5" ry="5.5" fill="#0b0614"/></svg>
     <h2 id="tutQ">Хотите пройти обучение?</h2>
-    <p id="tutD">Короткий гайд научит вас защищать дом от духов и строить башни.</p>
+    <p id="tutD">Короткий интерактивный уровень научит вас защищать дом от духов и строить башни.</p>
     <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
       <button class="btn primary" id="tutYes">Пройти обучение</button>
       <button class="btn" id="tutNo">Пропустить</button>
@@ -539,7 +554,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.2
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.3
    ============================================================ */
 
 /* ---------- БАЗОВЫЕ SVG ---------- */
@@ -570,7 +585,7 @@ const SVG = {
 };
 
 /* ============================================================
-   ИКОНКИ ПЕРСОНАЖЕЙ — детализированные
+   ИКОНКИ ПЕРСОНАЖЕЙ
    ============================================================ */
 function icoGhost(c){return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
   <path d="M32 5C18 5 10 15 10 28v28l7-6 7 6 8-6 8 6 7-6 7 6V28C54 15 46 5 32 5z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
@@ -753,7 +768,7 @@ const I18N = {
     loadVK:'Подключение к VK...', loadSave:'Загрузка сохранения...',
     loadHouse:'Подготовка дома...', loadReady:'Готово!',
     loading:'Загрузка данных...', tutQ:'Хотите пройти обучение?',
-    tutD:'Короткий гайд научит вас защищать дом от духов и строить башни.',
+    tutD:'Короткий интерактивный уровень научит вас защищать дом от духов и строить башни.',
     tutYes:'Пройти обучение', tutNo:'Пропустить',
     levels:'Уровни', settings:'Настройки', tasks:'Задания', afk:'Комната отдыха',
     daily:'Ежедневная награда', chars:'Коллекция', abilities:'Способности',
@@ -779,11 +794,6 @@ const I18N = {
     twFloor:'Этаж', twStart:'Начать этаж', twHint:'Каждый этаж сложнее предыдущего. Чем выше — тем больше награда.',
     buy:'Купить', bought:'Куплено', notEnough:'Недостаточно кристаллов',
     selectTower:'Выберите башню', upgrade:'Улучшить', sell:'Продать',
-    tut1T:'Обучение: башни', tut1D:'Выберите персонажа внизу и поставьте его на свободную клетку пола. Каждый персонаж атакует призраков по-своему.',
-    tut2T:'Обучение: волны', tut2D:'Призраки идут по дороге к выходу. Если они дойдут — вы теряете жизнь. Уничтожьте всех!',
-    tut3T:'Обучение: улучшения', tut3D:'Нажмите на поставленного персонажа, чтобы улучшить его за монеты. Монеты падают с монстров.',
-    tut4T:'Обучение: отряд', tut4D:'В коллекции вы можете выбрать до 4 персонажей — их вы и сможете ставить в бою. Удачи!',
-    tutNext:'Далее', tutFinish:'Начать игру', tutSkip:'Пропустить обучение',
     waveClear:'Волна пройдена!', bossIncoming:'БОСС!',
     tasksRefresh:'Задания обновятся через', hours:'ч', minutes:'м',
     playtimeReward:'Награда за игру!', claim:'Забрать',
@@ -811,13 +821,21 @@ const I18N = {
     seasonPoints:'Очки сезона', seasonClaim:'Забрать', seasonClaimed:'Получено',
     seasonReward:'Награда', seasonLevel:'Уровень', seasonNeed:'Нужно очков',
     abilityCount:'В наличии', abilityConsumable:'Расходник', abilityBuy:'Купить',
-    openingChest:'Открываем сундук...', chestContent:'Содержимое сундука'
+    openingChest:'Открываем сундук...', chestContent:'Содержимое сундука',
+    tutStepSelect:'Шаг 1/3: Тапни на карточку «Призрак» внизу, чтобы выбрать его.',
+    tutStepPlace:'Шаг 2/3: Тапни на подсвеченную клетку пола, чтобы поставить башню.',
+    tutStepWatch:'Шаг 3/3: Смотри, как твоя башня атакует призраков!',
+    tutComplete:'Обучение пройдено!',
+    tutCompleteDesc:'Ты научился строить башни и защищать дом. Вперёд — к новым уровням!',
+    tutToLobby:'В лобби',
+    tutPlaceWrong:'Тапни на подсвеченную клетку!',
+    tutFree:'бесплатно'
   },
   en:{
     loadVK:'Connecting to VK...', loadSave:'Loading save...',
     loadHouse:'Preparing house...', loadReady:'Ready!',
     loading:'Loading data...', tutQ:'Would you like a tutorial?',
-    tutD:'A short guide will teach you to defend the house from ghosts and build towers.',
+    tutD:'A short interactive level will teach you to defend the house from ghosts and build towers.',
     tutYes:'Start tutorial', tutNo:'Skip',
     levels:'Levels', settings:'Settings', tasks:'Tasks', afk:'Rest Room',
     daily:'Daily Reward', chars:'Collection', abilities:'Abilities',
@@ -843,11 +861,6 @@ const I18N = {
     twFloor:'Floor', twStart:'Start floor', twHint:'Each floor is harder. The higher — the bigger the reward.',
     buy:'Buy', bought:'Owned', notEnough:'Not enough crystals',
     selectTower:'Select tower', upgrade:'Upgrade', sell:'Sell',
-    tut1T:'Tutorial: towers', tut1D:'Pick a character below and place him on a free floor tile. Each character attacks ghosts differently.',
-    tut2T:'Tutorial: waves', tut2D:'Ghosts walk along the path to the exit. If they reach it — you lose a life. Destroy them all!',
-    tut3T:'Tutorial: upgrades', tut3D:'Tap a placed character to upgrade him with coins. Coins drop from monsters.',
-    tut4T:'Tutorial: squad', tut4D:'In the collection you can select up to 4 characters — those will be available in battle. Good luck!',
-    tutNext:'Next', tutFinish:'Start game', tutSkip:'Skip tutorial',
     waveClear:'Wave cleared!', bossIncoming:'BOSS!',
     tasksRefresh:'Tasks refresh in', hours:'h', minutes:'m',
     playtimeReward:'Playtime reward!', claim:'Claim',
@@ -875,7 +888,15 @@ const I18N = {
     seasonPoints:'Season points', seasonClaim:'Claim', seasonClaimed:'Claimed',
     seasonReward:'Reward', seasonLevel:'Level', seasonNeed:'Points needed',
     abilityCount:'In stock', abilityConsumable:'Consumable', abilityBuy:'Buy',
-    openingChest:'Opening chest...', chestContent:'Chest contents'
+    openingChest:'Opening chest...', chestContent:'Chest contents',
+    tutStepSelect:'Step 1/3: Tap the "Ghost" card below to select it.',
+    tutStepPlace:'Step 2/3: Tap the highlighted floor cell to place the tower.',
+    tutStepWatch:'Step 3/3: Watch your tower attack the ghosts!',
+    tutComplete:'Tutorial complete!',
+    tutCompleteDesc:'You learned to build towers and defend the house. Off to new levels!',
+    tutToLobby:'To lobby',
+    tutPlaceWrong:'Tap the highlighted cell!',
+    tutFree:'free'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -883,16 +904,35 @@ function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] ||
 /* ---------- КОНСТАНТЫ ---------- */
 const GRID_W = 16, GRID_H = 10, CELL = 40;
 const CANVAS_W = GRID_W*CELL, CANVAS_H = GRID_H*CELL;
-const PATH_CELLS = [[-1,4],[3,4],[3,1],[7,1],[7,7],[11,7],[11,3],[15,3],[15,5],[16,5]];
-const PATH_PX = PATH_CELLS.map(p=>({x:p[0]*CELL+CELL/2, y:p[1]*CELL+CELL/2}));
-const PATH_BLOCK = new Set();
-(function(){
-  for(let i=0;i<PATH_CELLS.length-1;i++){
-    const a=PATH_CELLS[i], b=PATH_CELLS[i+1];
-    if(a[0]===b[0]){ for(let y=Math.min(a[1],b[1]);y<=Math.max(a[1],b[1]);y++) PATH_BLOCK.add(a[0]+','+y); }
-    else { for(let x=Math.min(a[0],b[0]);x<=Math.max(a[0],b[0]);x++) PATH_BLOCK.add(x+','+a[1]); }
+
+/* 10 разных трасс — чередуются по уровням */
+const PATHS = [
+  [[-1,4],[3,4],[3,1],[7,1],[7,7],[11,7],[11,3],[15,3],[15,5],[16,5]],
+  [[-1,2],[5,2],[5,7],[10,7],[10,2],[14,2],[14,5],[16,5]],
+  [[-1,1],[2,1],[2,8],[6,8],[6,2],[10,2],[10,8],[14,8],[14,4],[16,4]],
+  [[-1,5],[4,5],[4,1],[8,1],[8,8],[12,8],[12,2],[16,2]],
+  [[-1,3],[2,3],[2,7],[5,7],[5,2],[9,2],[9,7],[13,7],[13,4],[16,4]],
+  [[-1,6],[3,6],[3,2],[7,2],[7,8],[11,8],[11,3],[15,3],[15,6],[16,6]],
+  [[-1,1],[6,1],[6,5],[3,5],[3,8],[10,8],[10,4],[14,4],[14,7],[16,7]],
+  [[-1,7],[4,7],[4,3],[8,3],[8,7],[12,7],[12,4],[16,4]],
+  [[-1,4],[3,4],[3,8],[7,8],[7,3],[11,3],[11,6],[15,6],[15,4],[16,4]],
+  [[-1,2],[5,2],[5,6],[2,6],[2,8],[8,8],[8,3],[12,3],[12,7],[16,7]]
+];
+const TUTORIAL_PATH = [[-1,4],[16,4]];
+
+function buildPathBlock(cells){
+  const set = new Set();
+  for(let i=0;i<cells.length-1;i++){
+    const a=cells[i], b=cells[i+1];
+    if(a[0]===b[0]){
+      for(let y=Math.min(a[1],b[1]); y<=Math.max(a[1],b[1]); y++) set.add(a[0]+','+y);
+    } else {
+      for(let x=Math.min(a[0],b[0]); x<=Math.max(a[0],b[0]); x++) set.add(x+','+a[1]);
+    }
   }
-})();
+  return set;
+}
+function cellsToPx(cells){ return cells.map(p=>({x:p[0]*CELL+CELL/2, y:p[1]*CELL+CELL/2})); }
 
 /* ---------- ПЕРСОНАЖИ ---------- */
 const CHARS = [
@@ -920,7 +960,6 @@ const CHARS = [
 const STARTER_CHARS = ['ghost'];
 const RARITY_WEIGHT = {common:70, epic:24, legendary:5, mythic:1};
 
-/* ---------- СПОСОБНОСТИ ---------- */
 const ABILITIES = [
   {id:'meteor', ru:'Метеор', en:'Meteor', cost:300, icon:SVG.meteor, cd:40, color:'#ff8a3d', desc:{ru:'Наносит огромный урон по области',en:'Massive AoE damage'}},
   {id:'freeze', ru:'Ледяная волна', en:'Ice Wave', cost:250, icon:SVG.freeze, cd:35, color:'#7fd8ff', desc:{ru:'Замораживает всех врагов на 5 сек',en:'Freezes all enemies for 5s'}},
@@ -928,7 +967,6 @@ const ABILITIES = [
   {id:'rage',   ru:'Ярость духов', en:'Spirit Rage', cost:400, icon:SVG.rage, cd:50, color:'#ff5f7e', desc:{ru:'+100% урона башен на 15 секунд',en:'+100% tower damage for 15s'}}
 ];
 
-/* ---------- ПАССИВНЫЕ НАВЫКИ ---------- */
 const PASSIVE_DEFS = [
   {id:'dmg', ru:'Урон башен', en:'Tower damage', per:0.5, base:80, mul:1.35, max:100,
    descRu:'+0.5% урона башен за уровень', descEn:'+0.5% tower damage per level'},
@@ -940,14 +978,12 @@ const PASSIVE_DEFS = [
    descRu:'+1% стартовых монет за уровень', descEn:'+1% starting coins per level'}
 ];
 
-/* ---------- СЕЗОННЫЙ ПРОПУСК ---------- */
 const SEASON_REWARDS = Array.from({length:30}, (_,i)=>({
   points: (i+1)*100,
   gems: 40 + i*20,
   chests: (i+1)%5===0 ? 1 : 0
 }));
 
-/* ---------- СОСТОЯНИЕ ---------- */
 const DEFAULT_STATE = {
   v:3, gems:0, chests:0, level:1, completed:0,
   chars: [], selectedChars: [], abilities: {},
@@ -965,7 +1001,6 @@ const DEFAULT_STATE = {
 let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let vkAvailable = false;
 
-/* ---------- УТИЛИТЫ ---------- */
 const SUF = ['','K','M','B','T','aa','ab','ac','ad','ae','af','ag','ah','ai','aj','ak','al','am','an','ao','ap','aq','ar','as','at','au','av','aw','ax','ay','az'];
 function fmt(n){
   if(!isFinite(n)) return '∞';
@@ -1159,7 +1194,6 @@ function showScreen(id){
 }
 function backToLobby(){ showScreen('scr-lobby'); renderLobby(); saveGame(); }
 
-/* ---------- МОДАЛЬНЫЕ ОКНА ---------- */
 function openModal(html, opts){
   opts = opts||{};
   const root = $('#modal-root');
@@ -1278,7 +1312,6 @@ function inviteFriends(){
   vkSend('VKWebAppShowInviteBox').then(()=>{ toast(t('invited')); }).catch(()=>{ toast(t('invited')); });
 }
 
-/* ---------- УРОВНИ ---------- */
 function openLevels(){
   showScreen('scr-levels');
   $('#lvlTitle').textContent = t('levels');
@@ -1297,7 +1330,6 @@ function openLevels(){
   grid.appendChild(frag);
 }
 
-/* ---------- НАСТРОЙКИ ---------- */
 function openSettings(){
   showScreen('scr-settings');
   $('#setTitle').textContent = t('settings');
@@ -1453,7 +1485,6 @@ $('#afkClaim').onclick = ()=>{
   saveGame(true); renderLobby(); openAFK();
 };
 
-/* ---------- ЕЖЕДНЕВНАЯ ---------- */
 function openDaily(){
   showScreen('scr-daily');
   $('#dailyTitle').textContent = t('daily');
@@ -1481,7 +1512,6 @@ $('#dailyClaim').onclick = ()=>{
   renderLobby(); openDaily();
 };
 
-/* ---------- КОЛЛЕКЦИЯ ---------- */
 function openChars(){
   showScreen('scr-chars');
   $('#charsTitle').textContent = t('chars');
@@ -1578,7 +1608,6 @@ function charBonus(){
   return {dmg, range, gold};
 }
 
-/* ---------- СПОСОБНОСТИ (РАСХОДНИКИ) ---------- */
 function openAbilities(){
   showScreen('scr-abilities');
   $('#abTitle').textContent = t('abilities');
@@ -1609,7 +1638,6 @@ function openAbilities(){
   });
 }
 
-/* ---------- БАШНЯ БЕСКОНЕЧНОСТИ ---------- */
 function openTower(){
   showScreen('scr-tower');
   $('#twTitle').textContent = t('tower');
@@ -1620,7 +1648,7 @@ function openTower(){
 $('#twStart').onclick = ()=>{ playClick(); startLevel(state.towerFloor, true); };
 
 /* ============================================================
-   ПРИЗЫВ (меню открытия сундуков)
+   ПРИЗЫВ
    ============================================================ */
 function pickRandomChar(){
   const byRarity = {common:[],epic:[],legendary:[],mythic:[]};
@@ -1751,6 +1779,7 @@ let canvas, ctx;
 let game = null;
 let lastTs = 0;
 let rafId = null;
+let pendingAbility = null;
 
 const charImages = {};
 function preloadCharImages(){
@@ -1771,6 +1800,14 @@ function initCanvas(){
   canvas.width = CANVAS_W;
   canvas.height = CANVAS_H;
   canvas.addEventListener('pointerdown', onCanvasPointer);
+  canvas.addEventListener('pointermove', (e)=>{
+    if(!game || game.paused || game.finished) return;
+    const rect = canvas.getBoundingClientRect();
+    const px = (e.clientX - rect.left) * (CANVAS_W / rect.width);
+    const py = (e.clientY - rect.top) * (CANVAS_H / rect.height);
+    game.hoverCell = {x: Math.floor(px/CELL), y: Math.floor(py/CELL)};
+  });
+  canvas.addEventListener('pointerleave', ()=>{ if(game) game.hoverCell = null; });
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 }
@@ -1802,14 +1839,14 @@ function buildLevelConfig(L, isTower){
   return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
 }
 
-function genDecorations(){
+function genDecorations(pathBlock){
   const types = ['tree','pumpkin','candle','cobweb','stone','bush','lantern','mushroom','tree','candle'];
   const deco = [];
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
-      if(PATH_BLOCK.has(x+','+y)) continue;
+      if(pathBlock.has(x+','+y)) continue;
       let nearPath=false;
-      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ if(PATH_BLOCK.has((x+dx)+','+(y+dy))) nearPath=true; }
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ if(pathBlock.has((x+dx)+','+(y+dy))) nearPath=true; }
       if(nearPath) continue;
       if(Math.random() < 0.16){ deco.push({x, y, type: types[Math.floor(Math.random()*types.length)]}); }
     }
@@ -1820,18 +1857,25 @@ function genDecorations(){
 function startLevel(levelNum, isTower){
   ensureStarter();
   const cfg = buildLevelConfig(levelNum, isTower);
+  const pathIdx = (levelNum - 1) % PATHS.length;
+  const pathCells = PATHS[pathIdx];
+  const pathBlock = buildPathBlock(pathCells);
+  const pathPx = cellsToPx(pathCells);
+
   game = {
     level: levelNum, isTower: !!isTower, cfg: cfg,
+    pathCells, pathBlock, pathPx,
     coins: cfg.startCoins, gemsEarned: 0,
     lives: cfg.lives, maxLives: cfg.lives,
     wave: 0, totalWaves: cfg.waves,
     enemies: [], towers: [], projectiles: [], particles: [],
-    decorations: genDecorations(),
+    decorations: genDecorations(pathBlock),
     selectedTowerType: null, selectedTower: null,
     spawnQueue: [], spawnTimer: 0, waveActive: false, waveDelay: 1.5,
     speedMul: 1, paused: false, finished: false,
     abilityCd: {}, buffs: {gold:0, rage:0},
-    killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null
+    killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null,
+    tutorial: null
   };
   ABILITIES.forEach(a=>{ game.abilityCd[a.id]=0; });
 
@@ -1899,7 +1943,7 @@ function update(dt){
       e.poisonT -= dt; e.hp -= e.poisonDps*dt;
       if(Math.random()<0.15) spawnParticle(e.x, e.y, '#8fd14f', 1);
     }
-    const tgt = PATH_PX[e.pathIdx+1];
+    const tgt = game.pathPx[e.pathIdx+1];
     if(!tgt){
       game.enemies.splice(i,1);
       game.lives -= (e.boss?5:1);
@@ -1996,9 +2040,9 @@ function makeEnemy(type, cfg, boss){
                 zombie:{hp:1.7, speed:0.72, color:'#7fa87f', size:16},
                 boss:{hp:22, speed:0.62, color:'#c2243c', size:26}}[type];
   const L = cfg.L;
-  const hp = Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012));
+  const hp = cfg.tutorial ? (boss? 80 : 22) : Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012));
   return {
-    x: PATH_PX[0].x, y: PATH_PX[0].y,
+    x: game.pathPx[0].x, y: game.pathPx[0].y,
     pathIdx: 0, hp, maxHp: hp,
     speed: cfg.enemySpeed * base.speed * (boss?0.9:1),
     color: base.color, size: base.size,
@@ -2121,7 +2165,7 @@ function render(){
 
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
-      const isPath = PATH_BLOCK.has(x+','+y);
+      const isPath = game.pathBlock.has(x+','+y);
       const px = x*CELL, py = y*CELL;
       if(isPath) ctx.fillStyle = ((x+y)%2===0) ? '#2a2038' : '#241a30';
       else ctx.fillStyle = ((x+y)%2===0) ? '#150c22' : '#120a1c';
@@ -2137,18 +2181,33 @@ function render(){
   ctx.strokeStyle = 'rgba(138,75,214,0.14)';
   ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   ctx.beginPath();
-  ctx.moveTo(PATH_PX[0].x, PATH_PX[0].y);
-  for(let i=1;i<PATH_PX.length;i++) ctx.lineTo(PATH_PX[i].x, PATH_PX[i].y);
+  ctx.moveTo(game.pathPx[0].x, game.pathPx[0].y);
+  for(let i=1;i<game.pathPx.length;i++) ctx.lineTo(game.pathPx[i].x, game.pathPx[i].y);
   ctx.stroke();
 
-  const exitP = PATH_PX[PATH_PX.length-1];
+  const exitP = game.pathPx[game.pathPx.length-1];
   const grad = ctx.createRadialGradient(exitP.x, exitP.y, 0, exitP.x, exitP.y, 60);
   grad.addColorStop(0, 'rgba(255,95,126,0.35)');
   grad.addColorStop(1, 'rgba(255,95,126,0)');
   ctx.fillStyle = grad;
   ctx.fillRect(exitP.x-60, exitP.y-60, 120, 120);
 
-  if(game.hoverCell && game.selectedTowerType){
+  if(game.tutorial && game.tutorial.step === 'place'){
+    const tc = game.tutorial.targetCell;
+    const pulse = 0.35 + Math.sin(game.time * 5) * 0.25;
+    ctx.fillStyle = `rgba(255,215,102,${pulse})`;
+    ctx.fillRect(tc.x*CELL, tc.y*CELL, CELL, CELL);
+    ctx.strokeStyle = '#ffd766';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(tc.x*CELL+2, tc.y*CELL+2, CELL-4, CELL-4);
+    ctx.fillStyle = '#ffeeb8';
+    ctx.font = 'bold 22px Trebuchet MS, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('▼', tc.x*CELL + CELL/2, tc.y*CELL + CELL/2 + 2);
+  }
+
+  if(!game.tutorial && game.hoverCell && game.selectedTowerType){
     const {x,y} = game.hoverCell;
     const canBuild = canBuildAt(x,y);
     ctx.fillStyle = canBuild ? 'rgba(0,255,180,0.22)' : 'rgba(255,60,90,0.22)';
@@ -2180,12 +2239,13 @@ function render(){
   }
   ctx.globalAlpha = 1;
 
-  if(game.paused && !game.finished){
+  if(game.paused && !game.finished && !game.tutorial){
     ctx.fillStyle = 'rgba(5,2,10,0.6)';
     ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
     ctx.fillStyle = '#d9b3ff';
     ctx.font = 'bold 26px Trebuchet MS, sans-serif';
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.fillText('II', CANVAS_W/2, CANVAS_H/2);
   }
 }
@@ -2363,12 +2423,23 @@ function onCanvasPointer(ev){
   if(!game || game.paused || game.finished) return;
   ev.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const clientX = ev.clientX != null ? ev.clientX : 0;
-  const clientY = ev.clientY != null ? ev.clientY : 0;
-  const px = (clientX - rect.left) * (CANVAS_W / rect.width);
-  const py = (clientY - rect.top) * (CANVAS_H / rect.height);
+  const px = (ev.clientX - rect.left) * (CANVAS_W / rect.width);
+  const py = (ev.clientY - rect.top) * (CANVAS_H / rect.height);
   const cx = Math.floor(px / CELL), cy = Math.floor(py / CELL);
   if(cx<0||cy<0||cx>=GRID_W||cy>=GRID_H) return;
+
+  // TUTORIAL
+  if(game.tutorial){
+    const step = game.tutorial.step;
+    if(step === 'select'){ return; }
+    if(step === 'place'){
+      const tc = game.tutorial.targetCell;
+      if(cx === tc.x && cy === tc.y){ placeTutorialTower(cx, cy); }
+      else { toast(t('tutPlaceWrong')); }
+      return;
+    }
+    return;
+  }
 
   if(pendingAbility){ useAbilityAt(pendingAbility, px, py); return; }
 
@@ -2381,7 +2452,8 @@ function onCanvasPointer(ev){
 }
 
 function canBuildAt(cx, cy){
-  if(PATH_BLOCK.has(cx+','+cy)) return false;
+  if(!game) return false;
+  if(game.pathBlock.has(cx+','+cy)) return false;
   if(game.towers.some(tw=>tw.cx===cx && tw.cy===cy)) return false;
   return true;
 }
@@ -2458,6 +2530,7 @@ function showTowerPopup(tower){
 }
 function hideTowerPopup(){ $$('[data-popup]').forEach(p=>p.remove()); }
 function applyAuras(){
+  if(!game) return;
   game.towers.forEach(tw=>tw.auraBuff=0);
   game.towers.forEach(src=>{
     const c = charTowerDef(src.type);
@@ -2474,6 +2547,39 @@ function renderGameTools(){
   if(!game) return;
   const tools = $('#gameTools');
   tools.innerHTML = '';
+
+  if(game.tutorial){
+    const bar = el('div','tower-bar');
+    const c = charTowerDef(game.tutorial.targetChar);
+    if(c){
+      const isSel = game.selectedTowerType === game.tutorial.targetChar;
+      const canSelect = game.tutorial.step === 'select';
+      const btn = el('button','tower-btn' + (isSel?' sel':'') + (canSelect?' tut-pulse':''));
+      if(!canSelect && !isSel) btn.disabled = true;
+      btn.innerHTML = `
+        <div style="color:${c.color};width:28px;height:28px">${c.icon}</div>
+        <div class="tn">${state.lang==='ru'?c.ru:c.en}</div>
+        <div class="tc">${t('tutFree')}</div>
+      `;
+      btn.onclick = ()=>{
+        if(game.tutorial.step !== 'select') return;
+        game.selectedTowerType = game.tutorial.targetChar;
+        game.tutorial.step = 'place';
+        renderGameTools();
+        renderTutorialHint();
+      };
+      bar.appendChild(btn);
+    }
+    tools.appendChild(bar);
+
+    const row = el('div','ability-bar');
+    const exitBtn = el('button','speed-btn');
+    exitBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px" fill="none" stroke="#ff9bb0" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>';
+    exitBtn.onclick = ()=>{ quitLevel(); };
+    row.appendChild(exitBtn);
+    tools.appendChild(row);
+    return;
+  }
 
   const bar = el('div','tower-bar');
   state.selectedChars.forEach(cid=>{
@@ -2533,7 +2639,6 @@ function renderGameTools(){
 }
 
 /* ---------- СПОСОБНОСТИ В БОЮ ---------- */
-let pendingAbility = null;
 function activateAbility(id){
   if(!game || game.abilityCd[id]>0) return;
   if(abilityCount(id)<=0){ toast(state.lang==='ru'?'Нет расходников':'No consumables'); return; }
@@ -2601,6 +2706,16 @@ function renderGameHud(){
 
 /* ---------- ФИНАЛ УРОВНЯ ---------- */
 function quitLevel(){
+  if(!game) return;
+  if(game.tutorial){
+    // Просто выходим из обучения
+    state.tutorialDone = true;
+    saveGame(true);
+    closeModal();
+    cleanupGame();
+    backToLobby();
+    return;
+  }
   game.finished = true; game.paused = true;
   const m = openModal(`
     <h3>${t('quitTitle')}</h3>
@@ -2618,6 +2733,11 @@ function finishLevel(win){
   if(!game || game.finished) return;
   game.finished = true; game.paused = true;
   hideTowerPopup();
+
+  if(game.tutorial){
+    showTutorialComplete();
+    return;
+  }
 
   const g = game;
   const level = g.level;
@@ -2689,158 +2809,123 @@ function finishLevel(win){
 function cleanupGame(){
   hideTowerPopup();
   pendingAbility = null;
+  const th = $('#tutorialHint');
+  if(th) th.remove();
   game = null;
   if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
 }
 
-/* ---------- ОБУЧЕНИЕ ---------- */
-const TUT_STEPS = [
-  {t:'tut1T', d:'tut1D', icon:'tower'},
-  {t:'tut2T', d:'tut2D', icon:'wave'},
-  {t:'tut3T', d:'tut3D', icon:'coin'},
-  {t:'tut4T', d:'tut4D', icon:'fire'}
-];
-function showTutorial(idx){
-  if(idx >= TUT_STEPS.length){ state.tutorialDone = true; saveGame(true); backToLobby(); return; }
-  const s = TUT_STEPS[idx];
-  const iconMap = {tower:SVG.tower, wave:SVG.wave, coin:SVG.coin, fire:SVG.fire};
+/* ============================================================
+   ИНТЕРАКТИВНОЕ ОБУЧЕНИЕ
+   ============================================================ */
+function startTutorial(){
+  const tutCharId = 'ghost';
+  if(!state.chars.includes(tutCharId)){
+    state.chars.push(tutCharId);
+    state.starterGiven = true;
+  }
+
+  const pathCells = TUTORIAL_PATH;
+  const pathBlock = buildPathBlock(pathCells);
+  const pathPx = cellsToPx(pathCells);
+
+  const targetCell = {x: 8, y: 3};
+
+  const cfg = {
+    L: 1, ecoScale: 1, hpScale: 0.7, waves: 1, perWave: 2,
+    enemySpeed: 50, isBossLevel: false, lives: 20, startCoins: 100,
+    rewardPerKill: 15, gemReward: 0, isTower: false, tutorial: true
+  };
+
+  game = {
+    level: 0, isTower: false, cfg,
+    pathCells, pathBlock, pathPx,
+    coins: cfg.startCoins, gemsEarned: 0,
+    lives: cfg.lives, maxLives: cfg.lives,
+    wave: 0, totalWaves: 1,
+    enemies: [], towers: [], projectiles: [], particles: [],
+    decorations: genDecorations(pathBlock),
+    selectedTowerType: null, selectedTower: null,
+    spawnQueue: [], spawnTimer: 0, waveActive: false, waveDelay: 999,
+    speedMul: 1, paused: false, finished: false,
+    abilityCd: {}, buffs: {gold:0, rage:0},
+    killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null,
+    tutorial: {
+      step: 'select',
+      targetChar: tutCharId,
+      targetCell: targetCell,
+      placedTower: null,
+      waveStarted: false
+    }
+  };
+  ABILITIES.forEach(a=>{ game.abilityCd[a.id]=0; });
+
+  showScreen('scr-game');
+  resizeCanvas();
+  renderGameTools();
+  renderGameHud();
+  renderTutorialHint();
+
+  if(state.music) playClick();
+  lastTs = 0;
+  startLoop();
+}
+
+function placeTutorialTower(cx, cy){
+  if(!game || !game.tutorial) return;
+  const c = charTowerDef(game.tutorial.targetChar);
+  if(!c) return;
+  const tower = {
+    cx, cy, x: cx*CELL + CELL/2, y: cy*CELL + CELL/2,
+    type: game.tutorial.targetChar, level: 1, cd: 0, maxCd: c.rate,
+    angle: -Math.PI/2, auraBuff: 0
+  };
+  game.towers.push(tower);
+  game.tutorial.placedTower = tower;
+  game.tutorial.step = 'watch';
+  game.tutorial.waveStarted = true;
+  game.selectedTowerType = null;
+  game.waveDelay = 0.6;
+
+  for(let i=0;i<14;i++) spawnParticle(tower.x, tower.y, c.color, 1.5);
+  playClick();
+  renderGameTools();
+  renderTutorialHint();
+}
+
+function renderTutorialHint(){
+  const old = $('#tutorialHint');
+  if(old) old.remove();
+  if(!game || !game.tutorial) return;
+
+  const texts = {
+    select: t('tutStepSelect'),
+    place: t('tutStepPlace'),
+    watch: t('tutStepWatch')
+  };
+  const msg = texts[game.tutorial.step];
+  if(!msg) return;
+
+  const hint = el('div', '', msg);
+  hint.id = 'tutorialHint';
+  $('#scr-game').appendChild(hint);
+}
+
+function showTutorialComplete(){
+  state.tutorialDone = true;
+  saveGame(true);
+  const th = $('#tutorialHint');
+  if(th) th.remove();
   const m = openModal(`
-    <div style="width:70px;height:70px;margin:0 auto 12px;color:#a765f0">${iconMap[s.icon]}</div>
-    <h3>${t(s.t)}</h3>
-    <p>${t(s.d)}</p>
-    <div class="row" style="margin-top:6px">
-      <button class="btn primary" id="tutNextBtn">${idx===TUT_STEPS.length-1? t('tutFinish') : t('tutNext')}</button>
-      <button class="btn" id="tutSkipBtn">${t('tutSkip')}</button>
-    </div>
+    <h3 style="color:#7ee6c0">🎉 ${t('tutComplete')}</h3>
+    <p>${t('tutCompleteDesc')}</p>
+    <div class="row"><button class="btn primary" id="tutFinishBtn">${t('tutToLobby')}</button></div>
   `, {dismissable:false});
-  m.querySelector('#tutNextBtn').onclick = ()=>{ closeModal(); showTutorial(idx+1); };
-  m.querySelector('#tutSkipBtn').onclick = ()=>{ closeModal(); state.tutorialDone=true; saveGame(true); backToLobby(); };
-}
-
-/* ---------- НАГРАДА ЗА ВРЕМЯ ---------- */
-function getPlaytimeMinutes(){ return Math.floor((state.totalPlaytime||0)/60); }
-function canClaimPlaytimeReward(){
-  const mins = getPlaytimeMinutes();
-  return PLAYTIME_REWARDS.some((r,i)=> mins>=r.min && !state.playtimeClaimed.includes(i));
-}
-function openPlaytime(){
-  showScreen('scr-playtime');
-  $('#playtimeTitle').textContent = t('playtimeTitle');
-  const list = $('#playtimeList'); list.innerHTML='';
-  const mins = getPlaytimeMinutes();
-  const head = el('div','', `
-    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:14px">
-      ${t('yourPlaytime')}: <b style="color:#9ef7e0">${mins} мин</b>
-    </div>
-  `);
-  list.appendChild(head);
-  PLAYTIME_REWARDS.forEach((r,i)=>{
-    const claimed = state.playtimeClaimed.includes(i);
-    const can = mins>=r.min && !claimed;
-    const div = el('div','task'+(can?' done':''));
-    div.innerHTML = `
-      <div class="ti" style="color:#9ef7e0">${SVG.clock}</div>
-      <div class="tinfo2">
-        <div class="tt">${r.min} ${state.lang==='ru'?'минут в игре':'minutes played'}</div>
-        <div class="tprog"><div class="tfill" style="width:${Math.min(100, mins/r.min*100)}%"></div></div>
-        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('seasonReward')}: +${fmt(r.gems)} 💎${r.chest?' + '+r.chest+' 🎁':''}</div>
-      </div>
-      <div class="treward">${claimed? t('playtimeClaimed') : (can? '' : t('playtimeNeed')+': '+r.min)}</div>
-    `;
-    if(can){
-      const btn = el('button','btn gold', t('playtimeClaim'));
-      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{
-        state.playtimeClaimed.push(i);
-        state.gems += r.gems;
-        if(r.chest) state.chests += r.chest;
-        playCoin();
-        toast('+' + fmt(r.gems) + ' 💎' + (r.chest?' + '+r.chest+' 🎁':''));
-        saveGame(true); renderLobby(); openPlaytime();
-      };
-      div.appendChild(btn);
-    }
-    list.appendChild(div);
-  });
-}
-
-/* ---------- ПАССИВНЫЕ НАВЫКИ ---------- */
-function passiveCost(def){
-  const lvl = (state.passives && state.passives[def.id]) || 0;
-  return Math.floor(def.base * Math.pow(def.mul, lvl));
-}
-function openPassives(){
-  showScreen('scr-passives');
-  $('#passivesTitle').textContent = t('passivesTitle');
-  const list = $('#passivesList'); list.innerHTML='';
-  PASSIVE_DEFS.forEach(def=>{
-    const lvl = (state.passives && state.passives[def.id]) || 0;
-    const maxed = lvl >= def.max;
-    const cost = passiveCost(def);
-    const div = el('div','task');
-    div.innerHTML = `
-      <div class="ti" style="color:#a765f0">${SVG.upgrade}</div>
-      <div class="tinfo2">
-        <div class="tt" style="color:#d5c2ff;font-weight:bold">${state.lang==='ru'?def.ru:def.en}</div>
-        <div style="font-size:11px;color:#8f7bb0">${state.lang==='ru'?def.descRu:def.descEn}</div>
-        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('passiveLevel')}: ${lvl}/${def.max}</div>
-      </div>
-      <div class="treward">${maxed? t('passiveMax') : fmt(cost)+' 💎'}</div>
-    `;
-    if(!maxed){
-      const btn = el('button','btn gold', t('passiveUpgrade'));
-      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{
-        if(state.gems < cost){ toast(t('notEnough')); return; }
-        state.gems -= cost;
-        state.passives[def.id] = (state.passives[def.id]||0) + 1;
-        playCoin(); saveGame(true); renderLobby(); openPassives();
-      };
-      div.appendChild(btn);
-    }
-    list.appendChild(div);
-  });
-}
-
-/* ---------- СЕЗОННЫЙ ПРОПУСК ---------- */
-function openSeason(){
-  ensureSeason();
-  showScreen('scr-season');
-  $('#seasonTitle').textContent = t('seasonTitle');
-  const body = $('#seasonBody'); body.innerHTML='';
-  body.appendChild(el('div','', `
-    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:12px">
-      ${t('seasonPoints')}: <b style="color:#ffd766">${fmt(state.season.points)}</b>
-    </div>
-  `));
-  SEASON_REWARDS.forEach((r,i)=>{
-    const claimed = state.season.claimed.includes(i);
-    const can = state.season.points >= r.points && !claimed;
-    const div = el('div','task'+(can?' done':''));
-    div.innerHTML = `
-      <div class="ti" style="color:#ffd766">${SVG.season}</div>
-      <div class="tinfo2">
-        <div class="tt">${t('seasonLevel')} ${i+1} · ${r.points} ${t('seasonPoints')}</div>
-        <div class="tprog"><div class="tfill" style="width:${Math.min(100, state.season.points/r.points*100)}%"></div></div>
-        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">+${fmt(r.gems)} 💎${r.chests?' + '+r.chests+' 🎁':''}</div>
-      </div>
-      <div class="treward">${claimed? t('seasonClaimed') : (can? '' : t('seasonNeed')+': '+r.points)}</div>
-    `;
-    if(can){
-      const btn = el('button','btn gold', t('seasonClaim'));
-      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{
-        state.season.claimed.push(i);
-        state.gems += r.gems;
-        if(r.chests) state.chests += r.chests;
-        playCoin();
-        toast('+' + fmt(r.gems) + ' 💎' + (r.chests?' + '+r.chests+' 🎁':''));
-        saveGame(true); renderLobby(); openSeason();
-      };
-      div.appendChild(btn);
-    }
-    body.appendChild(div);
-  });
+  m.querySelector('#tutFinishBtn').onclick = ()=>{
+    closeModal();
+    cleanupGame();
+    backToLobby();
+  };
 }
 
 /* ---------- СТАТИЧНЫЕ ТЕКСТЫ ---------- */
@@ -2891,7 +2976,7 @@ try{
   }
 }catch(e){}
 
-/* ---------- НАГРАДЫ ЗА ВРЕМЯ (СПИСОК) ---------- */
+/* ---------- НАГРАДЫ ЗА ВРЕМЯ ---------- */
 const PLAYTIME_REWARDS = [
   {min:5,  gems:30,  chest:0},
   {min:10, gems:60,  chest:0},
@@ -2902,6 +2987,128 @@ const PLAYTIME_REWARDS = [
   {min:105,gems:800, chest:1},
   {min:150,gems:1200,chest:0}
 ];
+function getPlaytimeMinutes(){ return Math.floor((state.totalPlaytime||0)/60); }
+function canClaimPlaytimeReward(){
+  const mins = getPlaytimeMinutes();
+  return PLAYTIME_REWARDS.some((r,i)=> mins>=r.min && !state.playtimeClaimed.includes(i));
+}
+function openPlaytime(){
+  showScreen('scr-playtime');
+  $('#playtimeTitle').textContent = t('playtimeTitle');
+  const list = $('#playtimeList'); list.innerHTML='';
+  const mins = getPlaytimeMinutes();
+  const head = el('div','', `
+    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:14px">
+      ${t('yourPlaytime')}: <b style="color:#9ef7e0">${mins} мин</b>
+    </div>
+  `);
+  list.appendChild(head);
+  PLAYTIME_REWARDS.forEach((r,i)=>{
+    const claimed = state.playtimeClaimed.includes(i);
+    const can = mins>=r.min && !claimed;
+    const div = el('div','task'+(can?' done':''));
+    div.innerHTML = `
+      <div class="ti" style="color:#9ef7e0">${SVG.clock}</div>
+      <div class="tinfo2">
+        <div class="tt">${r.min} ${state.lang==='ru'?'минут в игре':'minutes played'}</div>
+        <div class="tprog"><div class="tfill" style="width:${Math.min(100, mins/r.min*100)}%"></div></div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('seasonReward')}: +${fmt(r.gems)} 💎${r.chest?' + '+r.chest+' 🎁':''}</div>
+      </div>
+      <div class="treward">${claimed? t('playtimeClaimed') : (can? '' : t('playtimeNeed')+': '+r.min)}</div>
+    `;
+    if(can){
+      const btn = el('button','btn gold', t('playtimeClaim'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        state.playtimeClaimed.push(i);
+        state.gems += r.gems;
+        if(r.chest) state.chests += r.chest;
+        playCoin();
+        toast('+' + fmt(r.gems) + ' 💎' + (r.chest?' + '+r.chest+' 🎁':''));
+        saveGame(true); renderLobby(); openPlaytime();
+      };
+      div.appendChild(btn);
+    }
+    list.appendChild(div);
+  });
+}
+
+function passiveCost(def){
+  const lvl = (state.passives && state.passives[def.id]) || 0;
+  return Math.floor(def.base * Math.pow(def.mul, lvl));
+}
+function openPassives(){
+  showScreen('scr-passives');
+  $('#passivesTitle').textContent = t('passivesTitle');
+  const list = $('#passivesList'); list.innerHTML='';
+  PASSIVE_DEFS.forEach(def=>{
+    const lvl = (state.passives && state.passives[def.id]) || 0;
+    const maxed = lvl >= def.max;
+    const cost = passiveCost(def);
+    const div = el('div','task');
+    div.innerHTML = `
+      <div class="ti" style="color:#a765f0">${SVG.upgrade}</div>
+      <div class="tinfo2">
+        <div class="tt" style="color:#d5c2ff;font-weight:bold">${state.lang==='ru'?def.ru:def.en}</div>
+        <div style="font-size:11px;color:#8f7bb0">${state.lang==='ru'?def.descRu:def.descEn}</div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('passiveLevel')}: ${lvl}/${def.max}</div>
+      </div>
+      <div class="treward">${maxed? t('passiveMax') : fmt(cost)+' 💎'}</div>
+    `;
+    if(!maxed){
+      const btn = el('button','btn gold', t('passiveUpgrade'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        if(state.gems < cost){ toast(t('notEnough')); return; }
+        state.gems -= cost;
+        state.passives[def.id] = (state.passives[def.id]||0) + 1;
+        playCoin(); saveGame(true); renderLobby(); openPassives();
+      };
+      div.appendChild(btn);
+    }
+    list.appendChild(div);
+  });
+}
+
+function openSeason(){
+  ensureSeason();
+  showScreen('scr-season');
+  $('#seasonTitle').textContent = t('seasonTitle');
+  const body = $('#seasonBody'); body.innerHTML='';
+  body.appendChild(el('div','', `
+    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:12px">
+      ${t('seasonPoints')}: <b style="color:#ffd766">${fmt(state.season.points)}</b>
+    </div>
+  `));
+  SEASON_REWARDS.forEach((r,i)=>{
+    const claimed = state.season.claimed.includes(i);
+    const can = state.season.points >= r.points && !claimed;
+    const div = el('div','task'+(can?' done':''));
+    div.innerHTML = `
+      <div class="ti" style="color:#ffd766">${SVG.season}</div>
+      <div class="tinfo2">
+        <div class="tt">${t('seasonLevel')} ${i+1} · ${r.points} ${t('seasonPoints')}</div>
+        <div class="tprog"><div class="tfill" style="width:${Math.min(100, state.season.points/r.points*100)}%"></div></div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">+${fmt(r.gems)} 💎${r.chests?' + '+r.chests+' 🎁':''}</div>
+      </div>
+      <div class="treward">${claimed? t('seasonClaimed') : (can? '' : t('seasonNeed')+': '+r.points)}</div>
+    `;
+    if(can){
+      const btn = el('button','btn gold', t('seasonClaim'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        state.season.claimed.push(i);
+        state.gems += r.gems;
+        if(r.chests) state.chests += r.chests;
+        playCoin();
+        toast('+' + fmt(r.gems) + ' 💎' + (r.chests?' + '+r.chests+' 🎁':''));
+        saveGame(true); renderLobby(); openSeason();
+      };
+      div.appendChild(btn);
+    }
+    body.appendChild(div);
+  });
+}
 
 /* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
 async function boot(){
@@ -2956,8 +3163,8 @@ async function boot(){
   }
 }
 
-$('#tutYes').onclick = ()=>{ playClick(); state.tutorialDone=false; saveGame(true); showTutorial(0); };
-$('#tutNo').onclick  = ()=>{ playClick(); state.tutorialDone=true; saveGame(true); backToLobby(); };
+$('#tutYes').onclick = ()=>{ playClick(); startTutorial(); };
+$('#tutNo').onclick  = ()=>{ playClick(); state.tutorialDone = true; saveGame(true); backToLobby(); };
 
 document.addEventListener('click', (e)=>{
   const b = e.target.closest('[data-back]');
