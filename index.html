@@ -164,6 +164,9 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .ability-btn.cd{opacity:.45;filter:grayscale(.8)}
 .ability-btn .cdtext{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:15px;font-weight:bold;color:#fff;text-shadow:0 0 6px #000}
+.ability-btn .cnt{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#ffd766;color:#221905;
+  font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 3px;
+  box-shadow:0 0 8px rgba(255,215,102,.7)}
 .speed-btn{width:50px;height:50px;border-radius:12px;border:2px solid #4a2a7a;background:linear-gradient(180deg,#1d0f30,#0f0719);
   cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#c9a8ff;font-size:13px}
 
@@ -381,9 +384,6 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
         <input class="promo" id="promoInput" placeholder="Введите промокод">
         <button class="btn primary" id="promoBtn">Активировать</button>
       </div>
-      <div style="margin-top:18px;font-size:11px;color:#5a4a7a;text-align:center;line-height:1.7">
-        Ghost House TD v2.2<br>Все сохранения хранятся в VK
-      </div>
     </div>
   </div>
 
@@ -499,6 +499,33 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     </div>
   </div>
 
+  <div class="screen" id="scr-playtime">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="playtimeTitle">Награда за время</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body"><div id="playtimeList"></div></div>
+  </div>
+
+  <div class="screen" id="scr-passives">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="passivesTitle">Пассивные навыки</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body"><div id="passivesList"></div></div>
+  </div>
+
+  <div class="screen" id="scr-season">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="seasonTitle">Сезонный пропуск</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body"><div id="seasonBody"></div></div>
+  </div>
+
   <div class="screen" id="scr-game">
     <canvas id="gameCanvas"></canvas>
     <div class="game-hud" id="gameHud"></div>
@@ -536,7 +563,10 @@ const SVG = {
   freeze:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#7fd8ff" opacity=".35"/><path d="M12 3v18M4 7l16 10M20 7L4 17" stroke="#7fd8ff" stroke-width="1.8"/></svg>',
   gold:'<svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="6" fill="#ffd766"/><circle cx="16" cy="9" r="5" fill="#e0b23c"/><circle cx="9" cy="14" r="3" fill="#e0b23c"/></svg>',
   rage:'<svg viewBox="0 0 24 24"><path d="M12 2l2 6 6 1-5 4 1 7-4-3-4 3 1-7-5-4 6-1z" fill="#ff5f7e"/></svg>',
-  tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>'
+  tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>',
+  clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#9ef7e0" stroke-width="2"/><path d="M12 7v5l3 2" stroke="#9ef7e0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  upgrade:'<svg viewBox="0 0 24 24"><path d="M12 3l7 7h-4v10h-6V10H5z" fill="#a765f0"/><path d="M9 20h6" stroke="#c9a8ff" stroke-width="2" stroke-linecap="round"/></svg>',
+  season:'<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.2L21 9l-5 4.2L17.5 20 12 16.8 6.5 20 8 13.2 3 9l6.6-.8z" fill="#ffd766"/><circle cx="12" cy="12" r="2.2" fill="#8a6a1f"/></svg>'
 };
 
 /* ============================================================
@@ -771,7 +801,17 @@ const I18N = {
     quitText:'Прогресс уровня будет потерян.',
     quitYes:'Выйти', quitStay:'Остаться',
     heroTag:'Добро пожаловать в дом',
-    chestAdded:'Сундук добавлен в меню «Призыв»'
+    chestAdded:'Сундук добавлен в меню «Призыв»',
+    playtime:'Награда за время', playtimeTitle:'Награда за время',
+    yourPlaytime:'Ваше время в игре', playtimeClaim:'Забрать',
+    playtimeClaimed:'Получено', playtimeNeed:'Нужно минут',
+    passives:'Прокачка', passivesTitle:'Пассивные навыки',
+    passiveLevel:'Уровень', passiveUpgrade:'Улучшить', passiveMax:'Максимум',
+    season:'Сезонный пропуск', seasonTitle:'Сезонный пропуск',
+    seasonPoints:'Очки сезона', seasonClaim:'Забрать', seasonClaimed:'Получено',
+    seasonReward:'Награда', seasonLevel:'Уровень', seasonNeed:'Нужно очков',
+    abilityCount:'В наличии', abilityConsumable:'Расходник', abilityBuy:'Купить',
+    openingChest:'Открываем сундук...', chestContent:'Содержимое сундука'
   },
   en:{
     loadVK:'Connecting to VK...', loadSave:'Loading save...',
@@ -825,7 +865,17 @@ const I18N = {
     quitText:'Level progress will be lost.',
     quitYes:'Quit', quitStay:'Stay',
     heroTag:'Welcome to the house',
-    chestAdded:'Chest added to the "Summon" menu'
+    chestAdded:'Chest added to the "Summon" menu',
+    playtime:'Playtime reward', playtimeTitle:'Playtime reward',
+    yourPlaytime:'Your playtime', playtimeClaim:'Claim',
+    playtimeClaimed:'Claimed', playtimeNeed:'Minutes needed',
+    passives:'Upgrades', passivesTitle:'Passive skills',
+    passiveLevel:'Level', passiveUpgrade:'Upgrade', passiveMax:'Max',
+    season:'Season Pass', seasonTitle:'Season Pass',
+    seasonPoints:'Season points', seasonClaim:'Claim', seasonClaimed:'Claimed',
+    seasonReward:'Reward', seasonLevel:'Level', seasonNeed:'Points needed',
+    abilityCount:'In stock', abilityConsumable:'Consumable', abilityBuy:'Buy',
+    openingChest:'Opening chest...', chestContent:'Chest contents'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -868,7 +918,7 @@ const CHARS = [
   {id:'houseLord', ru:'Повелитель Дома',en:'House Lord',   r:'mythic',    color:'#00ffcc', cost:1000, dmg:220, range:150, rate:1.4,  aura:true, icon:icoCrown('#00ffcc'), desc:{ru:'Усиливает союзные башни рядом',en:'Buffs nearby towers'}}
 ];
 const STARTER_CHARS = ['ghost'];
-const RARITY_WEIGHT = {common:70, epic:22, legendary:6, mythic:2};
+const RARITY_WEIGHT = {common:70, epic:24, legendary:5, mythic:1};
 
 /* ---------- СПОСОБНОСТИ ---------- */
 const ABILITIES = [
@@ -878,10 +928,31 @@ const ABILITIES = [
   {id:'rage',   ru:'Ярость духов', en:'Spirit Rage', cost:400, icon:SVG.rage, cd:50, color:'#ff5f7e', desc:{ru:'+100% урона башен на 15 секунд',en:'+100% tower damage for 15s'}}
 ];
 
+/* ---------- ПАССИВНЫЕ НАВЫКИ ---------- */
+const PASSIVE_DEFS = [
+  {id:'dmg', ru:'Урон башен', en:'Tower damage', per:0.5, base:80, mul:1.35, max:100,
+   descRu:'+0.5% урона башен за уровень', descEn:'+0.5% tower damage per level'},
+  {id:'range', ru:'Дальность башен', en:'Tower range', per:0.5, base:80, mul:1.35, max:100,
+   descRu:'+0.5% дальности башен за уровень', descEn:'+0.5% tower range per level'},
+  {id:'gold', ru:'Монеты', en:'Coins', per:0.5, base:100, mul:1.4, max:100,
+   descRu:'+0.5% монет с врагов за уровень', descEn:'+0.5% coins per level'},
+  {id:'startCoins', ru:'Стартовые монеты', en:'Starting coins', per:1, base:60, mul:1.3, max:100,
+   descRu:'+1% стартовых монет за уровень', descEn:'+1% starting coins per level'}
+];
+
+/* ---------- СЕЗОННЫЙ ПРОПУСК ---------- */
+const SEASON_REWARDS = Array.from({length:30}, (_,i)=>({
+  points: (i+1)*100,
+  gems: 40 + i*20,
+  chests: (i+1)%5===0 ? 1 : 0
+}));
+
 /* ---------- СОСТОЯНИЕ ---------- */
 const DEFAULT_STATE = {
   v:3, gems:0, chests:0, level:1, completed:0,
-  chars: [], selectedChars: [], abilities: [],
+  chars: [], selectedChars: [], abilities: {},
+  passives: {dmg:0, range:0, gold:0, startCoins:0},
+  season: {id:'', points:0, claimed:[]},
   music:true, lang:'ru',
   lastDaily:0, lastTasks:0, tasks:[],
   lastAFK:0, afkPending:0,
@@ -913,6 +984,14 @@ function toast(msg, ms){
   setTimeout(()=>{ item.style.transition='opacity .3s, transform .3s'; item.style.opacity='0'; item.style.transform='translateY(-12px)'; setTimeout(()=>item.remove(),320); }, ms||1800);
 }
 function charTowerDef(charId){ return CHARS.find(x=>x.id===charId); }
+function abilityCount(id){ return (state.abilities && state.abilities[id]) || 0; }
+function addAbilityItem(id, n=1){ if(!state.abilities || typeof state.abilities!=='object') state.abilities={}; state.abilities[id]=(state.abilities[id]||0)+(n||1); }
+function consumeAbility(id){
+  if(!state.abilities || !state.abilities[id] || state.abilities[id]<=0) return false;
+  state.abilities[id]--;
+  if(state.abilities[id]<=0) delete state.abilities[id];
+  return true;
+}
 
 /* ---------- VK ---------- */
 function vkSend(method, params){
@@ -972,9 +1051,19 @@ function loadGame(){
             state = Object.assign({}, DEFAULT_STATE, parsed);
             if(!Array.isArray(state.chars)) state.chars=[];
             if(!Array.isArray(state.selectedChars)) state.selectedChars=[];
-            if(!Array.isArray(state.abilities)) state.abilities=[];
+            if(Array.isArray(state.abilities)){
+              const old = state.abilities;
+              state.abilities = {};
+              old.forEach(id=>{ state.abilities[id] = (state.abilities[id]||0) + 1; });
+            }
+            if(!state.abilities || typeof state.abilities!=='object' || Array.isArray(state.abilities)) state.abilities={};
+            if(!state.passives || typeof state.passives!=='object') state.passives={};
+            PASSIVE_DEFS.forEach(d=>{ if(typeof state.passives[d.id]!=='number') state.passives[d.id]=0; });
             if(!Array.isArray(state.tasks)) state.tasks=[];
             if(!Array.isArray(state.playtimeClaimed)) state.playtimeClaimed=[];
+            if(!state.season || typeof state.season!=='object') state.season={id:'',points:0,claimed:[]};
+            if(!Array.isArray(state.season.claimed)) state.season.claimed=[];
+            ensureSeason();
           }
         }catch(e){}
         resolve();
@@ -995,6 +1084,29 @@ function ensureStarter(){
     STARTER_CHARS.forEach(id=>{ if(!state.chars.includes(id)) state.chars.push(id); });
     state.selectedChars = STARTER_CHARS.slice();
   }
+}
+
+/* ---------- СЕЗОН ---------- */
+function getSeasonId(){
+  const d = new Date();
+  return d.getFullYear() + '-S' + (Math.floor(d.getMonth()/3)+1);
+}
+function ensureSeason(){
+  if(!state.season || typeof state.season!=='object') state.season={id:'',points:0,claimed:[]};
+  if(!Array.isArray(state.season.claimed)) state.season.claimed=[];
+  if(state.season.id !== getSeasonId()){
+    state.season = {id:getSeasonId(), points:0, claimed:[]};
+    saveGame();
+  }
+}
+function addSeasonPoints(n){
+  ensureSeason();
+  state.season.points = (state.season.points||0) + (n||0);
+  saveGame();
+}
+function canClaimSeasonReward(){
+  ensureSeason();
+  return SEASON_REWARDS.some((r,i)=> state.season.points>=r.points && !state.season.claimed.includes(i));
 }
 
 /* ---------- АУДИО ---------- */
@@ -1107,6 +1219,9 @@ function renderLobby(){
     {id:'summon', icon:SVG.chest, label:t('summon'), color:'#ffd766', badge: state.chests>0?state.chests:0, badgeClass:'gold'},
     {id:'afk', icon:SVG.bed, label:t('afk'), color:'#9ef7e0'},
     {id:'daily', icon:SVG.gift, label:t('daily'), color:'#ffd766', badge: canClaimDaily()?1:0},
+    {id:'playtime', icon:SVG.clock, label:t('playtime'), color:'#9ef7e0', badge: canClaimPlaytimeReward()?1:0},
+    {id:'passives', icon:SVG.upgrade, label:t('passives'), color:'#a765f0'},
+    {id:'season', icon:SVG.season, label:t('season'), color:'#ffd766', badge: canClaimSeasonReward()?1:0},
     {id:'settings', icon:SVG.gear, label:t('settings'), color:'#a898c8'}
   ];
   tiles.forEach(tl=>{
@@ -1150,6 +1265,9 @@ function handleTile(id){
     case 'summon': openSummon(); break;
     case 'afk': openAFK(); break;
     case 'daily': openDaily(); break;
+    case 'playtime': openPlaytime(); break;
+    case 'passives': openPassives(); break;
+    case 'season': openSeason(); break;
     case 'settings': openSettings(); break;
   }
 }
@@ -1287,14 +1405,21 @@ function openTasks(){
     if(done && !tk.claimed){
       const btn = el('button','btn gold', t('taskDone'));
       btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{ tk.claimed = true; state.gems += tk.reward; playCoin(); toast('+' + fmt(tk.reward) + ' 💎'); saveGame(true); renderLobby(); openTasks(); };
+      btn.onclick = ()=>{
+        tk.claimed = true;
+        state.gems += tk.reward;
+        addSeasonPoints(20);
+        playCoin();
+        toast('+' + fmt(tk.reward) + ' 💎');
+        saveGame(true); renderLobby(); openTasks();
+      };
       div.appendChild(btn);
     } else if(tk.claimed){ div.querySelector('.treward').style.color='#4a8a70'; }
     list.appendChild(div);
   });
 }
 
-/* ---------- КОМНАТА ОТДЫХА (бывший AFK) ---------- */
+/* ---------- КОМНАТА ОТДЫХА ---------- */
 let afkTimerInterval = null, afkStart = 0, afkAccum = 0;
 function openAFK(){
   showScreen('scr-afk');
@@ -1350,6 +1475,7 @@ $('#dailyClaim').onclick = ()=>{
   const gems = 150 + state.level*20;
   state.gems += gems;
   state.chests += 1;
+  addSeasonPoints(30);
   playCoin(); saveGame(true);
   toast('+ '+fmt(gems)+' 💎 +1 🎁');
   renderLobby(); openDaily();
@@ -1452,35 +1578,33 @@ function charBonus(){
   return {dmg, range, gold};
 }
 
-/* ---------- СПОСОБНОСТИ ---------- */
+/* ---------- СПОСОБНОСТИ (РАСХОДНИКИ) ---------- */
 function openAbilities(){
   showScreen('scr-abilities');
   $('#abTitle').textContent = t('abilities');
   const list = $('#abList'); list.innerHTML='';
   ABILITIES.forEach(a=>{
-    const owned = state.abilities.includes(a.id);
+    const cnt = abilityCount(a.id);
     const div = el('div','task');
     div.innerHTML = `
       <div class="ti" style="color:${a.color}">${a.icon}</div>
       <div class="tinfo2">
         <div class="tt" style="color:${a.color};font-weight:bold">${state.lang==='ru'?a.ru:a.en}</div>
         <div style="font-size:11px;color:#8f7bb0">${state.lang==='ru'?a.desc.ru:a.desc.en}</div>
-        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">CD: ${a.cd}s</div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">CD: ${a.cd}s · ${t('abilityConsumable')}</div>
+        ${cnt>0?`<div style="font-size:11px;color:#7ee6c0;margin-top:4px">${t('abilityCount')}: <b>${cnt}</b></div>`:''}
       </div>
     `;
-    if(owned){
-      const s = el('div','treward', t('bought')); s.style.color='#4a8a70'; div.appendChild(s);
-    } else {
-      const btn = el('button','btn gold', fmt(a.cost)+' 💎');
-      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
-      btn.onclick = ()=>{
-        if(state.gems < a.cost){ toast(t('notEnough')); return; }
-        state.gems -= a.cost; state.abilities.push(a.id);
-        playCoin(); saveGame(true); renderLobby(); openAbilities();
-        toast(t('bought')+': '+(state.lang==='ru'?a.ru:a.en));
-      };
-      div.appendChild(btn);
-    }
+    const btn = el('button','btn gold', `${t('abilityBuy')} · ${fmt(a.cost)} 💎`);
+    btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+    btn.onclick = ()=>{
+      if(state.gems < a.cost){ toast(t('notEnough')); return; }
+      state.gems -= a.cost;
+      addAbilityItem(a.id, 1);
+      playCoin(); saveGame(true); renderLobby(); openAbilities();
+      toast((state.lang==='ru'?'Куплено':'Bought')+': '+(state.lang==='ru'?a.ru:a.en));
+    };
+    div.appendChild(btn);
     list.appendChild(div);
   });
 }
@@ -1511,7 +1635,6 @@ function pickRandomChar(){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 function pickRandomPreview(){
-  // 3 разных случайных героя с учётом веса редкости
   const picks = []; const used = new Set(); let attempts = 0;
   while(picks.length < 3 && attempts < 200){
     attempts++;
@@ -1519,6 +1642,15 @@ function pickRandomPreview(){
     if(!used.has(c.id)){ used.add(c.id); picks.push(c); }
   }
   return picks;
+}
+function chestSvg(){
+  return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f" stroke="#5c3a00" stroke-width="1.5"/>
+    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a" stroke="#5c3a00" stroke-width="1.5"/>
+    <rect x="27" y="34" width="10" height="16" rx="3" fill="#ffd766"/>
+    <circle cx="32" cy="42" r="3" fill="#5c3a00"/>
+    <circle cx="32" cy="14" r="3" fill="#ffeeb8" opacity=".9"/>
+  </svg>`;
 }
 function openSummon(){
   showScreen('scr-summon');
@@ -1528,18 +1660,10 @@ function openSummon(){
   $('#summonPrevTitle').textContent = t('possibleHeroes');
   $('#summonChanceTitle').textContent = t('dropChances');
 
-  // Chest icon
-  $('#summonChestIcon').innerHTML = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="26" width="48" height="32" rx="5" fill="#8a6a1f" stroke="#5c3a00" stroke-width="1.5"/>
-    <path d="M8 26h48l-5-13H13L8 26z" fill="#c9a23a" stroke="#5c3a00" stroke-width="1.5"/>
-    <rect x="27" y="34" width="10" height="16" rx="3" fill="#ffd766"/>
-    <circle cx="32" cy="42" r="3" fill="#5c3a00"/>
-    <circle cx="32" cy="14" r="3" fill="#ffeeb8" opacity=".9"/>
-  </svg>`;
+  $('#summonChestIcon').innerHTML = chestSvg();
   $('#summonChestCount').textContent = state.chests;
   $('#summonOpenBtn').disabled = state.chests <= 0;
 
-  // Preview 3 random
   const preview = $('#summonPreview'); preview.innerHTML = '';
   const picks = pickRandomPreview();
   picks.forEach(c=>{
@@ -1552,7 +1676,6 @@ function openSummon(){
     preview.appendChild(card);
   });
 
-  // Chances
   const chances = $('#summonChances'); chances.innerHTML = '';
   const totalW = RARITY_WEIGHT.common + RARITY_WEIGHT.epic + RARITY_WEIGHT.legendary + RARITY_WEIGHT.mythic;
   const rarList = [
@@ -1576,37 +1699,49 @@ $('#summonOpenBtn').onclick = ()=>{
   openChestFromSummon();
 };
 function openChestFromSummon(){
+  if(state.chests <= 0){ toast(t('noChests')); return; }
   state.chests--;
   saveGame(true);
   playChestSound();
 
-  const c = pickRandomChar();
-  const isNew = !state.chars.includes(c.id);
-  let bonusGems = 0;
-  if(!isNew){
-    const dup = {common:15, epic:60, legendary:200, mythic:800};
-    bonusGems = dup[c.r]||10;
-    state.gems += bonusGems;
-  } else {
-    state.chars.push(c.id);
-    if(state.selectedChars.length<4){ state.selectedChars.push(c.id); }
-  }
-  saveGame(true);
-
-  const rarName = {common:t('common'),epic:t('epic'),legendary:t('legendary'),mythic:t('mythic')}[c.r];
-  const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#ff2a5a'}[c.r];
-
-  const m2 = openModal(`
-    <h3 style="color:${color}">${isNew? t('newChar') : rarName}</h3>
-    <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${c.icon}</div>
-    <div style="font-size:17px;font-weight:bold;color:${color};margin-bottom:6px">${state.lang==='ru'?c.ru:c.en}</div>
-    <div style="font-size:12px;color:${color};letter-spacing:2px;margin-bottom:12px">${rarName.toUpperCase()}</div>
-    ${isNew
-      ? `<p>${t('youGot')}: ${c.desc[state.lang==='ru'?'ru':'en']}</p>`
-      : `<p style="color:#ffd766">${t('duplicate').replace('{n}', fmt(bonusGems))}</p>`}
-    <div class="row"><button class="btn primary" id="mOk">OK</button></div>
+  openModal(`
+    <h3>${t('openChestBtn')}</h3>
+    <div class="chest-view shake">${chestSvg()}</div>
+    <p style="color:#a898c8">${t('openingChest')}</p>
   `, {dismissable:false});
-  m2.querySelector('#mOk').onclick = ()=>{ closeModal(); openSummon(); renderLobby(); };
+
+  setTimeout(()=>{
+    closeModal();
+
+    const c = pickRandomChar();
+    const isNew = !state.chars.includes(c.id);
+    let bonusGems = 0;
+    if(!isNew){
+      const dup = {common:15, epic:60, legendary:200, mythic:800};
+      bonusGems = dup[c.r]||10;
+      state.gems += bonusGems;
+    } else {
+      state.chars.push(c.id);
+      if(state.selectedChars.length<4){ state.selectedChars.push(c.id); }
+    }
+    addSeasonPoints(5);
+    saveGame(true);
+
+    const rarName = {common:t('common'),epic:t('epic'),legendary:t('legendary'),mythic:t('mythic')}[c.r];
+    const color = {common:'#a0a0b0',epic:'#b47bff',legendary:'#ffd766',mythic:'#ff2a5a'}[c.r];
+
+    const m2 = openModal(`
+      <h3 style="color:${color}">${isNew? t('newChar') : rarName}</h3>
+      <div class="char-reveal" style="width:130px;height:130px;color:${c.color}">${c.icon}</div>
+      <div style="font-size:17px;font-weight:bold;color:${color};margin-bottom:6px">${state.lang==='ru'?c.ru:c.en}</div>
+      <div style="font-size:12px;color:${color};letter-spacing:2px;margin-bottom:12px">${rarName.toUpperCase()}</div>
+      ${isNew
+        ? `<p>${t('youGot')}: ${c.desc[state.lang==='ru'?'ru':'en']}</p>`
+        : `<p style="color:#ffd766">${t('duplicate').replace('{n}', fmt(bonusGems))}</p>`}
+      <div class="row"><button class="btn primary" id="mOk">OK</button></div>
+    `, {dismissable:false});
+    m2.querySelector('#mOk').onclick = ()=>{ closeModal(); openSummon(); renderLobby(); };
+  }, 1400);
 }
 
 /* ============================================================
@@ -1617,7 +1752,6 @@ let game = null;
 let lastTs = 0;
 let rafId = null;
 
-/* Кэш изображений персонажей для canvas — добавлен xmlns, это важно! */
 const charImages = {};
 function preloadCharImages(){
   return Promise.all(CHARS.map(c => new Promise(resolve => {
@@ -1661,7 +1795,8 @@ function buildLevelConfig(L, isTower){
   const enemySpeed = Math.min(78, 30 + L*0.11);
   const isBossLevel = (!isTower) && (L % 5 === 0);
   const lives = isTower ? 10 : 20;
-  const startCoins = Math.floor(160 * ecoScale);
+  const passiveStart = 1 + ((state.passives && state.passives.startCoins) || 0) * 0.01;
+  const startCoins = Math.floor(160 * ecoScale * passiveStart);
   const rewardPerKill = Math.max(3, Math.floor((4 + L*0.5) * ecoScale));
   const gemReward = Math.floor((12 + L*2.2) * (1 + Math.min(L,500)/160));
   return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
@@ -1698,7 +1833,7 @@ function startLevel(levelNum, isTower){
     abilityCd: {}, buffs: {gold:0, rage:0},
     killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null
   };
-  ABILITIES.forEach(a=>{ if(state.abilities.includes(a.id)) game.abilityCd[a.id]=0; });
+  ABILITIES.forEach(a=>{ game.abilityCd[a.id]=0; });
 
   showScreen('scr-game');
   resizeCanvas();
@@ -1780,7 +1915,7 @@ function update(dt){
     if(e.hp<=0){
       game.enemies.splice(i,1);
       const mult = 1 + (game.buffs.gold>0?1:0);
-      let goldBonus = 1 + (bonus.gold/100);
+      let goldBonus = 1 + ((bonus.gold + ((state.passives && state.passives.gold) || 0) * 0.5)/100);
       const gold = Math.floor(game.cfg.rewardPerKill * (e.boss?14:1) * mult * goldBonus);
       game.coins += gold;
       game.killCount++;
@@ -1880,9 +2015,11 @@ function getTowerStats(tower){
   const bonus = charBonus();
   const rage = game.buffs.rage>0 ? 2 : 1;
   const auraBonus = 1 + (tower.auraBuff||0)/100;
+  const passiveDmg = 1 + ((state.passives && state.passives.dmg) || 0) * 0.005;
+  const passiveRange = 1 + ((state.passives && state.passives.range) || 0) * 0.005;
   return {
-    dmg: c.dmg * lvlMul * (1 + bonus.dmg/100) * rage * auraBonus * game.cfg.ecoScale,
-    range: c.range * (1 + (lvl-1)*0.06) * (1 + bonus.range/100),
+    dmg: c.dmg * lvlMul * (1 + bonus.dmg/100) * rage * auraBonus * game.cfg.ecoScale * passiveDmg,
+    range: c.range * (1 + (lvl-1)*0.06) * (1 + bonus.range/100) * passiveRange,
     rate: c.rate / (1 + (lvl-1)*0.08),
     splash: c.splash || 0, slow: c.slow || 0, slowDur: c.slowDur || 0,
     poison: c.poison || 0, poisonDur: c.poisonDur || 0,
@@ -2108,7 +2245,6 @@ function drawDecorations(){
   }
 }
 
-/* Отрисовка башни: теперь рисуем реальную SVG-иконку персонажа */
 function drawTower(tower){
   const c = charTowerDef(tower.type);
   if(!c) return;
@@ -2116,32 +2252,27 @@ function drawTower(tower){
   const size = 40;
   const bob = Math.sin(game.time*2 + x*0.05 + y*0.05) * 1.6;
 
-  // тень
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
   ctx.ellipse(x, y+16, size*0.42, size*0.18, 0, 0, Math.PI*2);
   ctx.fill();
 
-  // свечение под персонажем
   const grad = ctx.createRadialGradient(x, y+8, 0, x, y+8, size*0.95);
   grad.addColorStop(0, c.color+'66');
   grad.addColorStop(1, 'transparent');
   ctx.fillStyle = grad;
   ctx.fillRect(x-size, y-size, size*2, size*2);
 
-  // сам персонаж (SVG-картинка)
   const img = charImages[tower.type];
   if(img && img.complete && img.naturalWidth > 0){
     ctx.drawImage(img, x - size/2, y - size/2 + bob, size, size);
   } else {
-    // fallback — силуэт
     ctx.fillStyle = c.color;
     ctx.beginPath();
     ctx.arc(x, y+bob, size*0.35, 0, Math.PI*2);
     ctx.fill();
   }
 
-  // индикатор уровня
   if(tower.level>1){
     ctx.fillStyle = '#0b0614';
     ctx.beginPath();
@@ -2154,7 +2285,6 @@ function drawTower(tower){
     ctx.fillText(tower.level, x+14, y-14+bob+0.5);
   }
 
-  // индикатор кулдауна
   if(tower.cd>0 && tower.maxCd>0){
     const p = 1 - tower.cd/tower.maxCd;
     ctx.strokeStyle = 'rgba(255,215,102,0.7)';
@@ -2369,13 +2499,15 @@ function renderGameTools(){
 
   const abRow = el('div','ability-bar');
   ABILITIES.forEach(a=>{
-    if(!state.abilities.includes(a.id)) return;
+    const cnt = abilityCount(a.id);
+    if(cnt<=0) return;
     const cd = game.abilityCd[a.id]||0;
     const btn = el('button','ability-btn'+(cd>0?' cd':''));
-    btn.innerHTML = `<div style="color:${a.color};width:26px;height:26px">${a.icon}</div>`;
+    btn.innerHTML = `<div style="color:${a.color};width:26px;height:26px">${a.icon}</div><div class="cnt">${cnt}</div>`;
     if(cd>0){ const ct = el('div','cdtext', Math.ceil(cd)); btn.appendChild(ct); }
     btn.onclick = ()=>{
       if(cd>0) return;
+      if(abilityCount(a.id)<=0){ toast(state.lang==='ru'?'Нет расходников':'No consumables'); return; }
       if(a.id==='freeze' || a.id==='gold' || a.id==='rage'){ activateAbility(a.id); }
       else { pendingAbility = a.id; toast(state.lang==='ru'?'Выберите цель':'Select target'); }
     };
@@ -2404,8 +2536,10 @@ function renderGameTools(){
 let pendingAbility = null;
 function activateAbility(id){
   if(!game || game.abilityCd[id]>0) return;
+  if(abilityCount(id)<=0){ toast(state.lang==='ru'?'Нет расходников':'No consumables'); return; }
   const def = ABILITIES.find(a=>a.id===id);
   if(!def) return;
+  if(!consumeAbility(id)) return;
   game.abilityCd[id] = def.cd;
   state.abilitiesUsed++;
   addTaskProgress('ability', 1);
@@ -2421,12 +2555,15 @@ function activateAbility(id){
     game.buffs.rage = 15;
     toast('🔥 +100% ' + (state.lang==='ru'?'урона':'damage'));
   }
+  saveGame();
   renderGameTools();
 }
 function useAbilityAt(id, x, y){
   if(!game) return;
   if(game.abilityCd[id]>0) return;
   if(id==='meteor'){
+    if(abilityCount(id)<=0){ pendingAbility = null; return; }
+    if(!consumeAbility(id)){ pendingAbility = null; return; }
     const def = ABILITIES.find(a=>a.id==='meteor');
     game.abilityCd[id] = def.cd;
     state.abilitiesUsed++;
@@ -2442,6 +2579,7 @@ function useAbilityAt(id, x, y){
       spawnParticle(x+Math.cos(ang)*r, y+Math.sin(ang)*r, '#ff8a3d', 2);
     }
     toast('☄ ' + (state.lang==='ru'?'Метеор!':'Meteor!'));
+    saveGame();
     renderGameTools();
   }
   pendingAbility = null;
@@ -2493,11 +2631,13 @@ function finishLevel(win){
       chests = state.towerFloor % 5 === 0 ? 1 : 0;
       state.towerFloor++;
       state.towerBest = Math.max(state.towerBest, state.towerFloor);
+      addSeasonPoints(80);
     } else {
       if(level === state.level) state.level = Math.min(500, state.level+1);
       state.completed = Math.max(state.completed, level);
       state.levelsWon++;
       addTaskProgress('win', 1);
+      addSeasonPoints(50);
     }
     addTaskProgress('gold', g.killCount * 3);
 
@@ -2577,6 +2717,132 @@ function showTutorial(idx){
   m.querySelector('#tutSkipBtn').onclick = ()=>{ closeModal(); state.tutorialDone=true; saveGame(true); backToLobby(); };
 }
 
+/* ---------- НАГРАДА ЗА ВРЕМЯ ---------- */
+function getPlaytimeMinutes(){ return Math.floor((state.totalPlaytime||0)/60); }
+function canClaimPlaytimeReward(){
+  const mins = getPlaytimeMinutes();
+  return PLAYTIME_REWARDS.some((r,i)=> mins>=r.min && !state.playtimeClaimed.includes(i));
+}
+function openPlaytime(){
+  showScreen('scr-playtime');
+  $('#playtimeTitle').textContent = t('playtimeTitle');
+  const list = $('#playtimeList'); list.innerHTML='';
+  const mins = getPlaytimeMinutes();
+  const head = el('div','', `
+    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:14px">
+      ${t('yourPlaytime')}: <b style="color:#9ef7e0">${mins} мин</b>
+    </div>
+  `);
+  list.appendChild(head);
+  PLAYTIME_REWARDS.forEach((r,i)=>{
+    const claimed = state.playtimeClaimed.includes(i);
+    const can = mins>=r.min && !claimed;
+    const div = el('div','task'+(can?' done':''));
+    div.innerHTML = `
+      <div class="ti" style="color:#9ef7e0">${SVG.clock}</div>
+      <div class="tinfo2">
+        <div class="tt">${r.min} ${state.lang==='ru'?'минут в игре':'minutes played'}</div>
+        <div class="tprog"><div class="tfill" style="width:${Math.min(100, mins/r.min*100)}%"></div></div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('seasonReward')}: +${fmt(r.gems)} 💎${r.chest?' + '+r.chest+' 🎁':''}</div>
+      </div>
+      <div class="treward">${claimed? t('playtimeClaimed') : (can? '' : t('playtimeNeed')+': '+r.min)}</div>
+    `;
+    if(can){
+      const btn = el('button','btn gold', t('playtimeClaim'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        state.playtimeClaimed.push(i);
+        state.gems += r.gems;
+        if(r.chest) state.chests += r.chest;
+        playCoin();
+        toast('+' + fmt(r.gems) + ' 💎' + (r.chest?' + '+r.chest+' 🎁':''));
+        saveGame(true); renderLobby(); openPlaytime();
+      };
+      div.appendChild(btn);
+    }
+    list.appendChild(div);
+  });
+}
+
+/* ---------- ПАССИВНЫЕ НАВЫКИ ---------- */
+function passiveCost(def){
+  const lvl = (state.passives && state.passives[def.id]) || 0;
+  return Math.floor(def.base * Math.pow(def.mul, lvl));
+}
+function openPassives(){
+  showScreen('scr-passives');
+  $('#passivesTitle').textContent = t('passivesTitle');
+  const list = $('#passivesList'); list.innerHTML='';
+  PASSIVE_DEFS.forEach(def=>{
+    const lvl = (state.passives && state.passives[def.id]) || 0;
+    const maxed = lvl >= def.max;
+    const cost = passiveCost(def);
+    const div = el('div','task');
+    div.innerHTML = `
+      <div class="ti" style="color:#a765f0">${SVG.upgrade}</div>
+      <div class="tinfo2">
+        <div class="tt" style="color:#d5c2ff;font-weight:bold">${state.lang==='ru'?def.ru:def.en}</div>
+        <div style="font-size:11px;color:#8f7bb0">${state.lang==='ru'?def.descRu:def.descEn}</div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">${t('passiveLevel')}: ${lvl}/${def.max}</div>
+      </div>
+      <div class="treward">${maxed? t('passiveMax') : fmt(cost)+' 💎'}</div>
+    `;
+    if(!maxed){
+      const btn = el('button','btn gold', t('passiveUpgrade'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        if(state.gems < cost){ toast(t('notEnough')); return; }
+        state.gems -= cost;
+        state.passives[def.id] = (state.passives[def.id]||0) + 1;
+        playCoin(); saveGame(true); renderLobby(); openPassives();
+      };
+      div.appendChild(btn);
+    }
+    list.appendChild(div);
+  });
+}
+
+/* ---------- СЕЗОННЫЙ ПРОПУСК ---------- */
+function openSeason(){
+  ensureSeason();
+  showScreen('scr-season');
+  $('#seasonTitle').textContent = t('seasonTitle');
+  const body = $('#seasonBody'); body.innerHTML='';
+  body.appendChild(el('div','', `
+    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:12px">
+      ${t('seasonPoints')}: <b style="color:#ffd766">${fmt(state.season.points)}</b>
+    </div>
+  `));
+  SEASON_REWARDS.forEach((r,i)=>{
+    const claimed = state.season.claimed.includes(i);
+    const can = state.season.points >= r.points && !claimed;
+    const div = el('div','task'+(can?' done':''));
+    div.innerHTML = `
+      <div class="ti" style="color:#ffd766">${SVG.season}</div>
+      <div class="tinfo2">
+        <div class="tt">${t('seasonLevel')} ${i+1} · ${r.points} ${t('seasonPoints')}</div>
+        <div class="tprog"><div class="tfill" style="width:${Math.min(100, state.season.points/r.points*100)}%"></div></div>
+        <div style="font-size:10px;color:#6a5a8a;margin-top:4px">+${fmt(r.gems)} 💎${r.chests?' + '+r.chests+' 🎁':''}</div>
+      </div>
+      <div class="treward">${claimed? t('seasonClaimed') : (can? '' : t('seasonNeed')+': '+r.points)}</div>
+    `;
+    if(can){
+      const btn = el('button','btn gold', t('seasonClaim'));
+      btn.style.padding='7px 12px'; btn.style.fontSize='12px';
+      btn.onclick = ()=>{
+        state.season.claimed.push(i);
+        state.gems += r.gems;
+        if(r.chests) state.chests += r.chests;
+        playCoin();
+        toast('+' + fmt(r.gems) + ' 💎' + (r.chests?' + '+r.chests+' 🎁':''));
+        saveGame(true); renderLobby(); openSeason();
+      };
+      div.appendChild(btn);
+    }
+    body.appendChild(div);
+  });
+}
+
 /* ---------- СТАТИЧНЫЕ ТЕКСТЫ ---------- */
 function refreshStaticText(){
   $('#loadTxt').textContent = t('loading');
@@ -2596,6 +2862,9 @@ function refreshStaticText(){
   if(currentScreen==='scr-chars') openChars();
   if(currentScreen==='scr-abilities') openAbilities();
   if(currentScreen==='scr-summon') openSummon();
+  if(currentScreen==='scr-playtime') openPlaytime();
+  if(currentScreen==='scr-passives') openPassives();
+  if(currentScreen==='scr-season') openSeason();
 }
 
 /* ---------- ПАУЗА ПРИ СКРЫТИИ ---------- */
@@ -2622,7 +2891,7 @@ try{
   }
 }catch(e){}
 
-/* ---------- НАГРАДЫ ЗА ВРЕМЯ ---------- */
+/* ---------- НАГРАДЫ ЗА ВРЕМЯ (СПИСОК) ---------- */
 const PLAYTIME_REWARDS = [
   {min:5,  gems:30,  chest:0},
   {min:10, gems:60,  chest:0},
@@ -2633,35 +2902,6 @@ const PLAYTIME_REWARDS = [
   {min:105,gems:800, chest:1},
   {min:150,gems:1200,chest:0}
 ];
-let playtimeStart = now();
-let playtimeTimer = null;
-function startPlaytimeTracker(){
-  if(playtimeTimer) clearInterval(playtimeTimer);
-  playtimeTimer = setInterval(()=>{
-    const mins = Math.floor((now()-playtimeStart)/60000) + state.totalPlaytime/60;
-    PLAYTIME_REWARDS.forEach((r,i)=>{
-      if(state.playtimeClaimed.includes(i)) return;
-      if(mins >= r.min){
-        state.playtimeClaimed.push(i);
-        state.gems += r.gems;
-        if(r.chest) state.chests += r.chest;
-        saveGame(true);
-        showPlaytimeReward(r);
-      }
-    });
-  }, 15000);
-}
-function showPlaytimeReward(r){
-  const m = openModal(`
-    <h3 style="color:#ffd766">${t('playtimeReward')}</h3>
-    <div style="font-size:44px;margin:6px 0">${SVG.gift.replace('<svg','<svg style="width:60px;height:60px"')}</div>
-    <p>${state.lang==='ru'?'Вы играете уже':'You have been playing for'} ${r.min} ${state.lang==='ru'?'минут':'min'}!</p>
-    <div style="font-size:16px;color:#9ef7e0;margin-bottom:12px">+${fmt(r.gems)} 💎 ${r.chest?' + '+r.chest+' 🎁':''}</div>
-    ${r.chest?`<p style="font-size:11px;color:#8f7bb0;margin-bottom:10px">${t('chestAdded')}</p>`:''}
-    <div class="row"><button class="btn gold" id="ptOk">${t('claim')}</button></div>
-  `);
-  m.querySelector('#ptOk').onclick = ()=>{ closeModal(); renderLobby(); };
-}
 
 /* ---------- ИНИЦИАЛИЗАЦИЯ ---------- */
 async function boot(){
@@ -2689,7 +2929,9 @@ async function boot(){
   await loadGame();
   await tick(75, t('loadHouse'));
 
-  ensureStarter(); checkTaskRefresh();
+  ensureStarter();
+  checkTaskRefresh();
+  ensureSeason();
   document.documentElement.lang = state.lang;
   refreshStaticText();
 
@@ -2703,8 +2945,6 @@ async function boot(){
   initAudio();
   if(state.music) setTimeout(()=>startMusic(), 400);
 
-  playtimeStart = now();
-  startPlaytimeTracker();
   showBanner();
 
   if(!state.tutorialDone && !state.tutorialSeen){
@@ -2730,7 +2970,7 @@ document.addEventListener('click', (e)=>{
 
 window.addEventListener('beforeunload', ()=>{ saveGame(true); });
 setInterval(()=>{ saveGame(); }, 30000);
-setInterval(()=>{ if(game && !game.finished){ state.totalPlaytime += 5; } }, 5000);
+setInterval(()=>{ state.totalPlaytime = (state.totalPlaytime || 0) + 5; }, 5000);
 
 boot();
 </script>
