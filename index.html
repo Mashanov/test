@@ -306,6 +306,22 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 .chance-row .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .chance-row .val{font-weight:bold;color:#ffe6a3}
 
+/* ========== ПОДЗЕМЕЛЬЯ ========== */
+.dungeon-card{position:relative;display:flex;gap:11px;align-items:center;padding:12px;border:2px solid #2c1748;border-radius:14px;
+  background:linear-gradient(180deg,#180c28,#0e0618);margin-bottom:10px;transition:.2s}
+.dungeon-card.locked{opacity:.55}
+.dungeon-card .dico{width:52px;height:52px;flex-shrink:0;filter:drop-shadow(0 0 10px currentColor)}
+.dungeon-card .dinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.dungeon-card .dname{font-size:14px;font-weight:bold}
+.dungeon-card .ddesc{font-size:11px;color:#8f7bb0;line-height:1.3}
+.dungeon-card .dreward{font-size:11px;color:#ffd766}
+.dungeon-card .dchance{font-size:10px;color:#ff2a5a}
+
+.mythic-pool{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.mythic-thumb{width:48px;height:48px;border:2px solid #ff2a5a;border-radius:10px;padding:3px;
+  background:linear-gradient(135deg,#2a0a1a,#1a0508);box-shadow:0 0 10px rgba(255,42,90,.5);
+  display:flex;align-items:center;justify-content:center}
+
 @media(max-width:480px){
   .lobby-body{padding:8px;gap:8px}
   .lobby-grid{grid-template-columns:repeat(3,1fr);gap:8px}
@@ -372,6 +388,15 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
     <div class="lobby-body" id="lobbyBody"></div>
   </div>
 
+  <div class="screen" id="scr-play">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="playTitle">Играть</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body"><div class="lobby-grid" id="playGrid" style="grid-template-columns:repeat(3,1fr)"></div></div>
+  </div>
+
   <div class="screen" id="scr-levels">
     <div class="panel-head">
       <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
@@ -379,6 +404,15 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
       <div style="width:38px"></div>
     </div>
     <div class="panel-body"><div class="lvl-grid" id="lvlGrid"></div></div>
+  </div>
+
+  <div class="screen" id="scr-dungeons">
+    <div class="panel-head">
+      <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="dunTitle">Подземелья</h2>
+      <div style="width:38px"></div>
+    </div>
+    <div class="panel-body"><div id="dunList"></div></div>
   </div>
 
   <div class="screen" id="scr-settings">
@@ -556,7 +590,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.3
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.4
    ============================================================ */
 
 /* ---------- БАЗОВЫЕ SVG ---------- */
@@ -583,7 +617,8 @@ const SVG = {
   tower:'<svg viewBox="0 0 24 24"><path d="M8 21V9l4-6 4 6v12" fill="#7b3fbf" stroke="#c9a8ff" stroke-width="1.5"/><rect x="9" y="12" width="6" height="4" fill="#ffd766"/></svg>',
   clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#9ef7e0" stroke-width="2"/><path d="M12 7v5l3 2" stroke="#9ef7e0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   upgrade:'<svg viewBox="0 0 24 24"><path d="M12 3l7 7h-4v10h-6V10H5z" fill="#a765f0"/><path d="M9 20h6" stroke="#c9a8ff" stroke-width="2" stroke-linecap="round"/></svg>',
-  season:'<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.2L21 9l-5 4.2L17.5 20 12 16.8 6.5 20 8 13.2 3 9l6.6-.8z" fill="#ffd766"/><circle cx="12" cy="12" r="2.2" fill="#8a6a1f"/></svg>'
+  season:'<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.2L21 9l-5 4.2L17.5 20 12 16.8 6.5 20 8 13.2 3 9l6.6-.8z" fill="#ffd766"/><circle cx="12" cy="12" r="2.2" fill="#8a6a1f"/></svg>',
+  skull:'<svg viewBox="0 0 24 24"><path d="M12 2C7 2 4 6 4 11v6h4v3h2v-3h4v3h2v-3h4v-6c0-5-3-9-8-9z" fill="#e8e0c0"/><circle cx="9" cy="10" r="2" fill="#1a0f2a"/><circle cx="15" cy="10" r="2" fill="#1a0f2a"/><path d="M11 15h2v3h-2z" fill="#1a0f2a"/></svg>'
 };
 
 /* ============================================================
@@ -773,7 +808,8 @@ const I18N = {
     tutD:'Короткий интерактивный уровень научит вас защищать дом от духов и строить башни.',
     tutYes:'Пройти обучение', tutNo:'Пропустить',
     levels:'Уровни', settings:'Настройки', tasks:'Задания', afk:'Комната отдыха',
-    daily:'Ежедневная награда', chars:'Коллекция', abilities:'Способности',
+    daily:'Ежедневная награда', dailyClaim:'Забрать', dailyReady:'Награда доступна!', dailyWait:'Возвращайтесь через',
+    chars:'Коллекция', abilities:'Способности',
     tower:'Башня Бесконечности', invite:'Пригласить друзей',
     summon:'Призыв', yourChests:'Сундуков у вас', possibleHeroes:'Возможные герои',
     dropChances:'Шансы выпадения', noChests:'Нет сундуков для открытия',
@@ -790,7 +826,6 @@ const I18N = {
     common:'Обычный', epic:'Эпический', legendary:'Легендарный', mythic:'Мифический',
     owned:'Получен', notOwned:'Не найден',
     taskDone:'Получить', taskClaimed:'Получено',
-    dailyReady:'Награда доступна!', dailyWait:'Возвращайтесь через',
     afkHint:'Каждую минуту вы получаете кристаллы душ. Оставайтесь в комнате отдыха, чтобы копить.',
     afkClaim:'Забрать награду', afkEarned:'Накоплено',
     twFloor:'Этаж', twStart:'Начать этаж', twHint:'Каждый этаж сложнее предыдущего. Чем выше — тем больше награда.',
@@ -831,7 +866,15 @@ const I18N = {
     tutCompleteDesc:'Ты научился строить башни и защищать дом. Вперёд — к новым уровням!',
     tutToLobby:'В лобби',
     tutPlaceWrong:'Тапни на подсвеченную клетку!',
-    tutFree:'бесплатно'
+    tutFree:'бесплатно',
+    playMenu:'Играть', playTitle:'Играть',
+    dungeons:'Подземелья', dunTitle:'Подземелья',
+    enterDungeon:'Войти', guaranteedReward:'Гарантированная награда',
+    mythicChance:'Шанс мифического героя: 0.5%',
+    dungeonCleared:'Подземелье пройдено!', mythicDrop:'МИФИЧЕСКИЙ ГЕРОЙ!',
+    playtimeResetHint:'Счётчик времени сбрасывается при перезаходе в игру',
+    requiredLevel:'Требуется уровень', dungeonHint:'Проходи подземелья и получи шанс 0.5% на эксклюзивного мифического героя!',
+    lockedDungeon:'Закрыто'
   },
   en:{
     loadVK:'Connecting to VK...', loadSave:'Loading save...',
@@ -840,7 +883,8 @@ const I18N = {
     tutD:'A short interactive level will teach you to defend the house from ghosts and build towers.',
     tutYes:'Start tutorial', tutNo:'Skip',
     levels:'Levels', settings:'Settings', tasks:'Tasks', afk:'Rest Room',
-    daily:'Daily Reward', chars:'Collection', abilities:'Abilities',
+    daily:'Daily Reward', dailyClaim:'Claim', dailyReady:'Reward available!', dailyWait:'Come back in',
+    chars:'Collection', abilities:'Abilities',
     tower:'Endless Tower', invite:'Invite Friends',
     summon:'Summon', yourChests:'Your chests', possibleHeroes:'Possible heroes',
     dropChances:'Drop chances', noChests:'No chests to open',
@@ -857,7 +901,6 @@ const I18N = {
     common:'Common', epic:'Epic', legendary:'Legendary', mythic:'Mythic',
     owned:'Owned', notOwned:'Not found',
     taskDone:'Claim', taskClaimed:'Claimed',
-    dailyReady:'Reward available!', dailyWait:'Come back in',
     afkHint:'Every minute you earn soul crystals. Stay in the Rest Room to accumulate.',
     afkClaim:'Claim reward', afkEarned:'Accumulated',
     twFloor:'Floor', twStart:'Start floor', twHint:'Each floor is harder. The higher — the bigger the reward.',
@@ -898,7 +941,15 @@ const I18N = {
     tutCompleteDesc:'You learned to build towers and defend the house. Off to new levels!',
     tutToLobby:'To lobby',
     tutPlaceWrong:'Tap the highlighted cell!',
-    tutFree:'free'
+    tutFree:'free',
+    playMenu:'Play', playTitle:'Play',
+    dungeons:'Dungeons', dunTitle:'Dungeons',
+    enterDungeon:'Enter', guaranteedReward:'Guaranteed reward',
+    mythicChance:'Mythic hero chance: 0.5%',
+    dungeonCleared:'Dungeon cleared!', mythicDrop:'MYTHIC HERO!',
+    playtimeResetHint:'Playtime counter resets when you re-enter the game',
+    requiredLevel:'Requires level', dungeonHint:'Clear dungeons for a 0.5% chance at an exclusive mythic hero!',
+    lockedDungeon:'Locked'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -957,10 +1008,31 @@ const CHARS = [
   {id:'lich',      ru:'Лич',            en:'Lich',         r:'epic',      color:'#7fd8ff', cost:340,  dmg:60,  range:112, rate:1.6,  chain:4, poison:20, poisonDur:3, icon:icoLich('#7fd8ff'), desc:{ru:'Цепная некротическая молния',en:'Chain necro lightning'}},
   {id:'reaper',    ru:'Жнец',           en:'Reaper',       r:'legendary', color:'#ff5f7e', cost:600,  dmg:120, range:130, rate:1.5,  instakill:0.07, icon:icoReaper('#ff5f7e'), desc:{ru:'Шанс мгновенной смерти',en:'Chance to instant-kill'}},
   {id:'bloodyMary',ru:'Кровавая Мэри',  en:'Bloody Mary',  r:'legendary', color:'#ff2a5a', cost:700,  dmg:180, range:125, rate:1.8,  splash:55, icon:icoBloody('#ff2a5a'), desc:{ru:'Кровавая волна по площади',en:'Blood wave AoE'}},
-  {id:'houseLord', ru:'Повелитель Дома',en:'House Lord',   r:'mythic',    color:'#00ffcc', cost:1000, dmg:220, range:150, rate:1.4,  aura:true, icon:icoCrown('#00ffcc'), desc:{ru:'Усиливает союзные башни рядом',en:'Buffs nearby towers'}}
+  {id:'houseLord', ru:'Повелитель Дома',en:'House Lord',   r:'mythic',    color:'#00ffcc', cost:1000, dmg:220, range:150, rate:1.4,  aura:true, icon:icoCrown('#00ffcc'), desc:{ru:'Усиливает союзные башни рядом',en:'Buffs nearby towers'}},
+  /* --- Подземельные мифики (только из подземелий) --- */
+  {id:'voidReaper', ru:'Жнец Пустоты',    en:'Void Reaper',    r:'mythic', color:'#a020f0', cost:1100, dmg:250, range:155, rate:1.3, splash:60, dungeonOnly:true, icon:icoReaper('#a020f0'), desc:{ru:'Огромный урон по площади',en:'Massive AoE damage'}},
+  {id:'spectralKing', ru:'Король Призраков', en:'Spectral King', r:'mythic', color:'#ffd700', cost:1200, dmg:300, range:160, rate:1.2, chain:5, dungeonOnly:true, icon:icoCrown('#ffd700'), desc:{ru:'Цепная атака по 5 врагам',en:'Chain attack on 5 enemies'}},
+  {id:'shadowQueen', ru:'Королева Теней', en:'Shadow Queen',  r:'mythic', color:'#8b00ff', cost:1150, dmg:270, range:150, rate:1.4, aura:true, dungeonOnly:true, icon:icoBanshee('#8b00ff'), desc:{ru:'Усиливает башни рядом',en:'Buffs nearby towers'}},
+  {id:'abyssLord',  ru:'Владыка Бездны',  en:'Abyss Lord',    r:'mythic', color:'#00ffaa', cost:1300, dmg:320, range:165, rate:1.1, instakill:0.1, dungeonOnly:true, icon:icoLich('#00ffaa'), desc:{ru:'10% шанс мгновенной смерти',en:'10% instant-kill chance'}}
 ];
 const STARTER_CHARS = ['ghost'];
 const RARITY_WEIGHT = {common:70, epic:24, legendary:5, mythic:1};
+
+/* ---------- ПОДЗЕМЕЛЬЯ ---------- */
+const DUNGEONS = [
+  {id:'crypt', ru:'Склеп', en:'Crypt', level:25, minLevel:5, gemReward:800, color:'#a765f0', icon:SVG.reaper,
+    descRu:'Древний склеп, полный нежити. Победи босса и получи награду.',
+    descEn:'Ancient crypt full of undead. Defeat the boss for reward.'},
+  {id:'catacombs', ru:'Катакомбы', en:'Catacombs', level:50, minLevel:25, gemReward:2500, color:'#ff5f7e', icon:SVG.skull,
+    descRu:'Тёмные катакомбы с сильными призраками.',
+    descEn:'Dark catacombs with strong ghosts.'},
+  {id:'abyss', ru:'Бездна', en:'Abyss', level:80, minLevel:50, gemReward:7000, color:'#00ffcc', icon:SVG.star,
+    descRu:'Бездна, откуда приходят самые ужасные духи.',
+    descEn:'The Abyss where the most terrible spirits come from.'},
+  {id:'nightmare', ru:'Кошмар', en:'Nightmare', level:120, minLevel:80, gemReward:20000, color:'#ff2a5a', icon:SVG.wave,
+    descRu:'Кошмарный мир, где правит чистое зло.',
+    descEn:'Nightmare world ruled by pure evil.'}
+];
 
 const ABILITIES = [
   {id:'meteor', ru:'Метеор', en:'Meteor', cost:300, icon:SVG.meteor, cd:40, color:'#ff8a3d', desc:{ru:'Наносит огромный урон по области',en:'Massive AoE damage'}},
@@ -987,7 +1059,7 @@ const SEASON_REWARDS = Array.from({length:30}, (_,i)=>({
 }));
 
 const DEFAULT_STATE = {
-  v:3, gems:0, chests:0, level:1, completed:0,
+  v:4, gems:0, chests:0, level:1, completed:0,
   chars: [], selectedChars: [], abilities: {},
   passives: {dmg:0, range:0, gold:0, startCoins:0},
   season: {id:'', points:0, claimed:[]},
@@ -1245,13 +1317,16 @@ function renderLobby(){
   `;
   body.appendChild(hero);
 
+  const playBtn = el('button','btn primary','🎮 ' + t('playMenu'));
+  playBtn.style.cssText='width:100%;padding:16px;font-size:17px;letter-spacing:1px';
+  playBtn.onclick = ()=>{ playClick(); openPlay(); };
+  body.appendChild(playBtn);
+
   const grid = el('div','lobby-grid');
   const tiles = [
-    {id:'levels', icon:SVG.tower, label:t('levels'), badge: state.level, badgeClass:'', color:'#a765f0'},
     {id:'tasks', icon:SVG.scroll, label:t('tasks'), color:'#c9a8ff', badge: hasClaimableTask()?1:0},
     {id:'chars', icon:SVG.users, label:t('chars'), color:'#ffd766'},
     {id:'abilities', icon:SVG.fire, label:t('abilities'), color:'#ff8a3d'},
-    {id:'tower', icon:SVG.star, label:t('tower'), color:'#00ffcc'},
     {id:'summon', icon:SVG.chest, label:t('summon'), color:'#ffd766', badge: state.chests>0?state.chests:0, badgeClass:'gold'},
     {id:'afk', icon:SVG.bed, label:t('afk'), color:'#9ef7e0'},
     {id:'daily', icon:SVG.gift, label:t('daily'), color:'#ffd766', badge: canClaimDaily()?1:0},
@@ -1298,6 +1373,7 @@ function handleTile(id){
     case 'chars': openChars(); break;
     case 'abilities': openAbilities(); break;
     case 'tower': openTower(); break;
+    case 'dungeons': openDungeons(); break;
     case 'summon': openSummon(); break;
     case 'afk': openAFK(); break;
     case 'daily': openDaily(); break;
@@ -1312,6 +1388,68 @@ function canClaimDaily(){ return now() - (state.lastDaily||0) > 86400000; }
 function inviteFriends(){
   if(!vkAvailable){ toast(t('invited')); return; }
   vkSend('VKWebAppShowInviteBox').then(()=>{ toast(t('invited')); }).catch(()=>{ toast(t('invited')); });
+}
+
+/* ---------- МЕНЮ "ИГРАТЬ" ---------- */
+function openPlay(){
+  showScreen('scr-play');
+  $('#playTitle').textContent = t('playMenu');
+  const grid = $('#playGrid');
+  grid.innerHTML = '';
+  const tiles = [
+    {id:'levels', icon:SVG.tower, label:t('levels'), color:'#a765f0', badge: state.level},
+    {id:'tower', icon:SVG.star, label:t('tower'), color:'#00ffcc'},
+    {id:'dungeons', icon:SVG.reaper, label:t('dungeons'), color:'#ff2a5a'}
+  ];
+  tiles.forEach(tl=>{
+    const tile = el('div','tile');
+    tile.innerHTML = `<div class="ticon" style="color:${tl.color}">${tl.icon}</div><div class="tlabel">${tl.label}</div>`;
+    if(tl.badge){ const b = el('div','badge', tl.badge); tile.appendChild(b); }
+    tile.onclick = ()=>{
+      playClick();
+      if(tl.id==='levels') openLevels();
+      else if(tl.id==='tower') openTower();
+      else if(tl.id==='dungeons') openDungeons();
+    };
+    grid.appendChild(tile);
+  });
+}
+
+function openDungeons(){
+  showScreen('scr-dungeons');
+  $('#dunTitle').textContent = t('dungeons');
+  const list = $('#dunList');
+  list.innerHTML = '';
+
+  const pool = CHARS.filter(c=>c.dungeonOnly);
+  const header = el('div','', `
+    <div style="text-align:center;font-size:12px;color:#a898c8;margin-bottom:10px;line-height:1.5">${t('dungeonHint')}</div>
+    <div class="mythic-pool">
+      ${pool.map(c=>`<div class="mythic-thumb" style="color:${c.color}">${c.icon}</div>`).join('')}
+    </div>
+  `);
+  list.appendChild(header);
+
+  DUNGEONS.forEach(d=>{
+    const locked = state.level < d.minLevel;
+    const card = el('div','dungeon-card'+(locked?' locked':''));
+    card.innerHTML = `
+      <div class="dico" style="color:${d.color}">${d.icon}</div>
+      <div class="dinfo">
+        <div class="dname" style="color:${d.color}">${state.lang==='ru'?d.ru:d.en}</div>
+        <div class="ddesc">${state.lang==='ru'?d.descRu:d.descEn}</div>
+        <div class="dreward" style="color:${locked?'#6a5a8a':'#ffd766'}">${locked? t('requiredLevel')+': '+d.minLevel : '💎 '+t('guaranteedReward')+': +'+fmt(d.gemReward)}</div>
+        <div class="dchance">${locked? '🔒 '+t('lockedDungeon') : t('mythicChance')}</div>
+      </div>
+    `;
+    if(!locked){
+      const btn = el('button','btn gold', t('enterDungeon'));
+      btn.style.cssText='padding:8px 14px;font-size:12px;white-space:nowrap';
+      btn.onclick = ()=>{ playClick(); startLevel(d.level, false, d); };
+      card.appendChild(btn);
+    }
+    list.appendChild(card);
+  });
 }
 
 function openLevels(){
@@ -1654,7 +1792,10 @@ $('#twStart').onclick = ()=>{ playClick(); startLevel(state.towerFloor, true); }
    ============================================================ */
 function pickRandomChar(){
   const byRarity = {common:[],epic:[],legendary:[],mythic:[]};
-  CHARS.forEach(c=>byRarity[c.r].push(c));
+  CHARS.forEach(c=>{
+    if(c.dungeonOnly) return;
+    byRarity[c.r].push(c);
+  });
   const roll = Math.random()*100;
   let rarity;
   if(roll < RARITY_WEIGHT.mythic) rarity='mythic';
@@ -1856,7 +1997,7 @@ function genDecorations(pathBlock){
   return deco;
 }
 
-function startLevel(levelNum, isTower){
+function startLevel(levelNum, isTower, dungeon){
   ensureStarter();
   const cfg = buildLevelConfig(levelNum, isTower);
   const pathIdx = (levelNum - 1) % PATHS.length;
@@ -1865,7 +2006,7 @@ function startLevel(levelNum, isTower){
   const pathPx = cellsToPx(pathCells);
 
   game = {
-    level: levelNum, isTower: !!isTower, cfg: cfg,
+    level: levelNum, isTower: !!isTower, dungeon: dungeon || null, cfg: cfg,
     pathCells, pathBlock, pathPx,
     coins: cfg.startCoins, gemsEarned: 0,
     lives: cfg.lives, maxLives: cfg.lives,
@@ -2745,6 +2886,48 @@ function finishLevel(win){
   const level = g.level;
   const isTower = g.isTower;
 
+  /* ---- ПОДЗЕМЕЛЬЕ ---- */
+  if(win && g.dungeon){
+    const dun = g.dungeon;
+    const gems = dun.gemReward;
+    state.gems += gems;
+    addSeasonPoints(100);
+
+    const mythicPool = CHARS.filter(c=>c.dungeonOnly && !state.chars.includes(c.id));
+    let newMythic = null;
+    if(mythicPool.length > 0 && Math.random() < 0.005){
+      newMythic = mythicPool[Math.floor(Math.random()*mythicPool.length)];
+      state.chars.push(newMythic.id);
+      if(state.selectedChars.length<4) state.selectedChars.push(newMythic.id);
+    }
+    saveGame(true);
+
+    const mythicHtml = newMythic ? `
+      <div style="margin:14px 0;padding:12px;background:rgba(255,42,90,.12);border:2px solid #ff2a5a;border-radius:14px">
+        <div style="color:#ff2a5a;font-size:13px;font-weight:bold;margin-bottom:8px;letter-spacing:1px">${t('mythicDrop')}</div>
+        <div class="char-reveal" style="width:100px;height:100px;margin:8px auto;color:${newMythic.color}">${newMythic.icon}</div>
+        <div style="color:${newMythic.color};font-weight:bold;font-size:15px">${state.lang==='ru'?newMythic.ru:newMythic.en}</div>
+        <div style="font-size:11px;color:#a898c8;margin-top:4px">${newMythic.desc[state.lang==='ru'?'ru':'en']}</div>
+      </div>
+    ` : '';
+
+    const m = openModal(`
+      <h3 style="color:#7ee6c0">✨ ${t('dungeonCleared')}</h3>
+      <div style="font-size:14px;color:#a898c8;margin-bottom:14px">${state.lang==='ru'?dun.ru:dun.en}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:20px;color:#9ef7e0;margin-bottom:10px">
+        ${SVG.gem.replace('<svg','<svg style="width:26px;height:26px"')} +${fmt(gems)}
+      </div>
+      ${mythicHtml}
+      <div class="row" style="margin-top:14px;flex-direction:column;gap:9px">
+        <button class="btn primary" id="claimBtn" style="width:100%">${t('continueBtn')}</button>
+        <button class="btn" id="retryBtn2" style="width:100%">${t('retry')}</button>
+      </div>
+    `, {dismissable:false});
+    m.querySelector('#claimBtn').onclick = ()=>{ closeModal(); cleanupGame(); backToLobby(); };
+    m.querySelector('#retryBtn2').onclick = ()=>{ closeModal(); cleanupGame(); startLevel(dun.level, false, dun); };
+    return;
+  }
+
   if(win){
     let gems = g.cfg.gemReward + g.gemsEarned;
     let chests = 1;
@@ -2804,7 +2987,7 @@ function finishLevel(win){
       </div>
     `, {dismissable:false});
     m.querySelector('#backLobby').onclick = ()=>{ closeModal(); cleanupGame(); backToLobby(); };
-    m.querySelector('#retryBtn').onclick = ()=>{ closeModal(); const lvl=g.level, tw=g.isTower; cleanupGame(); startLevel(lvl, tw); };
+    m.querySelector('#retryBtn').onclick = ()=>{ closeModal(); const lvl=g.level, tw=g.isTower, dun=g.dungeon; cleanupGame(); startLevel(lvl, tw, dun); };
   }
 }
 
@@ -2840,7 +3023,7 @@ function startTutorial(){
   };
 
   game = {
-    level: 0, isTower: false, cfg,
+    level: 0, isTower: false, dungeon: null, cfg,
     pathCells, pathBlock, pathPx,
     coins: cfg.startCoins, gemsEarned: 0,
     lives: cfg.lives, maxLives: cfg.lives,
@@ -2944,6 +3127,10 @@ function refreshStaticText(){
   $('#promoInput').placeholder = t('promoPh');
   $('#promoBtn').textContent = t('activate');
   if(currentScreen==='scr-lobby') renderLobby();
+  if(currentScreen==='scr-play') openPlay();
+  if(currentScreen==='scr-dungeons') openDungeons();
+  if(currentScreen==='scr-levels') openLevels();
+  if(currentScreen==='scr-tower') openTower();
   if(currentScreen==='scr-settings') openSettings();
   if(currentScreen==='scr-tasks') openTasks();
   if(currentScreen==='scr-chars') openChars();
@@ -3000,9 +3187,10 @@ function openPlaytime(){
   const list = $('#playtimeList'); list.innerHTML='';
   const mins = getPlaytimeMinutes();
   const head = el('div','', `
-    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:14px">
-      ${t('yourPlaytime')}: <b style="color:#9ef7e0">${mins} мин</b>
+    <div style="text-align:center;font-size:13px;color:#a898c8;margin-bottom:4px">
+      ${t('yourPlaytime')}: <b style="color:#9ef7e0">${mins} ${state.lang==='ru'?'мин':'min'}</b>
     </div>
+    <div style="text-align:center;font-size:11px;color:#ff9bb0;margin-bottom:14px">${t('playtimeResetHint')}</div>
   `);
   list.appendChild(head);
   PLAYTIME_REWARDS.forEach((r,i)=>{
@@ -3136,6 +3324,8 @@ async function boot(){
   await initVK();
   await tick(50, t('loadSave'));
   await loadGame();
+  /* Счётчик времени в игре сбрасывается при каждом перезаходе */
+  state.totalPlaytime = 0;
   await tick(75, t('loadHouse'));
 
   ensureStarter();
@@ -3173,6 +3363,10 @@ document.addEventListener('click', (e)=>{
   if(b){
     playClick();
     if(currentScreen==='scr-afk') closeAFK();
+    if(currentScreen==='scr-levels' || currentScreen==='scr-tower' || currentScreen==='scr-dungeons'){
+      openPlay();
+      return;
+    }
     backToLobby();
   }
 });
