@@ -50,7 +50,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 /* ========== КНОПКИ ========== */
 .btn{position:relative;border:2px solid #6b3fb0;background:linear-gradient(180deg,#2a1440,#170a28);
   color:#e0ccff;padding:11px 16px;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;
-  transition:.15s;letter-spacing:.5px;box-shadow:0 3px 0 #0d0618,0 0 14px rgba(107,63,176,.3) inset}
+  transition:.15s;letter-spacing:.5px;box-shadow:0 3px 0 #0d0618,0 0 14px rgba(107,63,176,.3) inset;touch-action:manipulation}
 .btn:hover{background:linear-gradient(180deg,#3a1c58,#22103a);border-color:#a765f0;transform:translateY(-1px)}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0d0618}
 .btn.primary{background:linear-gradient(180deg,#5c2a9c,#33145c);border-color:#b47bff;color:#fff;
@@ -74,7 +74,6 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 /* ========== ЛОББИ ========== */
 .lobby-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:3;
   -webkit-overflow-scrolling:touch}
-/* ВАЖНО: дети не сжимаются, иначе лобби не скроллится и дом обрезается */
 .lobby-body > *{flex-shrink:0}
 .lobby-hero{position:relative;height:130px;margin:-4px 0 4px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;
   background:radial-gradient(ellipse at 50% 100%, rgba(138,75,214,.25), transparent 70%),linear-gradient(180deg,rgba(20,8,35,.4),rgba(8,3,16,.1));}
@@ -120,7 +119,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
   background:linear-gradient(90deg,transparent,#a765f0,#7b3fbf,#a765f0,transparent);opacity:.7}
 .panel-head h2{font-size:16px;color:#d9b3ff;letter-spacing:1px;flex:1;text-align:center}
 .back-btn{width:38px;height:38px;border-radius:10px;border:2px solid #6b3fb0;background:#1b0e2c;color:#d9b3ff;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;touch-action:manipulation}
 .back-btn:hover{background:#2c1548;border-color:#b47bff}
 .back-btn svg{width:20px;height:20px}
 .panel-body{flex:1;overflow-y:auto;padding:12px;position:relative;z-index:3}
@@ -129,7 +128,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .lvl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
 .lvl-btn{aspect-ratio:1;border-radius:12px;border:2px solid #3d2266;background:linear-gradient(180deg,#1c0f2e,#100821);
   color:#8a76ad;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  position:relative;transition:.15s;font-family:inherit}
+  position:relative;transition:.15s;font-family:inherit;touch-action:manipulation}
 .lvl-btn.unlocked{color:#e0ccff;border-color:#6b3fb0;background:linear-gradient(180deg,#2a1440,#170a28)}
 .lvl-btn.unlocked:hover{border-color:#b47bff;transform:scale(1.08);box-shadow:0 0 16px rgba(180,123,255,.5)}
 .lvl-btn.current{border-color:#ffd766;color:#ffeeb8;box-shadow:0 0 16px rgba(255,215,102,.5);animation:glow 2s infinite}
@@ -140,7 +139,8 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 
 /* ========== ИГРА ========== */
 #scr-game{background:#05030a}
-#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#gameCanvas:active{cursor:grabbing}
 .game-hud{position:absolute;top:0;left:0;right:0;display:flex;gap:6px;padding:6px;pointer-events:none;z-index:3;flex-wrap:wrap}
 .hud-chip{background:rgba(10,5,20,.85);border:2px solid #4a2a7a;border-radius:20px;padding:4px 11px;font-size:12px;
   font-weight:bold;color:#ffe6a3;display:flex;align-items:center;gap:4px;pointer-events:auto}
@@ -152,7 +152,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .tower-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
 .tower-btn{flex:0 0 auto;width:64px;height:74px;border-radius:12px;border:2px solid #4a2a7a;
   background:linear-gradient(180deg,#1d0f30,#0f0719);cursor:pointer;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;transition:.15s;padding:4px;font-family:inherit;position:relative;touch-action: manipulation}
+  align-items:center;justify-content:center;gap:2px;transition:.15s;padding:4px;font-family:inherit;position:relative;touch-action:manipulation}
 @media (hover: hover) {
   .tower-btn:hover{border-color:#a765f0}
 }
@@ -172,7 +172,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 @keyframes tutorialGlow{0%,100%{box-shadow:0 0 18px rgba(255,215,102,.5)}50%{box-shadow:0 0 32px rgba(255,215,102,.95)}}
 .ability-bar{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
 .ability-btn{width:50px;height:50px;border-radius:12px;border:2px solid #7a1f38;background:linear-gradient(180deg,#2a0f1c,#150710);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:.15s}
+  cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:.15s;touch-action:manipulation}
 .ability-btn svg{width:26px;height:26px}
 .ability-btn:hover{border-color:#ff5f7e}
 .ability-btn.cd{opacity:.45;filter:grayscale(.8)}
@@ -182,7 +182,9 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
   font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;padding:0 3px;
   box-shadow:0 0 8px rgba(255,215,102,.7)}
 .speed-btn{width:50px;height:50px;border-radius:12px;border:2px solid #4a2a7a;background:linear-gradient(180deg,#1d0f30,#0f0719);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#c9a8ff;font-size:13px}
+  cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#c9a8ff;font-size:13px;touch-action:manipulation}
+.cam-btn{width:50px;height:50px;border-radius:12px;border:2px solid #1f7a68;background:linear-gradient(180deg,#0e2a24,#07160f);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ef7e0;font-size:11px;font-weight:bold;touch-action:manipulation}
 
 .tower-popup{position:absolute;z-index:6;background:rgba(12,6,22,.97);border:2px solid #7b3fbf;border-radius:14px;
   padding:10px;display:flex;flex-direction:column;gap:7px;min-width:150px;box-shadow:0 8px 30px rgba(0,0,0,.8)}
@@ -212,7 +214,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .chars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;margin-top:6px}
 .char-card{border:2px solid #3d2266;border-radius:14px;background:linear-gradient(180deg,#1c0f2e,#100821);
   padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;cursor:pointer;
-  transition:transform .15s}
+  transition:transform .15s;touch-action:manipulation}
 .char-card.owned:hover{transform:translateY(-2px)}
 .char-card svg{width:44px;height:44px;position:relative;z-index:1}
 .char-card .cn{font-size:10px;text-align:center;color:#c0a8e8;line-height:1.1;position:relative;z-index:1}
@@ -241,7 +243,7 @@ html,body{height:100%;overflow:hidden;background:#07040c;font-family:'Trebuchet 
 .switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#8f7bb0;transition:.2s}
 .switch.on::after{left:26px;background:#e0ccff;box-shadow:0 0 10px #fff}
 .lang-btns{display:flex;gap:7px}
-.lang-btn{padding:7px 14px;border-radius:10px;border:2px solid #4a2a7a;background:#180c2a;color:#a898c8;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s}
+.lang-btn{padding:7px 14px;border-radius:10px;border:2px solid #4a2a7a;background:#180c2a;color:#a898c8;cursor:pointer;font-family:inherit;font-size:13px;transition:.15s;touch-action:manipulation}
 .lang-btn.active{border-color:#b47bff;color:#fff;background:#33145c;box-shadow:0 0 12px rgba(180,123,255,.5)}
 input.promo{width:100%;padding:11px;border-radius:11px;border:2px solid #4a2a7a;background:#140a22;color:#e0ccff;font-family:inherit;font-size:14px;outline:none;margin-bottom:9px}
 input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)}
@@ -590,7 +592,7 @@ input.promo:focus{border-color:#b47bff;box-shadow:0 0 12px rgba(180,123,255,.35)
 
 <script>
 /* ============================================================
-   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.4
+   ДОМ С ПРИВИДЕНИЯМИ — Tower Defense v2.5
    ============================================================ */
 
 /* ---------- БАЗОВЫЕ SVG ---------- */
@@ -618,7 +620,8 @@ const SVG = {
   clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#9ef7e0" stroke-width="2"/><path d="M12 7v5l3 2" stroke="#9ef7e0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   upgrade:'<svg viewBox="0 0 24 24"><path d="M12 3l7 7h-4v10h-6V10H5z" fill="#a765f0"/><path d="M9 20h6" stroke="#c9a8ff" stroke-width="2" stroke-linecap="round"/></svg>',
   season:'<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.2L21 9l-5 4.2L17.5 20 12 16.8 6.5 20 8 13.2 3 9l6.6-.8z" fill="#ffd766"/><circle cx="12" cy="12" r="2.2" fill="#8a6a1f"/></svg>',
-  skull:'<svg viewBox="0 0 24 24"><path d="M12 2C7 2 4 6 4 11v6h4v3h2v-3h4v3h2v-3h4v-6c0-5-3-9-8-9z" fill="#e8e0c0"/><circle cx="9" cy="10" r="2" fill="#1a0f2a"/><circle cx="15" cy="10" r="2" fill="#1a0f2a"/><path d="M11 15h2v3h-2z" fill="#1a0f2a"/></svg>'
+  skull:'<svg viewBox="0 0 24 24"><path d="M12 2C7 2 4 6 4 11v6h4v3h2v-3h4v3h2v-3h4v-6c0-5-3-9-8-9z" fill="#e8e0c0"/><circle cx="9" cy="10" r="2" fill="#1a0f2a"/><circle cx="15" cy="10" r="2" fill="#1a0f2a"/><path d="M11 15h2v3h-2z" fill="#1a0f2a"/></svg>',
+  camera:'<svg viewBox="0 0 24 24"><path d="M4 8h3l2-2h6l2 2h3a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2v-8a2 2 0 012-2z" fill="#9ef7e0"/><circle cx="12" cy="14" r="4" fill="#1a0f2a"/><circle cx="12" cy="14" r="2.5" fill="#7fd8ff"/></svg>'
 };
 
 /* ============================================================
@@ -874,7 +877,8 @@ const I18N = {
     dungeonCleared:'Подземелье пройдено!', mythicDrop:'МИФИЧЕСКИЙ ГЕРОЙ!',
     playtimeResetHint:'Счётчик времени сбрасывается при перезаходе в игру',
     requiredLevel:'Требуется уровень', dungeonHint:'Проходи подземелья и получи шанс 0.5% на эксклюзивного мифического героя!',
-    lockedDungeon:'Закрыто'
+    lockedDungeon:'Закрыто',
+    camReset:'Сброс', camHint:'Тяни — панорама, колесо/пинч — зум', camMode:'Камера'
   },
   en:{
     loadVK:'Connecting to VK...', loadSave:'Loading save...',
@@ -949,7 +953,8 @@ const I18N = {
     dungeonCleared:'Dungeon cleared!', mythicDrop:'MYTHIC HERO!',
     playtimeResetHint:'Playtime counter resets when you re-enter the game',
     requiredLevel:'Requires level', dungeonHint:'Clear dungeons for a 0.5% chance at an exclusive mythic hero!',
-    lockedDungeon:'Locked'
+    lockedDungeon:'Locked',
+    camReset:'Reset', camHint:'Drag — pan, wheel/pinch — zoom', camMode:'Camera'
   }
 };
 function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] || k; }
@@ -958,7 +963,6 @@ function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.ru[k] ||
 const GRID_W = 16, GRID_H = 10, CELL = 40;
 const CANVAS_W = GRID_W*CELL, CANVAS_H = GRID_H*CELL;
 
-/* 10 разных трасс — чередуются по уровням */
 const PATHS = [
   [[-1,4],[3,4],[3,1],[7,1],[7,7],[11,7],[11,3],[15,3],[15,5],[16,5]],
   [[-1,2],[5,2],[5,7],[10,7],[10,2],[14,2],[14,5],[16,5]],
@@ -1059,7 +1063,7 @@ const SEASON_REWARDS = Array.from({length:30}, (_,i)=>({
 }));
 
 const DEFAULT_STATE = {
-  v:4, gems:0, chests:0, level:1, completed:0,
+  v:5, gems:0, chests:0, level:1, completed:0,
   chars: [], selectedChars: [], abilities: {},
   passives: {dmg:0, range:0, gold:0, startCoins:0},
   season: {id:'', points:0, claimed:[]},
@@ -1924,6 +1928,50 @@ let lastTs = 0;
 let rafId = null;
 let pendingAbility = null;
 
+/* ---- КАМЕРА ---- */
+const camera = { centerX: CANVAS_W/2, centerY: CANVAS_H/2, zoom: 1 };
+const CAM_MIN_ZOOM = 0.6;
+const CAM_MAX_ZOOM = 3;
+function resetCamera(){
+  camera.centerX = CANVAS_W/2;
+  camera.centerY = CANVAS_H/2;
+  camera.zoom = 1;
+}
+function clampCamera(){
+  camera.zoom = Math.max(CAM_MIN_ZOOM, Math.min(CAM_MAX_ZOOM, camera.zoom));
+  const halfViewW = (CANVAS_W/2) / camera.zoom;
+  const halfViewH = (CANVAS_H/2) / camera.zoom;
+  const margin = 120;
+  if(halfViewW*2 >= CANVAS_W - margin*2){
+    camera.centerX = CANVAS_W/2;
+  } else {
+    camera.centerX = Math.max(halfViewW - margin, Math.min(CANVAS_W - halfViewW + margin, camera.centerX));
+  }
+  if(halfViewH*2 >= CANVAS_H - margin*2){
+    camera.centerY = CANVAS_H/2;
+  } else {
+    camera.centerY = Math.max(halfViewH - margin, Math.min(CANVAS_H - halfViewH + margin, camera.centerY));
+  }
+}
+function screenToWorld(sx, sy){
+  const cw = canvas.clientWidth || 1;
+  const ch = canvas.clientHeight || 1;
+  const canvasPx = sx * (CANVAS_W / cw);
+  const canvasPy = sy * (CANVAS_H / ch);
+  return {
+    x: (canvasPx - CANVAS_W/2) / camera.zoom + camera.centerX,
+    y: (canvasPy - CANVAS_H/2) / camera.zoom + camera.centerY
+  };
+}
+function applyCameraTransform(){
+  ctx.translate(CANVAS_W/2, CANVAS_H/2);
+  ctx.scale(camera.zoom, camera.zoom);
+  ctx.translate(-camera.centerX, -camera.centerY);
+}
+
+/* ---- УКАЗАТЕЛЬ ---- */
+let ptr = null;
+
 const charImages = {};
 function preloadCharImages(){
   return Promise.all(CHARS.map(c => new Promise(resolve => {
@@ -1942,22 +1990,21 @@ function initCanvas(){
   ctx = canvas.getContext('2d');
   canvas.width = CANVAS_W;
   canvas.height = CANVAS_H;
-  canvas.addEventListener('pointerdown', onCanvasPointer);
-  canvas.addEventListener('pointermove', (e)=>{
-    if(!game || game.paused || game.finished) return;
-    const rect = canvas.getBoundingClientRect();
-    const px = (e.clientX - rect.left) * (CANVAS_W / rect.width);
-    const py = (e.clientY - rect.top) * (CANVAS_H / rect.height);
-    game.hoverCell = {x: Math.floor(px/CELL), y: Math.floor(py/CELL)};
-  });
-  canvas.addEventListener('pointerleave', ()=>{ if(game) game.hoverCell = null; });
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerUp);
+  canvas.addEventListener('pointerleave', onPointerLeave);
+  canvas.addEventListener('wheel', onWheel, {passive: false});
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
+  requestAnimationFrame(resizeCanvas);
 }
 function resizeCanvas(){
   if(!canvas) return;
   const wrap = $('#scr-game');
   const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(w<=0 || h<=0) return;
   const scale = Math.min(w/CANVAS_W, h/CANVAS_H);
   const cw = CANVAS_W*scale, ch = CANVAS_H*scale;
   canvas.style.width = cw+'px';
@@ -1967,19 +2014,171 @@ function resizeCanvas(){
   canvas.style.top = ((h-ch)/2)+'px';
 }
 
-function buildLevelConfig(L, isTower){
-  const ecoScale = Math.pow(1.075, Math.min(L,500)-1);
-  const hpScale  = Math.pow(1.081, Math.min(L,500)-1) * (1 + Math.min(L,500)/220);
-  const waves = Math.min(16, 4 + Math.floor(L/22) + (isTower? 2:0));
-  const perWave = Math.min(22, 5 + Math.floor(L/16));
-  const enemySpeed = Math.min(78, 30 + L*0.11);
+function onWheel(e){
+  if(!game) return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+  const before = screenToWorld(sx, sy);
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  camera.zoom *= factor;
+  clampCamera();
+  const after = screenToWorld(sx, sy);
+  camera.centerX += before.x - after.x;
+  camera.centerY += before.y - after.y;
+  clampCamera();
+}
+
+function onPointerDown(ev){
+  if(!game || game.finished) return;
+  const rect = canvas.getBoundingClientRect();
+  const sx = ev.clientX - rect.left;
+  const sy = ev.clientY - rect.top;
+
+  if(ptr){
+    // Второй палец — пинч
+    ptr.isPinching = true;
+    ptr.secondStartX = sx;
+    ptr.secondStartY = sy;
+    ptr.pinchStartDist = Math.hypot(sx - ptr.startX, sy - ptr.startY) || 1;
+    ptr.pinchStartZoom = camera.zoom;
+    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
+    return;
+  }
+
+  ptr = {
+    startX: sx, startY: sy,
+    lastX: sx, lastY: sy,
+    moved: false,
+    isPanning: false,
+    isPinching: false,
+    startTime: now(),
+    holdTimer: null
+  };
+
+  // Зажатие → панорамирование
+  ptr.holdTimer = setTimeout(()=>{
+    if(ptr && !ptr.moved){
+      ptr.isPanning = true;
+      if(game && game.selectedTower){ game.selectedTower = null; hideTowerPopup(); }
+    }
+  }, 180);
+}
+
+function onPointerMove(ev){
+  if(!game) return;
+  const rect = canvas.getBoundingClientRect();
+  const sx = ev.clientX - rect.left;
+  const sy = ev.clientY - rect.top;
+
+  // Hover (без нажатия)
+  if(!ptr){
+    if(game.selectedTowerType && !game.paused && !game.finished){
+      const w = screenToWorld(sx, sy);
+      game.hoverCell = { x: Math.floor(w.x/CELL), y: Math.floor(w.y/CELL) };
+    } else {
+      game.hoverCell = null;
+    }
+    return;
+  }
+
+  // Пинч-зум
+  if(ptr.isPinching){
+    const dist = Math.hypot(sx - ptr.startX, sy - ptr.startY);
+    const ratio = dist / ptr.pinchStartDist;
+    camera.zoom = ptr.pinchStartZoom * ratio;
+    clampCamera();
+    return;
+  }
+
+  const totalMoved = Math.hypot(sx - ptr.startX, sy - ptr.startY);
+
+  if(totalMoved > 15){
+    ptr.moved = true;
+    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
+    if(!ptr.isPanning){
+      ptr.isPanning = true;
+      if(game.selectedTower){ game.selectedTower = null; hideTowerPopup(); }
+    }
+  }
+
+  if(ptr.isPanning){
+    const dx = sx - ptr.lastX;
+    const dy = sy - ptr.lastY;
+    camera.centerX -= dx * (CANVAS_W / canvas.clientWidth) / camera.zoom;
+    camera.centerY -= dy * (CANVAS_H / canvas.clientHeight) / camera.zoom;
+    clampCamera();
+  }
+
+  ptr.lastX = sx;
+  ptr.lastY = sy;
+}
+
+function onPointerUp(ev){
+  if(!ptr){ return; }
+  if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
+
+  const wasTap = !ptr.moved && !ptr.isPanning && !ptr.isPinching;
+  const sx = ptr.startX, sy = ptr.startY;
+  ptr = null;
+
+  if(wasTap && game && !game.finished){
+    const w = screenToWorld(sx, sy);
+    handleCanvasTap(w.x, w.y);
+  }
+}
+function onPointerLeave(){
+  if(game) game.hoverCell = null;
+  if(ptr){
+    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); }
+    ptr = null;
+  }
+}
+
+function handleCanvasTap(worldX, worldY){
+  if(!game || game.paused || game.finished) return;
+  const cx = Math.floor(worldX / CELL), cy = Math.floor(worldY / CELL);
+  if(cx<0||cy<0||cx>=GRID_W||cy>=GRID_H) return;
+
+  if(game.tutorial){
+    const step = game.tutorial.step;
+    if(step === 'select'){ return; }
+    if(step === 'place'){
+      const tc = game.tutorial.targetCell;
+      if(cx === tc.x && cy === tc.y){ placeTutorialTower(cx, cy); }
+      else { toast(t('tutPlaceWrong')); }
+      return;
+    }
+    return;
+  }
+
+  if(pendingAbility){ useAbilityAt(pendingAbility, worldX, worldY); return; }
+
+  const existing = game.towers.find(tw => tw.cx===cx && tw.cy===cy);
+  if(existing){ selectTower(existing); return; }
+  if(game.selectedTowerType){ placeTower(cx, cy); return; }
+
+  game.selectedTower = null;
+  hideTowerPopup();
+}
+
+/* ---------- СЛОЖНОСТЬ ---------- */
+function buildLevelConfig(L, isTower, dungeon){
+  L = Math.max(1, Math.min(L, 500));
+  const ecoScale = Math.pow(1.075, L-1);
+  let hpScale = Math.pow(1.083, L-1) * (1 + L/200);
+  if(isTower) hpScale *= 1.15;
+  if(dungeon) hpScale *= 1.4;
+  let waves = Math.min(16, 4 + Math.floor(L/20)) + (isTower ? 2 : 0) + (dungeon ? 2 : 0);
+  let perWave = Math.min(22, 6 + Math.floor(L/14)) + (dungeon ? 1 : 0);
+  const enemySpeed = Math.min(92, 32 + L*0.12);
   const isBossLevel = (!isTower) && (L % 5 === 0);
-  const lives = isTower ? 10 : 20;
+  let lives = isTower ? 10 : (dungeon ? 8 : 15);
   const passiveStart = 1 + ((state.passives && state.passives.startCoins) || 0) * 0.01;
-  const startCoins = Math.floor(160 * ecoScale * passiveStart);
+  const startCoins = Math.floor(150 * ecoScale * passiveStart);
   const rewardPerKill = Math.max(3, Math.floor((4 + L*0.5) * ecoScale));
-  const gemReward = Math.floor((12 + L*2.2) * (1 + Math.min(L,500)/160));
-  return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower};
+  const gemReward = Math.floor((12 + L*2.2) * (1 + L/160));
+  return {L, ecoScale, hpScale, waves, perWave, enemySpeed, isBossLevel, lives, startCoins, rewardPerKill, gemReward, isTower, dungeon: !!dungeon};
 }
 
 function genDecorations(pathBlock){
@@ -1999,11 +2198,13 @@ function genDecorations(pathBlock){
 
 function startLevel(levelNum, isTower, dungeon){
   ensureStarter();
-  const cfg = buildLevelConfig(levelNum, isTower);
+  const cfg = buildLevelConfig(levelNum, isTower, dungeon);
   const pathIdx = (levelNum - 1) % PATHS.length;
   const pathCells = PATHS[pathIdx];
   const pathBlock = buildPathBlock(pathCells);
   const pathPx = cellsToPx(pathCells);
+
+  resetCamera();
 
   game = {
     level: levelNum, isTower: !!isTower, dungeon: dungeon || null, cfg: cfg,
@@ -2015,7 +2216,7 @@ function startLevel(levelNum, isTower, dungeon){
     decorations: genDecorations(pathBlock),
     selectedTowerType: null, selectedTower: null,
     spawnQueue: [], spawnTimer: 0, waveActive: false, waveDelay: 1.5,
-    speedMul: 1, paused: false, finished: false,
+    paused: false, finished: false,
     abilityCd: {}, buffs: {gold:0, rage:0},
     killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null,
     tutorial: null
@@ -2024,15 +2225,23 @@ function startLevel(levelNum, isTower, dungeon){
 
   showScreen('scr-game');
   resizeCanvas();
+  requestAnimationFrame(resizeCanvas);
+
+  // Важно: игра стартует не на паузе, чтобы state кнопок совпадал
+  game.paused = false;
   renderGameTools();
   renderGameHud();
   playClick();
+  lastTs = 0;
+  startLoop();
 
-  game.paused = true;
+  // Показ interstitial не блокирует ввод — overlay поверх
   showInterstitial(()=>{
-    if(game) game.paused = false;
+    if(!game) return;
+    // Не сбрасываем паузу принудительно — если пользователь успел сам поставить,
+    // оставляем его выбор. Только перерисовываем для синхронизации кнопок.
     lastTs = 0;
-    startLoop();
+    renderGameTools();
   });
 }
 
@@ -2043,7 +2252,7 @@ function loop(ts){
   let dt = (ts - lastTs)/1000;
   lastTs = ts;
   dt = Math.min(dt, 0.05);
-  if(!game.paused && !game.finished) update(dt * game.speedMul);
+  if(!game.paused && !game.finished) update(dt);
   render();
   rafId = requestAnimationFrame(loop);
 }
@@ -2181,7 +2390,7 @@ function makeEnemy(type, cfg, boss){
   const base = {ghost:{hp:1, speed:1, color:'#b8c8ff', size:14},
                 bat:{hp:0.62, speed:1.75, color:'#8a6fae', size:11},
                 zombie:{hp:1.7, speed:0.72, color:'#7fa87f', size:16},
-                boss:{hp:22, speed:0.62, color:'#c2243c', size:26}}[type];
+                boss:{hp:30, speed:0.62, color:'#c2243c', size:26}}[type];
   const L = cfg.L;
   const hp = cfg.tutorial ? (boss? 80 : 22) : Math.floor(30 * cfg.hpScale * base.hp * (1 + L*0.012));
   return {
@@ -2303,8 +2512,12 @@ function spawnParticle(x,y,color,scale){
 /* ---------- ОТРИСОВКА ---------- */
 function render(){
   if(!ctx || !game) return;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0a0512';
   ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+
+  ctx.save();
+  applyCameraTransform();
 
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
@@ -2350,7 +2563,7 @@ function render(){
     ctx.fillText('▼', tc.x*CELL + CELL/2, tc.y*CELL + CELL/2 + 2);
   }
 
-  if(!game.tutorial && game.hoverCell && game.selectedTowerType){
+  if(!game.tutorial && game.hoverCell && game.selectedTowerType && !game.paused && !game.finished){
     const {x,y} = game.hoverCell;
     const canBuild = canBuildAt(x,y);
     ctx.fillStyle = canBuild ? 'rgba(0,255,180,0.22)' : 'rgba(255,60,90,0.22)';
@@ -2381,6 +2594,8 @@ function render(){
     ctx.beginPath(); ctx.arc(pa.x, pa.y, pa.size*a, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
+
+  ctx.restore();
 
   if(game.paused && !game.finished && !game.tutorial){
     ctx.fillStyle = 'rgba(5,2,10,0.6)';
@@ -2561,39 +2776,7 @@ function drawProjectile(p){
   ctx.shadowBlur = 0;
 }
 
-/* ---------- ВЗАИМОДЕЙСТВИЕ ---------- */
-function onCanvasPointer(ev){
-  if(!game || game.paused || game.finished) return;
-  ev.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const px = (ev.clientX - rect.left) * (CANVAS_W / rect.width);
-  const py = (ev.clientY - rect.top) * (CANVAS_H / rect.height);
-  const cx = Math.floor(px / CELL), cy = Math.floor(py / CELL);
-  if(cx<0||cy<0||cx>=GRID_W||cy>=GRID_H) return;
-
-  // TUTORIAL
-  if(game.tutorial){
-    const step = game.tutorial.step;
-    if(step === 'select'){ return; }
-    if(step === 'place'){
-      const tc = game.tutorial.targetCell;
-      if(cx === tc.x && cy === tc.y){ placeTutorialTower(cx, cy); }
-      else { toast(t('tutPlaceWrong')); }
-      return;
-    }
-    return;
-  }
-
-  if(pendingAbility){ useAbilityAt(pendingAbility, px, py); return; }
-
-  const existing = game.towers.find(tw => tw.cx===cx && tw.cy===cy);
-  if(existing){ selectTower(existing); return; }
-  if(game.selectedTowerType){ placeTower(cx, cy); return; }
-
-  game.selectedTower = null;
-  hideTowerPopup();
-}
-
+/* ---------- ВЗАИМОДЕЙСТВИЕ (TAP) ---------- */
 function canBuildAt(cx, cy){
   if(!game) return false;
   if(game.pathBlock.has(cx+','+cy)) return false;
@@ -2649,12 +2832,15 @@ function showTowerPopup(tower){
     </div>
   `;
   $('#scr-game').appendChild(popup);
+
+  // Позиционирование с учётом камеры
+  const towerScreenX = (tower.x - camera.centerX) * camera.zoom + CANVAS_W/2;
+  const towerScreenY = (tower.y - camera.centerY) * camera.zoom + CANVAS_H/2;
+  const px = canvas.offsetLeft + (towerScreenX / CANVAS_W) * canvas.clientWidth;
+  const py = canvas.offsetTop + (towerScreenY / CANVAS_H) * canvas.clientHeight;
   const wrap = $('#scr-game');
-  const cw = canvas.clientWidth, chh = canvas.clientHeight;
-  const left = canvas.offsetLeft + (tower.x/CANVAS_W)*cw;
-  const top = canvas.offsetTop + (tower.y/CANVAS_H)*chh;
-  popup.style.left = Math.min(wrap.clientWidth - 170, Math.max(6, left - 75)) + 'px';
-  popup.style.top = Math.max(60, top - 160) + 'px';
+  popup.style.left = Math.min(wrap.clientWidth - 170, Math.max(6, px - 75)) + 'px';
+  popup.style.top = Math.max(60, py - 160) + 'px';
   popup.dataset.popup = '1';
 
   popup.querySelector('#popUp').onclick = ()=>{
@@ -2768,10 +2954,11 @@ function renderGameTools(){
   pauseBtn.onclick = ()=>{ game.paused = !game.paused; renderGameTools(); };
   abRow.appendChild(pauseBtn);
 
-  const spBtn = el('button','speed-btn');
-  spBtn.textContent = 'x'+game.speedMul;
-  spBtn.onclick = ()=>{ game.speedMul = game.speedMul===1 ? 2 : (game.speedMul===2 ? 3 : 1); renderGameTools(); };
-  abRow.appendChild(spBtn);
+  // Кнопка сброса камеры
+  const camBtn = el('button','cam-btn', '⛶');
+  camBtn.title = t('camReset');
+  camBtn.onclick = ()=>{ resetCamera(); };
+  abRow.appendChild(camBtn);
 
   const exitBtn = el('button','speed-btn');
   exitBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px" fill="none" stroke="#ff9bb0" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>';
@@ -2851,7 +3038,6 @@ function renderGameHud(){
 function quitLevel(){
   if(!game) return;
   if(game.tutorial){
-    // Просто выходим из обучения
     state.tutorialDone = true;
     saveGame(true);
     closeModal();
@@ -2869,7 +3055,7 @@ function quitLevel(){
     </div>
   `);
   m.querySelector('#qYes').onclick = ()=>{ closeModal(); cleanupGame(); backToLobby(); };
-  m.querySelector('#qNo').onclick = ()=>{ closeModal(); game.finished=false; game.paused=false; };
+  m.querySelector('#qNo').onclick = ()=>{ closeModal(); game.finished=false; game.paused=false; renderGameTools(); };
 }
 
 function finishLevel(win){
@@ -2886,7 +3072,6 @@ function finishLevel(win){
   const level = g.level;
   const isTower = g.isTower;
 
-  /* ---- ПОДЗЕМЕЛЬЕ ---- */
   if(win && g.dungeon){
     const dun = g.dungeon;
     const gems = dun.gemReward;
@@ -2994,6 +3179,7 @@ function finishLevel(win){
 function cleanupGame(){
   hideTowerPopup();
   pendingAbility = null;
+  if(ptr){ if(ptr.holdTimer) clearTimeout(ptr.holdTimer); ptr = null; }
   const th = $('#tutorialHint');
   if(th) th.remove();
   game = null;
@@ -3013,7 +3199,6 @@ function startTutorial(){
   const pathCells = TUTORIAL_PATH;
   const pathBlock = buildPathBlock(pathCells);
   const pathPx = cellsToPx(pathCells);
-
   const targetCell = {x: 8, y: 3};
 
   const cfg = {
@@ -3021,6 +3206,8 @@ function startTutorial(){
     enemySpeed: 50, isBossLevel: false, lives: 20, startCoins: 100,
     rewardPerKill: 15, gemReward: 0, isTower: false, tutorial: true
   };
+
+  resetCamera();
 
   game = {
     level: 0, isTower: false, dungeon: null, cfg,
@@ -3032,7 +3219,7 @@ function startTutorial(){
     decorations: genDecorations(pathBlock),
     selectedTowerType: null, selectedTower: null,
     spawnQueue: [], spawnTimer: 0, waveActive: false, waveDelay: 999,
-    speedMul: 1, paused: false, finished: false,
+    paused: false, finished: false,
     abilityCd: {}, buffs: {gold:0, rage:0},
     killCount: 0, builtCount: 0, bossKilled: 0, time: 0, hoverCell: null,
     tutorial: {
@@ -3047,6 +3234,7 @@ function startTutorial(){
 
   showScreen('scr-game');
   resizeCanvas();
+  requestAnimationFrame(resizeCanvas);
   renderGameTools();
   renderGameHud();
   renderTutorialHint();
@@ -3324,7 +3512,7 @@ async function boot(){
   await initVK();
   await tick(50, t('loadSave'));
   await loadGame();
-  /* Счётчик времени в игре сбрасывается при каждом перезаходе */
+  /* Счётчик времени сбрасывается при каждом перезаходе */
   state.totalPlaytime = 0;
   await tick(75, t('loadHouse'));
 
