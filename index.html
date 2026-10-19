@@ -1127,21 +1127,31 @@ function initVK(){
 }
 function showAdOverlay(text){ $('#adText').textContent = text || t('adLoading'); $('#adOverlay').classList.add('active'); }
 function hideAdOverlay(){ $('#adOverlay').classList.remove('active'); }
+
+/* Межстраничная реклама — без полноэкранного оверлея.
+   Оверлей перехватывал первый клик и «съедал» ввод игрока на ПК. */
 function showInterstitial(cb){
-  if(!vkAvailable){ cb&&cb(); return; }
-  showAdOverlay(t('adLoading'));
+  if(!vkAvailable){ cb && cb(); return; }
+  let done = false;
+  const finish = ()=>{ if(done) return; done = true; cb && cb(); };
   vkSend('VKWebAppShowNativeAds', {ad_format:'interstitial'})
-    .then(()=>{ hideAdOverlay(); cb&&cb(); })
-    .catch(()=>{ hideAdOverlay(); cb&&cb(); });
-  setTimeout(()=>{ if($('#adOverlay').classList.contains('active')){ hideAdOverlay(); cb&&cb(); } }, 12000);
+    .then(finish).catch(finish);
+  setTimeout(()=>{ if(!done) finish(); }, 8000);
 }
+
 function showRewardAd(onReward, onFail){
   if(!vkAvailable){ if(onFail) onFail(); else toast('VK недоступен'); return; }
+  let done = false;
+  const finish = (ok)=>{
+    if(done) return; done = true;
+    hideAdOverlay();
+    if(ok) onReward && onReward();
+    else onFail && onFail();
+  };
   showAdOverlay(t('adReward'));
   vkSend('VKWebAppShowNativeAds', {ad_format:'reward'})
-    .then(()=>{ hideAdOverlay(); onReward&&onReward(); })
-    .catch(()=>{ hideAdOverlay(); onFail&&onFail(); });
-  setTimeout(()=>{ if($('#adOverlay').classList.contains('active')){ hideAdOverlay(); onReward&&onReward(); } }, 15000);
+    .then(()=>finish(true)).catch(()=>finish(false));
+  setTimeout(()=>{ if(!done) finish(true); }, 15000);
 }
 function showBanner(){ try{ vkSend('VKWebAppGetLaunchParams').then(()=>{ vkSend('VKWebAppShowBannerAd').catch(()=>{}); }).catch(()=>{}); }catch(e){} }
 
@@ -1941,16 +1951,16 @@ function clampCamera(){
   camera.zoom = Math.max(CAM_MIN_ZOOM, Math.min(CAM_MAX_ZOOM, camera.zoom));
   const halfViewW = (CANVAS_W/2) / camera.zoom;
   const halfViewH = (CANVAS_H/2) / camera.zoom;
-  const margin = 120;
-  if(halfViewW*2 >= CANVAS_W - margin*2){
+  // Пан работает как только видимая область меньше карты (zoom > 1).
+  if(halfViewW*2 >= CANVAS_W){
     camera.centerX = CANVAS_W/2;
   } else {
-    camera.centerX = Math.max(halfViewW - margin, Math.min(CANVAS_W - halfViewW + margin, camera.centerX));
+    camera.centerX = Math.max(halfViewW, Math.min(CANVAS_W - halfViewW, camera.centerX));
   }
-  if(halfViewH*2 >= CANVAS_H - margin*2){
+  if(halfViewH*2 >= CANVAS_H){
     camera.centerY = CANVAS_H/2;
   } else {
-    camera.centerY = Math.max(halfViewH - margin, Math.min(CANVAS_H - halfViewH + margin, camera.centerY));
+    camera.centerY = Math.max(halfViewH, Math.min(CANVAS_H - halfViewH, camera.centerY));
   }
 }
 function screenToWorld(sx, sy){
@@ -1969,8 +1979,10 @@ function applyCameraTransform(){
   ctx.translate(-camera.centerX, -camera.centerY);
 }
 
-/* ---- УКАЗАТЕЛЬ ---- */
-let ptr = null;
+/* ---- УКАЗАТЕЛЬ (мышь + тач) ---- */
+const activePointers = new Map();
+let panState = null;
+let pinchState = null;
 
 const charImages = {};
 function preloadCharImages(){
@@ -2031,50 +2043,39 @@ function onWheel(e){
 
 function onPointerDown(ev){
   if(!game || game.finished) return;
-  const rect = canvas.getBoundingClientRect();
-  const sx = ev.clientX - rect.left;
-  const sy = ev.clientY - rect.top;
+  activePointers.set(ev.pointerId, {x: ev.clientX, y: ev.clientY});
+  try { canvas.setPointerCapture(ev.pointerId); } catch(e){}
 
-  if(ptr){
-    // Второй палец — пинч
-    ptr.isPinching = true;
-    ptr.secondStartX = sx;
-    ptr.secondStartY = sy;
-    ptr.pinchStartDist = Math.hypot(sx - ptr.startX, sy - ptr.startY) || 1;
-    ptr.pinchStartZoom = camera.zoom;
-    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
-    return;
+  if(activePointers.size === 1){
+    panState = {
+      startX: ev.clientX, startY: ev.clientY,
+      lastX: ev.clientX, lastY: ev.clientY,
+      moved: false, isPanning: false
+    };
+    pinchState = null;
+  } else if(activePointers.size === 2){
+    panState = null;
+    const pts = [...activePointers.values()];
+    pinchState = {
+      startDist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1,
+      startZoom: camera.zoom
+    };
+    if(game.selectedTower){ game.selectedTower = null; hideTowerPopup(); }
   }
-
-  ptr = {
-    startX: sx, startY: sy,
-    lastX: sx, lastY: sy,
-    moved: false,
-    isPanning: false,
-    isPinching: false,
-    startTime: now(),
-    holdTimer: null
-  };
-
-  // Зажатие → панорамирование
-  ptr.holdTimer = setTimeout(()=>{
-    if(ptr && !ptr.moved){
-      ptr.isPanning = true;
-      if(game && game.selectedTower){ game.selectedTower = null; hideTowerPopup(); }
-    }
-  }, 180);
 }
 
 function onPointerMove(ev){
   if(!game) return;
-  const rect = canvas.getBoundingClientRect();
-  const sx = ev.clientX - rect.left;
-  const sy = ev.clientY - rect.top;
 
-  // Hover (без нажатия)
-  if(!ptr){
+  if(activePointers.has(ev.pointerId)){
+    activePointers.set(ev.pointerId, {x: ev.clientX, y: ev.clientY});
+  }
+
+  // hover без нажатия
+  if(activePointers.size === 0){
+    const rect = canvas.getBoundingClientRect();
     if(game.selectedTowerType && !game.paused && !game.finished){
-      const w = screenToWorld(sx, sy);
+      const w = screenToWorld(ev.clientX - rect.left, ev.clientY - rect.top);
       game.hoverCell = { x: Math.floor(w.x/CELL), y: Math.floor(w.y/CELL) };
     } else {
       game.hoverCell = null;
@@ -2082,57 +2083,60 @@ function onPointerMove(ev){
     return;
   }
 
-  // Пинч-зум
-  if(ptr.isPinching){
-    const dist = Math.hypot(sx - ptr.startX, sy - ptr.startY);
-    const ratio = dist / ptr.pinchStartDist;
-    camera.zoom = ptr.pinchStartZoom * ratio;
+  // pinch-зум
+  if(activePointers.size === 2 && pinchState){
+    const pts = [...activePointers.values()];
+    const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    camera.zoom = pinchState.startZoom * (dist / pinchState.startDist);
     clampCamera();
     return;
   }
 
-  const totalMoved = Math.hypot(sx - ptr.startX, sy - ptr.startY);
+  // pan
+  if(activePointers.size === 1 && panState){
+    const dx = ev.clientX - panState.lastX;
+    const dy = ev.clientY - panState.lastY;
+    const totalMoved = Math.hypot(ev.clientX - panState.startX, ev.clientY - panState.startY);
 
-  if(totalMoved > 15){
-    ptr.moved = true;
-    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
-    if(!ptr.isPanning){
-      ptr.isPanning = true;
+    if(!panState.moved && totalMoved > 8){
+      panState.moved = true;
+      panState.isPanning = true;
       if(game.selectedTower){ game.selectedTower = null; hideTowerPopup(); }
     }
+    if(panState.isPanning){
+      const cw = canvas.clientWidth || 1;
+      const ch = canvas.clientHeight || 1;
+      camera.centerX -= dx * (CANVAS_W / cw) / camera.zoom;
+      camera.centerY -= dy * (CANVAS_H / ch) / camera.zoom;
+      clampCamera();
+    }
+    panState.lastX = ev.clientX;
+    panState.lastY = ev.clientY;
   }
-
-  if(ptr.isPanning){
-    const dx = sx - ptr.lastX;
-    const dy = sy - ptr.lastY;
-    camera.centerX -= dx * (CANVAS_W / canvas.clientWidth) / camera.zoom;
-    camera.centerY -= dy * (CANVAS_H / canvas.clientHeight) / camera.zoom;
-    clampCamera();
-  }
-
-  ptr.lastX = sx;
-  ptr.lastY = sy;
 }
 
 function onPointerUp(ev){
-  if(!ptr){ return; }
-  if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); ptr.holdTimer = null; }
+  if(activePointers.has(ev.pointerId)) activePointers.delete(ev.pointerId);
+  try { canvas.releasePointerCapture(ev.pointerId); } catch(e){}
 
-  const wasTap = !ptr.moved && !ptr.isPanning && !ptr.isPinching;
-  const sx = ptr.startX, sy = ptr.startY;
-  ptr = null;
-
-  if(wasTap && game && !game.finished){
-    const w = screenToWorld(sx, sy);
-    handleCanvasTap(w.x, w.y);
+  if(activePointers.size === 0){
+    if(panState && !panState.moved && !panState.isPanning && game && !game.finished && !game.paused){
+      const rect = canvas.getBoundingClientRect();
+      const w = screenToWorld(panState.startX - rect.left, panState.startY - rect.top);
+      handleCanvasTap(w.x, w.y);
+    }
+    panState = null;
+    pinchState = null;
+  } else if(activePointers.size === 1 && pinchState){
+    // после pinch — продолжаем одним пальцем как пан
+    const p = [...activePointers.values()][0];
+    panState = { startX: p.x, startY: p.y, lastX: p.x, lastY: p.y, moved: true, isPanning: true };
+    pinchState = null;
   }
 }
+
 function onPointerLeave(){
-  if(game) game.hoverCell = null;
-  if(ptr){
-    if(ptr.holdTimer){ clearTimeout(ptr.holdTimer); }
-    ptr = null;
-  }
+  if(game && activePointers.size === 0) game.hoverCell = null;
 }
 
 function handleCanvasTap(worldX, worldY){
@@ -2226,22 +2230,28 @@ function startLevel(levelNum, isTower, dungeon){
   showScreen('scr-game');
   resizeCanvas();
   requestAnimationFrame(resizeCanvas);
+  $('#gameHud').innerHTML = '';
 
-  // Важно: игра стартует не на паузе, чтобы state кнопок совпадал
-  game.paused = false;
   renderGameTools();
   renderGameHud();
   playClick();
   lastTs = 0;
   startLoop();
 
-  // Показ interstitial не блокирует ввод — overlay поверх
+  // ⏸ Пауза на время загрузки/показа межстраничной рекламы.
+  // Оверлей не показываем — он перехватывает первый клик на ПК.
+  game.paused = true;
+  const toolsEl = $('#gameTools');
+  if(toolsEl) toolsEl.style.pointerEvents = 'none';
+  updatePauseButtonState();
+
   showInterstitial(()=>{
     if(!game) return;
-    // Не сбрасываем паузу принудительно — если пользователь успел сам поставить,
-    // оставляем его выбор. Только перерисовываем для синхронизации кнопок.
+    game.paused = false;
     lastTs = 0;
-    renderGameTools();
+    const el2 = $('#gameTools');
+    if(el2) el2.style.pointerEvents = '';
+    updatePauseButtonState();
   });
 }
 
@@ -2872,6 +2882,11 @@ function applyAuras(){
 }
 
 /* ---------- ПАНЕЛЬ БАШЕН ---------- */
+function updatePauseButtonState(){
+  const btn = document.getElementById('pauseToggleBtn');
+  if(btn && game) btn.textContent = game.paused ? '▶' : '❚❚';
+}
+
 function renderGameTools(){
   if(!game) return;
   const tools = $('#gameTools');
@@ -2950,8 +2965,9 @@ function renderGameTools(){
   });
 
   const pauseBtn = el('button','speed-btn');
+  pauseBtn.id = 'pauseToggleBtn';
   pauseBtn.textContent = game.paused ? '▶' : '❚❚';
-  pauseBtn.onclick = ()=>{ game.paused = !game.paused; renderGameTools(); };
+  pauseBtn.onclick = ()=>{ game.paused = !game.paused; updatePauseButtonState(); };
   abRow.appendChild(pauseBtn);
 
   // Кнопка сброса камеры
@@ -3024,14 +3040,30 @@ function useAbilityAt(id, x, y){
 function renderGameHud(){
   if(!game) return;
   const hud = $('#gameHud');
-  hud.innerHTML = `
-    <div class="hud-chip">${SVG.coin.replace('<svg','<svg style="width:15px;height:15px"')} ${fmt(game.coins)}</div>
-    <div class="hud-chip gem">${SVG.gem.replace('<svg','<svg style="width:15px;height:15px"')} ${fmt(game.gemsEarned)}</div>
-    <div class="hud-chip life">${SVG.heart.replace('<svg','<svg style="width:15px;height:15px"')} ${game.lives}</div>
-    <div class="hud-chip wave">${SVG.wave.replace('<svg','<svg style="width:15px;height:15px"')} ${game.wave}/${game.totalWaves}</div>
-    ${game.buffs.rage>0?'<div class="hud-chip" style="color:#ff5f7e">🔥 '+Math.ceil(game.buffs.rage)+'s</div>':''}
-    ${game.buffs.gold>0?'<div class="hud-chip">💰 '+Math.ceil(game.buffs.gold)+'s</div>':''}
-  `;
+  if(hud.children.length === 0){
+    hud.innerHTML = `
+      <div class="hud-chip" id="hudCoinChip"></div>
+      <div class="hud-chip gem" id="hudGemChip"></div>
+      <div class="hud-chip life" id="hudLifeChip"></div>
+      <div class="hud-chip wave" id="hudWaveChip"></div>
+      <div class="hud-chip" id="hudRageChip" style="display:none;color:#ff5f7e"></div>
+      <div class="hud-chip" id="hudGoldChip" style="display:none"></div>
+    `;
+    document.getElementById('hudCoinChip').innerHTML = SVG.coin.replace('<svg','<svg style="width:15px;height:15px"') + ' <span></span>';
+    document.getElementById('hudGemChip').innerHTML  = SVG.gem.replace('<svg','<svg style="width:15px;height:15px"')  + ' <span></span>';
+    document.getElementById('hudLifeChip').innerHTML = SVG.heart.replace('<svg','<svg style="width:15px;height:15px"') + ' <span></span>';
+    document.getElementById('hudWaveChip').innerHTML = SVG.wave.replace('<svg','<svg style="width:15px;height:15px"') + ' <span></span>';
+  }
+  document.querySelector('#hudCoinChip span').textContent = fmt(game.coins);
+  document.querySelector('#hudGemChip span').textContent  = fmt(game.gemsEarned);
+  document.querySelector('#hudLifeChip span').textContent = game.lives;
+  document.querySelector('#hudWaveChip span').textContent = game.wave+'/'+game.totalWaves;
+  const rage = document.getElementById('hudRageChip');
+  if(game.buffs.rage>0){ rage.style.display=''; rage.textContent = '🔥 '+Math.ceil(game.buffs.rage)+'s'; }
+  else rage.style.display='none';
+  const gold = document.getElementById('hudGoldChip');
+  if(game.buffs.gold>0){ gold.style.display=''; gold.textContent = '💰 '+Math.ceil(game.buffs.gold)+'s'; }
+  else gold.style.display='none';
 }
 
 /* ---------- ФИНАЛ УРОВНЯ ---------- */
@@ -3179,7 +3211,9 @@ function finishLevel(win){
 function cleanupGame(){
   hideTowerPopup();
   pendingAbility = null;
-  if(ptr){ if(ptr.holdTimer) clearTimeout(ptr.holdTimer); ptr = null; }
+  activePointers.clear();
+  panState = null;
+  pinchState = null;
   const th = $('#tutorialHint');
   if(th) th.remove();
   game = null;
@@ -3235,6 +3269,7 @@ function startTutorial(){
   showScreen('scr-game');
   resizeCanvas();
   requestAnimationFrame(resizeCanvas);
+  $('#gameHud').innerHTML = '';
   renderGameTools();
   renderGameHud();
   renderTutorialHint();
@@ -3334,11 +3369,10 @@ let hiddenPause = false;
 function handleVisibility(hidden){
   if(hidden){
     pauseMusic();
-    if(game && !game.finished){ game.paused = true; hiddenPause = true; }
+    if(game && !game.finished){ game.paused = true; hiddenPause = true; updatePauseButtonState(); }
   } else {
     if(state.music) startMusic();
-    if(hiddenPause && game){ game.paused = false; hiddenPause = false; }
-    if(currentScreen==='scr-game') renderGameTools();
+    if(hiddenPause && game){ game.paused = false; hiddenPause = false; updatePauseButtonState(); }
   }
 }
 document.addEventListener('visibilitychange', ()=>{ handleVisibility(document.hidden); });
