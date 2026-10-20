@@ -10,240 +10,281 @@
 <style>
 :root{
   --gold:#e8c26a; --gold-d:#a8813a; --gold-l:#ffe9a8;
-  --bg:#0b0813; --panel:#171226; --panel2:#211a33;
+  --bg:#0b0813; --panel:#171226;
   --text:#e9e2d0; --muted:#9d94ad;
   --accent:#7b5cff; --green:#5cd68a; --red:#ff5f6d;
+  --wheat:#e8c460; --wood:#a07040; --stone:#9098a8; --essence:#c88aff;
   --border:rgba(232,194,106,.32);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
-  margin:0;padding:0;height:100%;width:100%;overflow:hidden;
-  background:var(--bg);color:var(--text);
-  font-family:"Georgia","Palatino Linotype",serif;
-  user-select:none;-webkit-user-select:none;
-  overscroll-behavior:none;
-}
+html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:"Georgia","Palatino Linotype",serif;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh;width:100%;position:relative;overflow:hidden}
 
 /* ============ TOP BAR ============ */
 #topbar{
-  flex:0 0 auto;display:flex;align-items:center;gap:6px;
-  padding:5px 8px;min-height:46px;
+  flex:0 0 auto;display:flex;align-items:center;gap:4px;
+  padding:4px 6px;min-height:44px;
   background:linear-gradient(180deg,#1c1530,#120d20);
   border-bottom:1px solid rgba(232,194,106,.18);
   box-shadow:0 3px 12px rgba(0,0,0,.5);
-  z-index:20;
+  z-index:20;overflow-x:auto;scrollbar-width:none;
 }
-#goldbox{
-  display:flex;align-items:center;gap:5px;
+#topbar::-webkit-scrollbar{display:none}
+.chip{
+  display:flex;align-items:center;gap:4px;flex:0 0 auto;
   background:linear-gradient(180deg,#2c2140,#1c1530);
-  border:1px solid var(--border);border-radius:20px;
-  padding:4px 11px 4px 7px;font-size:14px;font-weight:bold;color:var(--gold-l);
+  border:1px solid var(--border);border-radius:16px;
+  padding:3px 9px 3px 5px;font-size:12px;font-weight:bold;color:var(--gold-l);
   white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
 }
-#goldbox svg{width:16px;height:16px;flex:0 0 auto}
-#spacer{flex:1}
+.chip svg{width:13px;height:13px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2}
+.chip.wheat{color:#f0d97a;border-color:rgba(240,217,122,.3)}
+.chip.wood{color:#c89060;border-color:rgba(200,144,96,.3)}
+.chip.stone{color:#b0b8c8;border-color:rgba(176,184,200,.3)}
+.chip.essence{color:#d8a8ff;border-color:rgba(216,168,255,.35)}
+.chip.hidden{display:none}
+#spacer{flex:1;min-width:6px}
 .tbtn{
-  width:36px;height:36px;flex:0 0 auto;border-radius:11px;
+  width:34px;height:34px;flex:0 0 auto;border-radius:10px;
   border:1px solid var(--border);
   background:linear-gradient(180deg,#2a2140,#1a1428);
   color:var(--gold);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;position:relative;padding:0;transition:transform .12s,filter .12s;
+  cursor:pointer;position:relative;padding:0;transition:transform .12s;
 }
-.tbtn:active{transform:scale(.92);filter:brightness(1.25)}
-.tbtn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;
-  stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.tbtn .dot{
-  position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;
-  background:var(--red);border:2px solid #120d20;display:none;
-  animation:pulse 1.4s infinite;
-}
+.tbtn:active{transform:scale(.9)}
+.tbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tbtn .dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid #120d20;display:none;animation:pulse 1.4s infinite}
 .tbtn.alert .dot{display:block}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
 
 /* ============ STAGE ============ */
 #stage{flex:1 1 auto;position:relative;min-height:0;overflow:hidden}
-#cv{display:block;width:100%;height:100%;touch-action:none}
+#cv{display:block;width:100%;height:100%;touch-action:none;position:absolute;inset:0}
 
-/* ============ UNIT BAR ============ */
-#unitbar{
-  flex:0 0 auto;display:flex;gap:5px;padding:6px 7px;
-  background:linear-gradient(180deg,#150f22,#0d0916);
-  border-top:1px solid rgba(232,194,106,.18);
-  z-index:20;min-height:70px;align-items:stretch;
+/* ============ LOBBY BUILDINGS ============ */
+#lobby-buildings{position:absolute;inset:0;pointer-events:none;z-index:5}
+.bld{
+  position:absolute;transform:translate(-50%,-100%);
+  pointer-events:auto;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;
+  transition:transform .12s;padding:0;border:none;background:none;
 }
-.ubtn{
-  flex:1 1 0;min-width:0;position:relative;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  gap:1px;padding:2px 1px 3px;border-radius:11px;
-  border:1px solid rgba(232,194,106,.28);
-  background:linear-gradient(180deg,#2b2142,#191227);
-  color:var(--text);cursor:pointer;overflow:hidden;
-  transition:transform .1s,filter .1s;
+.bld:active{transform:translate(-50%,-100%) scale(.94)}
+.bld .bicon{
+  width:72px;height:72px;position:relative;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.7));
 }
+.bld .bicon img{width:100%;height:100%;object-fit:contain;display:block}
+.bld .badge{
+  position:absolute;bottom:-4px;right:-4px;min-width:22px;height:22px;
+  padding:0 5px;border-radius:11px;background:linear-gradient(180deg,#c9a24a,#7d5a14);
+  border:2px solid #1a1428;color:#241a04;font-size:11px;font-weight:bold;
+  display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;
+}
+.bld .timer{
+  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  background:#0d0916;border:1px solid var(--border);border-radius:8px;
+  padding:1px 5px;font-size:9px;color:var(--gold-l);white-space:nowrap;
+  display:none;font-family:monospace;
+}
+.bld .timer.show{display:block}
+.bld .ready{
+  position:absolute;top:-6px;right:-4px;width:16px;height:16px;border-radius:50%;
+  background:var(--green);border:2px solid #1a1428;
+  box-shadow:0 0 10px var(--green);display:none;
+  animation:pulse 1.2s infinite;
+}
+.bld .ready.show{display:block}
+.bld .bname{
+  font-size:10px;color:var(--text);margin-top:2px;white-space:nowrap;
+  text-shadow:0 1px 3px #000,0 0 6px #000;font-weight:bold;
+}
+.bld.locked .bicon{filter:grayscale(1) brightness(.5) drop-shadow(0 4px 8px rgba(0,0,0,.7))}
+.bld.locked .bname{color:#777}
+.bld.unbuilt .bicon{filter:grayscale(.7) brightness(.6)}
+
+/* ============ BATTLE HUD ============ */
+#battlehud{position:absolute;top:8px;left:0;right:0;z-index:25;display:none;padding:0 10px;pointer-events:none}
+#battlehud.show{display:block}
+.bhrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.bhrow .bhn{width:56px;color:var(--muted);text-align:right;flex:0 0 auto}
+.bhrow .bhbar{flex:1;height:11px;border-radius:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);overflow:hidden}
+.bhrow .bhbar i{display:block;height:100%;transition:width .2s;border-radius:5px}
+.bhrow.enemy .bhn{text-align:left}
+#pausebtn{position:absolute;top:8px;right:8px;z-index:26;width:34px;height:34px;display:none;align-items:center;justify-content:center;border-radius:10px;border:1px solid var(--border);background:rgba(20,14,34,.85);color:var(--gold);cursor:pointer}
+#pausebtn.show{display:flex}
+#pausebtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ============ MAIN MENU (play) ============ */
+#mainmenu{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,rgba(123,92,255,.12),transparent 65%)}
+#mainmenu.hidden{display:none}
+#mainmenu button{pointer-events:auto}
+#gametitle{font-size:clamp(20px,5vw,30px);text-align:center;color:var(--gold-l);letter-spacing:1.5px;text-shadow:0 0 26px rgba(232,194,106,.45),0 2px 4px #000;line-height:1.2;margin:0;pointer-events:none}
+#gametitle small{display:block;font-size:.5em;color:var(--muted);letter-spacing:3px;margin-top:5px}
+#playbtn{padding:15px 52px;font-size:19px;border-radius:14px;background:linear-gradient(180deg,#c9a24a,#8a6a20);border:2px solid #ffdf94;color:#241a04;font-weight:bold;font-family:inherit;cursor:pointer;letter-spacing:2px;text-shadow:0 1px 0 rgba(255,255,255,.35);box-shadow:0 6px 0 #4a3610,0 12px 30px rgba(0,0,0,.6);transition:transform .09s,box-shadow .09s}
+#playbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #4a3610,0 6px 16px rgba(0,0,0,.6)}
+
+/* ============ BOTTOM BAR ============ */
+#bottom{flex:0 0 auto;background:linear-gradient(180deg,#150f22,#0d0916);border-top:1px solid rgba(232,194,106,.18);z-index:20;min-height:64px;display:flex;align-items:stretch;gap:5px;padding:6px 7px}
+#bottom.battle{min-height:68px}
+#bottom .lbtn{flex:1 1 0;min-width:0;border-radius:11px;border:1px solid rgba(232,194,106,.28);background:linear-gradient(180deg,#2b2142,#191227);color:var(--text);cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s;position:relative}
+#bottom .lbtn:active{transform:scale(.95)}
+#bottom .lbtn svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#bottom .lbtn span{font-size:10px;color:var(--muted);white-space:nowrap}
+#bottom .lbtn.big{background:linear-gradient(180deg,#3a2b5e,#241a3d);border-color:var(--border)}
+#bottom .lbtn.big span{color:var(--gold-l);font-weight:bold;font-size:11px}
+#bottom .lbtn:disabled{opacity:.35;cursor:default}
+#bottom .lbtn .bn{position:absolute;top:2px;right:4px;background:var(--red);color:#fff;font-size:9px;border-radius:8px;padding:0 4px;font-weight:bold;display:none}
+#bottom .lbtn.alert .bn{display:block}
+
+/* unit buttons */
+.ubtn{flex:1 1 0;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;padding:2px 1px 3px;border-radius:11px;border:1px solid rgba(232,194,106,.28);background:linear-gradient(180deg,#2b2142,#191227);color:var(--text);cursor:pointer;overflow:hidden;transition:transform .1s}
 .ubtn:active{transform:scale(.94)}
-.ubtn img{width:auto;height:34px;max-width:100%;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
-.ubtn .cost{
-  font-size:11px;font-weight:bold;color:var(--gold-l);
-  display:flex;align-items:center;gap:3px;line-height:1;
-}
-.ubtn .cost i{width:8px;height:8px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 6px var(--accent);display:inline-block}
-.ubtn .nm{font-size:9px;color:var(--muted);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ubtn img{width:auto;height:32px;max-width:100%;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.ubtn .cost{font-size:11px;font-weight:bold;color:var(--gold-l);display:flex;align-items:center;gap:3px;line-height:1}
+.ubtn .cost i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);display:inline-block}
 .ubtn.disabled{opacity:.42;filter:grayscale(.7)}
 
 /* ============ BANNER ============ */
-#banner{
-  flex:0 0 auto;min-height:0;height:0;overflow:hidden;
-  background:#000;display:flex;align-items:center;justify-content:center;
-  transition:height .25s;
-}
-#banner.on{height:56px;min-height:56px}
+#banner{flex:0 0 auto;min-height:0;height:0;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;transition:height .25s}
+#banner.on{height:50px;min-height:50px}
 
 /* ============ OVERLAYS ============ */
-.overlay{
-  position:fixed;inset:0;z-index:100;display:none;
-  align-items:center;justify-content:center;padding:12px;
-  background:rgba(5,3,10,.78);backdrop-filter:blur(3px);
-}
+.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,10,.78);backdrop-filter:blur(3px)}
 .overlay.show{display:flex;animation:fadeIn .18s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{
-  width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;
-  background:linear-gradient(180deg,#1e1730,#140f22);
-  border:1px solid var(--border);border-radius:16px;
-  box-shadow:0 18px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
-  overflow:hidden;animation:pop .2s cubic-bezier(.2,1.4,.5,1);
-}
+.modal{width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#1e1730,#140f22);border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden;animation:pop .2s cubic-bezier(.2,1.4,.5,1)}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
-.modal.wide{max-width:560px}
-.mhead{
-  flex:0 0 auto;display:flex;align-items:center;gap:8px;
-  padding:12px 14px;border-bottom:1px solid rgba(232,194,106,.2);
-  background:linear-gradient(180deg,rgba(123,92,255,.14),transparent);
-}
+.mhead{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid rgba(232,194,106,.2);background:linear-gradient(180deg,rgba(123,92,255,.14),transparent)}
 .mhead h2{margin:0;font-size:17px;color:var(--gold-l);letter-spacing:.5px;flex:1;font-weight:normal}
-.mclose{
-  width:30px;height:30px;border-radius:9px;border:1px solid var(--border);
-  background:rgba(255,255,255,.05);color:var(--gold);font-size:19px;line-height:1;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;
-}
+.mclose{width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--gold);font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .mclose:active{background:rgba(255,255,255,.12)}
 .mbody{padding:12px 14px 16px;overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0}
 
-/* ============ SCROLLBARS ============ */
-.mbody,.scroll{
-  scrollbar-width:thin;scrollbar-color:var(--gold-d) rgba(255,255,255,.05);
-}
+/* scrollbars */
+.mbody,.scroll{scrollbar-width:thin;scrollbar-color:var(--gold-d) rgba(255,255,255,.05)}
 .mbody::-webkit-scrollbar,.scroll::-webkit-scrollbar{width:9px;height:9px}
-.mbody::-webkit-scrollbar-track,.scroll::-webkit-scrollbar-track{
-  background:rgba(255,255,255,.045);border-radius:9px;margin:4px 0;
-}
-.mbody::-webkit-scrollbar-thumb,.scroll::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,var(--gold),var(--gold-d));
-  border-radius:9px;border:2px solid #171226;background-clip:padding-box;
-}
-.mbody::-webkit-scrollbar-thumb:hover,.scroll::-webkit-scrollbar-thumb:hover{
-  background:linear-gradient(180deg,var(--gold-l),var(--gold));background-clip:padding-box;
-}
+.mbody::-webkit-scrollbar-track,.scroll::-webkit-scrollbar-track{background:rgba(255,255,255,.045);border-radius:9px;margin:4px 0}
+.mbody::-webkit-scrollbar-thumb,.scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--gold),var(--gold-d));border-radius:9px;border:2px solid #171226;background-clip:padding-box}
 
-/* ============ GENERIC UI ============ */
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;
-  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);
-  border-radius:11px;margin-bottom:9px}
+/* generic UI */
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:11px;margin-bottom:9px}
 .row .lab{font-size:14px;color:var(--text)}
 .row .sub{font-size:11px;color:var(--muted);margin-top:2px}
-.btn{
-  border:1px solid var(--border);border-radius:11px;padding:9px 16px;
-  background:linear-gradient(180deg,#3a2b5e,#241a3d);color:var(--gold-l);
-  font-family:inherit;font-size:14px;cursor:pointer;font-weight:bold;
-  transition:transform .1s,filter .12s;white-space:nowrap;
-}
-.btn:active{transform:scale(.95);filter:brightness(1.2)}
+.btn{border:1px solid var(--border);border-radius:11px;padding:9px 16px;background:linear-gradient(180deg,#3a2b5e,#241a3d);color:var(--gold-l);font-family:inherit;font-size:14px;cursor:pointer;font-weight:bold;transition:transform .1s,filter .12s;white-space:nowrap}
+.btn:active{transform:scale(.95)}
 .btn:disabled{opacity:.4;cursor:default;filter:grayscale(.6)}
 .btn.green{background:linear-gradient(180deg,#2c6b47,#1c4530);border-color:rgba(92,214,138,.5);color:#c9ffe0}
+.btn.red{background:linear-gradient(180deg,#7a2b3e,#4a1830);border-color:rgba(255,95,109,.5);color:#ffd0d6}
 .btn.ghost{background:rgba(255,255,255,.05)}
 .btn.full{width:100%;display:block;margin-top:8px}
-.switch{
-  position:relative;width:52px;height:28px;border-radius:16px;flex:0 0 auto;
-  background:#2a2238;border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:.2s;
-}
-.switch::after{
-  content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(180deg,#8a8a9a,#5a5a6a);transition:.2s;
-}
-.switch.on{background:linear-gradient(180deg,#4b7bff,#2b4bc9);border-color:rgba(120,160,255,.6)}
-.switch.on::after{left:26px;background:linear-gradient(180deg,#fff,#cfe0ff)}
-.langrow{display:flex;gap:8px}
-.langbtn{flex:1;padding:9px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.04);color:var(--muted);font-family:inherit;font-size:14px;cursor:pointer}
-.langbtn.active{background:linear-gradient(180deg,#3a2b5e,#241a3d);color:var(--gold-l);border-color:var(--border);font-weight:bold}
-input.pcode{
-  flex:1;min-width:0;background:#0f0b1a;border:1px solid rgba(255,255,255,.13);
-  border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;
-}
-input.pcode:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,255,.22)}
-
-/* quests */
-.quest{
-  display:flex;align-items:center;gap:10px;padding:10px 11px;margin-bottom:8px;
-  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:11px;
-}
-.quest.done{border-color:rgba(92,214,138,.45);background:rgba(92,214,138,.08)}
-.quest .qi{flex:1;min-width:0}
-.quest .qn{font-size:13px;margin-bottom:5px;line-height:1.25}
-.quest .qbar{height:6px;border-radius:4px;background:rgba(0,0,0,.45);overflow:hidden}
-.quest .qbar i{display:block;height:100%;border-radius:4px;
-  background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .3s}
-.quest .qr{font-size:12px;color:var(--gold-l);font-weight:bold;white-space:nowrap;display:flex;gap:3px;align-items:center}
-.quest .qr svg{width:13px;height:13px}
-
-/* rest room */
-.rest-timer{
-  font-size:34px;text-align:center;color:var(--gold-l);letter-spacing:2px;
-  font-variant-numeric:tabular-nums;margin:6px 0 2px;
-}
-.rest-bar{height:9px;border-radius:5px;background:rgba(0,0,0,.5);overflow:hidden;margin:10px 0}
-.rest-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#b48bff);transition:width .5s linear}
 .center{text-align:center}
 .muted{color:var(--muted);font-size:12px;line-height:1.45}
 
-/* playtime rewards */
-.ptime-item{
-  display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:8px;
-  border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);
-}
+/* resource cost display */
+.costrow{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.costitem{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);font-size:12px;font-weight:bold}
+.costitem svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.costitem.miss{color:#ff5f6d}
+.costitem.ok{color:var(--green)}
+
+/* building modal content */
+.binfo{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(0,0,0,.28);border-radius:12px;margin-bottom:10px}
+.binfo img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+.binfo .bl{flex:1;min-width:0}
+.binfo .bnm{font-size:15px;color:var(--gold-l);font-weight:bold}
+.binfo .blv{font-size:12px;color:var(--muted);margin-top:3px}
+.binfo .bdesc{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+
+/* progress bar (build timer) */
+.progress{height:9px;border-radius:5px;background:rgba(0,0,0,.5);overflow:hidden;margin:8px 0;border:1px solid rgba(255,255,255,.06)}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#b48bff);transition:width .5s linear;border-radius:5px}
+
+/* unit shop cards */
+.ugrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ucard{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+.ucard img{width:52px;height:52px;object-fit:contain}
+.ucard .un{font-size:12px;color:var(--text);font-weight:bold}
+.ucard .us{font-size:10px;color:var(--muted)}
+.ucard.locked{opacity:.55;filter:grayscale(.6)}
+.ucard.owned{border-color:rgba(92,214,138,.5);background:rgba(92,214,138,.08)}
+.ucard .ubuy{margin-top:4px;width:100%;padding:6px;font-size:11px;border-radius:8px}
+.ucard .lock-msg{font-size:10px;color:var(--muted);padding:2px 4px}
+
+/* hero cards */
+.hcard{display:flex;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:9px;align-items:center}
+.hcard img{width:54px;height:54px;object-fit:contain;flex:0 0 auto}
+.hcard .hinfo{flex:1;min-width:0}
+.hcard .hn{font-size:14px;color:var(--gold-l);font-weight:bold}
+.hcard .hl{font-size:11px;color:var(--muted);margin-top:2px}
+.hcard .hb{font-size:11px;color:var(--essence);margin-top:4px}
+.hcard .hbtn{padding:6px 10px;font-size:11px}
+
+/* auction cards */
+.acard{padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:8px}
+.acard .arow{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.acard .anm{font-size:13px;color:var(--text)}
+.acard .aprice{font-size:13px;color:var(--gold-l);font-weight:bold}
+.acard .achance{font-size:11px;color:var(--muted);margin-top:4px}
+.acard .abtns{display:flex;gap:6px;margin-top:8px}
+.acard .abtns .btn{flex:1;font-size:11px;padding:6px}
+
+/* cave list */
+.ccard{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:8px}
+.ccard img{width:44px;height:44px;object-fit:contain;flex:0 0 auto}
+.ccard .cinfo{flex:1;min-width:0}
+.ccard .cn{font-size:13px;color:var(--text);font-weight:bold}
+.ccard .cr{font-size:11px;color:var(--essence);margin-top:2px}
+.ccard .btn{font-size:11px;padding:7px 12px}
+.ccard.locked{opacity:.5;filter:grayscale(.6)}
+
+/* form */
+input.fld{flex:1;min-width:0;background:#0f0b1a;border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+input.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,255,.22)}
+select.fld{flex:1;min-width:0;background:#0f0b1a;border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+
+/* toggles */
+.switch{position:relative;width:52px;height:28px;border-radius:16px;flex:0 0 auto;background:#2a2238;border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:.2s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,#8a8a9a,#5a5a6a);transition:.2s}
+.switch.on{background:linear-gradient(180deg,#4b7bff,#2b4bc9);border-color:rgba(120,160,255,.6)}
+.switch.on::after{left:26px;background:linear-gradient(180deg,#fff,#cfe0ff)}
+.langrow{display:flex;gap:8px}
+.langbtn{flex:1;padding:9px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+.langbtn.active{background:linear-gradient(180deg,#3a2b5e,#241a3d);color:var(--gold-l);border-color:var(--border);font-weight:bold}
+
+/* quests */
+.quest{display:flex;align-items:center;gap:10px;padding:10px 11px;margin-bottom:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:11px}
+.quest.done{border-color:rgba(92,214,138,.45);background:rgba(92,214,138,.08)}
+.quest .qi{flex:1;min-width:0}
+.quest .qn{font-size:12px;margin-bottom:5px;line-height:1.25}
+.quest .qbar{height:6px;border-radius:4px;background:rgba(0,0,0,.45);overflow:hidden}
+.quest .qbar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .3s}
+.quest .qr{font-size:12px;color:var(--gold-l);font-weight:bold;white-space:nowrap;display:flex;gap:3px;align-items:center}
+.quest .qr svg{width:13px;height:13px}
+
+/* rest */
+.rest-timer{font-size:34px;text-align:center;color:var(--gold-l);letter-spacing:2px;font-variant-numeric:tabular-nums;margin:6px 0 2px}
+.rest-bar{height:9px;border-radius:5px;background:rgba(0,0,0,.5);overflow:hidden;margin:10px 0}
+.rest-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#b48bff);transition:width .5s linear}
+
+/* playtime */
+.ptime-item{display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:8px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
 .ptime-item.ready{border-color:rgba(92,214,138,.5);background:rgba(92,214,138,.1);animation:glowp 1.6s infinite}
 @keyframes glowp{0%,100%{box-shadow:0 0 0 rgba(92,214,138,0)}50%{box-shadow:0 0 14px rgba(92,214,138,.4)}}
 .ptime-item.done{opacity:.45}
-.ptime-item .tl{flex:1;font-size:13px}
+.ptime-item .tl{flex:1;font-size:12px}
 
 /* ad overlay */
-#adov{
-  position:fixed;inset:0;z-index:9000;display:none;
-  align-items:center;justify-content:center;flex-direction:column;gap:18px;
-  background:rgba(3,2,8,.94);backdrop-filter:blur(6px);
-}
+#adov{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:rgba(3,2,8,.94);backdrop-filter:blur(6px)}
 #adov.show{display:flex}
-.spinner{
-  width:56px;height:56px;border-radius:50%;
-  border:4px solid rgba(232,194,106,.18);border-top-color:var(--gold);
-  animation:spin 1s linear infinite;
-}
+.spinner{width:56px;height:56px;border-radius:50%;border:4px solid rgba(232,194,106,.18);border-top-color:var(--gold);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#adov .adtxt{color:var(--gold-l);font-size:15px;text-align:center;padding:0 30px;line-height:1.5}
+#adov .adtxt{color:var(--gold-l);font-size:15px;text-align:center;padding:0 30px;line-height:1.5;white-space:pre-line}
 
 /* tutorial */
-#tutbox{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:calc(80px + env(safe-area-inset-bottom,0px));
-  width:calc(100% - 24px);max-width:430px;z-index:5000;display:none;
-  background:linear-gradient(180deg,#241b3a,#160f26);
-  border:1px solid var(--border);border-radius:14px;padding:14px;
-  box-shadow:0 12px 40px rgba(0,0,0,.85);
-}
+#tutbox{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(80px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:430px;z-index:5000;display:none;background:linear-gradient(180deg,#241b3a,#160f26);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.85)}
 #tutbox.show{display:block;animation:pop .22s}
-#tutbox .tt{font-size:14px;line-height:1.5;margin-bottom:11px;color:var(--text)}
+#tutbox .tt{font-size:13px;line-height:1.5;margin-bottom:11px;color:var(--text)}
 #tutbox .tfoot{display:flex;gap:8px;align-items:center;justify-content:space-between}
 #tutbox .dots{display:flex;gap:5px}
 #tutbox .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2)}
@@ -255,100 +296,56 @@ input.pcode:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,25
 .res-line{display:flex;justify-content:space-between;padding:7px 4px;font-size:14px;border-bottom:1px dashed rgba(255,255,255,.08)}
 
 /* toast */
-#toast{
-  position:fixed;left:50%;top:64px;transform:translate(-50%,-16px);
-  z-index:9500;background:linear-gradient(180deg,#2c2247,#1a1330);
-  border:1px solid var(--border);border-radius:11px;padding:10px 18px;
-  color:var(--gold-l);font-size:13px;opacity:0;pointer-events:none;
-  transition:opacity .25s,transform .25s;max-width:90vw;text-align:center;
-  box-shadow:0 8px 30px rgba(0,0,0,.7);
-}
+#toast{position:fixed;left:50%;top:64px;transform:translate(-50%,-16px);z-index:9500;background:linear-gradient(180deg,#2c2247,#1a1330);border:1px solid var(--border);border-radius:11px;padding:10px 18px;color:var(--gold-l);font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.7)}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* main menu */
-#mainmenu{
-  position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:14px;padding:20px;
-  background:radial-gradient(ellipse at 50% 40%,rgba(123,92,255,.16),transparent 65%);
-}
-#mainmenu.hidden{display:none}
-#gametitle{
-  font-size:clamp(20px,5.4vw,32px);text-align:center;color:var(--gold-l);
-  letter-spacing:1.5px;text-shadow:0 0 26px rgba(232,194,106,.45),0 2px 4px #000;
-  line-height:1.2;margin:0;
-}
-#gametitle small{display:block;font-size:.5em;color:var(--muted);letter-spacing:3px;margin-top:7px}
-#playbtn{
-  padding:15px 52px;font-size:19px;border-radius:14px;
-  background:linear-gradient(180deg,#c9a24a,#8a6a20);
-  border:2px solid #ffdf94;color:#241a04;font-weight:bold;font-family:inherit;
-  cursor:pointer;letter-spacing:2px;text-shadow:0 1px 0 rgba(255,255,255,.35);
-  box-shadow:0 6px 0 #4a3610,0 12px 30px rgba(0,0,0,.6);
-  transition:transform .09s,box-shadow .09s;
-}
-#playbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #4a3610,0 6px 16px rgba(0,0,0,.6)}
-#levelinfo{font-size:13px;color:var(--muted);letter-spacing:1px}
+/* menu grid in main menu modal */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mbtn{padding:14px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;font-size:12px;position:relative}
+.mbtn:active{transform:scale(.97)}
+.mbtn svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.mbtn .bn{position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;background:var(--red);display:none;animation:pulse 1.4s infinite}
+.mbtn.alert .bn{display:block}
 
-/* battle HUD */
-#battlehud{
-  position:absolute;top:8px;left:0;right:0;z-index:25;display:none;
-  padding:0 10px;pointer-events:none;
-}
-#battlehud.show{display:block}
-.bhrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
-.bhrow .bhn{width:56px;color:var(--muted);text-align:right;flex:0 0 auto}
-.bhrow .bhbar{flex:1;height:11px;border-radius:6px;background:rgba(0,0,0,.55);
-  border:1px solid rgba(255,255,255,.1);overflow:hidden}
-.bhrow .bhbar i{display:block;height:100%;transition:width .2s;border-radius:5px}
-.bhrow.enemy .bhn{text-align:left}
-#pausebtn{
-  position:absolute;top:8px;right:8px;z-index:26;width:34px;height:34px;
-  display:none;align-items:center;justify-content:center;
-  border-radius:10px;border:1px solid var(--border);
-  background:rgba(20,14,34,.85);color:var(--gold);cursor:pointer;
-}
-#pausebtn.show{display:flex}
-#pausebtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+/* resource info small */
+.res-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;background:rgba(0,0,0,.35);font-size:11px;font-weight:bold;border:1px solid rgba(255,255,255,.08)}
+.res-pill svg{width:11px;height:11px}
 </style>
 </head>
 <body>
 <div id="app">
 
   <header id="topbar">
-    <div id="goldbox">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="12" cy="12" r="9" fill="rgba(232,194,106,.18)"/>
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 7v10M9.5 9.5h3.8a1.7 1.7 0 010 3.4H9.5h4a1.7 1.7 0 010 3.4H9.5" stroke-width="1.4"/>
-      </svg>
-      <span id="goldval">0</span>
+    <div class="chip" id="chip-gold">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="rgba(232,194,106,.16)"/><path d="M12 7v10M9.5 9.5h3.8a1.7 1.7 0 010 3.4H9.5h4a1.7 1.7 0 010 3.4H9.5" stroke-width="1.4"/></svg>
+      <span id="val-gold">0</span>
+    </div>
+    <div class="chip wheat hidden" id="chip-wheat">
+      <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-3 4 3M8 12l4-3 4 3M8 17l4-3 4 3"/></svg>
+      <span id="val-wheat">0</span>
+    </div>
+    <div class="chip wood hidden" id="chip-wood">
+      <svg viewBox="0 0 24 24"><path d="M4 20l10-10M6 8l4-4 8 8-4 4zM14 18h6M17 15v6"/></svg>
+      <span id="val-wood">0</span>
+    </div>
+    <div class="chip stone hidden" id="chip-stone">
+      <svg viewBox="0 0 24 24"><path d="M4 16l3-8 5-2 5 4 3 8z M8 12l4-2 4 3"/></svg>
+      <span id="val-stone">0</span>
+    </div>
+    <div class="chip essence hidden" id="chip-essence">
+      <svg viewBox="0 0 24 24"><path d="M12 3l3 6-3 12-3-12z M9 9h6"/></svg>
+      <span id="val-essence">0</span>
     </div>
     <div id="spacer"></div>
-    <button class="tbtn" id="btn-quests" title="quests">
-      <svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+    <button class="tbtn" id="btn-menu" title="menu">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       <span class="dot"></span>
-    </button>
-    <button class="tbtn" id="btn-rest" title="rest">
-      <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
-    </button>
-    <button class="tbtn" id="btn-daily" title="daily">
-      <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S9 3 6.5 4.5 8 8 12 8zM12 8s3-5 5.5-3.5S16 8 12 8z"/></svg>
-      <span class="dot"></span>
-    </button>
-    <button class="tbtn" id="btn-time" title="time">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
-      <span class="dot"></span>
-    </button>
-    <button class="tbtn" id="btn-invite" title="invite">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 14.6c2.9.2 5 2.3 5 5.4"/></svg>
-    </button>
-    <button class="tbtn" id="btn-settings" title="settings">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>
     </button>
   </header>
 
   <main id="stage">
     <canvas id="cv"></canvas>
+    <div id="lobby-buildings"></div>
 
     <div id="battlehud">
       <div class="bhrow"><div class="bhn" id="lbl-ally">Вы</div><div class="bhbar"><i id="hp-ally" style="width:100%;background:linear-gradient(90deg,#3f8cff,#6bb6ff)"></i></div></div>
@@ -358,19 +355,51 @@ input.pcode:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,25
       <svg viewBox="0 0 24 24"><rect x="7" y="5" width="4" height="14" rx="1"/><rect x="13" y="5" width="4" height="14" rx="1"/></svg>
     </button>
 
-    <div id="mainmenu">
+    <div id="mainmenu" class="hidden">
       <h1 id="gametitle">МИСТИЧЕСКОЕ<small>СРЕДНЕВЕКОВЬЕ</small></h1>
-      <div id="levelinfo"></div>
       <button id="playbtn">В БОЙ</button>
-      <div class="muted center" style="max-width:280px" id="menu_hint"></div>
     </div>
   </main>
 
-  <div id="unitbar"></div>
+  <div id="bottom"></div>
   <div id="banner"></div>
 </div>
 
-<!-- ================= OVERLAYS ================= -->
+<!-- ================= MODALS ================= -->
+
+<div class="overlay" id="ov-menu">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="menu"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody">
+      <div class="mgrid">
+        <button class="mbtn" data-open="ov-quests">
+          <svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+          <span data-i18n="quests"></span><span class="bn"></span>
+        </button>
+        <button class="mbtn" data-open="ov-daily">
+          <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S9 3 6.5 4.5 8 8 12 8zM12 8s3-5 5.5-3.5S16 8 12 8z"/></svg>
+          <span data-i18n="daily"></span><span class="bn"></span>
+        </button>
+        <button class="mbtn" data-open="ov-time">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <span data-i18n="time"></span><span class="bn"></span>
+        </button>
+        <button class="mbtn" data-open="ov-rest">
+          <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+          <span data-i18n="rest"></span>
+        </button>
+        <button class="mbtn" id="mbtn-invite">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 14.6c2.9.2 5 2.3 5 5.4"/></svg>
+          <span data-i18n="invite"></span>
+        </button>
+        <button class="mbtn" data-open="ov-settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v3M12 18.4v3M2.6 12h3M18.4 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>
+          <span data-i18n="settings"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="overlay" id="ov-settings">
   <div class="modal">
@@ -390,11 +419,74 @@ input.pcode:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,25
       <div class="row" style="display:block">
         <div class="lab" style="margin-bottom:8px" data-i18n="promocode"></div>
         <div style="display:flex;gap:8px">
-          <input class="pcode" id="pcode-input" type="text" placeholder="...">
+          <input class="fld" id="pcode-input" type="text" placeholder="...">
           <button class="btn" id="pcode-apply" data-i18n="apply"></button>
         </div>
         <div class="muted" id="pcode-msg" style="margin-top:8px;min-height:16px"></div>
       </div>
+      <div class="row" style="display:block">
+        <div class="lab" style="margin-bottom:4px" data-i18n="reset"></div>
+        <div class="muted" style="margin-bottom:8px" data-i18n="reset_desc"></div>
+        <button class="btn red" id="btn-reset" data-i18n="reset_btn"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-building">
+  <div class="modal">
+    <div class="mhead"><h2 id="bld-title"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody" id="bld-body"></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-units">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="units"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody">
+      <div class="muted" style="margin-bottom:10px" data-i18n="units_desc"></div>
+      <div class="ugrid" id="units-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-lab">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="lab"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody">
+      <div class="muted" style="margin-bottom:10px" data-i18n="lab_desc"></div>
+      <div id="heroes-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-auction">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="auction"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody">
+      <div class="muted" style="margin-bottom:10px" data-i18n="auction_desc"></div>
+      <div class="row" style="display:block">
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <select class="fld" id="auc-res"></select>
+          <input class="fld" id="auc-amt" type="number" min="1" style="max-width:90px" placeholder="кол-во">
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input class="fld" id="auc-price" type="number" min="1" placeholder="цена за ед.">
+          <button class="btn green" id="auc-add" data-i18n="list"></button>
+        </div>
+        <div class="muted" id="auc-hint" style="margin-top:8px"></div>
+      </div>
+      <div id="auction-list" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-cave">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="cave"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody">
+      <div class="muted" style="margin-bottom:10px" data-i18n="cave_desc"></div>
+      <div id="cave-list"></div>
     </div>
   </div>
 </div>
@@ -486,9 +578,9 @@ input.pcode:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,92,25
 <div id="toast"></div>
 
 <script>
-/* ==========================================================================
-   0. SAFE VK BRIDGE
-   ========================================================================== */
+/* ========================================================================
+   SAFE VK BRIDGE
+   ======================================================================== */
 const HAS_VK = (typeof vkBridge !== 'undefined');
 const VK = {
   send(method, params){
@@ -497,114 +589,280 @@ const VK = {
     catch(e){ return Promise.reject(e); }
   }
 };
-if(HAS_VK){
-  VK.send('VKWebAppInit').catch(()=>{});
-}
+if(HAS_VK) VK.send('VKWebAppInit').catch(()=>{});
 
-/* ==========================================================================
-   1. I18N
-   ========================================================================== */
+/* ========================================================================
+   I18N
+   ======================================================================== */
 const STR = {
   ru:{
-    settings:'Настройки', quests:'Задания', rest:'Комната отдыха', daily:'Награда дня',
-    time:'Награда за время', invite:'Пригласить друзей',
-    music:'Музыка', music_sub:'Фоновая музыка в игре',
-    language:'Язык интерфейса', promocode:'Промокод', apply:'Применить',
+    menu:'Меню', settings:'Настройки', quests:'Задания', rest:'Комната отдыха',
+    daily:'Награда дня', time:'Награда за время', invite:'Пригласить друзей',
+    music:'Музыка', music_sub:'Фоновая музыка в игре', language:'Язык интерфейса',
+    promocode:'Промокод', apply:'Применить',
+    reset:'Сброс прогресса', reset_desc:'Удалить все данные игрока (без возможности восстановления).',
+    reset_btn:'Начать заново',
     tut_q:'Обучение', tut_q_desc:'Хотите пройти короткое обучение?',
-    tut_yes:'Пройти обучение', tut_no:'Пропустить',
-    claim:'Получить', next:'Далее', close:'Закрыть',
+    tut_yes:'Пройти обучение', tut_no:'Пропустить', next:'Далее', claim:'Получить',
     daily_desc:'Заходите каждый день и получайте золото. Чем длиннее серия — тем больше награда!',
     rest_desc:'Пока вы отдыхаете у камина, каждую минуту в казну капает золото.',
     ad_loading:'Загрузка рекламы…\nПожалуйста, подождите.',
     double_reward:'Удвоить за рекламу', take_reward:'Забрать награду',
     paused:'Пауза', resume:'Продолжить', quit_level:'Покинуть уровень',
     win:'ПОБЕДА', lose:'ПОРАЖЕНИЕ',
-    quests_empty:'Задания обновятся завтра',
-    no_gold:'Недостаточно золота',
-    promocode_ok:'Промокод активирован!', promocode_bad:'Неверный промокод',
+    units:'Войска', units_desc:'Покупайте и улучшайте воинов. Доступность зависит от уровня Казарм.',
+    lab:'Лаборатория', lab_desc:'Прокачивайте героев. Улучшения занимают время и усиливают всю армию.',
+    auction:'Аукцион', auction_desc:'Выставляйте ресурсы на продажу. Чем ниже цена — тем быстрее продажа.',
+    cave:'Пещера', cave_desc:'Сражайтесь с чудовищами пещеры за редкую эссенцию.',
+    list:'Выставить', level:'Уровень', upgrade:'Улучшить', build:'Построить',
+    collect:'Собрать', building:'Строится', ready:'Готово', cancel:'Отмена',
+    no_gold:'Недостаточно ресурсов', promocode_ok:'Промокод активирован!', promocode_bad:'Неверный промокод',
     time_gone:'Уже получено', time_ready:'Получить', time_locked:'Через',
-    gold:'Золото', level:'Уровень', minutes:'мин', seconds:'сек',
-    reward_for:'Награда за', winreward:'Награда за победу',
-    units_spawned:'Призвано воинов', enemies_killed:'Побеждено врагов',
-    next_level:'Следующий уровень', back:'В главное меню',
-    invite_ok:'Приглашение отправлено', invite_err:'Не удалось пригласить',
+    gold:'Золото', wheat:'Пшеница', wood:'Дерево', stone:'Камень', essence:'Эссенция',
+    reward_for:'Награда', winreward:'Награда за победу', units_spawned:'Призвано', enemies_killed:'Побеждено',
+    level_max:'Максимальный уровень', req_castle:'Требуется замок ур.', need_barracks:'Требуются казармы ур.',
+    unlocked_at:'Откроется на ур.',
+    buy:'Купить', owned:'Куплено', locked:'Закрыто',
+    inv_ok:'Приглашение отправлено', inv_err:'Не удалось пригласить',
     daily_ok:'Награда получена!', daily_wait:'Уже получено сегодня',
     quest_done:'Получено', quest_claim:'Забрать',
-    tut_1:'Добро пожаловать в Мистическое Средневековье! Здесь вы командуете армией против тёмных сил.',
-    tut_2:'Слева — ваш замок. Если его разрушат, вы проиграете.',
-    tut_3:'Внизу — кнопки призыва воинов. Нажмите на любую, чтобы призвать бойца на поле.',
-    tut_4:'За призыв тратится Эссенция (фиолетовая шкала). Она восстанавливается сама.',
-    tut_5:'Уничтожьте тёмную башню справа — и вы победите. За победу дают золото.',
-    tut_6:'Золото тратится на награды и улучшения. Выполняйте задания, заходите ежедневно и отдыхайте в комнате отдыха!',
-    session:'Сессия', online:'В игре'
+    hp_bonus:'+HP армии', dmg_bonus:'+Урон армии', essence_bonus:'+Реген эссенции',
+    price:'Цена', amount:'Количество', chance:'Шанс продажи/мин', res:'Ресурс',
+    sold:'ПРОДАНО', listing:'На аукционе', collect_res:'Собрать ресурсы',
+    production:'Производство', storage:'Хранилище',
+    tut_1:'Добро пожаловать в Мистическое Средневековье! Вы — правитель крепости на границе тьмы.',
+    tut_2:'На карте ваши владения. Тапайте по зданиям, чтобы собирать ресурсы, улучшать их и открывать новое.',
+    tut_3:'Ферма даёт пшеницу, Лесопилка — дерево, Каменоломня — камень. Эти ресурсы нужны для строительства.',
+    tut_4:'Казармы открывают новых воинов. Заходите туда, чтобы купить бойцов.',
+    tut_5:'Лаборатория усиливает вашу армию. Пещера приносит редкую эссенцию. Аукцион продаёт лишние ресурсы.',
+    tut_6:'Кнопка "В БОЙ" — основной режим. Победа даёт золото и повышает уровень. Развивайте базу, копите силы!',
+    session:'Сессия'
   },
   en:{
-    settings:'Settings', quests:'Quests', rest:'Rest Room', daily:'Daily Reward',
-    time:'Playtime Reward', invite:'Invite Friends',
-    music:'Music', music_sub:'Background music in game',
-    language:'Interface language', promocode:'Promo code', apply:'Apply',
+    menu:'Menu', settings:'Settings', quests:'Quests', rest:'Rest Room',
+    daily:'Daily Reward', time:'Playtime Reward', invite:'Invite Friends',
+    music:'Music', music_sub:'Background music in game', language:'Language',
+    promocode:'Promo code', apply:'Apply',
+    reset:'Reset progress', reset_desc:'Delete all player data (cannot be undone).',
+    reset_btn:'Start over',
     tut_q:'Tutorial', tut_q_desc:'Would you like to take a short tutorial?',
-    tut_yes:'Start tutorial', tut_no:'Skip',
-    claim:'Claim', next:'Next', close:'Close',
+    tut_yes:'Start tutorial', tut_no:'Skip', next:'Next', claim:'Claim',
     daily_desc:'Log in every day to get gold. The longer your streak, the bigger the reward!',
     rest_desc:'While resting by the fireplace, gold trickles into your treasury every minute.',
     ad_loading:'Loading advertisement…\nPlease wait.',
     double_reward:'Double for ad', take_reward:'Take reward',
     paused:'Paused', resume:'Resume', quit_level:'Leave level',
     win:'VICTORY', lose:'DEFEAT',
-    quests_empty:'Quests will refresh tomorrow',
-    no_gold:'Not enough gold',
-    promocode_ok:'Promo code activated!', promocode_bad:'Invalid promo code',
-    time_gone:'Already claimed', time_ready:'Claim', time_locked:'In',
-    gold:'Gold', level:'Level', minutes:'min', seconds:'sec',
-    reward_for:'Reward for', winreward:'Victory reward',
-    units_spawned:'Units summoned', enemies_killed:'Enemies defeated',
-    next_level:'Next level', back:'Main menu',
-    invite_ok:'Invitation sent', invite_err:'Invite failed',
+    units:'Army', units_desc:'Buy and upgrade warriors. Availability depends on Barracks level.',
+    lab:'Laboratory', lab_desc:'Upgrade heroes. Upgrades take time and buff your whole army.',
+    auction:'Auction', auction_desc:'List resources for sale. Lower price — faster sale.',
+    cave:'Cave', cave_desc:'Battle cave monsters for rare essence.',
+    list:'List', level:'Level', upgrade:'Upgrade', build:'Build',
+    collect:'Collect', building:'Building', ready:'Ready', cancel:'Cancel',
+    no_gold:'Not enough resources', promocode_ok:'Promo activated!', promocode_bad:'Invalid promo',
+    time_gone:'Claimed', time_ready:'Claim', time_locked:'In',
+    gold:'Gold', wheat:'Wheat', wood:'Wood', stone:'Stone', essence:'Essence',
+    reward_for:'Reward', winreward:'Victory reward', units_spawned:'Summoned', enemies_killed:'Defeated',
+    level_max:'Max level', req_castle:'Requires castle lvl', need_barracks:'Requires barracks lvl',
+    unlocked_at:'Unlocks at lvl',
+    buy:'Buy', owned:'Owned', locked:'Locked',
+    inv_ok:'Invitation sent', inv_err:'Invite failed',
     daily_ok:'Reward claimed!', daily_wait:'Already claimed today',
     quest_done:'Claimed', quest_claim:'Claim',
-    tut_1:'Welcome to Mystic Middle Ages! Here you command an army against dark forces.',
-    tut_2:'On the left is your castle. If it falls, you lose.',
-    tut_3:'At the bottom are summon buttons. Tap one to summon a warrior to the field.',
-    tut_4:'Summoning costs Essence (purple bar). It regenerates over time.',
-    tut_5:'Destroy the dark tower on the right to win. Victory grants gold.',
-    tut_6:'Gold is used for rewards and upgrades. Complete quests, log in daily and rest in the rest room!',
-    session:'Session', online:'Online'
+    hp_bonus:'+Army HP', dmg_bonus:'+Army damage', essence_bonus:'+Essence regen',
+    price:'Price', amount:'Amount', chance:'Sale chance/min', res:'Resource',
+    sold:'SOLD', listing:'Listed', collect_res:'Collect resources',
+    production:'Production', storage:'Storage',
+    tut_1:'Welcome to Mystic Middle Ages! You rule a fortress on the edge of darkness.',
+    tut_2:'Tap buildings to collect resources, upgrade them, and unlock new ones.',
+    tut_3:'Farm gives wheat, Lumber Mill gives wood, Quarry gives stone. Needed for construction.',
+    tut_4:'Barracks unlock new warriors. Tap them to buy soldiers.',
+    tut_5:'Laboratory buffs your army. Cave yields rare essence. Auction sells surplus resources.',
+    tut_6:'The "FIGHT" button is the main mode. Win for gold and levels. Build up your base!',
+    session:'Session'
   }
 };
 let LANG = 'ru';
 function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.ru[k] || k; }
 
-/* ==========================================================================
-   2. GAME STATE
-   ========================================================================== */
-const SAVE_KEY = 'mystic_save_v1';
+/* ========================================================================
+   CONFIG
+   ======================================================================== */
+const RES = {
+  gold:{ru:'Золото', en:'Gold', color:'#e8c26a', icon:'M12 3a9 9 0 100 18 9 9 0 000-18zm0 3v12M9.5 8.5h3.8a1.7 1.7 0 010 3.4H9.5h4a1.7 1.7 0 010 3.4H9.5'},
+  wheat:{ru:'Пшеница', en:'Wheat', color:'#f0d97a', icon:'M12 3v18M8 7l4-3 4 3M8 12l4-3 4 3M8 17l4-3 4 3'},
+  wood:{ru:'Дерево', en:'Wood', color:'#c89060', icon:'M4 20l10-10M6 8l4-4 8 8-4 4zM14 18h6M17 15v6'},
+  stone:{ru:'Камень', en:'Stone', color:'#b0b8c8', icon:'M4 16l3-8 5-2 5 4 3 8z'},
+  essence:{ru:'Эссенция', en:'Essence', color:'#d8a8ff', icon:'M12 3l3 6-3 12-3-12zM9 9h6'}
+};
+
+const BUILDINGS = {
+  castle: {
+    ru:'Замок', en:'Castle',
+    icon:'castle',
+    desc_ru:'Сердце крепости. Уровень замка ограничивает другие здания.',
+    desc_en:'Heart of the fortress. Castle level limits other buildings.',
+    maxLevel: 30,
+    cost(lv){ return {gold: 150*lv + 100*lv*lv}; },
+    time(lv){ return 60 * Math.pow(1.55, lv); }
+  },
+  farm: {
+    ru:'Ферма', en:'Farm',
+    icon:'farm',
+    resource:'wheat',
+    desc_ru:'Производит пшеницу. Улучшайте для роста добычи.',
+    desc_en:'Produces wheat. Upgrade for higher yield.',
+    maxLevel: 30,
+    req:'castle', reqLv(lv){ return lv; },
+    rate(lv){ return 12 + 8*lv; },   // per hour
+    cap(lv){ return 80 + 70*lv; },
+    cost(lv){ return {gold: 80*lv, wood: 30*lv}; },
+    time(lv){ return 60 * Math.pow(1.4, lv); }
+  },
+  lumber: {
+    ru:'Лесопилка', en:'Lumber Mill',
+    icon:'lumber',
+    resource:'wood',
+    desc_ru:'Производит дерево. Улучшайте для роста добычи.',
+    desc_en:'Produces wood. Upgrade for higher yield.',
+    maxLevel: 30,
+    req:'castle', reqLv(lv){ return lv; },
+    rate(lv){ return 9 + 6*lv; },
+    cap(lv){ return 60 + 50*lv; },
+    cost(lv){ return {gold: 120*lv, wheat: 40*lv}; },
+    time(lv){ return 90 * Math.pow(1.4, lv); }
+  },
+  quarry: {
+    ru:'Каменоломня', en:'Quarry',
+    icon:'quarry',
+    resource:'stone',
+    desc_ru:'Производит камень. Улучшайте для роста добычи.',
+    desc_en:'Produces stone. Upgrade for higher yield.',
+    maxLevel: 30,
+    req:'castle', reqLv(lv){ return Math.max(1, lv-1); },
+    rate(lv){ return 5 + 4*lv; },
+    cap(lv){ return 40 + 40*lv; },
+    cost(lv){ return {gold: 180*lv, wood: 60*lv}; },
+    time(lv){ return 120 * Math.pow(1.4, lv); }
+  },
+  barracks: {
+    ru:'Казармы', en:'Barracks',
+    icon:'barracks',
+    desc_ru:'Открывает новых воинов. Каждый уровень разблокирует бойца.',
+    desc_en:'Unlocks new warriors. Each level unlocks a fighter.',
+    maxLevel: 10,
+    req:'castle', reqLv(lv){ return lv; },
+    cost(lv){ return {gold: 150*lv + 80*lv*lv, wood: 60*lv, stone: 40*lv}; },
+    time(lv){ return 180 * Math.pow(1.6, lv); }
+  },
+  lab: {
+    ru:'Лаборатория', en:'Laboratory',
+    icon:'lab',
+    desc_ru:'Позволяет прокачивать героев, усиливающих армию.',
+    desc_en:'Allows upgrading heroes that buff your army.',
+    maxLevel: 10,
+    req:'castle', reqLv(lv){ return lv; },
+    cost(lv){ return {gold: 400*lv + 100*lv*lv, wheat: 100*lv, wood: 80*lv, stone: 60*lv}; },
+    time(lv){ return 240 * Math.pow(1.6, lv); }
+  },
+  auction: {
+    ru:'Аукцион', en:'Auction House',
+    icon:'auction',
+    desc_ru:'Позволяет выставлять ресурсы на продажу за золото.',
+    desc_en:'Allows listing resources for sale for gold.',
+    maxLevel: 10,
+    req:'castle', reqLv(lv){ return lv; },
+    cost(lv){ return {gold: 250*lv, wood: 100*lv, stone: 50*lv}; },
+    time(lv){ return 180 * Math.pow(1.6, lv); }
+  },
+  cave: {
+    ru:'Пещера', en:'Cave',
+    icon:'cave',
+    desc_ru:'Портал в тёмную пещеру. Проходите подземелья за редкой эссенцией.',
+    desc_en:'Portal to a dark cave. Clear dungeons for rare essence.',
+    maxLevel: 10,
+    req:'castle', reqLv(lv){ return lv; },
+    cost(lv){ return {gold: 350*lv + 150*lv*lv, stone: 100*lv, wood: 80*lv}; },
+    time(lv){ return 240 * Math.pow(1.6, lv); }
+  }
+};
+
+const UNIT_DEFS = {
+  sword:  {ru:'Мечник', en:'Swordsman', cost:30,  hp:110, dmg:12, range:0.030, speed:0.085, atk:0.90, img:'sword',  unlockBarracks:1, buyPrice:0},
+  archer: {ru:'Лучник', en:'Archer',    cost:45,  hp:66,  dmg:10, range:0.150, speed:0.075, atk:1.10, img:'archer', unlockBarracks:2, buyPrice:200, ranged:true, proj:'#e8e2d0'},
+  mage:   {ru:'Маг',    en:'Mage',      cost:70,  hp:78,  dmg:20, range:0.135, speed:0.060, atk:1.70, img:'mage',   unlockBarracks:3, buyPrice:600, ranged:true, proj:'#b48bff', aoe:0.055},
+  knight: {ru:'Рыцарь', en:'Knight',    cost:110, hp:310, dmg:25, range:0.028, speed:0.055, atk:1.30, img:'knight', unlockBarracks:4, buyPrice:1500},
+  heal:   {ru:'Целитель',en:'Healer',   cost:80,  hp:92,  dmg:0,  range:0.125, speed:0.065, atk:1.50, img:'heal',   unlockBarracks:5, buyPrice:2500, ranged:true, proj:'#8ef0b0', heal:26}
+};
+const UNIT_ORDER = ['sword','archer','mage','knight','heal'];
+
+const HERO_DEFS = {
+  paladin: {ru:'Паладин', en:'Paladin', img:'paladin', bonus:'hp', bonusPer:0.06, desc_ru:'Увеличивает HP всех воинов', desc_en:'Increases HP of all warriors', maxLevel:15,
+    cost(lv){ return {gold: 250*lv, wheat: 80*lv, wood: 60*lv, stone: 40*lv, essence: 10*lv}; },
+    time(lv){ return 180 * Math.pow(1.5, lv); }},
+  sorceress:{ru:'Чародейка', en:'Sorceress', img:'sorceress', bonus:'dmg', bonusPer:0.06, desc_ru:'Увеличивает урон всех воинов', desc_en:'Increases damage of all warriors', maxLevel:15,
+    cost(lv){ return {gold: 300*lv, wheat: 60*lv, wood: 40*lv, stone: 40*lv, essence: 15*lv}; },
+    time(lv){ return 240 * Math.pow(1.5, lv); }},
+  warden: {ru:'Хранитель', en:'Warden', img:'warden', bonus:'essence', bonusPer:0.05, desc_ru:'Ускоряет восстановление эссенции в бою', desc_en:'Speeds up essence regen in battle', maxLevel:15,
+    cost(lv){ return {gold: 200*lv, wheat: 60*lv, wood: 50*lv, stone: 50*lv, essence: 12*lv}; },
+    time(lv){ return 180 * Math.pow(1.5, lv); }}
+};
+const HERO_ORDER = ['paladin','sorceress','warden'];
+
+const CAVE_REWARDS = [
+  {essence:15, gold:80, wheat:40, wood:20, stone:15},
+  {essence:25, gold:150, wheat:70, wood:35, stone:25},
+  {essence:40, gold:250, wheat:120, wood:60, stone:45},
+  {essence:60, gold:400, wheat:200, wood:100, stone:80},
+  {essence:90, gold:650, wheat:320, wood:160, stone:130}
+];
+
+const BASE_PRICES = {wheat:3, wood:5, stone:8};
+
+/* ========================================================================
+   STATE
+   ======================================================================== */
+const SAVE_KEY = 'mystic_save_v2';
 
 function defaultState(){
-  return {
-    v:1,
-    gold: 0,
-    maxLevel: 1,
-    music: true,
-    lang: 'ru',
-    tutorial: 0,          // 0 = not asked, 1 = skipped, 2 = completed
-    questDate: '',
-    questList: [],
-    quests: {},
-    questClaimed: {},
-    dailyLast: 0,
-    dailyStreak: 0,
-    onlineMinutes: 0,
-    playClaimed: [],
-    restTotal: 0,
-    stats: { wins:0, kills:0, spawns:0, goldEarned:0, mages:0, knights:0, archers:0, minutes:0 }
+  const st = {
+    v:2,
+    gold: 150, wheat: 0, wood: 0, stone: 0, essence: 0,
+    buildings: {},          // {key: {level, buildEnd}}
+    unitsOwned: {sword:true}, // sword free
+    heroes: {},             // {key: {level, upgradeEnd}}
+    auction: [],            // [{id, resource, amount, price, createdAt}]
+    auctionSeq: 1,
+    caveMaxLevel: 1,
+    // production timers per building (per key: lastProduce timestamp)
+    prod: {},
+    // quests
+    questDate:'', questList:[], quests:{}, questClaimed:{},
+    // daily
+    dailyLast:0, dailyStreak:0,
+    // playtime
+    onlineMinutes:0, playClaimed:[],
+    // rest
+    restTotal:0,
+    // other
+    maxLevel:1, wins:0, kills:0, spawns:0, goldEarned:0,
+    music:true, lang:'ru', tutorial:0
   };
+  // start with castle 1, barracks 1, farm 1
+  st.buildings.castle = {level:1, buildEnd:0};
+  st.buildings.barracks = {level:1, buildEnd:0};
+  st.buildings.farm = {level:1, buildEnd:0};
+  st.prod.farm = Date.now();
+  st.heroes.paladin = {level:0, upgradeEnd:0};
+  st.heroes.sorceress = {level:0, upgradeEnd:0};
+  st.heroes.warden = {level:0, upgradeEnd:0};
+  return st;
 }
 let state = defaultState();
 
-/* ==========================================================================
-   3. VK SAVE / LOAD
-   ========================================================================== */
+/* ========================================================================
+   SAVE / LOAD
+   ======================================================================== */
 let saveTimer = null;
 function saveGame(now){
   if(!HAS_VK) return;
@@ -622,21 +880,14 @@ async function loadGame(){
   try{
     const r = await VK.send('VKWebAppStorageGet', {keys:[SAVE_KEY]});
     const v = r && r.keys && r.keys[0] && r.keys[0].value;
-    if(v){ return JSON.parse(v); }
+    if(v) return JSON.parse(v);
   }catch(e){}
   return null;
 }
-async function clearGameData(){
-  if(HAS_VK){
-    try{ await VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: ''}); }catch(e){}
-  }
-  state = defaultState();
-  saveGame(true);
-}
 
-/* ==========================================================================
-   4. MUSIC (WebAudio procedural)
-   ========================================================================== */
+/* ========================================================================
+   MUSIC
+   ======================================================================== */
 const Music = {
   ctx:null, master:null, timer:null, playing:false, pad:null, i:0,
   ensure(){
@@ -649,17 +900,14 @@ const Music = {
     this.master.connect(this.ctx.destination);
   },
   play(){
-    this.ensure();
-    if(!this.ctx) return;
+    this.ensure(); if(!this.ctx) return;
     if(this.ctx.state === 'suspended') this.ctx.resume();
     this.playing = true;
     const n = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(n);
-    this.master.gain.setTargetAtTime(0.13, n, 0.8);
+    this.master.gain.setTargetAtTime(0.12, n, 0.8);
     if(!this.pad) this._startPad();
-    if(!this.timer){
-      this.timer = setInterval(()=>this._tick(), 400);
-    }
+    if(!this.timer) this.timer = setInterval(()=>this._tick(), 400);
   },
   stop(){
     this.playing = false;
@@ -710,89 +958,153 @@ function refreshMusic(){
   }
 }
 
-/* ==========================================================================
-   5. PAUSE SYSTEM
-   ========================================================================== */
+/* ========================================================================
+   PAUSE SYSTEM
+   ======================================================================== */
 const pauseReasons = new Set();
-function setPause(reason, on){
-  if(on) pauseReasons.add(reason); else pauseReasons.delete(reason);
-  refreshMusic();
-}
+function setPause(r, on){ if(on) pauseReasons.add(r); else pauseReasons.delete(r); refreshMusic(); }
 function isPausedBy(r){ return pauseReasons.has(r); }
 function anyPause(){ return pauseReasons.size > 0; }
-function anyModalOpen(){
-  return !!document.querySelector('.overlay.show');
-}
-function syncPause(){
-  setPause('modal', anyModalOpen());
-}
+function anyModalOpen(){ return !!document.querySelector('.overlay.show'); }
+function syncPause(){ setPause('modal', anyModalOpen()); }
 
-/* ==========================================================================
-   6. SVG SPRITES
-   ========================================================================== */
+/* ========================================================================
+   SPRITES
+   ======================================================================== */
 const SVG_SRC = {
   sword: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
-    <ellipse cx="32" cy="79" rx="15" ry="4" fill="#000" opacity=".32"/>
-    <path d="M25 46h14l5 30H20z" fill="#3a5f9e"/>
-    <path d="M25 46h14l1 6H24z" fill="#4d74b8"/>
-    <rect x="25" y="34" width="14" height="14" rx="4" fill="#5b83c9"/>
+    <defs><linearGradient id="sw1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4d74b8"/><stop offset="1" stop-color="#25345a"/></linearGradient></defs>
+    <ellipse cx="32" cy="79" rx="15" ry="4" fill="#000" opacity=".35"/>
+    <path d="M24 46h16l5 30H19z" fill="url(#sw1)"/>
+    <path d="M24 46h16l1 5H23z" fill="#5b83c9"/>
+    <path d="M26 54h12v4H26zM27 62h10v3H27z" fill="#1f2c4a" opacity=".7"/>
+    <rect x="24" y="34" width="16" height="14" rx="4" fill="#5b83c9"/>
+    <rect x="24" y="34" width="16" height="14" rx="4" fill="none" stroke="#1f2c4a" stroke-width="1"/>
     <circle cx="32" cy="25" r="9.5" fill="#e8c39e"/>
+    <circle cx="29" cy="24" r="1.1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1.1" fill="#2a1f18"/>
+    <path d="M29 29q3 2 6 0" stroke="#a67d5b" stroke-width="1.2" fill="none"/>
     <path d="M22.5 24q0-13 9.5-13t9.5 13q-4-6.5-9.5-6.5T22.5 24z" fill="#9aa7b8"/>
+    <path d="M22.5 24q0-13 9.5-13t9.5 13" fill="none" stroke="#5d6b7a" stroke-width="1"/>
     <g transform="rotate(20 44 36)">
-      <rect x="42.4" y="14" width="3.4" height="28" rx="1.7" fill="#dfe6ee"/>
+      <rect x="42.4" y="14" width="3.4" height="28" rx="1.7" fill="#eaf0f6"/>
+      <rect x="42.4" y="14" width="1.4" height="28" fill="#b8c4d0"/>
       <rect x="36.5" y="40" width="15" height="4" rx="2" fill="#c8a35a"/>
       <rect x="43.6" y="44" width="3.6" height="9" rx="1.8" fill="#6b4a2a"/>
     </g>
   </svg>`,
   archer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
-    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".32"/>
-    <path d="M26 46h12l4 30H22z" fill="#2f6b46"/>
+    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/>
+    <path d="M25 46h14l4 30H21z" fill="#2f6b46"/>
+    <path d="M25 46h14l1 5H24z" fill="#3d8a5c"/>
+    <path d="M28 54h8v3H28z" fill="#1c4530"/>
     <rect x="26" y="34" width="12" height="14" rx="4" fill="#3d8a5c"/>
     <circle cx="32" cy="25" r="9" fill="#e8c39e"/>
-    <path d="M23 23q9-12 18 0q-3-8-9-8t-9 8z" fill="#4b7a3a"/>
-    <path d="M47 19q13 15 0 31" fill="none" stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"/>
-    <path d="M47 19v31" stroke="#e6dfcf" stroke-width="1.1"/>
+    <circle cx="29" cy="24" r="1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1" fill="#2a1f18"/>
+    <path d="M23 22q9-13 18 0q-2-8-9-8t-9 8z" fill="#4b7a3a"/>
+    <path d="M23 22q9-3 18 0" fill="none" stroke="#2f5a22" stroke-width="1"/>
+    <path d="M47 18q13 16 0 32" fill="none" stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"/>
+    <path d="M47 18v32" stroke="#e6dfcf" stroke-width="1"/>
     <path d="M36 34h11" stroke="#c8a35a" stroke-width="2"/>
+    <path d="M40 34l-2-1.5M40 34l-2 1.5" stroke="#c8a35a" stroke-width="1.2" fill="none"/>
+    <path d="M24 44q-3 0-3 4" fill="none" stroke="#2f6b46" stroke-width="2"/>
   </svg>`,
   mage: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
-    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".32"/>
-    <path d="M24 44h16l6 32H18z" fill="#4b2e7a"/>
-    <path d="M24 44h16l1 5H23z" fill="#6b45a8"/>
+    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/>
+    <path d="M22 44h20l6 32H16z" fill="#4b2e7a"/>
+    <path d="M22 44h20l1 5H21z" fill="#6b45a8"/>
+    <path d="M26 52h12v4H26zM27 60h10v3H27z" fill="#3a1f5e" opacity=".8"/>
     <circle cx="32" cy="25" r="9" fill="#e8c39e"/>
+    <circle cx="29" cy="24" r="1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1" fill="#2a1f18"/>
     <path d="M21 22q0-14 11-14t11 14q-5-7-11-7t-11 7z" fill="#2d1b4d"/>
     <path d="M21 22q11-6 22 0" fill="none" stroke="#9d7bff" stroke-width="2"/>
+    <path d="M27 20l2-4 2 4M33 20l2-4 2 4" stroke="#9d7bff" stroke-width="1.4" fill="none"/>
     <rect x="45" y="26" width="3" height="46" rx="1.5" fill="#6b4a2a"/>
+    <rect x="45" y="26" width="1.2" height="46" fill="#8a6a40"/>
     <circle cx="46.5" cy="23" r="9.5" fill="#b48bff" opacity=".22"/>
     <circle cx="46.5" cy="23" r="6" fill="#b48bff"/>
     <circle cx="44.5" cy="21" r="2" fill="#efe6ff" opacity=".9"/>
   </svg>`,
   knight: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
-    <ellipse cx="32" cy="80" rx="18" ry="4.5" fill="#000" opacity=".35"/>
-    <path d="M22 46h20l5 32H17z" fill="#8a8f99"/>
-    <path d="M22 46h20l1 6H21z" fill="#a9b0bb"/>
+    <defs><linearGradient id="kn1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b8bec9"/><stop offset="1" stop-color="#6f7785"/></linearGradient></defs>
+    <ellipse cx="32" cy="80" rx="18" ry="4.5" fill="#000" opacity=".4"/>
+    <path d="M22 46h20l5 32H17z" fill="url(#kn1)"/>
+    <path d="M22 46h20l1 6H21z" fill="#c8ced7"/>
+    <path d="M26 54h12v4H26zM27 62h10v3H27z" fill="#4b525d" opacity=".6"/>
     <rect x="21" y="32" width="22" height="16" rx="5" fill="#a9b0bb"/>
     <rect x="21" y="32" width="22" height="16" rx="5" fill="none" stroke="#6b727d" stroke-width="1.4"/>
+    <path d="M21 40h22" stroke="#6b727d" stroke-width="1"/>
     <circle cx="32" cy="23" r="10" fill="#c2c9d4"/>
-    <rect x="26" y="21" width="12" height="3.2" rx="1.6" fill="#22222b"/>
+    <rect x="25" y="21" width="14" height="3.2" rx="1.6" fill="#22222b"/>
+    <circle cx="32" cy="23" r="10" fill="none" stroke="#6b727d" stroke-width="1"/>
     <path d="M32 11l3.4 6.6h-6.8z" fill="#c8a35a"/>
+    <path d="M32 11l3.4 6.6h-6.8z" fill="none" stroke="#7d5f22" stroke-width="1"/>
     <path d="M45 28h13v23H45z" fill="#c8a35a"/>
     <path d="M45 28h13v23H45z" fill="none" stroke="#7d5f22" stroke-width="1.6"/>
     <path d="M51.5 33v13M46 39.5h11" stroke="#7d5f22" stroke-width="1.4"/>
+    <path d="M27 44h10" stroke="#7d5f22" stroke-width="1.2"/>
   </svg>`,
   heal: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
-    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".32"/>
+    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/>
     <path d="M25 45h14l5 31H20z" fill="#e8e2d0"/>
     <path d="M25 45h14l1 5H24z" fill="#c8a35a"/>
+    <path d="M28 54h8v3H28zM29 62h6v3H29z" fill="#b8a882" opacity=".7"/>
     <circle cx="32" cy="25" r="9" fill="#e8c39e"/>
+    <circle cx="29" cy="24" r="1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1" fill="#2a1f18"/>
     <path d="M22 24q0-13 10-13t10 13q-4-6.5-10-6.5T22 24z" fill="#f2e9cb"/>
     <rect x="44" y="27" width="3" height="45" rx="1.5" fill="#b8a06a"/>
+    <rect x="44" y="27" width="1.2" height="45" fill="#8a7540"/>
     <circle cx="45.5" cy="24" r="9" fill="#8ef0b0" opacity=".22"/>
     <circle cx="45.5" cy="24" r="5.5" fill="#8ef0b0"/>
     <circle cx="43.8" cy="22.3" r="1.8" fill="#e6fff1" opacity=".9"/>
   </svg>`,
+  paladin: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
+    <ellipse cx="32" cy="80" rx="15" ry="4" fill="#000" opacity=".4"/>
+    <path d="M23 46h18l4 32H19z" fill="#c8a35a"/>
+    <path d="M23 46h18l1 5H22z" fill="#e8c26a"/>
+    <circle cx="32" cy="24" r="9.5" fill="#e8c39e"/>
+    <path d="M22 22q0-14 10-14t10 14q-4-8-10-8t-10 8z" fill="#c8a35a"/>
+    <rect x="28" y="22" width="8" height="3" fill="#c8a35a" opacity=".4"/>
+    <path d="M32 12l2 4h-4z" fill="#ffe9a8"/>
+    <path d="M46 32h10v26H46z" fill="#e8c26a"/>
+    <path d="M46 32h10v26H46z" fill="none" stroke="#7d5f22" stroke-width="1.6"/>
+    <path d="M51 36v18M47 42h8" stroke="#7d5f22" stroke-width="1.4"/>
+    <circle cx="51" cy="58" r="3" fill="#ffe9a8"/>
+  </svg>`,
+  sorceress: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
+    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/>
+    <path d="M22 44h20l6 32H16z" fill="#6b2d7a"/>
+    <path d="M22 44h20l1 5H21z" fill="#8f45a8"/>
+    <circle cx="32" cy="25" r="9" fill="#e8c39e"/>
+    <circle cx="29" cy="24" r="1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1" fill="#2a1f18"/>
+    <path d="M20 24q0-15 12-15t12 15q-5-8-12-8t-12 8z" fill="#3a1b4d"/>
+    <path d="M20 24q12-6 24 0" fill="none" stroke="#d8a8ff" stroke-width="1.8"/>
+    <path d="M30 10l2-3 2 3" fill="#d8a8ff"/>
+    <rect x="45" y="26" width="3" height="46" rx="1.5" fill="#4a2a5a"/>
+    <circle cx="46.5" cy="23" r="9.5" fill="#e0a8ff" opacity=".22"/>
+    <circle cx="46.5" cy="23" r="6" fill="#d8a8ff"/>
+    <circle cx="44.5" cy="21" r="2" fill="#f5e8ff" opacity=".9"/>
+  </svg>`,
+  warden: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84">
+    <ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/>
+    <path d="M24 46h16l5 30H19z" fill="#2f5a3d"/>
+    <path d="M24 46h16l1 5H23z" fill="#4b7a3a"/>
+    <circle cx="32" cy="25" r="9" fill="#e8c39e"/>
+    <circle cx="29" cy="24" r="1" fill="#2a1f18"/>
+    <circle cx="35" cy="24" r="1" fill="#2a1f18"/>
+    <path d="M22 24q0-14 10-14t10 14q-4-7-10-7t-10 7z" fill="#2a4a25"/>
+    <path d="M30 10l2-3 2 3" fill="#8ef0b0"/>
+    <rect x="44" y="26" width="3" height="46" rx="1.5" fill="#4a3520"/>
+    <circle cx="45.5" cy="23" r="9" fill="#8ef0b0" opacity=".22"/>
+    <circle cx="45.5" cy="23" r="6" fill="#8ef0b0"/>
+    <circle cx="43.8" cy="21.3" r="2" fill="#e6fff1" opacity=".9"/>
+  </svg>`,
   castle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200">
-    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#6a6f7e"/><stop offset="1" stop-color="#3b3f4b"/></linearGradient></defs>
+    <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a6f7e"/><stop offset="1" stop-color="#3b3f4b"/></linearGradient></defs>
     <ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".35"/>
     <path d="M35 190V70h70v120z" fill="url(#cg)"/>
     <path d="M35 190V70h70v120z" fill="none" stroke="#2b2e37" stroke-width="3"/>
@@ -807,8 +1119,7 @@ const SVG_SRC = {
     <path d="M115 36l30 10-30 10z" fill="none" stroke="#8a6a2a" stroke-width="1.4"/>
   </svg>`,
   darktower: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200">
-    <defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3a2a44"/><stop offset="1" stop-color="#1c1224"/></linearGradient></defs>
+    <defs><linearGradient id="dg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a44"/><stop offset="1" stop-color="#1c1224"/></linearGradient></defs>
     <ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/>
     <path d="M40 190V74l30-34 30 34v116z" fill="url(#dg)"/>
     <path d="M40 190V74l30-34 30 34v116z" fill="none" stroke="#0f0a16" stroke-width="3"/>
@@ -820,32 +1131,144 @@ const SVG_SRC = {
     <circle cx="70" cy="120" r="4" fill="#ffd0d8"/>
     <path d="M58 190v-30q12-16 24 0v30z" fill="#0d0812"/>
     <path d="M104 46l14-16M108 58l18-8" stroke="#6b1f3a" stroke-width="3" stroke-linecap="round"/>
+  </svg>`,
+  cavebase: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200">
+    <defs><linearGradient id="cb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a4a"/><stop offset="1" stop-color="#181022"/></linearGradient></defs>
+    <ellipse cx="70" cy="190" rx="60" ry="12" fill="#000" opacity=".45"/>
+    <path d="M20 190V70q50-55 100 0v120z" fill="url(#cb)"/>
+    <path d="M20 190V70q50-55 100 0v120z" fill="none" stroke="#0a0612" stroke-width="3"/>
+    <path d="M20 90q50-30 100 0M20 130h100M20 160h100" stroke="#251a35" stroke-width="2"/>
+    <path d="M45 190v-40q25-30 50 0v40z" fill="#06030e"/>
+    <circle cx="70" cy="120" r="22" fill="#7b3dff" opacity=".14"/>
+    <circle cx="70" cy="120" r="11" fill="#7b3dff"/>
+    <circle cx="70" cy="120" r="5" fill="#d8a8ff"/>
+    <path d="M55 70l15-10 15 10" fill="none" stroke="#7b3dff" stroke-width="2.4"/>
+  </svg>`,
+  altardark: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200">
+    <ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/>
+    <path d="M40 190V74l30-34 30 34v116z" fill="#2a1a44"/>
+    <path d="M40 190V74l30-34 30 34v116z" fill="none" stroke="#0a0612" stroke-width="3"/>
+    <path d="M40 100h60M40 130h60M40 160h60" stroke="#3a2460" stroke-width="2.2"/>
+    <circle cx="70" cy="120" r="22" fill="#a02060" opacity=".18"/>
+    <circle cx="70" cy="120" r="12" fill="#a02060"/>
+    <circle cx="70" cy="120" r="5" fill="#ffb8d0"/>
+    <path d="M30 74l10-22 8 12 10-18 12 20 12-20 10 18 8-12 10 22z" fill="#3a1f54"/>
+    <path d="M58 190v-30q12-16 24 0v30z" fill="#0a0410"/>
+  </svg>`,
+  // Building icons (map view)
+  farm: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="34" ry="6" fill="#000" opacity=".35"/>
+    <rect y="70" width="100" height="20" fill="#3a4a2a"/>
+    <rect y="70" width="100" height="20" fill="url(#ff1)"/>
+    <defs><linearGradient id="ff1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d6138"/><stop offset="1" stop-color="#2a3819"/></linearGradient></defs>
+    <g stroke="#e8c460" stroke-width="2" stroke-linecap="round" fill="none">
+      <path d="M20 70V52M20 58l4-4M20 58l-4-4M20 64l4-4M20 64l-4-4"/>
+      <path d="M32 70V50M32 56l4-4M32 56l-4-4M32 62l4-4M32 62l-4-4"/>
+      <path d="M44 70V54M44 60l4-4M44 60l-4-4"/>
+      <path d="M56 70V52M56 58l4-4M56 58l-4-4M56 64l4-4M56 64l-4-4"/>
+      <path d="M68 70V50M68 56l4-4M68 56l-4-4M68 62l4-4M68 62l-4-4"/>
+      <path d="M80 70V54M80 60l4-4M80 60l-4-4"/>
+    </g>
+    <path d="M60 20l14 8v14H60z" fill="#8a6a3a"/>
+    <path d="M58 42l10-4v26H58z" fill="#a8804a"/>
+    <path d="M60 20l14 8-14 8z" fill="#6a4a2a"/>
+    <circle cx="72" cy="28" r="3" fill="#c8a35a"/>
+  </svg>`,
+  lumber: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="30" ry="5" fill="#000" opacity=".35"/>
+    <rect y="72" width="100" height="18" fill="#2a3819"/>
+    <path d="M35 72v-8h30v8" fill="#3a4a2a"/>
+    <ellipse cx="50" cy="40" rx="22" ry="24" fill="#2f5a2a"/>
+    <ellipse cx="50" cy="40" rx="22" ry="24" fill="url(#lg1)"/>
+    <defs><radialGradient id="lg1"><stop offset="0" stop-color="#5a8a3a"/><stop offset="1" stop-color="#1c3618"/></radialGradient></defs>
+    <path d="M50 30v22M40 42h20" stroke="#1c3618" stroke-width="1.4" opacity=".6"/>
+    <rect x="46" y="60" width="8" height="20" fill="#5a3a20"/>
+    <rect x="46" y="60" width="3" height="20" fill="#7a5a3a"/>
+    <path d="M30 20l30 20" stroke="#c8a35a" stroke-width="3" stroke-linecap="round"/>
+    <path d="M30 20l-4-4 8 2z" fill="#e8e2d0"/>
+    <circle cx="30" cy="20" r="2" fill="#a8813a"/>
+  </svg>`,
+  quarry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="34" ry="6" fill="#000" opacity=".35"/>
+    <rect y="70" width="100" height="20" fill="#2a2a30"/>
+    <path d="M20 72l8-14 10 6 8-10 12 8 10-6 8 16z" fill="#5a5a6a"/>
+    <path d="M20 72l8-14 10 6 8-10 12 8 10-6 8 16" fill="none" stroke="#3a3a48" stroke-width="1.4"/>
+    <path d="M34 60l4 4M48 58l4 4M62 62l4 4" stroke="#3a3a48" stroke-width="1.4"/>
+    <rect x="44" y="18" width="3" height="30" fill="#6b4a2a"/>
+    <path d="M38 22l14-8 2 6-14 8z" fill="#a8b0c0"/>
+    <path d="M38 22l14-8" stroke="#5a5a6a" stroke-width="1.4"/>
+  </svg>`,
+  barracks: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="34" ry="6" fill="#000" opacity=".35"/>
+    <path d="M18 72V40l32-20 32 20v32z" fill="#4a3a2a"/>
+    <path d="M18 72V40l32-20 32 20v32" fill="none" stroke="#2a1f14" stroke-width="2"/>
+    <path d="M18 40l32 20v12L18 52z" fill="#3a2a1a"/>
+    <path d="M82 40L50 60v12l32-20z" fill="#5a4a38"/>
+    <rect x="42" y="48" width="16" height="24" fill="#1c1410"/>
+    <path d="M50 12v6M48 14h4" stroke="#c8a35a" stroke-width="2"/>
+    <g transform="translate(38 20) rotate(-25)"><rect x="-1.5" y="0" width="3" height="22" fill="#c8ced7"/><rect x="-5" y="18" width="10" height="3" fill="#c8a35a"/></g>
+    <g transform="translate(62 20) rotate(25)"><rect x="-1.5" y="0" width="3" height="22" fill="#c8ced7"/><rect x="-5" y="18" width="10" height="3" fill="#c8a35a"/></g>
+  </svg>`,
+  lab: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="30" ry="5" fill="#000" opacity=".35"/>
+    <rect x="26" y="46" width="48" height="38" rx="4" fill="#3a2a4a"/>
+    <rect x="26" y="46" width="48" height="38" rx="4" fill="none" stroke="#1c1230" stroke-width="2"/>
+    <rect x="30" y="40" width="40" height="8" fill="#2a1f3d"/>
+    <path d="M42 20h16v10l-4 4v8l-8 8-8-8v-8l-4-4z" fill="#8ef0b0" opacity=".3"/>
+    <path d="M42 20h16v10l-4 4v8l-8 8-8-8v-8l-4-4z" fill="none" stroke="#c8a35a" stroke-width="1.4"/>
+    <circle cx="50" cy="34" r="3" fill="#8ef0b0"/>
+    <circle cx="60" cy="60" r="6" fill="#c88aff" opacity=".5"/>
+    <circle cx="40" cy="70" r="4" fill="#c88aff" opacity=".4"/>
+    <path d="M18 84h64" stroke="#1c1230" stroke-width="2"/>
+    <path d="M28 18v10M72 18v10" stroke="#c8a35a" stroke-width="2"/>
+  </svg>`,
+  auction: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="34" ry="6" fill="#000" opacity=".35"/>
+    <rect x="14" y="60" width="72" height="26" rx="3" fill="#3a2a1a"/>
+    <rect x="14" y="60" width="72" height="26" rx="3" fill="none" stroke="#c8a35a" stroke-width="2"/>
+    <rect x="20" y="66" width="60" height="4" fill="#c8a35a" opacity=".4"/>
+    <circle cx="34" cy="46" r="10" fill="#e8c26a"/>
+    <text x="34" y="51" text-anchor="middle" fill="#5a3a10" font-size="12" font-family="Georgia" font-weight="bold">$</text>
+    <path d="M50 30l20-10" stroke="#8a6a3a" stroke-width="3"/>
+    <circle cx="70" cy="20" r="10" fill="#8a6a3a" opacity=".4"/>
+    <path d="M58 42l24-6" stroke="#c8a35a" stroke-width="2"/>
+    <path d="M78 30l6 4-4 6z" fill="#c8a35a"/>
+    <path d="M20 30h20v20H20z" fill="none" stroke="#e8c26a" stroke-width="1.6"/>
+    <path d="M24 34l14 14M38 34L24 48" stroke="#e8c26a" stroke-width="1.4"/>
+  </svg>`,
+  cave: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="88" rx="36" ry="6" fill="#000" opacity=".4"/>
+    <path d="M10 82V40q40-50 80 0v42z" fill="#1a1428"/>
+    <path d="M10 82V40q40-50 80 0v42z" fill="none" stroke="#0a0612" stroke-width="2"/>
+    <path d="M30 82V58q20-22 40 0v24z" fill="#06030e"/>
+    <path d="M30 82V58q20-22 40 0v24z" fill="none" stroke="#4a2a6a" stroke-width="1.4"/>
+    <circle cx="50" cy="64" r="14" fill="#7b3dff" opacity=".25"/>
+    <circle cx="50" cy="64" r="7" fill="#a870ff"/>
+    <circle cx="50" cy="64" r="3" fill="#e8d4ff"/>
+    <path d="M24 40l4-4M76 40l-4-4M18 52l3-3M82 52l-3-3" stroke="#a870ff" stroke-width="1.4" stroke-linecap="round"/>
   </svg>`
 };
 
 const SPRITES = {};
-function svgToImage(svg){
-  const img = new Image();
-  img.decoding = 'async';
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-  return img;
-}
 function loadSprites(){
   return new Promise(resolve=>{
     let left = Object.keys(SVG_SRC).length;
+    const done = ()=>{ if(--left<=0) resolve(); };
     Object.keys(SVG_SRC).forEach(k=>{
-      const img = svgToImage(SVG_SRC[k]);
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = done;
+      img.onerror = done;
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG_SRC[k]);
       SPRITES[k] = img;
-      const done = ()=>{ if(--left<=0) resolve(); };
-      if(img.complete && img.naturalWidth) done();
-      else { img.onload = done; img.onerror = done; }
     });
   });
 }
+function getSprite(key){ return SPRITES[key]; }
 
-/* ==========================================================================
-   7. GAME ENGINE
-   ========================================================================== */
+/* ========================================================================
+   CANVAS SETUP
+   ======================================================================== */
 const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 const stage = document.getElementById('stage');
@@ -861,55 +1284,24 @@ function resizeCanvas(){
   cv.style.width = W + 'px';
   cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  positionBuildings();
 }
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', ()=>setTimeout(resizeCanvas, 220));
 
-/* ---- projection ---- */
-function project(u, lane){
-  const s = 0.50 + 0.44 * lane;
-  const x = W * 0.5 + (u - 0.5) * W * s;
-  const y = H * 0.32 + lane * H * 0.48;
-  return {x, y, s};
-}
-
-/* ---- unit defs ---- */
-const UNITS = {
-  sword:  {key:'sword',  cost:30,  hp:110, dmg:12, range:0.030, speed:0.085, atk:0.90, img:'sword'},
-  archer: {key:'archer', cost:45,  hp:66,  dmg:10, range:0.150, speed:0.075, atk:1.10, img:'archer', ranged:true, proj:'#e8e2d0'},
-  mage:   {key:'mage',   cost:70,  hp:78,  dmg:20, range:0.135, speed:0.060, atk:1.70, img:'mage',  ranged:true, proj:'#b48bff', aoe:0.055},
-  knight: {key:'knight', cost:110, hp:310, dmg:25, range:0.028, speed:0.055, atk:1.30, img:'knight'},
-  heal:   {key:'heal',   cost:80,  hp:92,  dmg:0,  range:0.125, speed:0.065, atk:1.50, img:'heal',  heal:26}
-};
-const UNIT_ORDER = ['sword','archer','mage','knight','heal'];
-
-const LANES = [0.22, 0.5, 0.78];
-const PLAYER_BASE_U = 0.045;
-const ENEMY_BASE_U  = 0.955;
-
-/* ---- particles / projectiles ---- */
+/* ========================================================================
+   LOBBY (village) VIEW
+   ======================================================================== */
+let VIEW = 'lobby'; // 'lobby' | 'battle' | 'cave'
 const G = {
-  active: false,
-  over: true,
-  level: 1,
-  units: [],
-  projectiles: [],
-  particles: [],
-  essence: 60,
-  essenceMax: 120,
-  essenceRegen: 10,
-  playerBase: {hp: 1000, max: 1000},
-  enemyBase:  {hp: 900,  max: 900},
-  spawnTimer: 0,
-  spawnInterval: 4,
-  time: 0,
-  kills: 0,
-  spawned: 0,
-  shakeT: 0,
-  stars: [],
-  uid: 1
+  active:false, over:true, mode:'battle', level:1,
+  units:[], projectiles:[], particles:[], damageNums:[],
+  essence:60, essenceMax:120, essenceRegen:10,
+  playerBase:{hp:1000,max:1000}, enemyBase:{hp:900,max:900},
+  spawnTimer:0, spawnInterval:4, time:0, kills:0, spawned:0,
+  shakeT:0, stars:[], uid:1,
+  hpBuff:0, dmgBuff:0, essBuff:0
 };
-
 function initStars(){
   G.stars = [];
   let seed = 1337;
@@ -920,237 +1312,6 @@ function initStars(){
 }
 initStars();
 
-/* ---- level config ---- */
-function levelCfg(lv){
-  return {
-    enemyBaseHp: 700 + lv*240,
-    playerBaseHp: 950 + lv*60,
-    spawnInterval: Math.max(1.25, 4.3 - lv*0.22),
-    tier: Math.min(1, (lv-1)/10)
-  };
-}
-
-/* ---- unit factory ---- */
-function makeUnit(type, side, lane, u){
-  const d = UNITS[type];
-  const hpScale = side==='enemy' ? (1 + (G.level-1)*0.16) : (1 + (G.level-1)*0.05);
-  const dmgScale = side==='enemy' ? (1 + (G.level-1)*0.13) : (1 + (G.level-1)*0.04);
-  return {
-    id: G.uid++,
-    type, side, lane, u,
-    hp: d.hp*hpScale,
-    maxHp: d.hp*hpScale,
-    dmg: d.dmg*dmgScale,
-    range: d.range,
-    speed: d.speed,
-    atk: d.atk,
-    cd: Math.random()*0.4,
-    bob: Math.random()*6.28,
-    hitFlash: 0,
-    heal: d.heal ? d.heal*0.9 : 0
-  };
-}
-
-function spawnUnit(type, side, lane){
-  const d = UNITS[type];
-  const u = side === 'player' ? PLAYER_BASE_U + 0.03 : ENEMY_BASE_U - 0.03;
-  const unit = makeUnit(type, side, lane, u);
-  G.units.push(unit);
-  if(side === 'player'){
-    G.spawned++;
-    questProgress('spawns', 1);
-    if(type==='mage') { questProgress('mages',1); state.stats.mages++; }
-    if(type==='knight') { questProgress('knights',1); state.stats.knights++; }
-    if(type==='archer') { questProgress('archers',1); state.stats.archers++; }
-    state.stats.spawns++;
-  }
-  return unit;
-}
-
-/* ---- damage ---- */
-function damageUnit(target, amount, byPlayer){
-  if(target.hp <= 0) return;
-  target.hp -= amount;
-  target.hitFlash = 0.18;
-  if(target.hp <= 0){
-    target.hp = 0;
-    burst(target.u, target.lane, byPlayer ? '#7b5cff' : '#ff5f6d', 8);
-    if(byPlayer){
-      G.kills++;
-      state.stats.kills++;
-      questProgress('kills', 1);
-    }
-  }
-}
-
-function burst(u, lane, color, n){
-  const p = project(u, lane);
-  for(let i=0;i<n;i++){
-    const a = Math.random()*6.28, sp = 18 + Math.random()*60;
-    G.particles.push({
-      x:p.x, y:p.y - 22*p.s,
-      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 40,
-      life:0.55 + Math.random()*0.35, max:0.9,
-      color, r: 1.6 + Math.random()*2.2, s:p.s
-    });
-  }
-}
-
-/* ---- combat step ---- */
-function updateGame(dt){
-  G.time += dt;
-  G.essence = Math.min(G.essenceMax, G.essence + G.essenceRegen*dt);
-
-  /* enemy spawner */
-  G.spawnTimer -= dt;
-  if(G.spawnTimer <= 0){
-    G.spawnTimer = G.spawnInterval * (0.8 + Math.random()*0.45);
-    const pool = ['sword','sword','archer'];
-    if(G.level >= 2) pool.push('archer','mage');
-    if(G.level >= 3) pool.push('knight','heal');
-    if(G.level >= 5) pool.push('knight','mage','heal');
-    const type = pool[Math.floor(Math.random()*pool.length)];
-    spawnUnit(type, 'enemy', LANES[Math.floor(Math.random()*LANES.length)]);
-  }
-
-  /* units */
-  const list = G.units;
-  for(let i=0;i<list.length;i++){
-    const u = list[i];
-    if(u.hp <= 0) continue;
-    u.bob += dt*7;
-    if(u.hitFlash > 0) u.hitFlash -= dt;
-    u.cd -= dt;
-
-    const dir = u.side === 'player' ? 1 : -1;
-
-    /* --- healer behaviour --- */
-    if(UNITS[u.type].heal){
-      let ally = null, worst = 1;
-      for(let j=0;j<list.length;j++){
-        const o = list[j];
-        if(o === u || o.side !== u.side || o.hp <= 0) continue;
-        if(o.lane !== u.lane) continue;
-        const dist = Math.abs(o.u - u.u);
-        if(dist > u.range) continue;
-        const ratio = o.hp / o.maxHp;
-        if(ratio < worst){ worst = ratio; ally = o; }
-      }
-      if(ally){
-        if(u.cd <= 0){
-          u.cd = u.atk;
-          const before = ally.hp;
-          ally.hp = Math.min(ally.maxHp, ally.hp + u.heal);
-          if(ally.hp > before) burst(ally.u, ally.lane, '#8ef0b0', 5);
-          G.projectiles.push({x1:u.u, y1:u.lane, x2:ally.u, y2:ally.lane, t:0, dur:0.22, color:'#8ef0b0'});
-        }
-        continue;
-      }
-    }
-
-    /* --- find enemy unit in front --- */
-    let target = null, bestD = 1e9;
-    for(let j=0;j<list.length;j++){
-      const o = list[j];
-      if(o.side === u.side || o.hp <= 0 || o.lane !== u.lane) continue;
-      const d = (o.u - u.u) * dir;
-      if(d > -0.015 && d < bestD){ bestD = d; target = o; }
-    }
-
-    const enemyBaseU = dir > 0 ? ENEMY_BASE_U : PLAYER_BASE_U;
-    const distToBase = Math.abs(enemyBaseU - u.u);
-
-    if(target && bestD <= u.range){
-      /* attack unit */
-      if(u.cd <= 0 && u.dmg > 0){
-        u.cd = u.atk;
-        attackUnit(u, target);
-      }
-    } else if(distToBase <= u.range + 0.025){
-      /* attack base */
-      if(u.cd <= 0 && u.dmg > 0){
-        u.cd = u.atk;
-        attackBase(u);
-      }
-    } else {
-      u.u += dir * u.speed * dt;
-      u.u = Math.max(0.01, Math.min(0.99, u.u));
-    }
-  }
-
-  /* cleanup */
-  for(let i=G.units.length-1;i>=0;i--){
-    if(G.units[i].hp <= 0) G.units.splice(i,1);
-  }
-
-  /* projectiles */
-  for(let i=G.projectiles.length-1;i>=0;i--){
-    const p = G.projectiles[i];
-    p.t += dt;
-    if(p.t >= p.dur) G.projectiles.splice(i,1);
-  }
-
-  /* particles */
-  for(let i=G.particles.length-1;i>=0;i--){
-    const p = G.particles[i];
-    p.life -= dt;
-    if(p.life <= 0){ G.particles.splice(i,1); continue; }
-    p.x += p.vx*dt; p.y += p.vy*dt;
-    p.vy += 190*dt;
-  }
-
-  if(G.shakeT > 0) G.shakeT -= dt;
-
-  /* win / lose */
-  if(G.enemyBase.hp <= 0 && !G.over){ endLevel(true); }
-  else if(G.playerBase.hp <= 0 && !G.over){ endLevel(false); }
-
-  updateBattleHud();
-}
-
-function attackUnit(u, target){
-  if(UNITS[u.type].ranged){
-    G.projectiles.push({x1:u.u, y1:u.lane, x2:target.u, y2:target.lane, t:0, dur:0.2, color:UNITS[u.type].proj||'#fff'});
-    if(UNITS[u.type].aoe){
-      const aoe = UNITS[u.type].aoe;
-      for(const o of G.units){
-        if(o.side === u.side || o.hp <= 0) continue;
-        if(Math.abs(o.u - target.u) <= aoe && Math.abs(o.lane - target.lane) < 0.01){
-          damageUnit(o, u.dmg, u.side === 'player');
-        }
-      }
-      burst(target.u, target.lane, '#b48bff', 10);
-    } else {
-      damageUnit(target, u.dmg, u.side === 'player');
-    }
-  } else {
-    damageUnit(target, u.dmg, u.side === 'player');
-    burst(target.u, target.lane, u.side === 'player' ? '#9fc7ff' : '#ff9f9f', 3);
-  }
-}
-
-function attackBase(u){
-  const dmg = u.dmg;
-  if(u.side === 'player'){
-    G.enemyBase.hp = Math.max(0, G.enemyBase.hp - dmg);
-    G.shakeT = 0.18;
-    burst(ENEMY_BASE_U, u.lane, '#ffcf6b', 5);
-  } else {
-    G.playerBase.hp = Math.max(0, G.playerBase.hp - dmg);
-    G.shakeT = 0.18;
-    burst(PLAYER_BASE_U, u.lane, '#ff5f6d', 5);
-  }
-  if(UNITS[u.type].ranged){
-    G.projectiles.push({
-      x1:u.u, y1:u.lane,
-      x2: u.side === 'player' ? ENEMY_BASE_U : PLAYER_BASE_U,
-      y2: 0.5, t:0, dur:0.2,
-      color: UNITS[u.type].proj || '#fff'
-    });
-  }
-}
-
-/* ---- rendering ---- */
 function drawSky(){
   const g = ctx.createLinearGradient(0,0,0,H*0.72);
   g.addColorStop(0,'#070510');
@@ -1159,20 +1320,15 @@ function drawSky(){
   g.addColorStop(1,'#33204a');
   ctx.fillStyle = g;
   ctx.fillRect(0,0,W,H);
-
   const now = performance.now()/1000;
   for(const s of G.stars){
     const a = s.a * (0.55 + 0.45*Math.sin(now*0.9 + s.tw));
     ctx.globalAlpha = a;
     ctx.fillStyle = '#dfe6ff';
-    ctx.beginPath();
-    ctx.arc(s.x*W, s.y*H, s.r, 0, 6.283);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, 6.283); ctx.fill();
   }
   ctx.globalAlpha = 1;
-
-  /* moon */
-  const mx = W*0.79, my = H*0.13, mr = Math.min(W,H)*0.052;
+  const mx = W*0.79, my = H*0.13, mr = Math.min(W,H)*0.05;
   const mg = ctx.createRadialGradient(mx,my,mr*0.3,mx,my,mr*4.2);
   mg.addColorStop(0,'rgba(200,190,255,.30)');
   mg.addColorStop(1,'rgba(200,190,255,0)');
@@ -1183,8 +1339,6 @@ function drawSky(){
   ctx.fillStyle = 'rgba(150,140,200,.35)';
   ctx.beginPath(); ctx.arc(mx-mr*0.3,my-mr*0.25,mr*0.22,0,6.283); ctx.fill();
   ctx.beginPath(); ctx.arc(mx+mr*0.28,my+mr*0.18,mr*0.16,0,6.283); ctx.fill();
-
-  /* distant hills */
   ctx.fillStyle = '#150e24';
   ctx.beginPath();
   ctx.moveTo(0, H*0.44);
@@ -1195,417 +1349,688 @@ function drawSky(){
   }
   ctx.lineTo(W, H*0.62); ctx.lineTo(0, H*0.62); ctx.closePath();
   ctx.fill();
-
-  /* fog */
-  const fg = ctx.createLinearGradient(0, H*0.28, 0, H*0.5);
-  fg.addColorStop(0,'rgba(120,90,190,0)');
-  fg.addColorStop(1,'rgba(120,90,190,.10)');
-  ctx.fillStyle = fg;
-  ctx.fillRect(0, H*0.28, W, H*0.24);
 }
 
-function drawGround(){
-  const a = project(0,0), b = project(1,0), c = project(1,1), d = project(0,1);
-  const g = ctx.createLinearGradient(0,a.y,0,d.y);
+function drawLobbyScene(){
+  drawSky();
+  // Ground
+  const gy = H*0.42;
+  const g = ctx.createLinearGradient(0, gy, 0, H);
   g.addColorStop(0,'#1a2419');
-  g.addColorStop(0.55,'#22301f');
+  g.addColorStop(0.6,'#22301f');
   g.addColorStop(1,'#2c3f28');
-  ctx.beginPath();
-  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
-  ctx.closePath();
-  ctx.fillStyle = g; ctx.fill();
-
-  ctx.save();
-  ctx.clip();
-  ctx.strokeStyle = 'rgba(150,210,160,.10)';
-  ctx.lineWidth = 1;
-  for(let i=0;i<=12;i++){
-    const p1 = project(i/12,0), p2 = project(i/12,1);
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
-  }
-  for(let i=0;i<=6;i++){
-    const p1 = project(0,i/6), p2 = project(1,i/6);
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
-  }
-  /* mid divider */
-  const m1 = project(0.5,0), m2 = project(0.5,1);
-  ctx.strokeStyle = 'rgba(232,194,106,.14)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([8,8]);
-  ctx.beginPath(); ctx.moveTo(m1.x,m1.y); ctx.lineTo(m2.x,m2.y); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  /* edges */
-  ctx.strokeStyle = 'rgba(160,220,170,.14)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
-  ctx.closePath(); ctx.stroke();
-}
-
-function drawBase(side){
-  const isPlayer = side === 'player';
-  const u = isPlayer ? PLAYER_BASE_U : ENEMY_BASE_U;
-  const p = project(u, 0.5);
-  const img = SPRITES[isPlayer ? 'castle' : 'darktower'];
-  const h = (isPlayer ? 178 : 178) * p.s;
-  const w = h * (140/200);
-
-  /* glow under base */
-  const gg = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, w*0.85);
-  gg.addColorStop(0, isPlayer ? 'rgba(120,170,255,.30)' : 'rgba(255,60,90,.28)');
-  gg.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = gg;
-  ctx.beginPath(); ctx.ellipse(p.x, p.y, w*0.85, w*0.36, 0, 0, 6.283); ctx.fill();
-
-  if(img && img.complete && img.naturalWidth){
-    ctx.drawImage(img, p.x - w/2, p.y - h, w, h);
-  }
-
-  /* hp bar */
-  const hp = isPlayer ? G.playerBase.hp / G.playerBase.max : G.enemyBase.hp / G.enemyBase.max;
-  const bw = w * 0.88, bh = 7;
-  const bx = p.x - bw/2, by = p.y - h - 16;
-  ctx.fillStyle = 'rgba(0,0,0,.65)';
-  roundRect(ctx, bx-1, by-1, bw+2, bh+2, 4); ctx.fill();
-  ctx.fillStyle = isPlayer ? '#4d9dff' : '#ff4d5e';
-  roundRect(ctx, bx, by, bw*Math.max(0,hp), bh, 3); ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,.22)';
-  ctx.lineWidth = 1;
-  roundRect(ctx, bx, by, bw, bh, 3); ctx.stroke();
-}
-
-function roundRect(c, x, y, w, h, r){
-  r = Math.min(r, w/2, h/2);
-  c.beginPath();
-  c.moveTo(x+r, y);
-  c.arcTo(x+w, y, x+w, y+h, r);
-  c.arcTo(x+w, y+h, x, y+h, r);
-  c.arcTo(x, y+h, x, y, r);
-  c.arcTo(x, y, x+w, y, r);
-  c.closePath();
-}
-
-function drawUnit(u){
-  const p = project(u.u, u.lane);
-  const def = UNITS[u.type];
-  const img = SPRITES[def.img];
-  const hh = 70 * p.s;
-  const ww = hh * (64/84);
-
-  /* shadow / team ring */
-  ctx.save();
-  ctx.globalAlpha = 0.4;
-  ctx.fillStyle = u.side === 'player' ? '#4fa8ff' : '#ff5a5a';
-  ctx.beginPath();
-  ctx.ellipse(p.x, p.y, ww*0.40, ww*0.15, 0, 0, 6.283);
-  ctx.fill();
-  ctx.restore();
-
-  if(img && img.complete && img.naturalWidth){
-    const bob = Math.sin(u.bob)*1.8*p.s;
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    if(u.side === 'enemy'){
-      ctx.scale(-1,1);
-      /* dark red tint for enemies */
-      ctx.filter = 'saturate(0.55) brightness(0.85) hue-rotate(-25deg)';
-    }
-    ctx.drawImage(img, -ww/2, -hh + bob, ww, hh);
-    ctx.restore();
-
-    if(u.hitFlash > 0){
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = u.hitFlash * 3;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.ellipse(p.x, p.y - hh*0.5, ww*0.4, hh*0.45, 0, 0, 6.283);
-      ctx.fill();
-      ctx.restore();
-    }
-  } else {
-    ctx.fillStyle = u.side === 'player' ? '#4fa8ff' : '#ff5a5a';
-    ctx.fillRect(p.x - ww*0.25, p.y - hh, ww*0.5, hh);
-  }
-
-  /* hp bar */
-  if(u.hp < u.maxHp){
-    const bw = ww*0.86, bh = 3.6;
-    const bx = p.x - bw/2, by = p.y - hh - 9;
-    ctx.fillStyle = 'rgba(0,0,0,.7)';
-    roundRect(ctx, bx-0.6, by-0.6, bw+1.2, bh+1.2, 2.2); ctx.fill();
-    ctx.fillStyle = u.side === 'player' ? '#54e08a' : '#ff6b6b';
-    roundRect(ctx, bx, by, bw*Math.max(0,u.hp/u.maxHp), bh, 1.8); ctx.fill();
-  }
-}
-
-function drawProjectiles(){
-  for(const pr of G.projectiles){
-    const k = Math.min(1, pr.t/pr.dur);
-    const p1 = project(pr.x1, pr.y1);
-    const p2 = project(pr.x2, pr.y2);
-    const x = p1.x + (p2.x-p1.x)*k;
-    const y = p1.y + (p2.y-p1.y)*k - Math.sin(k*Math.PI)*34*p1.s;
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    const g = ctx.createRadialGradient(x,y,0,x,y,13);
-    g.addColorStop(0, pr.color);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x,y,13,0,6.283); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(x,y,2.2,0,6.283); ctx.fill();
-    ctx.restore();
-  }
-}
-
-function drawParticles(){
-  for(const p of G.particles){
-    const a = Math.max(0, p.life / p.max);
-    ctx.globalAlpha = a;
-    ctx.fillStyle = p.color;
+  ctx.fillStyle = g;
+  ctx.fillRect(0, gy, W, H-gy);
+  // Paths (simple dirt roads)
+  ctx.strokeStyle = 'rgba(180,150,100,.10)';
+  ctx.lineWidth = 26;
+  ctx.lineCap = 'round';
+  const cx = W*0.5, cy = H*0.55;
+  const points = [
+    [W*0.5,H*0.15], [W*0.15,H*0.42], [W*0.85,H*0.42],
+    [W*0.5,H*0.45], [W*0.15,H*0.75], [W*0.5,H*0.85],
+    [W*0.85,H*0.75]
+  ];
+  points.forEach(p=>{
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * (0.5 + a*0.9) * p.s, 0, 6.283);
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(p[0],p[1]);
+    ctx.stroke();
+  });
+  // Decorative trees
+  const rnd = (n)=>{ const s=Math.sin(n*99.7)*0.5+0.5; return s; };
+  for(let i=0;i<14;i++){
+    const tx = rnd(i*1.3)*W;
+    const ty = gy + rnd(i*2.1)*(H-gy)*0.9;
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.beginPath(); ctx.ellipse(tx,ty,10,3,0,0,6.283); ctx.fill();
+    ctx.fillStyle = '#1c3318';
+    ctx.beginPath();
+    ctx.moveTo(tx-8, ty);
+    ctx.lineTo(tx, ty-22);
+    ctx.lineTo(tx+8, ty);
+    ctx.closePath();
     ctx.fill();
+    ctx.fillStyle = '#2a4a1f';
+    ctx.beginPath();
+    ctx.moveTo(tx-6, ty-8);
+    ctx.lineTo(tx, ty-24);
+    ctx.lineTo(tx+6, ty-8);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Fireflies
+  const now = performance.now()/1000;
+  for(let i=0;i<12;i++){
+    const fx = ((Math.sin(now*0.3 + i*1.7)*0.5+0.5)*0.7 + 0.15) * W;
+    const fy = ((Math.cos(now*0.4 + i*2.3)*0.5+0.5)*0.5 + 0.35) * H;
+    ctx.globalAlpha = 0.4 + 0.4*Math.sin(now*2 + i);
+    ctx.fillStyle = '#a8e8a8';
+    ctx.beginPath(); ctx.arc(fx, fy, 1.5, 0, 6.283); ctx.fill();
   }
   ctx.globalAlpha = 1;
 }
 
-function renderGame(){
-  ctx.setTransform(DPR,0,0,DPR,0,0);
-  if(G.shakeT > 0){
-    const m = G.shakeT * 14;
-    ctx.translate((Math.random()-0.5)*m, (Math.random()-0.5)*m);
-  }
-  drawSky();
-  drawGround();
-  drawBase('player');
-  drawBase('enemy');
+/* building placement (percent coords) */
+const BLD_POS = {
+  castle:  {x:50, y:52},
+  farm:    {x:14, y:50},
+  lumber:  {x:86, y:52},
+  quarry:  {x:22, y:76},
+  barracks:{x:78, y:76},
+  lab:     {x:38, y:36},
+  auction: {x:62, y:38},
+  cave:    {x:50, y:84}
+};
 
-  const sorted = G.units.slice().sort((a,b)=>{
-    if(a.lane !== b.lane) return a.lane - b.lane;
-    return a.u - b.u;
-  });
-  for(const u of sorted) drawUnit(u);
-
-  drawProjectiles();
-  drawParticles();
-
-  /* essence aura on player base */
-  if(G.active){
-    const p = project(PLAYER_BASE_U, 0.5);
-    const now = performance.now()/1000;
-    ctx.save();
-    ctx.globalAlpha = 0.16 + 0.06*Math.sin(now*2.4);
-    ctx.fillStyle = '#7b5cff';
-    ctx.beginPath();
-    ctx.ellipse(p.x, p.y, 46*p.s, 16*p.s, 0, 0, 6.283);
-    ctx.fill();
-    ctx.restore();
-  }
-}
-
-/* ==========================================================================
-   8. BATTLE FLOW
-   ========================================================================== */
-const elHud = document.getElementById('battlehud');
-const elHpAlly = document.getElementById('hp-ally');
-const elHpEnemy = document.getElementById('hp-enemy');
-const elMainMenu = document.getElementById('mainmenu');
-const elUnitbar = document.getElementById('unitbar');
-const elPauseBtn = document.getElementById('pausebtn');
-
-function updateBattleHud(){
-  if(!G.active) return;
-  elHpAlly.style.width = Math.max(0, (G.playerBase.hp/G.playerBase.max)*100) + '%';
-  elHpEnemy.style.width = Math.max(0, (G.enemyBase.hp/G.enemyBase.max)*100) + '%';
-  refreshUnitButtons();
-}
-
-function startLevel(level){
-  const cfg = levelCfg(level);
-  G.level = level;
-  G.units = [];
-  G.projectiles = [];
-  G.particles = [];
-  G.essence = 60;
-  G.essenceMax = 120;
-  G.essenceRegen = 10 + level*0.35;
-  G.playerBase = {hp: cfg.playerBaseHp, max: cfg.playerBaseHp};
-  G.enemyBase  = {hp: cfg.enemyBaseHp,  max: cfg.enemyBaseHp};
-  G.spawnInterval = cfg.spawnInterval;
-  G.spawnTimer = 2.5;
-  G.time = 0;
-  G.kills = 0;
-  G.spawned = 0;
-  G.over = false;
-  G.active = true;
-
-  elMainMenu.classList.add('hidden');
-  elHud.classList.add('show');
-  elUnitbar.style.display = 'flex';
-  elPauseBtn.classList.add('show');
-  updateBattleHud();
-}
-
-function stopLevel(){
-  G.active = false;
-  G.over = true;
-  elHud.classList.remove('show');
-  elPauseBtn.classList.remove('show');
-  elMainMenu.classList.remove('hidden');
-}
-
-/* ------------------ AD OVERLAY ------------------ */
-const adov = document.getElementById('adov');
-function showAdOverlay(){
-  adov.classList.add('show');
-  setPause('ad', true);
-}
-function hideAdOverlay(){
-  adov.classList.remove('show');
-  setPause('ad', false);
-}
-
-function showNativeAd(format){
-  return new Promise(resolve=>{
-    if(!HAS_VK){ setTimeout(()=>resolve({result:true}), 350); return; }
-    showAdOverlay();
-    const done = (res)=>{ hideAdOverlay(); resolve(res); };
-    VK.send('VKWebAppShowNativeAds', {ad_format: format})
-      .then(data=> done(data || {result:true}))
-      .catch(()=> done({result:false}));
-    /* safety timeout */
-    setTimeout(()=>{ if(adov.classList.contains('show')) done({result:false}); }, 25000);
+function positionBuildings(){
+  const cont = document.getElementById('lobby-buildings');
+  if(!cont) return;
+  Object.keys(BLD_POS).forEach(key=>{
+    const el = cont.querySelector(`[data-bld="${key}"]`);
+    if(!el) return;
+    el.style.left = BLD_POS[key].x + '%';
+    el.style.top = BLD_POS[key].y + '%';
   });
 }
 
-/* ------------------ PLAY / RESULT ------------------ */
-const levelInfoEl = document.getElementById('levelinfo');
-function refreshMenu(){
-  levelInfoEl.textContent = t('level') + ' ' + state.maxLevel;
+function renderLobbyBuildings(){
+  const cont = document.getElementById('lobby-buildings');
+  cont.innerHTML = '';
+  Object.keys(BLD_POS).forEach(key=>{
+    const cfg = BUILDINGS[key];
+    if(!cfg) return;
+    const data = state.buildings[key];
+    const lvl = data ? data.level : 0;
+    const building = data && data.buildEnd > Date.now();
+    const img = getSprite(cfg.icon);
+    const name = LANG === 'ru' ? cfg.ru : cfg.en;
+    const btn = document.createElement('button');
+    btn.className = 'bld';
+    if(lvl === 0 && key !== 'castle') btn.classList.add('unbuilt');
+    if(!building && key !== 'castle' && !data) btn.classList.add('unbuilt');
+    btn.dataset.bld = key;
+    btn.innerHTML = `
+      <div class="bicon">
+        <img src="${img.src}" alt="">
+        ${lvl>0 ? `<div class="badge">${lvl}</div>` : ''}
+        <div class="ready"></div>
+        <div class="timer"></div>
+      </div>
+      <div class="bname">${name}</div>
+    `;
+    btn.addEventListener('click', ()=> openBuildingModal(key));
+    cont.appendChild(btn);
+  });
+  positionBuildings();
+  updateBuildingIndicators();
 }
 
-async function onPlayClick(){
-  Music.ensure();
-  if(state.music) Music.play();
+function updateBuildingIndicators(){
+  const cont = document.getElementById('lobby-buildings');
+  if(!cont) return;
+  Object.keys(BLD_POS).forEach(key=>{
+    const btn = cont.querySelector(`[data-bld="${key}"]`);
+    if(!btn) return;
+    const data = state.buildings[key];
+    const lvl = data ? data.level : 0;
+    const building = data && data.buildEnd > Date.now();
+    const cfg = BUILDINGS[key];
 
-  /* 1) pause everything and show interstitial */
-  setPause('ad', true);
-  const res = await showNativeAd('interstitial');
-  /* 2) restore and start */
-  setPause('ad', false);
-  startLevel(state.maxLevel);
-}
+    const timerEl = btn.querySelector('.timer');
+    const readyEl = btn.querySelector('.ready');
 
-let pendingReward = 0;
-let pendingWin = false;
-
-function endLevel(win){
-  if(G.over) return;
-  G.over = true;
-  G.active = false;
-  setTimeout(()=>{
-    elPauseBtn.classList.remove('show');
-    if(win){
-      questProgress('wins', 1);
-      state.stats.wins++;
-      const reward = 60 + G.level*30 + Math.floor(G.kills*1.5);
-      pendingReward = reward;
-      pendingWin = true;
-      if(state.maxLevel <= G.level) state.maxLevel = G.level + 1;
-      showResult(true, reward);
+    if(building){
+      timerEl.classList.add('show');
+      const left = Math.max(0, Math.floor((data.buildEnd - Date.now())/1000));
+      timerEl.textContent = fmtTime(left);
+      readyEl.classList.remove('show');
+    } else if(cfg.resource && lvl > 0){
+      timerEl.classList.remove('show');
+      // ready if stored >= cap
+      const prod = getProduction(key);
+      if(prod.stored >= prod.cap - 0.5) readyEl.classList.add('show');
+      else readyEl.classList.remove('show');
     } else {
-      pendingReward = Math.floor(10 + G.kills*1.2);
-      pendingWin = false;
-      showResult(false, pendingReward);
+      timerEl.classList.remove('show');
+      readyEl.classList.remove('show');
     }
-    saveGame();
-  }, 700);
+  });
 }
 
-const ovResult = document.getElementById('ov-result');
-function showResult(win, reward){
-  document.getElementById('res-title').textContent = win ? t('win') : t('lose');
-  document.getElementById('res-title').style.color = win ? 'var(--gold-l)' : '#ff8b8b';
-  document.getElementById('res-big').textContent = (win ? '✦ ' : '✧ ') + t('level') + ' ' + G.level;
-  document.getElementById('res-lines').innerHTML =
-    `<div class="res-line"><span>${t('units_spawned')}</span><b>${G.spawned}</b></div>` +
-    `<div class="res-line"><span>${t('enemies_killed')}</span><b>${G.kills}</b></div>` +
-    `<div class="res-line" style="border:none"><span>${t('winreward')}</span><b style="color:var(--gold-l)">+${reward}</b></div>`;
-  const dbl = document.getElementById('res-double');
-  dbl.style.display = win ? 'block' : 'none';
-  dbl.disabled = false;
-  dbl.textContent = t('double_reward');
-  document.getElementById('res-take').textContent = t('take_reward');
-  ovResult.classList.add('show');
-  syncPause();
+/* ========================================================================
+   PRODUCTION
+   ======================================================================== */
+function getProduction(key){
+  const cfg = BUILDINGS[key];
+  if(!cfg || !cfg.resource) return {stored:0, cap:0, rate:0};
+  const data = state.buildings[key];
+  const lvl = data ? data.level : 0;
+  if(lvl === 0) return {stored:0, cap:0, rate:0};
+  const now = Date.now();
+  const last = state.prod[key] || now;
+  const hours = Math.max(0, (now - last)/3600000);
+  const rate = cfg.rate(lvl);
+  const cap = cfg.cap(lvl);
+  const stored = Math.min(cap, rate * hours);
+  return {stored, cap, rate};
 }
 
-document.getElementById('res-take').addEventListener('click', ()=>{
-  addGold(pendingReward);
-  ovResult.classList.remove('show');
-  syncPause();
-  stopLevel();
-  refreshMenu();
-  saveGame();
-});
-
-document.getElementById('res-double').addEventListener('click', async ()=>{
-  const btn = document.getElementById('res-double');
-  btn.disabled = true;
-  const r = await showNativeAd('reward');
-  if(r && (r.result === true || r.result === 'true')){
-    addGold(pendingReward * 2);
-    toast('+' + (pendingReward*2) + ' ' + t('gold'));
-  } else {
-    addGold(pendingReward);
-  }
-  ovResult.classList.remove('show');
-  syncPause();
-  stopLevel();
-  refreshMenu();
-  saveGame();
-});
-
-/* ==========================================================================
-   9. ECONOMY / QUESTS / REWARDS
-   ========================================================================== */
-function addGold(n){
-  state.gold += n;
-  state.stats.goldEarned += n;
-  questProgress('gold', n);
-  refreshGold();
+function collectProduction(key){
+  const cfg = BUILDINGS[key];
+  if(!cfg || !cfg.resource) return;
+  const data = state.buildings[key];
+  if(!data || data.level === 0) return;
+  const prod = getProduction(key);
+  const amount = Math.floor(prod.stored);
+  if(amount <= 0) return;
+  state[cfg.resource] = (state[cfg.resource] || 0) + amount;
+  state.prod[key] = Date.now();
+  refreshAllUI();
+  toast('+' + amount + ' ' + t(cfg.resource));
   saveGame();
 }
-function refreshGold(){
-  document.getElementById('goldval').textContent = formatNum(state.gold);
+
+/* ========================================================================
+   HELPERS
+   ======================================================================== */
+function fmtTime(sec){
+  if(sec <= 0) return LANG==='ru'?'0с':'0s';
+  const d = Math.floor(sec/86400);
+  const h = Math.floor((sec%86400)/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = Math.floor(sec%60);
+  const parts = [];
+  if(d) parts.push(d + (LANG==='ru'?'д':'d'));
+  if(h) parts.push(h + (LANG==='ru'?'ч':'h'));
+  if(m && !d) parts.push(m + (LANG==='ru'?'м':'m'));
+  if(!d && !h && s && !m) parts.push(s + (LANG==='ru'?'с':'s'));
+  return parts.join(' ') || (LANG==='ru'?'0с':'0s');
 }
-function formatNum(n){
+
+function fmtNum(n){
   n = Math.floor(n);
   if(n >= 1000000) return (n/1000000).toFixed(1) + 'M';
   if(n >= 10000) return (n/1000).toFixed(1) + 'K';
   return String(n);
 }
 
-/* ---- quests ---- */
+function resName(r){ return RES[r] ? (RES[r][LANG] || RES[r].ru) : r; }
+function resColor(r){ return RES[r] ? RES[r].color : '#fff'; }
+function resIcon(r){ return RES[r] ? RES[r].icon : ''; }
+
+function canAfford(cost){
+  for(const k in cost){
+    if((state[k]||0) < cost[k]) return false;
+  }
+  return true;
+}
+function spendCost(cost){
+  for(const k in cost){
+    state[k] = (state[k]||0) - cost[k];
+  }
+}
+
+function addResource(k, n){
+  state[k] = (state[k]||0) + n;
+}
+function addGold(n){ addResource('gold', n); state.goldEarned = (state.goldEarned||0)+n; }
+
+function showCostHTML(cost){
+  let html = '<div class="costrow">';
+  for(const k in cost){
+    const have = state[k]||0;
+    const need = cost[k];
+    const cls = have >= need ? 'ok' : 'miss';
+    html += `<span class="costitem ${cls}"><svg viewBox="0 0 24 24"><path d="${resIcon(k)}"/></svg>${need}</span>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ========================================================================
+   BUILDING MODAL
+   ======================================================================== */
+let currentBuildingKey = null;
+
+function openBuildingModal(key){
+  if(VIEW !== 'lobby') return;
+  currentBuildingKey = key;
+  renderBuildingModal();
+  openOverlay('ov-building');
+}
+
+function renderBuildingModal(){
+  const key = currentBuildingKey;
+  if(!key) return;
+  const cfg = BUILDINGS[key];
+  const data = state.buildings[key];
+  const lvl = data ? data.level : 0;
+  const name = LANG === 'ru' ? cfg.ru : cfg.en;
+  document.getElementById('bld-title').textContent = name;
+
+  const body = document.getElementById('bld-body');
+  const img = getSprite(cfg.icon);
+
+  const desc = LANG === 'ru' ? cfg.desc_ru : cfg.desc_en;
+
+  let html = `
+    <div class="binfo">
+      <img src="${img.src}" alt="">
+      <div class="bl">
+        <div class="bnm">${name}</div>
+        <div class="blv">${t('level')} ${lvl} / ${cfg.maxLevel}</div>
+        <div class="bdesc">${desc}</div>
+      </div>
+    </div>
+  `;
+
+  const building = data && data.buildEnd > Date.now();
+  const nextLvl = lvl + 1;
+
+  if(building){
+    const left = Math.max(0, Math.floor((data.buildEnd - Date.now())/1000));
+    const total = data.buildStart ? Math.max(1, data.buildEnd - data.buildStart) : 1;
+    const pct = 100 * (1 - left*1000/total);
+    html += `<div class="center muted" style="margin-bottom:6px">${t('building')}… ${fmtTime(left)}</div>`;
+    html += `<div class="progress"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></div>`;
+  } else if(lvl >= cfg.maxLevel){
+    html += `<div class="center muted" style="margin:10px 0">${t('level_max')}</div>`;
+  } else {
+    // Check requirements
+    let reqOK = true;
+    let reqMsg = '';
+    if(cfg.req){
+      const reqLvl = cfg.reqLv(nextLvl);
+      const have = (state.buildings[cfg.req]||{}).level || 0;
+      if(have < reqLvl){ reqOK = false; reqMsg = `${t('req_castle')} ${reqLvl}`; }
+    }
+
+    const cost = cfg.cost(nextLvl);
+    const time = cfg.time(nextLvl);
+    const ok = canAfford(cost) && reqOK;
+
+    html += `<div style="margin-top:6px;font-size:12px;color:var(--muted)">${LANG==='ru'?'Стоимость:':'Cost:'}</div>`;
+    html += showCostHTML(cost);
+    html += `<div class="center muted" style="margin:6px 0">${LANG==='ru'?'Время:':'Time:'} ${fmtTime(time)}</div>`;
+    if(!reqOK) html += `<div class="center" style="color:#ff8b8b;font-size:12px;margin:6px 0">${reqMsg}</div>`;
+    if(cfg.resource){
+      const prod = getProduction(key);
+      const newRate = cfg.rate(nextLvl);
+      const newCap = cfg.cap(nextLvl);
+      html += `<div class="muted" style="margin:8px 0">${t('production')}: +${newRate}/ч → ${t('storage')} ${newCap}</div>`;
+    }
+    html += `<button class="btn green full" id="bld-action" ${ok?'':'disabled'} data-act="${lvl>0?'upgrade':'build'}">${lvl>0?t('upgrade'):t('build')}</button>`;
+  }
+
+  // collect button
+  if(cfg.resource && lvl > 0){
+    const prod = getProduction(key);
+    const stored = Math.floor(prod.stored);
+    html += `<div class="row" style="margin-top:10px">
+      <div>
+        <div class="lab">${t('storage')}: <b style="color:${resColor(cfg.resource)}">${stored}</b> / ${prod.cap}</div>
+        <div class="sub">+${prod.rate}/ч</div>
+      </div>
+      <button class="btn ${stored>0?'green':''}" id="bld-collect" ${stored>0?'':'disabled'}>${t('collect')}</button>
+    </div>`;
+  }
+
+  // special actions
+  if(key === 'barracks' && lvl > 0){
+    html += `<button class="btn full" id="bld-units">${t('units')} →</button>`;
+  }
+  if(key === 'lab' && lvl > 0){
+    html += `<button class="btn full" id="bld-lab">${t('lab')} →</button>`;
+  }
+  if(key === 'auction' && lvl > 0){
+    html += `<button class="btn full" id="bld-auction">${t('auction')} →</button>`;
+  }
+  if(key === 'cave' && lvl > 0){
+    html += `<button class="btn full" id="bld-cave">${t('cave')} →</button>`;
+  }
+
+  body.innerHTML = html;
+
+  const actionBtn = body.querySelector('#bld-action');
+  if(actionBtn){
+    actionBtn.addEventListener('click', ()=>{
+      if(building) return;
+      if(!canAfford(cfg.cost(nextLvl))) { toast(t('no_gold')); return; }
+      if(cfg.req){
+        const reqLvl = cfg.reqLv(nextLvl);
+        const have = (state.buildings[cfg.req]||{}).level || 0;
+        if(have < reqLvl){ toast(LANG==='ru'?`Требуется ${cfg.req} ур. ${reqLvl}`:`Requires ${cfg.req} lvl ${reqLvl}`); return; }
+      }
+      spendCost(cfg.cost(nextLvl));
+      if(!state.buildings[key]) state.buildings[key] = {level:lvl, buildEnd:0};
+      state.buildings[key].level = nextLvl;
+      state.buildings[key].buildEnd = Date.now() + cfg.time(nextLvl)*1000;
+      state.buildings[key].buildStart = Date.now();
+      if(cfg.resource) state.prod[key] = Date.now();
+      refreshAllUI();
+      renderBuildingModal();
+      saveGame();
+    });
+  }
+
+  const collectBtn = body.querySelector('#bld-collect');
+  if(collectBtn){
+    collectBtn.addEventListener('click', ()=>{
+      collectProduction(key);
+      renderBuildingModal();
+    });
+  }
+  const btnUnits = body.querySelector('#bld-units');
+  if(btnUnits) btnUnits.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openUnitsModal(); });
+  const btnLab = body.querySelector('#bld-lab');
+  if(btnLab) btnLab.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openLabModal(); });
+  const btnAuc = body.querySelector('#bld-auction');
+  if(btnAuc) btnAuc.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openAuctionModal(); });
+  const btnCave = body.querySelector('#bld-cave');
+  if(btnCave) btnCave.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openCaveModal(); });
+}
+
+/* ========================================================================
+   UNITS MODAL
+   ======================================================================== */
+function openUnitsModal(){
+  if(!state.buildings.barracks || state.buildings.barracks.level < 1){
+    toast(LANG==='ru'?'Постройте казармы':'Build barracks first');
+    return;
+  }
+  renderUnitsModal();
+  openOverlay('ov-units');
+}
+function renderUnitsModal(){
+  const grid = document.getElementById('units-grid');
+  const barracksLvl = state.buildings.barracks ? state.buildings.barracks.level : 0;
+  let html = '';
+  UNIT_ORDER.forEach(key=>{
+    const d = UNIT_DEFS[key];
+    const owned = !!state.unitsOwned[key];
+    const unlocked = barracksLvl >= d.unlockBarracks;
+    const canBuy = unlocked && !owned && state.gold >= d.buyPrice;
+    const img = getSprite(d.img);
+    const name = LANG==='ru'?d.ru:d.en;
+    let st = '';
+    if(owned) st = `<span style="color:var(--green);font-size:10px">${t('owned')}</span>`;
+    else if(!unlocked) st = `<span style="color:var(--muted);font-size:10px">${t('unlocked_at')} ${d.unlockBarracks}</span>`;
+    else st = `<span style="color:var(--gold-l);font-size:10px">${t('buy')}: ${d.buyPrice} ${t('gold')}</span>`;
+    html += `<div class="ucard ${owned?'owned':''} ${!unlocked&&!owned?'locked':''}">
+      <img src="${img.src}" alt="">
+      <div class="un">${name}</div>
+      <div class="us">HP ${d.hp} · DMG ${d.dmg}</div>
+      ${st}
+      ${canBuy ? `<button class="btn ubuy" data-buy="${key}">${t('buy')}</button>` : ''}
+    </div>`;
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll('[data-buy]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const key = b.getAttribute('data-buy');
+      const d = UNIT_DEFS[key];
+      if(state.gold < d.buyPrice) return;
+      state.gold -= d.buyPrice;
+      state.unitsOwned[key] = true;
+      refreshAllUI();
+      renderUnitsModal();
+      saveGame();
+      toast('+ ' + (LANG==='ru'?d.ru:d.en));
+    });
+  });
+}
+
+/* ========================================================================
+   LAB (HEROES) MODAL
+   ======================================================================== */
+function openLabModal(){
+  if(!state.buildings.lab || state.buildings.lab.level < 1){
+    toast(LANG==='ru'?'Постройте лабораторию':'Build laboratory first');
+    return;
+  }
+  renderLabModal();
+  openOverlay('ov-lab');
+}
+function renderLabModal(){
+  const cont = document.getElementById('heroes-list');
+  let html = '';
+  HERO_ORDER.forEach(key=>{
+    const d = HERO_DEFS[key];
+    const h = state.heroes[key] || {level:0, upgradeEnd:0};
+    const lvl = h.level;
+    const upgrading = h.upgradeEnd > Date.now();
+    const img = getSprite(d.img);
+    const name = LANG==='ru'?d.ru:d.en;
+    const desc = LANG==='ru'?d.desc_ru:d.desc_en;
+    const bonus = (lvl * d.bonusPer * 100).toFixed(0);
+    const nextLvl = lvl+1;
+    let action = '';
+    if(upgrading){
+      const left = Math.max(0, Math.floor((h.upgradeEnd - Date.now())/1000));
+      action = `<div class="muted" style="font-size:11px;margin-top:4px">${t('building')}… ${fmtTime(left)}</div>`;
+    } else if(lvl >= d.maxLevel){
+      action = `<div class="muted" style="font-size:11px;margin-top:4px">${t('level_max')}</div>`;
+    } else {
+      const cost = d.cost(nextLvl);
+      const time = d.time(nextLvl);
+      const ok = canAfford(cost);
+      action = `${showCostHTML(cost)}
+        <div class="muted" style="font-size:10px;margin:4px 0">${fmtTime(time)}</div>
+        <button class="btn hbtn ${ok?'green':''}" data-up="${key}" ${ok?'':'disabled'}>${t('upgrade')}</button>`;
+    }
+    html += `<div class="hcard">
+      <img src="${img.src}" alt="">
+      <div class="hinfo">
+        <div class="hn">${name} · ${t('level')} ${lvl}/${d.maxLevel}</div>
+        <div class="hl">${desc}</div>
+        <div class="hb">${bonus}% ${t(d.bonus==='hp'?'hp_bonus':d.bonus==='dmg'?'dmg_bonus':'essence_bonus')}</div>
+        ${action}
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
+  cont.querySelectorAll('[data-up]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const key = b.getAttribute('data-up');
+      const d = HERO_DEFS[key];
+      const h = state.heroes[key];
+      const nextLvl = h.level + 1;
+      const cost = d.cost(nextLvl);
+      if(!canAfford(cost)){ toast(t('no_gold')); return; }
+      spendCost(cost);
+      h.level = nextLvl;
+      h.upgradeEnd = Date.now() + d.time(nextLvl)*1000;
+      refreshAllUI();
+      renderLabModal();
+      saveGame();
+    });
+  });
+}
+
+/* ========================================================================
+   AUCTION MODAL
+   ======================================================================== */
+function openAuctionModal(){
+  if(!state.buildings.auction || state.buildings.auction.level < 1){
+    toast(LANG==='ru'?'Постройте аукцион':'Build auction first');
+    return;
+  }
+  renderAuctionModal();
+  openOverlay('ov-auction');
+}
+function auctionSlotLimit(){
+  const lvl = state.buildings.auction ? state.buildings.auction.level : 0;
+  return 1 + lvl; // level 1: 2 slots
+}
+function renderAuctionModal(){
+  const resSel = document.getElementById('auc-res');
+  resSel.innerHTML = '';
+  ['wheat','wood','stone'].forEach(k=>{
+    if((state[k]||0) > 0 || resSel.children.length === 0){
+      const opt = document.createElement('option');
+      opt.value = k;
+      opt.textContent = resName(k) + ' (' + (state[k]||0) + ')';
+      resSel.appendChild(opt);
+    }
+  });
+  // list
+  const listEl = document.getElementById('auction-list');
+  const slots = auctionSlotLimit();
+  let html = `<div class="muted" style="margin-bottom:6px">${LANG==='ru'?'Слоты':'Slots'}: ${state.auction.length}/${slots}</div>`;
+  if(state.auction.length === 0){
+    html += `<div class="muted center" style="padding:14px">${LANG==='ru'?'Нет активных лотов':'No active listings'}</div>`;
+  } else {
+    state.auction.forEach(a=>{
+      const base = BASE_PRICES[a.resource] || 1;
+      const mult = a.price / base;
+      const chance = Math.min(0.8, Math.max(0.02, 0.4 / mult));
+      const age = Math.floor((Date.now() - a.createdAt)/60000);
+      html += `<div class="acard">
+        <div class="arow">
+          <div class="anm">${resName(a.resource)} x${a.amount}</div>
+          <div class="aprice">${a.price} ${t('gold')}/${LANG==='ru'?'ед.':'u'}</div>
+        </div>
+        <div class="achance">${t('chance')}: ${Math.round(chance*100)}% · ${LANG==='ru'?'выставлено':'listed'} ${age} ${LANG==='ru'?'м':'m'} назад</div>
+        <div class="abtns">
+          <button class="btn red" data-cancel="${a.id}">${t('cancel')}</button>
+        </div>
+      </div>`;
+    });
+  }
+  listEl.innerHTML = html;
+  listEl.querySelectorAll('[data-cancel]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const id = parseInt(b.getAttribute('data-cancel'),10);
+      const idx = state.auction.findIndex(a=>a.id===id);
+      if(idx>=0){
+        const a = state.auction[idx];
+        state[a.resource] = (state[a.resource]||0) + a.amount;
+        state.auction.splice(idx,1);
+        refreshAllUI();
+        renderAuctionModal();
+        saveGame();
+      }
+    });
+  });
+}
+document.getElementById('auc-add').addEventListener('click', ()=>{
+  const res = document.getElementById('auc-res').value;
+  const amt = parseInt(document.getElementById('auc-amt').value,10);
+  const price = parseInt(document.getElementById('auc-price').value,10);
+  const hint = document.getElementById('auc-hint');
+  if(!res || !amt || !price || amt <= 0 || price <= 0){ hint.textContent = LANG==='ru'?'Заполните поля':'Fill fields'; return; }
+  if((state[res]||0) < amt){ hint.textContent = LANG==='ru'?'Недостаточно ресурса':'Not enough resource'; return; }
+  if(state.auction.length >= auctionSlotLimit()){ hint.textContent = LANG==='ru'?'Все слоты заняты':'All slots busy'; return; }
+  const base = BASE_PRICES[res] || 1;
+  const mult = price / base;
+  if(mult > 5){ hint.textContent = LANG==='ru'?'Слишком высокая цена':'Price too high'; return; }
+  state[res] -= amt;
+  state.auction.push({
+    id: state.auctionSeq++,
+    resource: res,
+    amount: amt,
+    price,
+    createdAt: Date.now()
+  });
+  document.getElementById('auc-amt').value = '';
+  document.getElementById('auc-price').value = '';
+  hint.textContent = '';
+  refreshAllUI();
+  renderAuctionModal();
+  saveGame();
+});
+
+/* process auction sales every minute */
+setInterval(()=>{
+  if(!state.auction || !state.auction.length) return;
+  let changed = false;
+  for(let i=state.auction.length-1;i>=0;i--){
+    const a = state.auction[i];
+    const base = BASE_PRICES[a.resource] || 1;
+    const mult = a.price / base;
+    const chance = Math.min(0.8, Math.max(0.02, 0.4 / mult));
+    if(Math.random() < chance){
+      const total = a.price * a.amount;
+      state.gold = (state.gold||0) + total;
+      state.goldEarned = (state.goldEarned||0) + total;
+      state.auction.splice(i,1);
+      changed = true;
+      toast('+' + total + ' ' + t('gold'));
+    }
+  }
+  if(changed){
+    refreshAllUI();
+    if(document.getElementById('ov-auction').classList.contains('show')) renderAuctionModal();
+    saveGame();
+  }
+}, 60000);
+
+/* ========================================================================
+   CAVE MODAL
+   ======================================================================== */
+function openCaveModal(){
+  if(!state.buildings.cave || state.buildings.cave.level < 1){
+    toast(LANG==='ru'?'Постройте пещеру':'Build cave first');
+    return;
+  }
+  renderCaveModal();
+  openOverlay('ov-cave');
+}
+function caveCount(){
+  const lvl = state.buildings.cave ? state.buildings.cave.level : 0;
+  return 2 + lvl; // e.g. level 1: 3 caves
+}
+function renderCaveModal(){
+  const list = document.getElementById('cave-list');
+  let html = '';
+  const count = caveCount();
+  const maxLvl = state.caveMaxLevel || 1;
+  const img = getSprite('cave');
+  for(let i=1;i<=count;i++){
+    const idx = Math.min(CAVE_REWARDS.length-1, i-1);
+    const rew = CAVE_REWARDS[idx];
+    const unlocked = i <= maxLvl;
+    html += `<div class="ccard ${unlocked?'':'locked'}">
+      <img src="${img.src}" alt="">
+      <div class="cinfo">
+        <div class="cn">${LANG==='ru'?'Пещера':'Cave'} ${i}</div>
+        <div class="cr">${t('essence')}+${rew.essence} · ${t('gold')}+${rew.gold}</div>
+      </div>
+      <button class="btn ${unlocked?'green':''}" ${unlocked?'':'disabled'} data-cave="${i}">${unlocked?(LANG==='ru'?'Войти':'Enter'):(LANG==='ru'?'Закрыто':'Locked')}</button>
+    </div>`;
+  }
+  list.innerHTML = html;
+  list.querySelectorAll('[data-cave]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const lvl = parseInt(b.getAttribute('data-cave'),10);
+      closeOverlay(document.getElementById('ov-cave'));
+      await startCaveBattle(lvl);
+    });
+  });
+}
+
+/* ========================================================================
+   QUESTS
+   ======================================================================== */
 const QUEST_POOL = [
-  {id:'q_win1',   type:'wins',    target:1,  reward:120},
-  {id:'q_win2',   type:'wins',    target:2,  reward:250},
-  {id:'q_win4',   type:'wins',    target:4,  reward:520},
-  {id:'q_spawn20',type:'spawns',  target:20, reward:100},
-  {id:'q_spawn60',type:'spawns',  target:60, reward:260},
-  {id:'q_kill25', type:'kills',   target:25, reward:130},
-  {id:'q_kill70', type:'kills',   target:70, reward:330},
-  {id:'q_gold300',type:'gold',    target:300,reward:150},
-  {id:'q_gold900',type:'gold',    target:900,reward:380},
-  {id:'q_mage8',  type:'mages',   target:8,  reward:140},
-  {id:'q_min10',  type:'minutes', target:10, reward:110},
-  {id:'q_min25',  type:'minutes', target:25, reward:280},
-  {id:'q_knight5',type:'knights', target:5,  reward:160},
-  {id:'q_arch15', type:'archers', target:15, reward:170}
+  {id:'q_win1',type:'wins',target:1,reward:120},
+  {id:'q_win2',type:'wins',target:2,reward:250},
+  {id:'q_win4',type:'wins',target:4,reward:520},
+  {id:'q_spawn20',type:'spawns',target:20,reward:100},
+  {id:'q_spawn60',type:'spawns',target:60,reward:260},
+  {id:'q_kill25',type:'kills',target:25,reward:130},
+  {id:'q_kill70',type:'kills',target:70,reward:330},
+  {id:'q_gold300',type:'gold',target:300,reward:150},
+  {id:'q_gold900',type:'gold',target:900,reward:380},
+  {id:'q_mage8',type:'mages',target:8,reward:140},
+  {id:'q_min10',type:'minutes',target:10,reward:110},
+  {id:'q_min25',type:'minutes',target:25,reward:280},
+  {id:'q_knight5',type:'knights',target:5,reward:160},
+  {id:'q_arch15',type:'archers',target:15,reward:170},
+  {id:'q_build1',type:'builds',target:1,reward:200},
+  {id:'q_cave1',type:'caveWins',target:1,reward:250},
+  {id:'q_auc1',type:'auctionSales',target:1,reward:180}
 ];
 const QUEST_BY_ID = {};
 QUEST_POOL.forEach(q=>QUEST_BY_ID[q.id]=q);
@@ -1649,7 +2074,7 @@ function questProgress(type, n){
     }
   }
   if(changed){
-    renderQuests();
+    if(document.getElementById('ov-quests').classList.contains('show')) renderQuests();
     updateAlertDots();
     saveGame();
   }
@@ -1659,10 +2084,27 @@ function questReady(id){
   if(!def) return false;
   return (state.quests[id]||0) >= def.target && !state.questClaimed[id];
 }
+function questName(def){
+  const names = {
+    wins:{ru:'Победить в битвах',en:'Win battles'},
+    spawns:{ru:'Призвать воинов',en:'Summon warriors'},
+    kills:{ru:'Победить врагов',en:'Defeat enemies'},
+    gold:{ru:'Заработать золота',en:'Earn gold'},
+    mages:{ru:'Призвать магов',en:'Summon mages'},
+    minutes:{ru:'Провести в игре минут',en:'Spend minutes in game'},
+    knights:{ru:'Призвать рыцарей',en:'Summon knights'},
+    archers:{ru:'Призвать лучников',en:'Summon archers'},
+    builds:{ru:'Построить зданий',en:'Construct buildings'},
+    caveWins:{ru:'Победить в пещере',en:'Win in cave'},
+    auctionSales:{ru:'Продать на аукционе',en:'Sell on auction'}
+  };
+  const n = names[def.type];
+  return n ? (n[LANG] || n.ru) : def.type;
+}
 function renderQuests(){
   const box = document.getElementById('quest-list');
   if(!box) return;
-  if(!state.questList.length){ box.innerHTML = '<div class="muted center">'+t('quests_empty')+'</div>'; return; }
+  if(!state.questList.length){ box.innerHTML = `<div class="muted center">${LANG==='ru'?'Задания обновятся завтра':'Quests will refresh tomorrow'}</div>`; return; }
   let html = '';
   for(const id of state.questList){
     const def = QUEST_BY_ID[id];
@@ -1671,17 +2113,12 @@ function renderQuests(){
     const done = questReady(id);
     const claimed = !!state.questClaimed[id];
     const pct = Math.min(100, (cur/def.target)*100);
-    html += `<div class="quest ${done?'done':''}" data-qid="${id}">
+    html += `<div class="quest ${done?'done':''}">
       <div class="qi">
         <div class="qn">${questName(def)} — ${cur}/${def.target}</div>
         <div class="qbar"><i style="width:${pct}%"></i></div>
       </div>
-      <div class="qr">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="12" r="9" fill="rgba(232,194,106,.16)"/>
-          <path d="M12 7v10"/>
-        </svg>${def.reward}
-      </div>
+      <div class="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9" fill="rgba(232,194,106,.16)"/><path d="M12 7v10"/></svg>${def.reward}</div>
       ${done ? `<button class="btn" data-claim="${id}" style="padding:6px 10px;font-size:12px">${t('quest_claim')}</button>` : (claimed ? `<span class="muted" style="font-size:11px">${t('quest_done')}</span>` : '')}
     </div>`;
   }
@@ -1695,52 +2132,34 @@ function renderQuests(){
         toast('+' + QUEST_BY_ID[id].reward + ' ' + t('gold'));
         renderQuests();
         updateAlertDots();
+        refreshAllUI();
         saveGame();
       }
     });
   });
 }
-function questName(def){
-  const names = {
-    wins:{ru:'Победить в битвах', en:'Win battles'},
-    spawns:{ru:'Призвать воинов', en:'Summon warriors'},
-    kills:{ru:'Победить врагов', en:'Defeat enemies'},
-    gold:{ru:'Заработать золота', en:'Earn gold'},
-    mages:{ru:'Призвать магов', en:'Summon mages'},
-    minutes:{ru:'Провести в игре минут', en:'Spend minutes in game'},
-    knights:{ru:'Призвать рыцарей', en:'Summon knights'},
-    archers:{ru:'Призвать лучников', en:'Summon archers'}
-  };
-  const n = names[def.type];
-  return n ? n[LANG] || n.ru : def.type;
-}
 
-/* ---- daily ---- */
-function dayIndex(){
-  return Math.floor(Date.now() / 86400000);
-}
-function dailyAvailable(){
-  return dayIndex() > (state.dailyLast || 0);
-}
+/* ========================================================================
+   DAILY
+   ======================================================================== */
+function dayIndex(){ return Math.floor(Date.now()/86400000); }
+function dailyAvailable(){ return dayIndex() > (state.dailyLast||0); }
 function renderDaily(){
   const st = document.getElementById('daily-status');
   const btn = document.getElementById('daily-claim');
   if(dailyAvailable()){
-    const streak = Math.min(state.dailyStreak + 1, 7);
+    const streak = Math.min((state.dailyStreak||0) + 1, 7);
     const amount = 80 + streak*40;
-    st.innerHTML = `<span style="color:var(--gold-l);font-size:20px">+${amount}</span> ${t('gold')}<br>
-      <span class="muted">Серия: ${state.dailyStreak} → ${streak}</span>`;
+    st.innerHTML = `<span style="color:var(--gold-l);font-size:20px">+${amount}</span> ${t('gold')}`;
     btn.disabled = false;
-    btn.textContent = t('claim');
   } else {
     st.innerHTML = `<span class="muted">${t('daily_wait')}</span>`;
     btn.disabled = true;
-    btn.textContent = t('claim');
   }
 }
 document.getElementById('daily-claim').addEventListener('click', ()=>{
   if(!dailyAvailable()) return;
-  const streak = Math.min(state.dailyStreak + 1, 7);
+  const streak = Math.min((state.dailyStreak||0) + 1, 7);
   const amount = 80 + streak*40;
   state.dailyStreak = streak;
   state.dailyLast = dayIndex();
@@ -1748,13 +2167,16 @@ document.getElementById('daily-claim').addEventListener('click', ()=>{
   toast('+' + amount + ' ' + t('gold'));
   renderDaily();
   updateAlertDots();
+  refreshAllUI();
   saveGame();
 });
 
-/* ---- rest room ---- */
+/* ========================================================================
+   REST ROOM
+   ======================================================================== */
 let restTick = 0;
 let restOpen = false;
-const REST_PERIOD = 60;      /* seconds */
+const REST_PERIOD = 60;
 const REST_GOLD = 8;
 
 function renderRest(){
@@ -1762,88 +2184,965 @@ function renderRest(){
   document.getElementById('rest-timer').textContent = Math.ceil(left);
   document.getElementById('rest-fill').style.width = (restTick/REST_PERIOD*100) + '%';
   document.getElementById('rest-total').textContent =
-    (LANG==='ru' ? 'Всего заработано в комнате отдыха: ' : 'Total earned in rest room: ') + state.restTotal;
+    (LANG==='ru' ? 'Всего заработано: ' : 'Total earned: ') + (state.restTotal||0);
 }
 setInterval(()=>{
   if(!restOpen) return;
   restTick += 0.25;
   if(restTick >= REST_PERIOD){
     restTick = 0;
-    state.restTotal += REST_GOLD;
+    state.restTotal = (state.restTotal||0) + REST_GOLD;
     addGold(REST_GOLD);
-    burst(0.5, 0.5, '#e8c26a', 6);
     toast('+' + REST_GOLD + ' ' + t('gold'));
+    refreshAllUI();
+    saveGame();
   }
   renderRest();
 }, 250);
 
-/* ---- playtime rewards ---- */
+/* ========================================================================
+   PLAYTIME
+   ======================================================================== */
 const PLAYTIME = [
-  {min:5,  gold:60},
-  {min:10, gold:120},
-  {min:20, gold:260},
-  {min:40, gold:520},
-  {min:60, gold:800},
-  {min:120,gold:1600}
+  {min:5, gold:60}, {min:10, gold:120}, {min:20, gold:260},
+  {min:40, gold:520}, {min:60, gold:800}, {min:120, gold:1600}
 ];
-let sessionSeconds = 0;
-setInterval(()=>{
-  if(document.hidden) return;
-  sessionSeconds++;
-  if(sessionSeconds % 60 === 0){
-    state.onlineMinutes = (state.onlineMinutes||0) + 1;
-    state.stats.minutes++;
-    questProgress('minutes', 1);
-    renderPlaytime();
-    updateAlertDots();
-    saveGame();
-  }
-}, 1000);
-
 function renderPlaytime(){
   const box = document.getElementById('time-list');
   if(!box) return;
   let html = '';
   PLAYTIME.forEach((p, i)=>{
-    const claimed = state.playClaimed.indexOf(i) >= 0;
-    const ready = !claimed && state.onlineMinutes >= p.min;
-    const left = Math.max(0, p.min - state.onlineMinutes);
+    const claimed = (state.playClaimed||[]).indexOf(i) >= 0;
+    const ready = !claimed && (state.onlineMinutes||0) >= p.min;
+    const left = Math.max(0, p.min - (state.onlineMinutes||0));
     html += `<div class="ptime-item ${ready?'ready':''} ${claimed?'done':''}">
       <div class="tl">${t('online')} ${p.min} ${t('minutes')} — <b style="color:var(--gold-l)">+${p.gold}</b></div>
       ${claimed ? `<span class="muted">${t('time_gone')}</span>`
         : ready ? `<button class="btn green" data-pt="${i}" style="padding:6px 12px;font-size:12px">${t('time_ready')}</button>`
-        : `<span class="muted">${t('time_locked')} ${left} ${t('minutes')}</span>`}
+        : `<span class="muted">${t('time_locked')} ${left}</span>`}
     </div>`;
   });
   box.innerHTML = html;
   box.querySelectorAll('[data-pt]').forEach(b=>{
     b.addEventListener('click', ()=>{
-      const i = parseInt(b.getAttribute('data-pt'), 10);
+      const i = parseInt(b.getAttribute('data-pt'),10);
       const p = PLAYTIME[i];
-      if(state.playClaimed.indexOf(i) < 0 && state.onlineMinutes >= p.min){
+      if((state.playClaimed||[]).indexOf(i)<0 && (state.onlineMinutes||0) >= p.min){
         state.playClaimed.push(i);
         addGold(p.gold);
         toast('+' + p.gold + ' ' + t('gold'));
         renderPlaytime();
         updateAlertDots();
+        refreshAllUI();
         saveGame();
       }
     });
   });
 }
 
-/* ---- alert dots ---- */
+setInterval(()=>{
+  if(document.hidden) return;
+  state.onlineMinutes = (state.onlineMinutes||0) + 0;
+  // handled in tick below
+}, 1000);
+
+let sessionSeconds = 0;
+setInterval(()=>{
+  if(document.hidden || anyPause()) return;
+  sessionSeconds++;
+  if(sessionSeconds % 60 === 0){
+    state.onlineMinutes = (state.onlineMinutes||0) + 1;
+    questProgress('minutes', 1);
+    if(document.getElementById('ov-time').classList.contains('show')) renderPlaytime();
+    updateAlertDots();
+    saveGame();
+  }
+}, 1000);
+
+/* ========================================================================
+   ALERTS
+   ======================================================================== */
 function updateAlertDots(){
-  document.getElementById('btn-quests').classList.toggle('alert',
-    state.questList.some(id=>questReady(id)));
-  document.getElementById('btn-daily').classList.toggle('alert', dailyAvailable());
-  document.getElementById('btn-time').classList.toggle('alert',
-    PLAYTIME.some((p,i)=> state.playClaimed.indexOf(i)<0 && state.onlineMinutes >= p.min));
+  // top menu button
+  const menuBtn = document.getElementById('btn-menu');
+  const anyQuest = state.questList && state.questList.some(id=>questReady(id));
+  const anyDaily = dailyAvailable();
+  const anyTime = PLAYTIME.some((p,i)=> (state.playClaimed||[]).indexOf(i)<0 && (state.onlineMinutes||0) >= p.min);
+  if(menuBtn) menuBtn.classList.toggle('alert', anyQuest || anyDaily || anyTime);
+
+  // menu buttons
+  document.querySelectorAll('.mbtn').forEach(b=>{
+    const openId = b.getAttribute('data-open');
+    if(openId === 'ov-quests') b.classList.toggle('alert', anyQuest);
+    if(openId === 'ov-daily') b.classList.toggle('alert', anyDaily);
+    if(openId === 'ov-time') b.classList.toggle('alert', anyTime);
+  });
 }
 
-/* ==========================================================================
-   10. UI: BUTTONS / MODALS
-   ========================================================================== */
+/* ========================================================================
+   UPDATE ALL UI
+   ======================================================================== */
+function refreshAllUI(){
+  // resource chips
+  document.getElementById('val-gold').textContent = fmtNum(state.gold||0);
+  const chips = [
+    ['wheat','chip-wheat','val-wheat', state.buildings.farm && state.buildings.farm.level > 0],
+    ['wood','chip-wood','val-wood', state.buildings.lumber && state.buildings.lumber.level > 0],
+    ['stone','chip-stone','val-stone', state.buildings.quarry && state.buildings.quarry.level > 0],
+    ['essence','chip-essence','val-essence', state.buildings.cave && state.buildings.cave.level > 0]
+  ];
+  chips.forEach(([k, chipId, valId, show])=>{
+    const chip = document.getElementById(chipId);
+    chip.classList.toggle('hidden', !show);
+    if(show) document.getElementById(valId).textContent = fmtNum(state[k]||0);
+  });
+
+  updateBuildingIndicators();
+  updateAlertDots();
+  updateBottomBar();
+  if(document.getElementById('ov-building').classList.contains('show') && currentBuildingKey) renderBuildingModal();
+}
+
+/* ========================================================================
+   BOTTOM BAR
+   ======================================================================== */
+function updateBottomBar(){
+  const bottom = document.getElementById('bottom');
+  if(VIEW === 'battle' || VIEW === 'cave'){
+    buildBattleUnitBar();
+  } else {
+    buildLobbyBottom();
+  }
+}
+
+function buildLobbyBottom(){
+  const bottom = document.getElementById('bottom');
+  bottom.classList.remove('battle');
+  let html = '';
+  html += `<button class="lbtn big" id="btn-fight">
+    <svg viewBox="0 0 24 24"><path d="M4 20l7-7M4 4l16 16M14 4l6 6-8 8-6-6zM18 18l2 2"/></svg>
+    <span>${LANG==='ru'?'В БОЙ':'FIGHT'}</span>
+  </button>`;
+  if(state.buildings.cave && state.buildings.cave.level > 0){
+    html += `<button class="lbtn" id="btn-cave-bottom">
+      <svg viewBox="0 0 24 24"><path d="M4 20V8q8-8 16 0v12z"/><path d="M9 20v-6q3-3 6 0v6"/></svg>
+      <span>${LANG==='ru'?'Пещера':'Cave'}</span>
+    </button>`;
+  }
+  if(state.buildings.barracks && state.buildings.barracks.level > 0){
+    html += `<button class="lbtn" id="btn-units-bottom">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3.5-6 7-6s7 2 7 6"/></svg>
+      <span>${LANG==='ru'?'Войска':'Army'}</span>
+    </button>`;
+  }
+  bottom.innerHTML = html;
+  const bf = document.getElementById('btn-fight');
+  if(bf) bf.addEventListener('click', onPlayClick);
+  const bc = document.getElementById('btn-cave-bottom');
+  if(bc) bc.addEventListener('click', openCaveModal);
+  const bu = document.getElementById('btn-units-bottom');
+  if(bu) bu.addEventListener('click', openUnitsModal);
+}
+
+function buildBattleUnitBar(){
+  const bottom = document.getElementById('bottom');
+  bottom.classList.add('battle');
+  bottom.innerHTML = '';
+  UNIT_ORDER.forEach(key=>{
+    if(!state.unitsOwned[key]) return;
+    const d = UNIT_DEFS[key];
+    const b = document.createElement('button');
+    b.className = 'ubtn disabled';
+    b.dataset.unit = key;
+    b.innerHTML = `
+      <img src="${getSprite(d.img).src}" alt="">
+      <span class="cost"><i></i>${d.cost}</span>
+    `;
+    b.addEventListener('click', ()=>trySpawn(key));
+    bottom.appendChild(b);
+  });
+  refreshUnitButtons();
+}
+function refreshUnitButtons(){
+  if(VIEW !== 'battle' && VIEW !== 'cave') return;
+  const bottom = document.getElementById('bottom');
+  bottom.querySelectorAll('.ubtn').forEach(b=>{
+    const key = b.dataset.unit;
+    const d = UNIT_DEFS[key];
+    b.classList.toggle('disabled', G.essence < d.cost);
+  });
+}
+function trySpawn(key){
+  if(!G.active || G.over) return;
+  const d = UNIT_DEFS[key];
+  if(G.essence < d.cost){ toast(t('no_gold')); return; }
+  G.essence -= d.cost;
+  spawnUnit(key, 'player', LANES[Math.floor(Math.random()*LANES.length)]);
+  refreshUnitButtons();
+}
+
+/* ========================================================================
+   BATTLE ENGINE
+   ======================================================================== */
+const LANES = [0.22, 0.5, 0.78];
+const PLAYER_BASE_U = 0.045;
+const ENEMY_BASE_U  = 0.955;
+
+function project(u, lane){
+  const s = 0.50 + 0.44 * lane;
+  const x = W * 0.5 + (u - 0.5) * W * s;
+  const y = H * 0.32 + lane * H * 0.48;
+  return {x, y, s};
+}
+
+function levelCfg(lv){
+  return {
+    enemyBaseHp: 700 + lv*240,
+    playerBaseHp: 950 + lv*60,
+    spawnInterval: Math.max(1.25, 4.3 - lv*0.22)
+  };
+}
+function caveCfg(lv){
+  return {
+    enemyBaseHp: 900 + lv*400,
+    playerBaseHp: 900 + lv*100,
+    spawnInterval: Math.max(1.0, 3.0 - lv*0.15)
+  };
+}
+
+function makeUnit(type, side, lane, u){
+  const d = UNIT_DEFS[type];
+  const hpScale = side==='enemy' ? (1 + (G.level-1)*0.16) : (1 + (G.level-1)*0.05 + (G.hpBuff||0));
+  const dmgScale = side==='enemy' ? (1 + (G.level-1)*0.13) : (1 + (G.level-1)*0.04 + (G.dmgBuff||0));
+  return {
+    id: G.uid++, type, side, lane, u,
+    hp: d.hp*hpScale, maxHp: d.hp*hpScale,
+    dmg: d.dmg*dmgScale, range: d.range, speed: d.speed, atk: d.atk,
+    cd: Math.random()*0.4, bob: Math.random()*6.28, hitFlash: 0,
+    heal: d.heal ? d.heal*0.9 : 0,
+    atkAnim: 0, hitAnim: 0, hitDir: 1
+  };
+}
+
+function spawnUnit(type, side, lane){
+  const d = UNIT_DEFS[type];
+  const u = side === 'player' ? PLAYER_BASE_U + 0.03 : ENEMY_BASE_U - 0.03;
+  const unit = makeUnit(type, side, lane, u);
+  G.units.push(unit);
+  if(side === 'player'){
+    G.spawned++;
+    questProgress('spawns', 1);
+    if(type==='mage') questProgress('mages',1);
+    if(type==='knight') questProgress('knights',1);
+    if(type==='archer') questProgress('archers',1);
+    state.spawns = (state.spawns||0) + 1;
+  }
+  return unit;
+}
+
+function damageUnit(target, amount, byPlayer){
+  if(target.hp <= 0) return;
+  target.hp -= amount;
+  target.hitFlash = 0.18;
+  target.hitAnim = 0.2;
+  target.hitDir = byPlayer ? 1 : -1;
+  addDamageNumber(target.u, target.lane, Math.round(amount));
+  if(target.hp <= 0){
+    target.hp = 0;
+    burst(target.u, target.lane, byPlayer ? '#7b5cff' : '#ff5f6d', 8);
+    if(byPlayer){
+      G.kills++;
+      state.kills = (state.kills||0) + 1;
+      questProgress('kills', 1);
+    }
+  }
+}
+
+function addDamageNumber(u, lane, dmg){
+  const p = project(u, lane);
+  G.damageNums.push({
+    x: p.x + (Math.random()-0.5)*16,
+    y: p.y - 60*p.s,
+    vy: -60 - Math.random()*30,
+    life: 0.9,
+    max: 0.9,
+    text: String(dmg),
+    color: '#ffdb6b'
+  });
+}
+
+function burst(u, lane, color, n){
+  const p = project(u, lane);
+  for(let i=0;i<n;i++){
+    const a = Math.random()*6.28, sp = 18 + Math.random()*60;
+    G.particles.push({
+      x:p.x, y:p.y - 22*p.s,
+      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 40,
+      life:0.55 + Math.random()*0.35, max:0.9,
+      color, r: 1.6 + Math.random()*2.2, s:p.s
+    });
+  }
+}
+
+function updateGame(dt){
+  G.time += dt;
+  G.essence = Math.min(G.essenceMax, G.essence + G.essenceRegen*dt*(1+(G.essBuff||0)));
+
+  G.spawnTimer -= dt;
+  if(G.spawnTimer <= 0){
+    G.spawnTimer = G.spawnInterval * (0.8 + Math.random()*0.45);
+    let pool = ['sword','sword','archer'];
+    if(G.level >= 2) pool.push('archer','mage');
+    if(G.level >= 3) pool.push('knight','heal');
+    if(G.level >= 5) pool.push('knight','mage','heal');
+    const type = pool[Math.floor(Math.random()*pool.length)];
+    spawnUnit(type, 'enemy', LANES[Math.floor(Math.random()*LANES.length)]);
+  }
+
+  const list = G.units;
+  for(let i=0;i<list.length;i++){
+    const u = list[i];
+    if(u.hp <= 0) continue;
+    u.bob += dt*7;
+    if(u.hitFlash > 0) u.hitFlash -= dt;
+    if(u.hitAnim > 0) u.hitAnim -= dt;
+    if(u.atkAnim > 0) u.atkAnim -= dt;
+    u.cd -= dt;
+
+    const dir = u.side === 'player' ? 1 : -1;
+
+    if(UNIT_DEFS[u.type].heal){
+      let ally = null, worst = 1;
+      for(let j=0;j<list.length;j++){
+        const o = list[j];
+        if(o === u || o.side !== u.side || o.hp <= 0) continue;
+        if(o.lane !== u.lane) continue;
+        const dist = Math.abs(o.u - u.u);
+        if(dist > u.range) continue;
+        const ratio = o.hp / o.maxHp;
+        if(ratio < worst){ worst = ratio; ally = o; }
+      }
+      if(ally){
+        if(u.cd <= 0){
+          u.cd = u.atk;
+          u.atkAnim = 0.3;
+          const before = ally.hp;
+          ally.hp = Math.min(ally.maxHp, ally.hp + u.heal);
+          if(ally.hp > before) burst(ally.u, ally.lane, '#8ef0b0', 5);
+          G.projectiles.push({x1:u.u,y1:u.lane,x2:ally.u,y2:ally.lane,t:0,dur:0.22,color:'#8ef0b0'});
+        }
+        continue;
+      }
+    }
+
+    let target = null, bestD = 1e9;
+    for(let j=0;j<list.length;j++){
+      const o = list[j];
+      if(o.side === u.side || o.hp <= 0 || o.lane !== u.lane) continue;
+      const d = (o.u - u.u) * dir;
+      if(d > -0.015 && d < bestD){ bestD = d; target = o; }
+    }
+
+    const enemyBaseU = dir > 0 ? ENEMY_BASE_U : PLAYER_BASE_U;
+    const distToBase = Math.abs(enemyBaseU - u.u);
+
+    if(target && bestD <= u.range){
+      if(u.cd <= 0 && u.dmg > 0){
+        u.cd = u.atk;
+        u.atkAnim = 0.3;
+        attackUnit(u, target);
+      }
+    } else if(distToBase <= u.range + 0.025){
+      if(u.cd <= 0 && u.dmg > 0){
+        u.cd = u.atk;
+        u.atkAnim = 0.3;
+        attackBase(u);
+      }
+    } else {
+      u.u += dir * u.speed * dt;
+      u.u = Math.max(0.01, Math.min(0.99, u.u));
+    }
+  }
+
+  for(let i=G.units.length-1;i>=0;i--){
+    if(G.units[i].hp <= 0) G.units.splice(i,1);
+  }
+
+  for(let i=G.projectiles.length-1;i>=0;i--){
+    const p = G.projectiles[i];
+    p.t += dt;
+    if(p.t >= p.dur) G.projectiles.splice(i,1);
+  }
+
+  for(let i=G.particles.length-1;i>=0;i--){
+    const p = G.particles[i];
+    p.life -= dt;
+    if(p.life <= 0){ G.particles.splice(i,1); continue; }
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.vy += 190*dt;
+  }
+
+  for(let i=G.damageNums.length-1;i>=0;i--){
+    const d = G.damageNums[i];
+    d.life -= dt;
+    if(d.life <= 0){ G.damageNums.splice(i,1); continue; }
+    d.y += d.vy*dt;
+    d.vy += 30*dt;
+  }
+
+  if(G.shakeT > 0) G.shakeT -= dt;
+
+  if(G.enemyBase.hp <= 0 && !G.over) endLevel(true);
+  else if(G.playerBase.hp <= 0 && !G.over) endLevel(false);
+
+  updateBattleHud();
+}
+
+function attackUnit(u, target){
+  if(UNIT_DEFS[u.type].ranged){
+    G.projectiles.push({x1:u.u,y1:u.lane,x2:target.u,y2:target.lane,t:0,dur:0.2,color:UNIT_DEFS[u.type].proj||'#fff'});
+    if(UNIT_DEFS[u.type].aoe){
+      const aoe = UNIT_DEFS[u.type].aoe;
+      for(const o of G.units){
+        if(o.side === u.side || o.hp <= 0) continue;
+        if(Math.abs(o.u - target.u) <= aoe && Math.abs(o.lane - target.lane) < 0.01){
+          damageUnit(o, u.dmg, u.side === 'player');
+        }
+      }
+      burst(target.u, target.lane, '#b48bff', 10);
+    } else {
+      damageUnit(target, u.dmg, u.side === 'player');
+    }
+  } else {
+    damageUnit(target, u.dmg, u.side === 'player');
+    burst(target.u, target.lane, u.side === 'player' ? '#9fc7ff' : '#ff9f9f', 3);
+  }
+}
+function attackBase(u){
+  const dmg = u.dmg;
+  if(u.side === 'player'){
+    G.enemyBase.hp = Math.max(0, G.enemyBase.hp - dmg);
+    G.shakeT = 0.18;
+    burst(ENEMY_BASE_U, u.lane, '#ffcf6b', 5);
+  } else {
+    G.playerBase.hp = Math.max(0, G.playerBase.hp - dmg);
+    G.shakeT = 0.18;
+    burst(PLAYER_BASE_U, u.lane, '#ff5f6d', 5);
+  }
+  if(UNIT_DEFS[u.type].ranged){
+    G.projectiles.push({
+      x1:u.u,y1:u.lane,
+      x2: u.side === 'player' ? ENEMY_BASE_U : PLAYER_BASE_U,
+      y2: 0.5, t:0, dur:0.2,
+      color: UNIT_DEFS[u.type].proj || '#fff'
+    });
+  }
+}
+
+/* ========================================================================
+   RENDERING
+   ======================================================================== */
+function roundRect(c, x, y, w, h, r){
+  r = Math.min(r, w/2, h/2);
+  c.beginPath();
+  c.moveTo(x+r, y);
+  c.arcTo(x+w, y, x+w, y+h, r);
+  c.arcTo(x+w, y+h, x, y+h, r);
+  c.arcTo(x, y+h, x, y, r);
+  c.arcTo(x, y, x+w, y, r);
+  c.closePath();
+}
+
+function drawGround(){
+  const a = project(0,0), b = project(1,0), c = project(1,1), d = project(0,1);
+  const isCave = G.mode === 'cave';
+  const g = ctx.createLinearGradient(0,a.y,0,d.y);
+  if(isCave){
+    g.addColorStop(0,'#181022');
+    g.addColorStop(0.55,'#211830');
+    g.addColorStop(1,'#2a1f3d');
+  } else {
+    g.addColorStop(0,'#1a2419');
+    g.addColorStop(0.55,'#22301f');
+    g.addColorStop(1,'#2c3f28');
+  }
+  ctx.beginPath();
+  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
+  ctx.closePath();
+  ctx.fillStyle = g; ctx.fill();
+
+  ctx.save();
+  ctx.clip();
+  ctx.strokeStyle = isCave ? 'rgba(180,140,255,.10)' : 'rgba(150,210,160,.10)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<=12;i++){
+    const p1 = project(i/12,0), p2 = project(i/12,1);
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+  }
+  for(let i=0;i<=6;i++){
+    const p1 = project(0,i/6), p2 = project(1,i/6);
+    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+  }
+  const m1 = project(0.5,0), m2 = project(0.5,1);
+  ctx.strokeStyle = 'rgba(232,194,106,.14)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([8,8]);
+  ctx.beginPath(); ctx.moveTo(m1.x,m1.y); ctx.lineTo(m2.x,m2.y); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.strokeStyle = isCave ? 'rgba(200,160,255,.14)' : 'rgba(160,220,170,.14)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
+  ctx.closePath(); ctx.stroke();
+}
+
+function drawBase(side){
+  const isPlayer = side === 'player';
+  const u = isPlayer ? PLAYER_BASE_U : ENEMY_BASE_U;
+  const p = project(u, 0.5);
+  const isCave = G.mode === 'cave';
+  let key;
+  if(isCave){
+    key = isPlayer ? 'castle' : 'altardark';
+  } else {
+    key = isPlayer ? 'castle' : 'darktower';
+  }
+  const img = getSprite(key);
+  const h = 178 * p.s;
+  const w = h * (140/200);
+
+  const gg = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, w*0.85);
+  gg.addColorStop(0, isPlayer ? 'rgba(120,170,255,.30)' : (isCave ? 'rgba(180,80,255,.28)' : 'rgba(255,60,90,.28)'));
+  gg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = gg;
+  ctx.beginPath(); ctx.ellipse(p.x, p.y, w*0.85, w*0.36, 0, 0, 6.283); ctx.fill();
+
+  if(img && img.complete && img.naturalWidth){
+    ctx.drawImage(img, p.x - w/2, p.y - h, w, h);
+  }
+
+  const hp = isPlayer ? G.playerBase.hp/G.playerBase.max : G.enemyBase.hp/G.enemyBase.max;
+  const bw = w * 0.88, bh = 7;
+  const bx = p.x - bw/2, by = p.y - h - 16;
+  ctx.fillStyle = 'rgba(0,0,0,.65)';
+  roundRect(ctx, bx-1, by-1, bw+2, bh+2, 4); ctx.fill();
+  ctx.fillStyle = isPlayer ? '#4d9dff' : (isCave ? '#b46bff' : '#ff4d5e');
+  roundRect(ctx, bx, by, bw*Math.max(0,hp), bh, 3); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.22)';
+  ctx.lineWidth = 1;
+  roundRect(ctx, bx, by, bw, bh, 3); ctx.stroke();
+}
+
+function drawUnit(u){
+  const p = project(u.u, u.lane);
+  const def = UNIT_DEFS[u.type];
+  const img = getSprite(def.img);
+  const hh = 70 * p.s;
+  const ww = hh * (64/84);
+
+  // attack lunge
+  let lungeX = 0, lungeY = 0, rot = 0;
+  if(u.atkAnim > 0){
+    const k = u.atkAnim / 0.3;
+    const sign = u.side === 'player' ? 1 : -1;
+    const lunge = Math.sin((1-k)*Math.PI) * 8;
+    lungeX = sign * lunge;
+    rot = sign * Math.sin((1-k)*Math.PI) * 0.14;
+  }
+  // hit recoil
+  if(u.hitAnim > 0){
+    const k = u.hitAnim / 0.2;
+    lungeX -= u.hitDir * Math.sin(k*Math.PI) * 6;
+  }
+
+  // shadow
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  ctx.fillStyle = u.side === 'player' ? '#4fa8ff' : (G.mode==='cave' ? '#b46bff' : '#ff5a5a');
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y, ww*0.40, ww*0.15, 0, 0, 6.283);
+  ctx.fill();
+  ctx.restore();
+
+  if(img && img.complete && img.naturalWidth){
+    const bob = Math.sin(u.bob)*1.8*p.s;
+    ctx.save();
+    ctx.translate(p.x + lungeX, p.y + lungeY);
+    if(u.side === 'enemy'){
+      ctx.scale(-1,1);
+      ctx.filter = G.mode==='cave' ? 'saturate(0.7) brightness(0.85) hue-rotate(-30deg)' : 'saturate(0.55) brightness(0.85) hue-rotate(-25deg)';
+    }
+    if(rot) ctx.rotate(rot);
+    ctx.drawImage(img, -ww/2, -hh + bob, ww, hh);
+    ctx.restore();
+
+    if(u.hitFlash > 0){
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = u.hitFlash * 3;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y - hh*0.5, ww*0.4, hh*0.45, 0, 0, 6.283);
+      ctx.fill();
+      ctx.restore();
+    }
+  } else {
+    ctx.fillStyle = u.side === 'player' ? '#4fa8ff' : '#ff5a5a';
+    ctx.fillRect(p.x - ww*0.25, p.y - hh, ww*0.5, hh);
+  }
+
+  if(u.hp < u.maxHp){
+    const bw = ww*0.86, bh = 3.6;
+    const bx = p.x - bw/2, by = p.y - hh - 9;
+    ctx.fillStyle = 'rgba(0,0,0,.7)';
+    roundRect(ctx, bx-0.6, by-0.6, bw+1.2, bh+1.2, 2.2); ctx.fill();
+    ctx.fillStyle = u.side === 'player' ? '#54e08a' : '#ff6b6b';
+    roundRect(ctx, bx, by, bw*Math.max(0,u.hp/u.maxHp), bh, 1.8); ctx.fill();
+  }
+}
+
+function drawProjectiles(){
+  for(const pr of G.projectiles){
+    const k = Math.min(1, pr.t/pr.dur);
+    const p1 = project(pr.x1, pr.y1);
+    const p2 = project(pr.x2, pr.y2);
+    const x = p1.x + (p2.x-p1.x)*k;
+    const y = p1.y + (p2.y-p1.y)*k - Math.sin(k*Math.PI)*34*p1.s;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createRadialGradient(x,y,0,x,y,13);
+    g.addColorStop(0, pr.color);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x,y,13,0,6.283); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(x,y,2.2,0,6.283); ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawParticles(){
+  for(const p of G.particles){
+    const a = Math.max(0, p.life / p.max);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * (0.5 + a*0.9) * p.s, 0, 6.283);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawDamageNums(){
+  for(const d of G.damageNums){
+    const a = Math.max(0, d.life / d.max);
+    ctx.globalAlpha = a;
+    ctx.font = 'bold 14px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.strokeStyle = 'rgba(0,0,0,.85)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(d.text, d.x, d.y);
+    ctx.fillStyle = d.color;
+    ctx.fillText(d.text, d.x, d.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function renderBattle(){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(G.shakeT > 0){
+    const m = G.shakeT * 14;
+    ctx.translate((Math.random()-0.5)*m, (Math.random()-0.5)*m);
+  }
+  if(G.mode === 'cave'){
+    // cave ambience
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#080512');
+    g.addColorStop(0.5,'#150a20');
+    g.addColorStop(1,'#1d0f2a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+    // crystals on walls
+    const now = performance.now()/1000;
+    for(let i=0;i<14;i++){
+      const cx = (Math.sin(i*13.7)*0.5+0.5) * W;
+      const cy = ((Math.cos(i*7.3)*0.5+0.5)*0.6 + 0.05) * H;
+      ctx.globalAlpha = 0.25 + 0.2*Math.sin(now + i);
+      ctx.fillStyle = '#b46bff';
+      ctx.beginPath(); ctx.arc(cx, cy, 2 + Math.sin(i)*1, 0, 6.283); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  } else {
+    drawSky();
+  }
+  drawGround();
+  drawBase('player');
+  drawBase('enemy');
+
+  const sorted = G.units.slice().sort((a,b)=>{
+    if(a.lane !== b.lane) return a.lane - b.lane;
+    return a.u - b.u;
+  });
+  for(const u of sorted) drawUnit(u);
+  drawProjectiles();
+  drawParticles();
+  drawDamageNums();
+
+  if(G.active){
+    const p = project(PLAYER_BASE_U, 0.5);
+    const now = performance.now()/1000;
+    ctx.save();
+    ctx.globalAlpha = 0.16 + 0.06*Math.sin(now*2.4);
+    ctx.fillStyle = '#7b5cff';
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, 46*p.s, 16*p.s, 0, 0, 6.283);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* ========================================================================
+   BATTLE FLOW
+   ======================================================================== */
+function updateBattleHud(){
+  if(!G.active) return;
+  const elHpAlly = document.getElementById('hp-ally');
+  const elHpEnemy = document.getElementById('hp-enemy');
+  elHpAlly.style.width = Math.max(0,(G.playerBase.hp/G.playerBase.max)*100)+'%';
+  elHpEnemy.style.width = Math.max(0,(G.enemyBase.hp/G.enemyBase.max)*100)+'%';
+  refreshUnitButtons();
+}
+
+async function onPlayClick(){
+  Music.ensure();
+  if(state.music) Music.play();
+  setPause('ad', true);
+  await showNativeAd('interstitial');
+  setPause('ad', false);
+  startBattle(state.maxLevel);
+}
+
+async function startCaveBattle(lvl){
+  Music.ensure();
+  if(state.music) Music.play();
+  setPause('ad', true);
+  await showNativeAd('interstitial');
+  setPause('ad', false);
+  startCave(lvl);
+}
+
+function setBuffFromHeroes(){
+  G.hpBuff = 0; G.dmgBuff = 0; G.essBuff = 0;
+  for(const k in HERO_DEFS){
+    const d = HERO_DEFS[k];
+    const h = state.heroes[k];
+    if(!h) continue;
+    const bonus = h.level * d.bonusPer;
+    if(d.bonus === 'hp') G.hpBuff += bonus;
+    else if(d.bonus === 'dmg') G.dmgBuff += bonus;
+    else if(d.bonus === 'essence') G.essBuff += bonus;
+  }
+}
+
+function startBattle(level){
+  const cfg = levelCfg(level);
+  G.mode = 'battle';
+  G.level = level;
+  G.units = []; G.projectiles = []; G.particles = []; G.damageNums = [];
+  G.essence = 60; G.essenceMax = 120;
+  G.essenceRegen = 10 + level*0.35;
+  G.playerBase = {hp: cfg.playerBaseHp, max: cfg.playerBaseHp};
+  G.enemyBase  = {hp: cfg.enemyBaseHp, max: cfg.enemyBaseHp};
+  G.spawnInterval = cfg.spawnInterval;
+  G.spawnTimer = 2.5;
+  G.time = 0; G.kills = 0; G.spawned = 0;
+  G.over = false; G.active = true;
+  setBuffFromHeroes();
+
+  VIEW = 'battle';
+  document.getElementById('lobby-buildings').style.display = 'none';
+  document.getElementById('mainmenu').classList.add('hidden');
+  document.getElementById('battlehud').classList.add('show');
+  document.getElementById('pausebtn').classList.add('show');
+  updateBottomBar();
+  resizeCanvas();
+}
+
+function startCave(lvl){
+  const cfg = caveCfg(lvl);
+  G.mode = 'cave';
+  G.level = lvl;
+  G.units = []; G.projectiles = []; G.particles = []; G.damageNums = [];
+  G.essence = 60; G.essenceMax = 120;
+  G.essenceRegen = 9 + lvl*0.4;
+  G.playerBase = {hp: cfg.playerBaseHp, max: cfg.playerBaseHp};
+  G.enemyBase  = {hp: cfg.enemyBaseHp, max: cfg.enemyBaseHp};
+  G.spawnInterval = cfg.spawnInterval;
+  G.spawnTimer = 2.0;
+  G.time = 0; G.kills = 0; G.spawned = 0;
+  G.over = false; G.active = true;
+  setBuffFromHeroes();
+
+  VIEW = 'cave';
+  document.getElementById('lobby-buildings').style.display = 'none';
+  document.getElementById('mainmenu').classList.add('hidden');
+  document.getElementById('battlehud').classList.add('show');
+  document.getElementById('pausebtn').classList.add('show');
+  updateBottomBar();
+  resizeCanvas();
+}
+
+function stopBattle(){
+  G.active = false;
+  G.over = true;
+  VIEW = 'lobby';
+  document.getElementById('battlehud').classList.remove('show');
+  document.getElementById('pausebtn').classList.remove('show');
+  document.getElementById('lobby-buildings').style.display = '';
+  updateBottomBar();
+  refreshAllUI();
+}
+
+function endLevel(win){
+  if(G.over) return;
+  G.over = true;
+  G.active = false;
+  const isCave = G.mode === 'cave';
+  setTimeout(()=>{
+    document.getElementById('pausebtn').classList.remove('show');
+    if(win){
+      questProgress('wins',1);
+      state.wins = (state.wins||0)+1;
+      if(isCave){
+        questProgress('caveWins',1);
+        if(G.level >= (state.caveMaxLevel||1)) state.caveMaxLevel = G.level + 1;
+        const idx = Math.min(CAVE_REWARDS.length-1, G.level-1);
+        const rew = CAVE_REWARDS[idx];
+        pendingReward = {mode:'cave', ess: rew.essence, gold: rew.gold, wheat: rew.wheat, wood: rew.wood, stone: rew.stone};
+      } else {
+        const reward = 60 + G.level*30 + Math.floor(G.kills*1.5);
+        pendingReward = {mode:'battle', gold: reward};
+        if(state.maxLevel <= G.level) state.maxLevel = G.level + 1;
+      }
+    } else {
+      const reward = Math.floor(10 + G.kills*1.2);
+      pendingReward = {mode: isCave?'cave':'battle', gold: reward, ess: 0, wheat:0, wood:0, stone:0};
+    }
+    showResult(win);
+    saveGame();
+  }, 700);
+}
+
+let pendingReward = null;
+const ovResult = document.getElementById('ov-result');
+
+function showResult(win){
+  const r = pendingReward || {};
+  document.getElementById('res-title').textContent = win ? t('win') : t('lose');
+  document.getElementById('res-title').style.color = win ? 'var(--gold-l)' : '#ff8b8b';
+  document.getElementById('res-big').textContent = (win ? '✦ ' : '✧ ') + (G.mode==='cave'? (LANG==='ru'?'Пещера ':'Cave ') : t('level') + ' ') + G.level;
+  let lines = `<div class="res-line"><span>${t('units_spawned')}</span><b>${G.spawned}</b></div>
+    <div class="res-line"><span>${t('enemies_killed')}</span><b>${G.kills}</b></div>`;
+  let rewardText = '';
+  if(r.gold) rewardText += '+'+r.gold+' '+t('gold')+' ';
+  if(r.ess) rewardText += '+'+r.ess+' '+t('essence')+' ';
+  if(r.wheat) rewardText += '+'+r.wheat+' '+t('wheat')+' ';
+  if(r.wood) rewardText += '+'+r.wood+' '+t('wood')+' ';
+  if(r.stone) rewardText += '+'+r.stone+' '+t('stone');
+  lines += `<div class="res-line" style="border:none"><span>${t('winreward')}</span><b style="color:var(--gold-l)">${rewardText}</b></div>`;
+  document.getElementById('res-lines').innerHTML = lines;
+
+  const dbl = document.getElementById('res-double');
+  dbl.style.display = win ? 'block' : 'none';
+  dbl.disabled = false;
+  dbl.textContent = t('double_reward');
+  document.getElementById('res-take').textContent = t('take_reward');
+  ovResult.classList.add('show');
+  syncPause();
+}
+
+function claimPendingReward(){
+  const r = pendingReward;
+  if(!r) return;
+  if(r.gold) addGold(r.gold);
+  if(r.ess) addResource('essence', r.ess);
+  if(r.wheat) addResource('wheat', r.wheat);
+  if(r.wood) addResource('wood', r.wood);
+  if(r.stone) addResource('stone', r.stone);
+  pendingReward = null;
+  refreshAllUI();
+  saveGame();
+}
+
+document.getElementById('res-take').addEventListener('click', ()=>{
+  claimPendingReward();
+  ovResult.classList.remove('show');
+  syncPause();
+  stopBattle();
+});
+
+document.getElementById('res-double').addEventListener('click', async ()=>{
+  const btn = document.getElementById('res-double');
+  btn.disabled = true;
+  const r = await showNativeAd('reward');
+  const success = r && (r.result === true || r.result === 'true');
+  const orig = pendingReward;
+  if(success){
+    if(orig.gold) orig.gold *= 2;
+    if(orig.ess) orig.ess *= 2;
+    if(orig.wheat) orig.wheat *= 2;
+    if(orig.wood) orig.wood *= 2;
+    if(orig.stone) orig.stone *= 2;
+    toast('x2!');
+  }
+  claimPendingReward();
+  ovResult.classList.remove('show');
+  syncPause();
+  stopBattle();
+});
+
+/* ========================================================================
+   PAUSE
+   ======================================================================== */
+document.getElementById('pausebtn').addEventListener('click', ()=>{
+  setPause('userpause', true);
+  openOverlay('ov-pause');
+});
+document.getElementById('pause-resume').addEventListener('click', ()=>{
+  closeOverlay(document.getElementById('ov-pause'));
+  setPause('userpause', false);
+});
+document.getElementById('pause-quit').addEventListener('click', ()=>{
+  closeOverlay(document.getElementById('ov-pause'));
+  setPause('userpause', false);
+  G.over = true;
+  G.active = false;
+  stopBattle();
+});
+
+/* ========================================================================
+   AD OVERLAY
+   ======================================================================== */
+const adov = document.getElementById('adov');
+function showAdOverlay(){ adov.classList.add('show'); setPause('ad', true); }
+function hideAdOverlay(){ adov.classList.remove('show'); setPause('ad', false); }
+function showNativeAd(format){
+  return new Promise(resolve=>{
+    if(!HAS_VK){ setTimeout(()=>resolve({result:true}), 350); return; }
+    showAdOverlay();
+    const done = (res)=>{ hideAdOverlay(); resolve(res); };
+    VK.send('VKWebAppShowNativeAds', {ad_format: format})
+      .then(data=> done(data || {result:true}))
+      .catch(()=> done({result:false}));
+    setTimeout(()=>{ if(adov.classList.contains('show')) done({result:false}); }, 25000);
+  });
+}
+
+/* ========================================================================
+   MODAL OPEN/CLOSE
+   ======================================================================== */
 function openOverlay(id){
   const el = document.getElementById(id);
   if(!el) return;
@@ -1855,19 +3154,46 @@ function closeOverlay(el){
   syncPause();
 }
 document.querySelectorAll('.overlay').forEach(ov=>{
-  ov.addEventListener('click', (e)=>{
-    if(e.target === ov) closeOverlay(ov);
-  });
+  ov.addEventListener('click', (e)=>{ if(e.target === ov) closeOverlay(ov); });
   ov.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', ()=>closeOverlay(ov));
   });
 });
 
-/* settings */
-document.getElementById('btn-settings').addEventListener('click', ()=>{
-  syncSettingsUI();
-  openOverlay('ov-settings');
+/* menu button */
+document.getElementById('btn-menu').addEventListener('click', ()=>{
+  updateAlertDots();
+  openOverlay('ov-menu');
 });
+document.querySelectorAll('.mbtn[data-open]').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const id = b.getAttribute('data-open');
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(id === 'ov-quests') renderQuests();
+    if(id === 'ov-daily') renderDaily();
+    if(id === 'ov-time') renderPlaytime();
+    if(id === 'ov-rest') { restOpen = true; renderRest(); }
+    closeOverlay(document.getElementById('ov-menu'));
+    openOverlay(id);
+  });
+});
+document.getElementById('mbtn-invite').addEventListener('click', ()=>{
+  closeOverlay(document.getElementById('ov-menu'));
+  if(HAS_VK){
+    VK.send('VKWebAppShowInviteBox')
+      .then(()=> toast(t('inv_ok')))
+      .catch(()=> toast(t('inv_err')));
+  } else {
+    toast(t('inv_err'));
+  }
+});
+document.getElementById('ov-rest').addEventListener('click', (e)=>{
+  if(e.target.id === 'ov-rest') restOpen = false;
+});
+document.querySelector('#ov-rest .mclose').addEventListener('click', ()=>{ restOpen = false; });
+
+/* settings */
 function syncSettingsUI(){
   document.getElementById('sw-music').classList.toggle('on', !!state.music);
   document.querySelectorAll('.langbtn').forEach(b=>{
@@ -1894,12 +3220,13 @@ document.getElementById('pcode-apply').addEventListener('click', ()=>{
   const msg = document.getElementById('pcode-msg');
   const code = (inp.value || '').trim().toLowerCase();
   if(!code){ msg.textContent = t('promocode_bad'); msg.style.color = '#ff8b8b'; return; }
-
   if(code === 'clear12'){
     msg.textContent = '...';
-    clearGameData().then(()=>{
+    if(HAS_VK){
+      VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: ''}).finally(()=>location.reload());
+    } else {
       location.reload();
-    });
+    }
     return;
   }
   if(code === 'admin17'){
@@ -1907,116 +3234,25 @@ document.getElementById('pcode-apply').addEventListener('click', ()=>{
     msg.textContent = t('promocode_ok') + ' +100000 ' + t('gold');
     msg.style.color = 'var(--green)';
     inp.value = '';
+    refreshAllUI();
     saveGame();
     return;
   }
   msg.textContent = t('promocode_bad');
   msg.style.color = '#ff8b8b';
 });
-
-/* quests */
-document.getElementById('btn-quests').addEventListener('click', ()=>{
-  renderQuests();
-  openOverlay('ov-quests');
-});
-
-/* rest */
-document.getElementById('btn-rest').addEventListener('click', ()=>{
-  restOpen = true;
-  renderRest();
-  openOverlay('ov-rest');
-});
-document.getElementById('ov-rest').addEventListener('click', (e)=>{
-  if(e.target.id === 'ov-rest') restOpen = false;
-});
-document.querySelector('#ov-rest .mclose').addEventListener('click', ()=>{ restOpen = false; });
-
-/* daily */
-document.getElementById('btn-daily').addEventListener('click', ()=>{
-  renderDaily();
-  openOverlay('ov-daily');
-});
-
-/* playtime */
-document.getElementById('btn-time').addEventListener('click', ()=>{
-  renderPlaytime();
-  openOverlay('ov-time');
-});
-
-/* invite */
-document.getElementById('btn-invite').addEventListener('click', ()=>{
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  if(!confirm(LANG==='ru'?'Сбросить весь прогресс?':'Reset all progress?')) return;
   if(HAS_VK){
-    VK.send('VKWebAppShowInviteBox')
-      .then(()=> toast(t('invite_ok')))
-      .catch(()=> toast(t('invite_err')));
+    VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: ''}).finally(()=>location.reload());
   } else {
-    toast(t('invite_err'));
+    location.reload();
   }
 });
 
-/* pause */
-document.getElementById('pausebtn').addEventListener('click', ()=>{
-  setPause('userpause', true);
-  openOverlay('ov-pause');
-});
-document.getElementById('pause-resume').addEventListener('click', ()=>{
-  closeOverlay(document.getElementById('ov-pause'));
-  setPause('userpause', false);
-});
-document.getElementById('pause-quit').addEventListener('click', ()=>{
-  closeOverlay(document.getElementById('ov-pause'));
-  setPause('userpause', false);
-  G.over = true;
-  G.active = false;
-  stopLevel();
-  refreshMenu();
-});
-
-/* play */
-document.getElementById('playbtn').addEventListener('click', onPlayClick);
-
-/* ==========================================================================
-   11. UNIT BAR
-   ========================================================================== */
-function buildUnitBar(){
-  elUnitbar.innerHTML = '';
-  UNIT_ORDER.forEach(key=>{
-    const d = UNITS[key];
-    const b = document.createElement('button');
-    b.className = 'ubtn disabled';
-    b.dataset.unit = key;
-    b.innerHTML = `
-      <img src="${SPRITES[d.img].src}" alt="">
-      <span class="cost"><i></i>${d.cost}</span>
-    `;
-    b.addEventListener('click', ()=>trySpawn(key));
-    elUnitbar.appendChild(b);
-  });
-}
-function trySpawn(key){
-  if(!G.active || G.over) return;
-  const d = UNITS[key];
-  if(G.essence < d.cost){
-    toast(t('no_gold'));
-    return;
-  }
-  G.essence -= d.cost;
-  const lane = LANES[Math.floor(Math.random()*LANES.length)];
-  spawnUnit(key, 'player', lane);
-  refreshUnitButtons();
-}
-function refreshUnitButtons(){
-  if(!G.active) return;
-  elUnitbar.querySelectorAll('.ubtn').forEach(b=>{
-    const key = b.dataset.unit;
-    const d = UNITS[key];
-    b.classList.toggle('disabled', G.essence < d.cost);
-  });
-}
-
-/* ==========================================================================
-   12. LANGUAGE APPLY
-   ========================================================================== */
+/* ========================================================================
+   LANGUAGE
+   ======================================================================== */
 function applyLang(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k = el.getAttribute('data-i18n');
@@ -2024,23 +3260,28 @@ function applyLang(){
     if(v) el.textContent = v;
   });
   document.getElementById('adov-text').textContent = t('ad_loading');
-  document.getElementById('adov-text').style.whiteSpace = 'pre-line';
-  document.getElementById('menu_hint').textContent =
-    LANG === 'ru' ? 'Призывайте воинов, уничтожьте тёмную башню!' : 'Summon warriors, destroy the dark tower!';
   document.documentElement.lang = LANG;
   refreshMenu();
-  renderQuests();
-  renderPlaytime();
-  renderDaily();
-  renderRest();
+  refreshAllUI();
+  renderLobbyBuildings();
+  if(document.getElementById('ov-quests').classList.contains('show')) renderQuests();
+  if(document.getElementById('ov-daily').classList.contains('show')) renderDaily();
+  if(document.getElementById('ov-time').classList.contains('show')) renderPlaytime();
+  if(document.getElementById('ov-units').classList.contains('show')) renderUnitsModal();
+  if(document.getElementById('ov-lab').classList.contains('show')) renderLabModal();
+  if(document.getElementById('ov-auction').classList.contains('show')) renderAuctionModal();
+  if(document.getElementById('ov-cave').classList.contains('show')) renderCaveModal();
   syncSettingsUI();
 }
+function refreshMenu(){
+  // mainmenu is hidden in this version
+}
 
-/* ==========================================================================
-   13. TUTORIAL
-   ========================================================================== */
+/* ========================================================================
+   TUTORIAL
+   ======================================================================== */
 const TUT_STEPS = ['tut_1','tut_2','tut_3','tut_4','tut_5','tut_6'];
-const TUT_TARGETS = [null, '#stage', '#unitbar', '#unitbar', '#stage', null];
+const TUT_TARGETS = [null, '#lobby-buildings', null, '#bottom', null, null];
 let tutIndex = 0;
 let tutActive = false;
 const tutBox = document.getElementById('tutbox');
@@ -2068,10 +3309,7 @@ function showTutStep(){
   document.getElementById('tut-next').textContent =
     tutIndex === TUT_STEPS.length-1 ? (LANG==='ru'?'Готово':'Done') : t('next');
 }
-document.getElementById('tut-next').addEventListener('click', ()=>{
-  tutIndex++;
-  showTutStep();
-});
+document.getElementById('tut-next').addEventListener('click', ()=>{ tutIndex++; showTutStep(); });
 function endTutorial(){
   tutActive = false;
   tutBox.classList.remove('show');
@@ -2092,9 +3330,9 @@ document.getElementById('tut-no').addEventListener('click', ()=>{
   syncPause();
 });
 
-/* ==========================================================================
-   14. TOAST
-   ========================================================================== */
+/* ========================================================================
+   TOAST
+   ======================================================================== */
 let toastTimer = null;
 function toast(msg){
   const el = document.getElementById('toast');
@@ -2104,9 +3342,47 @@ function toast(msg){
   toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
 }
 
-/* ==========================================================================
-   15. MAIN LOOP
-   ========================================================================== */
+/* ========================================================================
+   BUILDING COMPLETION TICK
+   ======================================================================== */
+setInterval(()=>{
+  if(VIEW !== 'lobby') return;
+  let changed = false;
+  // check buildings completed
+  for(const key in state.buildings){
+    const b = state.buildings[key];
+    if(b.buildEnd && b.buildEnd > 0 && Date.now() >= b.buildEnd){
+      b.buildEnd = 0;
+      b.buildStart = 0;
+      if(BUILDINGS[key].resource){
+        state.prod[key] = Date.now();
+      }
+      changed = true;
+      const name = LANG==='ru' ? BUILDINGS[key].ru : BUILDINGS[key].en;
+      toast(name + ' — ' + t('ready'));
+      questProgress('builds', 1);
+    }
+  }
+  // check hero upgrades
+  for(const key in state.heroes){
+    const h = state.heroes[key];
+    if(h.upgradeEnd && h.upgradeEnd > 0 && Date.now() >= h.upgradeEnd){
+      h.upgradeEnd = 0;
+      changed = true;
+      toast((LANG==='ru'?HERO_DEFS[key].ru:HERO_DEFS[key].en) + ' — ' + t('ready'));
+    }
+  }
+  if(changed){
+    refreshAllUI();
+    saveGame();
+  } else {
+    updateBuildingIndicators();
+  }
+}, 1000);
+
+/* ========================================================================
+   MAIN LOOP
+   ======================================================================== */
 let lastTs = 0;
 function loop(ts){
   requestAnimationFrame(loop);
@@ -2116,49 +3392,45 @@ function loop(ts){
   if(dt > 0.06) dt = 0.06;
   if(dt < 0) dt = 0;
 
-  if(G.active && !anyPause()){
+  if((VIEW === 'battle' || VIEW === 'cave') && G.active && !anyPause()){
     updateGame(dt);
-  } else if(G.active){
-    /* keep particles alive while paused? no — freeze everything */
   }
 
-  renderGame();
+  // draw
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  if(VIEW === 'lobby'){
+    drawLobbyScene();
+  } else {
+    renderBattle();
+  }
 }
 
-/* ==========================================================================
-   16. VISIBILITY / VK EVENTS
-   ========================================================================== */
-window.addEventListener('blur', ()=>{
-  setPause('hidden', true);
-});
-window.addEventListener('focus', ()=>{
-  setPause('hidden', false);
-});
+/* ========================================================================
+   VISIBILITY / VK EVENTS
+   ======================================================================== */
+window.addEventListener('blur', ()=> setPause('hidden', true));
+window.addEventListener('focus', ()=> setPause('hidden', false));
 document.addEventListener('visibilitychange', ()=>{
   if(document.hidden) setPause('hidden', true);
   else setPause('hidden', false);
 });
-
 if(HAS_VK){
   try{
     vkBridge.subscribe((e)=>{
       const type = e && e.detail && e.detail.type;
-      if(type === 'VKWebAppViewHide'){
-        setPause('hidden', true);
-      } else if(type === 'VKWebAppViewRestore'){
-        setPause('hidden', false);
-      }
+      if(type === 'VKWebAppViewHide') setPause('hidden', true);
+      else if(type === 'VKWebAppViewRestore') setPause('hidden', false);
     });
   }catch(err){}
 }
 
-/* banner */
+/* ========================================================================
+   BANNER
+   ======================================================================== */
 function initBanner(){
   if(!HAS_VK) return;
   VK.send('VKWebAppGetLaunchParams')
-    .then(()=>{
-      return VK.send('VKWebAppShowBannerAd', {banner_location:'bottom'});
-    })
+    .then(()=> VK.send('VKWebAppShowBannerAd', {banner_location:'bottom'}))
     .then(()=>{
       document.getElementById('banner').classList.add('on');
       setTimeout(resizeCanvas, 320);
@@ -2166,22 +3438,40 @@ function initBanner(){
     .catch(()=>{});
 }
 
-/* ==========================================================================
-   17. BOOT
-   ========================================================================== */
+/* ========================================================================
+   BOOT
+   ======================================================================== */
 async function boot(){
   resizeCanvas();
   await loadSprites();
-  buildUnitBar();
 
   const saved = await loadGame();
-  if(saved && typeof saved === 'object'){
+  if(saved && typeof saved === 'object' && saved.v === 2){
     state = Object.assign(defaultState(), saved);
-    state.stats = Object.assign(defaultState().stats, saved.stats || {});
-    if(!Array.isArray(state.playClaimed)) state.playClaimed = [];
-    if(!Array.isArray(state.questList)) state.questList = [];
+    if(!state.buildings) state.buildings = {};
+    if(!state.unitsOwned) state.unitsOwned = {sword:true};
+    if(!state.heroes) state.heroes = {};
+    if(!state.prod) state.prod = {};
+    if(!state.auction) state.auction = [];
+    if(!state.questList) state.questList = [];
     if(!state.quests) state.quests = {};
     if(!state.questClaimed) state.questClaimed = {};
+    if(!state.playClaimed) state.playClaimed = [];
+    // ensure hero defaults
+    HERO_ORDER.forEach(k=>{
+      if(!state.heroes[k]) state.heroes[k] = {level:0, upgradeEnd:0};
+    });
+  } else if(saved && typeof saved === 'object' && saved.v !== 2){
+    // migrate old v1 data roughly
+    const old = saved;
+    state = defaultState();
+    state.gold = old.gold || 0;
+    state.maxLevel = old.maxLevel || 1;
+    state.music = old.music !== false;
+    state.lang = old.lang || 'ru';
+    state.tutorial = old.tutorial || 0;
+    state.wins = old.stats ? old.stats.wins : 0;
+    state.onlineMinutes = old.onlineMinutes || 0;
   } else {
     state = defaultState();
   }
@@ -2191,23 +3481,14 @@ async function boot(){
 
   ensureDailyQuests();
   applyLang();
-  refreshGold();
-  refreshMenu();
-  updateAlertDots();
+  refreshAllUI();
+  renderLobbyBuildings();
 
-  /* restore "today" resets */
-  if(!dailyAvailable() && state.dailyLast && dayIndex() > state.dailyLast + 1){
-    state.dailyStreak = 0;
-  }
-
-  document.getElementById('banner').classList.add('on');
   document.getElementById('banner').style.height = '0px';
   setTimeout(()=>{ document.getElementById('banner').style.height=''; }, 100);
-
   initBanner();
-  resizeCanvas();
 
-  /* music after first interaction */
+  // audio unlock
   const firstGesture = ()=>{
     Music.ensure();
     if(state.music) Music.play();
@@ -2217,7 +3498,7 @@ async function boot(){
   window.addEventListener('pointerdown', firstGesture);
   window.addEventListener('keydown', firstGesture);
 
-  /* first-run tutorial prompt */
+  // first-run tutorial
   if(!state.tutorial){
     setTimeout(()=>{
       document.getElementById('ov-tutorial-ask').classList.add('show');
@@ -2229,10 +3510,8 @@ async function boot(){
 }
 
 boot();
-
-/* periodic save */
-setInterval(()=>{ saveGame(); }, 20000);
-window.addEventListener('beforeunload', ()=>{ saveGame(true); });
+setInterval(()=>saveGame(), 20000);
+window.addEventListener('beforeunload', ()=>saveGame(true));
 </script>
 </body>
 </html>
