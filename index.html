@@ -63,7 +63,6 @@ body.placing .bld:not(.empty){opacity:.35}
 .bld.ship .bicon img{filter:drop-shadow(0 8px 16px rgba(0,0,0,.8)) drop-shadow(0 0 15px rgba(232,194,106,.45))}
 .bld.ship .ship-glow{position:absolute;inset:-25%;border-radius:50%;background:radial-gradient(circle,rgba(232,194,106,.28),transparent 60%);animation:pulse 2s infinite;pointer-events:none}
 
-/* ============ CANCEL PLACEMENT ============ */
 #cancel-placement{
   position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;
   transform:translateX(-50%);z-index:9989;
@@ -89,9 +88,6 @@ body.placing .bld:not(.empty){opacity:.35}
 #bottom .ubtn .cost{font-size:11px;font-weight:bold;color:var(--gold-l);display:flex;align-items:center;gap:3px;line-height:1}
 #bottom .ubtn .cost i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px var(--accent);display:inline-block}
 #bottom .ubtn.disabled{opacity:.42;filter:grayscale(.7)}
-
-#banner{flex:0 0 auto;min-height:0;height:0;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;transition:height .25s}
-#banner.on{height:50px;min-height:50px}
 
 .overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,10,.82);backdrop-filter:blur(3px)}
 .overlay.show{display:flex;animation:fadeIn .18s ease}
@@ -128,7 +124,6 @@ body.placing .bld:not(.empty){opacity:.35}
 .costitem.miss{color:#ff5f6d}
 .costitem.ok{color:var(--green)}
 
-/* FIXED bcard layout - cost on own row */
 .bcard{display:flex;flex-wrap:wrap;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:9px;align-items:flex-start}
 .bcard img{width:52px;height:52px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.6))}
 .bcard .binfo{flex:1;min-width:0;overflow-wrap:break-word}
@@ -168,6 +163,18 @@ body.placing .bld:not(.empty){opacity:.35}
 .hcard .hl{font-size:11px;color:var(--muted);margin-top:2px}
 .hcard .hb{font-size:11px;color:var(--essence);margin-top:4px}
 .hcard .hbtn{padding:6px 10px;font-size:11px}
+
+/* Passive skill / dragon ability cards */
+.skillcard{display:flex;flex-wrap:wrap;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:9px;align-items:flex-start}
+.skill-ico{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:#fff;flex:0 0 auto;box-shadow:0 3px 8px rgba(0,0,0,.5);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.skill-info{flex:1;min-width:0}
+.skill-name{font-size:14px;color:var(--gold-l);font-weight:bold}
+.skill-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+.skill-lvl{font-size:10px;color:var(--essence);margin-top:3px;font-weight:bold}
+.skillcard > .btn{flex:0 0 auto;align-self:center}
+.skillcard .skill-cost{flex-basis:100%;padding-top:6px;border-top:1px dashed rgba(255,255,255,.08)}
+.skillcard .skill-cost .costrow{margin:0}
+.skillcard.maxed{opacity:.55;filter:grayscale(.4)}
 
 .acard{padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:8px}
 .acard .arow{display:flex;justify-content:space-between;align-items:center;gap:6px}
@@ -269,6 +276,21 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 #pausebtn.show{display:flex}
 #pausebtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
+/* Dragon ability bar in battle */
+#dragonbar{position:absolute;left:0;right:0;bottom:8px;z-index:26;display:none;justify-content:center;gap:8px;padding:0 12px;pointer-events:none}
+#dragonbar.show{display:flex}
+.dragbtn{width:52px;height:52px;border-radius:12px;border:2px solid var(--border);background:rgba(20,14,34,.92);color:var(--gold-l);cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;pointer-events:auto;overflow:hidden;padding:0;box-shadow:0 4px 12px rgba(0,0,0,.7)}
+.dragbtn:active:not(:disabled){transform:scale(.92)}
+.dragbtn:disabled{cursor:default}
+.dragbtn.locked{opacity:.35;filter:grayscale(.8)}
+.dragbtn.ready{animation:dragPulse 1.5s infinite}
+@keyframes dragPulse{
+  0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.7)}
+  50%{box-shadow:0 4px 12px rgba(0,0,0,.7),0 0 18px rgba(232,194,106,.8)}
+}
+.dragbtn .drag-sym{font-size:24px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.8))}
+.dragbtn .dragcd{position:absolute;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:bold;font-family:monospace}
+
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mbtn{padding:14px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;font-size:12px;position:relative}
 .mbtn:active{transform:scale(.97)}
@@ -300,11 +322,11 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
       <div class="bhrow"><div class="bhn" id="lbl-ally">Вы</div><div class="bhbar"><i id="hp-ally" style="width:100%;background:linear-gradient(90deg,#3f8cff,#6bb6ff)"></i></div></div>
       <div class="bhrow enemy"><div class="bhn" id="lbl-enemy">Враг</div><div class="bhbar"><i id="hp-enemy" style="width:100%;background:linear-gradient(90deg,#ff4d5e,#ff8b6b)"></i></div></div>
     </div>
+    <div id="dragonbar"></div>
     <button id="pausebtn"><svg viewBox="0 0 24 24"><rect x="7" y="5" width="4" height="14" rx="1"/><rect x="13" y="5" width="4" height="14" rx="1"/></svg></button>
   </main>
 
   <div id="bottom"></div>
-  <div id="banner"></div>
 </div>
 
 <button id="cancel-placement">✕ <span data-i18n="cancel_place">Отменить размещение</span></button>
@@ -365,6 +387,20 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
   <div class="modal">
     <div class="mhead"><h2 data-i18n="lab"></h2><button class="mclose" data-close>&times;</button></div>
     <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="lab_desc"></div><div id="heroes-list"></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-altar">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="altar"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="altar_desc"></div><div id="passive-list"></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-dragon">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="magetower"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody"><div id="dragon-body"></div></div>
   </div>
 </div>
 
@@ -531,7 +567,14 @@ const STR = {
     tut_6:'Теперь тапните по кораблю на карте, чтобы отправиться в сражение.',
     tut_7:'Ваша первая битва! Призывайте воинов и уничтожьте тёмную башню.',
     tut_8:'Поздравляем! Вы готовы к великим свершениям!',
-    tap_here:'Нажмите здесь', session:'Сессия'
+    tap_here:'Нажмите здесь', session:'Сессия',
+    altar:'Древний алтарь', altar_desc:'Вечные пассивные улучшения для всех воинов. Каждое улучшение действует навсегда.',
+    magetower:'Башня мага', dragon:'Дракон', dragon_abilities:'Способности дракона',
+    passive_skills:'Пассивные навыки', awaken_dragon:'Пробудить дракона',
+    awaken_desc:'Призовите древнего дракона — он будет сражаться на вашей стороне и даровать мощные способности.',
+    dragon_level:'Уровень дракона', cooldown:'Перезарядка', unlocked_at:'Открывается на ур.',
+    dragon_active:'Дракон активен в бою', dragon_inactive:'Пробудите дракона, чтобы использовать способности',
+    ability_unlocked:'Открыто', ability_locked:'Закрыто'
   },
   en:{
     menu:'Menu', settings:'Settings', quests:'Quests', rest:'Rest Room', daily:'Daily', time:'Playtime', invite:'Invite',
@@ -573,7 +616,14 @@ const STR = {
     tut_6:'Now tap the ship on the map to sail to battle.',
     tut_7:'Your first battle! Summon warriors and destroy the dark tower.',
     tut_8:'Congratulations! You\'re ready for great things!',
-    tap_here:'Tap here', session:'Session'
+    tap_here:'Tap here', session:'Session',
+    altar:'Ancient Altar', altar_desc:'Eternal passive upgrades for all warriors. Each upgrade lasts forever.',
+    magetower:'Mage Tower', dragon:'Dragon', dragon_abilities:'Dragon Abilities',
+    passive_skills:'Passive Skills', awaken_dragon:'Awaken Dragon',
+    awaken_desc:'Summon an ancient dragon — it will fight on your side and grant mighty abilities.',
+    dragon_level:'Dragon level', cooldown:'Cooldown', unlocked_at:'Unlocks at lvl',
+    dragon_active:'Dragon active in battle', dragon_inactive:'Awaken the dragon to use abilities',
+    ability_unlocked:'Unlocked', ability_locked:'Locked'
   }
 };
 let LANG = 'ru';
@@ -616,9 +666,152 @@ const BUILDINGS = {
   auction: { ru:'Аукцион', en:'Auction', icon:'auction', max:1, desc_ru:'Продажа ресурсов за золото.', desc_en:'Sell resources for gold.', maxLevel:10, reqCastle:3,
     cost(lv){ return lv===1 ? {gold:250} : {gold:200*lv, wood:80*lv, stone:40*lv}; }, time(lv){ return 150 * Math.pow(1.55, lv-1); } },
   witch: { ru:'Ведьмин дом', en:'Witch House', icon:'witch', max:1, desc_ru:'Варите зелья за ресурсы для временных бонусов.', desc_en:'Brew potions from resources for temporary buffs.', maxLevel:1, reqCastle:2,
-    cost(){ return {gold: 500, wood: 150, stone: 100, essence: 30}; }, time(){ return 200; } }
+    cost(){ return {gold: 500, wood: 150, stone: 100, essence: 30}; }, time(){ return 200; } },
+  altar: { ru:'Древний алтарь', en:'Ancient Altar', icon:'altar', max:1,
+    desc_ru:'Вечные пассивные улучшения для всех воинов.',
+    desc_en:'Eternal passive upgrades for all warriors.',
+    maxLevel:1, reqCastle:3,
+    cost(){ return {gold: 800, wood: 200, stone: 150, essence: 60}; }, time(){ return 300; } },
+  magetower: { ru:'Башня мага', en:'Mage Tower', icon:'magetower', max:1,
+    desc_ru:'Пробудите дракона — он поможет в боях.',
+    desc_en:'Awaken a dragon — it will aid you in battles.',
+    maxLevel:1, reqCastle:4,
+    cost(){ return {gold: 1500, wood: 300, stone: 300, essence: 150}; }, time(){ return 400; } }
 };
-const SHOP_BUILDINGS = ['farm','lumber','quarry','house','warehouse','barracks','lab','auction','witch','builder'];
+const SHOP_BUILDINGS = ['farm','lumber','quarry','house','warehouse','barracks','lab','auction','witch','altar','magetower','builder'];
+
+/* ========================================================================
+   PASSIVE SKILLS (Древний алтарь)
+   ======================================================================== */
+const PASSIVE_SKILLS = {
+  warrior_hp: {
+    ru:'Стойкость', en:'Fortitude',
+    desc_ru:'+2% HP всех воинов за уровень',
+    desc_en:'+2% HP of all warriors per level',
+    color:'#ff6b6b', label:'HP',
+    perLevel: 0.02, maxLevel: 50,
+    cost(lv){ return {gold: 200*lv, essence: 15*lv}; }
+  },
+  warrior_dmg: {
+    ru:'Ярость', en:'Fury',
+    desc_ru:'+2% урона всех воинов за уровень',
+    desc_en:'+2% damage of all warriors per level',
+    color:'#ff9f4a', label:'DMG',
+    perLevel: 0.02, maxLevel: 50,
+    cost(lv){ return {gold: 220*lv, essence: 15*lv}; }
+  },
+  warrior_speed: {
+    ru:'Скорость', en:'Speed',
+    desc_ru:'+1% скорости передвижения воинов за уровень',
+    desc_en:'+1% warrior movement speed per level',
+    color:'#4af0ff', label:'SPD',
+    perLevel: 0.01, maxLevel: 30,
+    cost(lv){ return {gold: 180*lv, essence: 10*lv}; }
+  },
+  warrior_atk: {
+    ru:'Быстрота', en:'Swiftness',
+    desc_ru:'+1% скорости атаки воинов за уровень',
+    desc_en:'+1% warrior attack speed per level',
+    color:'#ffe94a', label:'ATK',
+    perLevel: 0.01, maxLevel: 30,
+    cost(lv){ return {gold: 250*lv, essence: 12*lv}; }
+  },
+  warrior_range: {
+    ru:'Дальность', en:'Reach',
+    desc_ru:'+1% дальности атаки за уровень',
+    desc_en:'+1% attack range per level',
+    color:'#8ef0b0', label:'RNG',
+    perLevel: 0.01, maxLevel: 25,
+    cost(lv){ return {gold: 200*lv, essence: 10*lv}; }
+  },
+  essence_regen: {
+    ru:'Поток магии', en:'Mana Flow',
+    desc_ru:'+3% регенерации эссенции в бою за уровень',
+    desc_en:'+3% essence regen in battle per level',
+    color:'#c88aff', label:'ESS',
+    perLevel: 0.03, maxLevel: 30,
+    cost(lv){ return {gold: 220*lv, essence: 12*lv}; }
+  },
+  base_hp: {
+    ru:'Крепость', en:'Fortress',
+    desc_ru:'+3% HP базы за уровень',
+    desc_en:'+3% base HP per level',
+    color:'#4d9dff', label:'DEF',
+    perLevel: 0.03, maxLevel: 30,
+    cost(lv){ return {gold: 240*lv, essence: 15*lv}; }
+  },
+  gold_bonus: {
+    ru:'Жадность', en:'Greed',
+    desc_ru:'+2% золота за победу за уровень',
+    desc_en:'+2% victory gold per level',
+    color:'#e8c26a', label:'GLD',
+    perLevel: 0.02, maxLevel: 50,
+    cost(lv){ return {gold: 300*lv, essence: 20*lv}; }
+  },
+  enemy_weaken: {
+    ru:'Проклятие', en:'Curse',
+    desc_ru:'-1% HP врагов за уровень',
+    desc_en:'-1% enemy HP per level',
+    color:'#ff5f6d', label:'CRS',
+    perLevel: 0.01, maxLevel: 40,
+    cost(lv){ return {gold: 260*lv, essence: 15*lv}; }
+  },
+  start_essence: {
+    ru:'Вдохновение', en:'Inspiration',
+    desc_ru:'+5 стартовой эссенции за уровень',
+    desc_en:'+5 starting essence per level',
+    color:'#ff4ad0', label:'INS',
+    perLevel: 5, maxLevel: 20,
+    cost(lv){ return {gold: 280*lv, essence: 18*lv}; }
+  }
+};
+const PASSIVE_ORDER = ['warrior_hp','warrior_dmg','warrior_speed','warrior_atk','warrior_range','essence_regen','base_hp','gold_bonus','enemy_weaken','start_essence'];
+
+function getPassiveBonus(id){
+  const def = PASSIVE_SKILLS[id];
+  if(!def) return 0;
+  const lvl = (state.passiveSkills && state.passiveSkills[id]) || 0;
+  return lvl * def.perLevel;
+}
+
+/* ========================================================================
+   DRAGON (Башня мага)
+   ======================================================================== */
+const DRAGON = {
+  maxLevel: 15,
+  cost(lv){ return {gold: 500*lv, wheat: 100*lv, wood: 100*lv, stone: 100*lv, essence: 30*lv}; }
+};
+
+const DRAGON_ABILITIES = [
+  {
+    id:'fire', ru:'Огненное дыхание', en:'Fire Breath',
+    desc_ru:'Сжигает всех врагов на поле', desc_en:'Burns all enemies on the field',
+    color:'#ff6b3a', symbol:'🔥', unlockLevel: 1, cd: 50,
+    power(lv){ return 60 + lv*25; }
+  },
+  {
+    id:'frost', ru:'Ледяная буря', en:'Frost Storm',
+    desc_ru:'Замедляет всех врагов на 5 секунд', desc_en:'Slows all enemies for 5 seconds',
+    color:'#6bd0ff', symbol:'❄', unlockLevel: 3, cd: 50,
+    power(lv){ return 5; }
+  },
+  {
+    id:'heal', ru:'Исцеляющий свет', en:'Healing Light',
+    desc_ru:'Лечит союзников и вашу базу', desc_en:'Heals allies and your base',
+    color:'#8ef0b0', symbol:'✚', unlockLevel: 5, cd: 50,
+    power(lv){ return 100 + lv*40; }
+  },
+  {
+    id:'wrath', ru:'Гнев дракона', en:'Dragon Wrath',
+    desc_ru:'Огромный урон всем врагам и базе', desc_en:'Massive damage to all enemies and base',
+    color:'#c88aff', symbol:'☄', unlockLevel: 8, cd: 50,
+    power(lv){ return 200 + lv*60; }
+  }
+];
+
+function hasDragonActive(){
+  return state.dragon && state.dragon.level >= 1;
+}
 
 /* ========================================================================
    UNITS / HEROES / POTIONS
@@ -691,7 +884,7 @@ const SLOT_LAYOUT = [
 /* ========================================================================
    STATE
    ======================================================================== */
-const SAVE_KEY = 'mystic_save_v6';
+const SAVE_KEY = 'mystic_save_v7';
 
 function defaultState(){
   const slots = {};
@@ -699,7 +892,7 @@ function defaultState(){
     slots[s.id] = s.fixed ? {key: s.fixed, level: 1, buildEnd: 0} : null;
   });
   return {
-    v: 6,
+    v: 7,
     gold: 200, wheat: 0, wood: 0, stone: 0, essence: 0,
     slots, prod: {},
     unitsOwned: {sword: true},
@@ -715,6 +908,8 @@ function defaultState(){
     maxLevel:1, wins:0, kills:0, spawns:0, goldEarned:0,
     music:true, lang:'ru',
     tutorial: 0, tutStep: 0,
+    passiveSkills: {},
+    dragon: { level: 0, upgradeEnd: 0 },
     lastSaveTime: Date.now()
   };
 }
@@ -744,7 +939,7 @@ async function loadGame(){
     const v = r && r.keys && r.keys[0] && r.keys[0].value;
     if(!v || v === '{}' || v === '') return null;
     const parsed = JSON.parse(v);
-    if(!parsed || parsed.v !== 6) return null;
+    if(!parsed || parsed.v !== 7) return null;
     return parsed;
   }catch(e){ return null; }
 }
@@ -863,6 +1058,8 @@ const SVG_SRC = {
   lab: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><radialGradient id="labglow"><stop offset="0" stop-color="#c88aff" stop-opacity=".9"/><stop offset="1" stop-color="#7b3dff" stop-opacity="0"/></radialGradient></defs><ellipse cx="70" cy="188" rx="58" ry="10" fill="#000" opacity=".4"/><rect x="26" y="120" width="88" height="66" fill="#5a4a7a"/><path d="M26 120l22-30 44 0 22 30z" fill="#3a2a5a"/><path d="M48 90l22-30 22 30" fill="#3a2a5a"/><circle cx="70" cy="60" r="12" fill="url(#labglow)"/><circle cx="70" cy="60" r="5" fill="#e0b8ff"/><rect x="60" y="140" width="20" height="46" fill="#0a0418"/><circle cx="70" cy="158" r="4" fill="url(#labglow)"/></svg>`,
   auction: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="188" rx="60" ry="10" fill="#000" opacity=".4"/><rect x="18" y="118" width="104" height="68" fill="#a8885a"/><path d="M18 118V96h14V78h10v18h14V78h12v18h14V78h10v18h14V78h10v18h14V96h10v22z" fill="#8a7040"/><path d="M10 96l60-44 60 44z" fill="#c8a35a"/><rect x="56" y="136" width="28" height="50" fill="#3a2010"/><rect x="28" y="128" width="18" height="18" fill="#ffd97a" opacity=".6"/><rect x="94" y="128" width="18" height="18" fill="#ffd97a" opacity=".6"/><path d="M110 108v-20" stroke="#8a6a2a" stroke-width="2.4"/><circle cx="110" cy="84" r="8" fill="#c8a35a"/></svg>`,
   witch: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="188" rx="58" ry="10" fill="#000" opacity=".4"/><path d="M30 190V110q0-15 15-15h50q15 0 15 15v80z" fill="#5a3a5a"/><path d="M30 190V110q0-15 15-15h50q15 0 15 15v80z" fill="none" stroke="#2a1a28" stroke-width="2.4"/><path d="M18 108l52-52 52 52z" fill="#3a1a2a"/><path d="M18 108l52-52 52 52z" fill="none" stroke="#1a0a12" stroke-width="2"/><rect x="95" y="40" width="10" height="30" fill="#3a2020"/><ellipse cx="100" cy="30" rx="8" ry="5" fill="#5a4a5a" opacity=".5"/><ellipse cx="105" cy="20" rx="6" ry="4" fill="#5a4a5a" opacity=".4"/><path d="M60 190v-38q10-14 20 0v38z" fill="#2a1428"/><circle cx="76" cy="172" r="2" fill="#c8a35a"/><rect x="40" y="130" width="14" height="14" rx="2" fill="#8ef0b0" opacity=".7"/><rect x="40" y="130" width="14" height="14" rx="2" fill="none" stroke="#2a1428" stroke-width="1.4"/><rect x="86" y="130" width="14" height="14" rx="2" fill="#c88aff" opacity=".7"/><rect x="86" y="130" width="14" height="14" rx="2" fill="none" stroke="#2a1428" stroke-width="1.4"/><ellipse cx="70" cy="188" rx="20" ry="5" fill="#000" opacity=".3"/><path d="M55 188q0-14 15-14t15 14z" fill="#1a1a1a"/><ellipse cx="70" cy="175" rx="15" ry="4" fill="#8ef0b0" opacity=".5"/><circle cx="65" cy="168" r="2" fill="#c8f0d0" opacity=".8"/><circle cx="75" cy="170" r="1.5" fill="#c8f0d0" opacity=".7"/></svg>`,
+  altar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><radialGradient id="altarGlow"><stop offset="0" stop-color="#8ef0b0" stop-opacity=".9"/><stop offset="1" stop-color="#8ef0b0" stop-opacity="0"/></radialGradient></defs><ellipse cx="70" cy="190" rx="60" ry="10" fill="#000" opacity=".4"/><rect x="20" y="180" width="100" height="10" fill="#5a4a3a"/><rect x="30" y="170" width="80" height="10" fill="#6a5a4a"/><rect x="40" y="160" width="60" height="10" fill="#7a6a5a"/><rect x="45" y="130" width="50" height="30" fill="#8a7a6a"/><rect x="40" y="125" width="60" height="8" fill="#9a8a7a"/><circle cx="45" cy="100" r="22" fill="url(#altarGlow)"/><path d="M45 80l8 20-8 20-8-20z" fill="#8ef0b0"/><path d="M45 88l5 12-5 12-5-12z" fill="#c8ffd8"/><circle cx="95" cy="100" r="22" fill="url(#altarGlow)"/><path d="M95 80l8 20-8 20-8-20z" fill="#8ef0b0"/><path d="M95 88l5 12-5 12-5-12z" fill="#c8ffd8"/><circle cx="70" cy="60" r="42" fill="url(#altarGlow)"/><path d="M70 20l20 40-20 40-20-40z" fill="#8ef0b0"/><path d="M70 28l14 32-14 32-14-32z" fill="#c8ffd8"/><circle cx="70" cy="60" r="6" fill="#fff"/><path d="M30 145h20M90 145h20" stroke="#c8ffd8" stroke-width="1.5" opacity=".6"/></svg>`,
+  magetower: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><radialGradient id="mgGlow"><stop offset="0" stop-color="#c88aff" stop-opacity=".9"/><stop offset="1" stop-color="#c88aff" stop-opacity="0"/></radialGradient></defs><ellipse cx="70" cy="190" rx="55" ry="10" fill="#000" opacity=".4"/><path d="M35 190V150h70v40z" fill="#3a2a5a"/><path d="M30 150V145h80v5z" fill="#5a4a7a"/><path d="M45 145V105h50v40z" fill="#4a3a6a"/><path d="M42 105V100h56v5z" fill="#5a4a7a"/><path d="M55 100V70h30v30z" fill="#5a4a7a"/><path d="M52 70V65h36v5z" fill="#6a5a8a"/><path d="M70 25l20 40H50z" fill="#3a2a5a"/><path d="M70 15l12 22H58z" fill="#8a6ac8"/><circle cx="70" cy="82" r="20" fill="url(#mgGlow)"/><circle cx="70" cy="82" r="6" fill="#e0b8ff"/><rect x="62" y="120" width="16" height="18" rx="8" fill="#1a0a2a"/><circle cx="70" cy="150" r="6" fill="#1a0a2a"/><circle cx="70" cy="150" r="3" fill="#c88aff"/><path d="M70 15l-18-8 8 12z" fill="#8a6ac8" opacity=".7"/><path d="M70 15l18-8-8 12z" fill="#8a6ac8" opacity=".7"/></svg>`,
   darktower: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/><path d="M40 190V74l30-34 30 34v116z" fill="#2a1a34"/><path d="M70 40l6 20-6 8-6-8z" fill="#6b1f3a"/><path d="M30 74l10-22 8 12 10-18 12 20 12-20 10 18 8-12 10 22z" fill="#2a1c35"/><circle cx="70" cy="120" r="19" fill="#ff2d55" opacity=".16"/><circle cx="70" cy="120" r="9" fill="#ff2d55"/><circle cx="70" cy="120" r="4" fill="#ffd0d8"/><path d="M58 190v-30q12-16 24 0v30z" fill="#0d0812"/></svg>`,
   altardark: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/><path d="M40 190V74l30-34 30 34v116z" fill="#2a1a44"/><circle cx="70" cy="120" r="22" fill="#a02060" opacity=".18"/><circle cx="70" cy="120" r="12" fill="#a02060"/><circle cx="70" cy="120" r="5" fill="#ffb8d0"/><path d="M30 74l10-22 8 12 10-18 12 20 12-20 10 18 8-12 10 22z" fill="#3a1f54"/><path d="M58 190v-30q12-16 24 0v30z" fill="#0a0410"/></svg>`
 };
@@ -940,7 +1137,6 @@ function smoothPanToWorld(wx, wy, z, duration){
   camAnimFrame = requestAnimationFrame(step);
 }
 
-/* Compute chaotic paths between nearby slots (once at boot) */
 function computeLobbyPaths(){
   LOBBY_PATHS = [];
   let seed = 12345;
@@ -1090,7 +1286,6 @@ function drawPort(){
   if(!shipSlot) return;
   const sx = shipSlot.x/100 * WORLD.w;
   const landBottom = WORLD.h * 0.88;
-  // Wooden dock planks going from land into water
   for(let i=0; i<7; i++){
     const py = landBottom + i*10;
     ctx.fillStyle = i % 2 === 0 ? '#6b4a2a' : '#7a5a3a';
@@ -1099,28 +1294,23 @@ function drawPort(){
     ctx.lineWidth = 1;
     ctx.strokeRect(sx - 60, py, 120, 9);
   }
-  // Posts on both sides
   [landBottom + 3, landBottom + 25, landBottom + 47].forEach(py => {
     ctx.fillStyle = '#3a2818';
     ctx.fillRect(sx - 66, py, 8, 22);
     ctx.fillRect(sx + 58, py, 8, 22);
-    // small rope detail
     ctx.fillStyle = 'rgba(180,150,100,.4)';
     ctx.fillRect(sx - 64, py + 4, 4, 2);
     ctx.fillRect(sx + 60, py + 4, 4, 2);
   });
-  // Rope between bollards
   ctx.strokeStyle = 'rgba(180,150,100,.5)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(sx - 62, landBottom + 60);
   ctx.quadraticCurveTo(sx, landBottom + 85, sx + 62, landBottom + 60);
   ctx.stroke();
-  // Bollards
   ctx.fillStyle = '#5a3a1a';
   ctx.fillRect(sx - 72, landBottom + 55, 6, 14);
   ctx.fillRect(sx + 66, landBottom + 55, 6, 14);
-  // Lantern on post
   ctx.fillStyle = 'rgba(255,200,100,.7)';
   ctx.beginPath(); ctx.arc(sx - 68, landBottom + 12, 6, 0, 6.283); ctx.fill();
   ctx.fillStyle = '#ffe9a8';
@@ -1156,7 +1346,6 @@ function drawLobbyScene(){
     ctx.fillRect(gx, gy, 3, 3);
   }
 
-  // Chaotic paths between slots
   LOBBY_PATHS.forEach(p => {
     ctx.strokeStyle = 'rgba(120,90,60,.22)';
     ctx.lineWidth = 20; ctx.lineCap = 'round';
@@ -1204,7 +1393,6 @@ function drawLobbyScene(){
     }
   }
 
-  // Water
   const wg = ctx.createLinearGradient(0, landBottom, 0, WORLD.h);
   wg.addColorStop(0, '#1a2a3a'); wg.addColorStop(0.4, '#102030'); wg.addColorStop(1, '#081420');
   ctx.fillStyle = wg;
@@ -1225,7 +1413,6 @@ function drawLobbyScene(){
     ctx.stroke();
   }
 
-  // Port near ship
   drawPort();
 
   const now = performance.now()/1000;
@@ -1388,14 +1575,12 @@ function getStorageCap(resource){
     const b = state.slots[id];
     if(b && b.key === 'warehouse' && b.buildEnd <= Date.now()) cap += b.level * WAREHOUSE_BONUS;
   }
-  // Не показывать лимит ниже текущего значения (админ-ресурсы не «обрезаем» визуально)
   return Math.max(cap, Math.floor(state[resource] || 0));
 }
 
 function addResource(k, n){
   const cap = getStorageCap(k);
   const cur = state[k] || 0;
-  // Если уже выше лимита — только добавляем, никогда не режем вниз
   state[k] = cur >= cap ? cur + n : Math.min(cap, cur + n);
 }
 function addGold(n){
@@ -1403,7 +1588,6 @@ function addGold(n){
   state.goldEarned = (state.goldEarned||0) + n;
 }
 
-/* Buffs */
 function applySpeedBuff(seconds){
   if(state.potions.speed > Date.now()) return Math.floor(seconds * 0.7);
   return seconds;
@@ -1652,6 +1836,8 @@ function renderBuildingModal(){
   if(b.key === 'lab' && lvl > 0) html += `<button class="btn full" id="bld-lab">${t('lab')} →</button>`;
   if(b.key === 'auction' && lvl > 0) html += `<button class="btn full" id="bld-auction">${t('auction')} →</button>`;
   if(b.key === 'witch' && lvl > 0) html += `<button class="btn full" id="bld-witch">${t('witch')} →</button>`;
+  if(b.key === 'altar' && lvl > 0) html += `<button class="btn full" id="bld-altar">${t('passive_skills')} →</button>`;
+  if(b.key === 'magetower' && lvl > 0) html += `<button class="btn full" id="bld-dragon">${t('dragon')} →</button>`;
   if(b.key === 'builder'){
     html += `<div class="row" style="margin-top:10px">
       <div><div class="lab">${t('builders')}</div><div class="sub">${LANG==='ru'?'Заняты':'Busy'}: ${getActiveBuilds()} / ${getBuilders()}</div></div>
@@ -1703,10 +1889,14 @@ function renderBuildingModal(){
   if(btnAuc) btnAuc.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openAuctionModal(); });
   const btnWitch = body.querySelector('#bld-witch');
   if(btnWitch) btnWitch.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openWitchModal(); });
+  const btnAltar = body.querySelector('#bld-altar');
+  if(btnAltar) btnAltar.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openAltarModal(); });
+  const btnDragon = body.querySelector('#bld-dragon');
+  if(btnDragon) btnDragon.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openDragonModal(); });
 }
 
 /* ========================================================================
-   SHOP (FIXED LAYOUT)
+   SHOP
    ======================================================================== */
 function openShop(){
   renderShop();
@@ -1746,6 +1936,226 @@ function renderShop(){
       if(tutActive && tutIndex === 2 && key === 'farm') tutTrigger('shop-place');
     });
   });
+}
+
+/* ========================================================================
+   ALTAR (PASSIVE SKILLS)
+   ======================================================================== */
+function openAltarModal(){
+  const s = findBuildingSlot('altar');
+  if(s === null || state.slots[s].level < 1 || state.slots[s].buildEnd > Date.now()){
+    toast(LANG==='ru'?'Постройте древний алтарь':'Build the Ancient Altar first'); return;
+  }
+  renderAltarModal();
+  openOverlay('ov-altar');
+}
+function renderAltarModal(){
+  const cont = document.getElementById('passive-list');
+  if(!cont) return;
+  let html = '';
+  for(const id of PASSIVE_ORDER){
+    const def = PASSIVE_SKILLS[id];
+    const lvl = (state.passiveSkills && state.passiveSkills[id]) || 0;
+    const maxed = lvl >= def.maxLevel;
+    const nextLvl = lvl + 1;
+    const cost = def.cost(nextLvl);
+    const ok = !maxed && canAfford(cost);
+    const name = LANG === 'ru' ? def.ru : def.en;
+    const desc = LANG === 'ru' ? def.desc_ru : def.desc_en;
+    const bonusPct = (lvl * def.perLevel * (id === 'start_essence' ? 100 : 100)).toFixed(0);
+    const bonusDisplay = id === 'start_essence'
+      ? `+${Math.round(lvl * def.perLevel)} ${LANG==='ru'?'эссенции':'essence'}`
+      : `+${bonusPct}%`;
+    html += `<div class="skillcard ${maxed?'maxed':''}">
+      <div class="skill-ico" style="background:linear-gradient(180deg, ${def.color}, ${def.color}88)">${def.label}</div>
+      <div class="skill-info">
+        <div class="skill-name">${name} · ${t('level')} ${lvl}/${def.maxLevel}</div>
+        <div class="skill-desc">${desc}</div>
+        <div class="skill-lvl">${LANG==='ru'?'Текущий бонус':'Current bonus'}: ${bonusDisplay}</div>
+      </div>
+      ${maxed ? `<span class="muted" style="color:var(--green);font-weight:bold">${t('maxed')}</span>` :
+        `<button class="btn sm ${ok?'green':''}" data-skill="${id}" ${ok?'':'disabled'}>${t('upgrade')}</button>`}
+      ${!maxed ? `<div class="skill-cost">${showCostHTML(cost)}</div>` : ''}
+    </div>`;
+  }
+  cont.innerHTML = html;
+  cont.querySelectorAll('[data-skill]').forEach(b => {
+    b.addEventListener('click', ()=>{
+      const id = b.getAttribute('data-skill');
+      const def = PASSIVE_SKILLS[id];
+      const curLvl = (state.passiveSkills && state.passiveSkills[id]) || 0;
+      if(curLvl >= def.maxLevel) return;
+      const cost = def.cost(curLvl + 1);
+      if(!canAfford(cost)){ toast(t('no_gold')); return; }
+      spendCost(cost);
+      state.passiveSkills[id] = curLvl + 1;
+      refreshAllUI(); renderAltarModal(); saveGame();
+      toast((LANG==='ru'?def.ru:def.en) + ' → ' + t('level') + ' ' + (curLvl+1));
+    });
+  });
+}
+
+/* ========================================================================
+   DRAGON (MAGE TOWER)
+   ======================================================================== */
+function openDragonModal(){
+  const s = findBuildingSlot('magetower');
+  if(s === null || state.slots[s].level < 1 || state.slots[s].buildEnd > Date.now()){
+    toast(LANG==='ru'?'Постройте башню мага':'Build the Mage Tower first'); return;
+  }
+  renderDragonModal();
+  openOverlay('ov-dragon');
+}
+function renderDragonModal(){
+  const body = document.getElementById('dragon-body');
+  if(!body) return;
+  const dl = state.dragon ? state.dragon.level : 0;
+  const maxed = dl >= DRAGON.maxLevel;
+  let html = '';
+
+  // Dragon header
+  html += `<div class="binfo" style="background:linear-gradient(135deg, rgba(123,92,255,.16), rgba(200,138,255,.08))">
+    <div style="width:56px;height:56px;border-radius:50%;background:radial-gradient(circle, #c88aff, #6b3aa8);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 24px rgba(200,138,255,.6)">🐉</div>
+    <div class="bl">
+      <div class="bnm">${t('dragon')} · ${t('level')} ${dl} / ${DRAGON.maxLevel}</div>
+      <div class="blv">${hasDragonActive() ? '<span style="color:var(--green)">'+t('dragon_active')+'</span>' : '<span style="color:#ff8b8b">'+t('dragon_inactive')+'</span>'}</div>
+    </div>
+  </div>`;
+
+  // Dragon upgrade button
+  if(!maxed){
+    const cost = DRAGON.cost(dl + 1);
+    const ok = canAfford(cost);
+    html += `<div style="margin-top:6px;font-size:12px;color:var(--muted)">${LANG==='ru'?'Стоимость улучшения:':'Upgrade cost:'}</div>`;
+    html += showCostHTML(cost);
+    html += `<button class="btn green full" id="dragon-upgrade" ${ok?'':'disabled'}>${dl===0 ? t('awaken_dragon') : t('upgrade')} → ${t('level')} ${dl+1}</button>`;
+    if(dl === 0){
+      html += `<div class="muted center" style="margin-top:8px;font-size:11px;line-height:1.4">${t('awaken_desc')}</div>`;
+    }
+  } else {
+    html += `<div class="center muted" style="margin:8px 0">${t('level_max')}</div>`;
+  }
+
+  // Abilities list
+  html += `<div style="margin-top:16px;font-size:13px;color:var(--gold-l);font-weight:bold;margin-bottom:8px">${t('dragon_abilities')}</div>`;
+  for(const ab of DRAGON_ABILITIES){
+    const unlocked = dl >= ab.unlockLevel;
+    const name = LANG === 'ru' ? ab.ru : ab.en;
+    const desc = LANG === 'ru' ? ab.desc_ru : ab.desc_en;
+    const power = ab.power(Math.max(dl, ab.unlockLevel));
+    html += `<div class="skillcard" style="${unlocked?'':'opacity:.55;filter:grayscale(.6)'}">
+      <div class="skill-ico" style="background:linear-gradient(180deg, ${ab.color}, ${ab.color}88);font-size:22px">${ab.symbol}</div>
+      <div class="skill-info">
+        <div class="skill-name">${name} ${unlocked?'<span style="color:var(--green);font-size:11px">✓</span>':''}</div>
+        <div class="skill-desc">${desc}</div>
+        <div class="skill-lvl" style="color:var(--muted)">${t('cooldown')}: ${ab.cd}${LANG==='ru'?'с':'s'} · ${t('unlocked_at')} ${ab.unlockLevel}</div>
+        ${unlocked ? `<div class="skill-lvl" style="color:${ab.color}">${LANG==='ru'?'Сила':'Power'}: ${Math.round(power)}</div>` : ''}
+      </div>
+      <span class="${unlocked?'':'muted'}" style="font-size:11px;color:${unlocked?'var(--green)':'var(--muted)'};font-weight:bold">${unlocked?t('ability_unlocked'):t('ability_locked')}</span>
+    </div>`;
+  }
+  body.innerHTML = html;
+
+  const upBtn = document.getElementById('dragon-upgrade');
+  if(upBtn){
+    upBtn.addEventListener('click', ()=>{
+      const cur = state.dragon.level;
+      if(cur >= DRAGON.maxLevel) return;
+      const cost = DRAGON.cost(cur + 1);
+      if(!canAfford(cost)){ toast(t('no_gold')); return; }
+      spendCost(cost);
+      state.dragon.level = cur + 1;
+      refreshAllUI(); renderDragonModal(); saveGame();
+      toast((LANG==='ru'?'Дракон':'Dragon') + ' → ' + t('level') + ' ' + (cur+1));
+    });
+  }
+}
+
+/* ========================================================================
+   DRAGON ABILITIES IN BATTLE
+   ======================================================================== */
+function renderDragonBar(){
+  const bar = document.getElementById('dragonbar');
+  if(!bar) return;
+  if(!hasDragonActive() || !G.active || G.over || (VIEW !== 'battle' && VIEW !== 'cave')){
+    bar.classList.remove('show');
+    bar.innerHTML = '';
+    return;
+  }
+  bar.classList.add('show');
+  bar.innerHTML = DRAGON_ABILITIES.map(ab => {
+    const unlocked = state.dragon.level >= ab.unlockLevel;
+    return `<button class="dragbtn ${unlocked?'':'locked'}" data-ab="${ab.id}" ${!unlocked?'disabled':''} title="${LANG==='ru'?ab.ru:ab.en} · CD ${ab.cd}s">
+      <span class="drag-sym" style="color:${ab.color}">${ab.symbol}</span>
+    </button>`;
+  }).join('');
+  bar.querySelectorAll('[data-ab]').forEach(b => {
+    b.addEventListener('click', ()=> useDragonAbility(b.getAttribute('data-ab')));
+  });
+  updateDragonCdDisplay();
+}
+function updateDragonCdDisplay(){
+  const bar = document.getElementById('dragonbar');
+  if(!bar || !bar.classList.contains('show')) return;
+  for(const ab of DRAGON_ABILITIES){
+    const btn = bar.querySelector(`[data-ab="${ab.id}"]`);
+    if(!btn) continue;
+    const cd = Math.max(0, G.dragonCds[ab.id] || 0);
+    const unlocked = state.dragon.level >= ab.unlockLevel;
+    let cdEl = btn.querySelector('.dragcd');
+    if(cd > 0){
+      const txt = String(Math.ceil(cd));
+      if(!cdEl){
+        cdEl = document.createElement('div');
+        cdEl.className = 'dragcd';
+        btn.appendChild(cdEl);
+      }
+      if(cdEl.textContent !== txt) cdEl.textContent = txt;
+      btn.disabled = true;
+      btn.classList.remove('ready');
+    } else {
+      if(cdEl) cdEl.remove();
+      btn.disabled = !unlocked;
+      btn.classList.toggle('ready', unlocked);
+    }
+  }
+}
+function useDragonAbility(id){
+  if(!G.active || G.over) return;
+  if(!hasDragonActive()) return;
+  const ab = DRAGON_ABILITIES.find(a => a.id === id);
+  if(!ab) return;
+  if(state.dragon.level < ab.unlockLevel) return;
+  if((G.dragonCds[id]||0) > 0) return;
+  G.dragonCds[id] = ab.cd;
+  const lv = state.dragon.level;
+  const power = ab.power(lv);
+  if(id === 'fire'){
+    for(const u of G.units){
+      if(u.side === 'enemy' && u.hp > 0) damageUnit(u, power, true);
+    }
+    for(const ln of LANES) burst(0.9, ln, '#ff6b3a', 6);
+    G.shakeT = 0.25;
+  } else if(id === 'frost'){
+    for(const u of G.units){
+      if(u.side === 'enemy' && u.hp > 0) u.slowUntil = G.time + power;
+    }
+    for(const ln of LANES) burst(0.5, ln, '#6bd0ff', 5);
+  } else if(id === 'heal'){
+    for(const u of G.units){
+      if(u.side === 'player' && u.hp > 0) u.hp = Math.min(u.maxHp, u.hp + power);
+    }
+    G.playerBase.hp = Math.min(G.playerBase.max, G.playerBase.hp + power);
+    for(const ln of LANES) burst(0.1, ln, '#8ef0b0', 5);
+  } else if(id === 'wrath'){
+    for(const u of G.units){
+      if(u.side === 'enemy' && u.hp > 0) damageUnit(u, power, true);
+    }
+    G.enemyBase.hp = Math.max(0, G.enemyBase.hp - power);
+    G.shakeT = 0.5;
+    for(const ln of LANES) burst(0.9, ln, '#c88aff', 8);
+  }
+  updateDragonCdDisplay();
 }
 
 /* ========================================================================
@@ -1985,7 +2395,6 @@ function renderWitchModal(){
   const now = Date.now();
   let html = '';
 
-  // Active potions
   const active = [];
   POTION_ORDER.forEach(type => {
     if(state.potions[type] > now){
@@ -2007,7 +2416,6 @@ function renderWitchModal(){
     html += `</div>`;
   }
 
-  // Brewing
   if(state.brewing){
     const left = Math.max(0, Math.floor((state.brewing.endsAt - now) / 1000));
     const def = POTION_DEFS[state.brewing.type];
@@ -2022,7 +2430,6 @@ function renderWitchModal(){
     </div>`;
   }
 
-  // Available potions
   POTION_ORDER.forEach(type => {
     const def = POTION_DEFS[type];
     const isActive = state.potions[type] > now;
@@ -2125,7 +2532,8 @@ const G = {
   playerBase:{hp:1000,max:1000}, enemyBase:{hp:900,max:900},
   spawnTimer:0, spawnInterval:4, time:0, kills:0, spawned:0,
   shakeT:0, uid:1,
-  hpBuff:0, dmgBuff:0, essBuff:0
+  hpBuff:0, dmgBuff:0, essBuff:0,
+  dragonCds: {}
 };
 
 function project(u, lane){
@@ -2153,19 +2561,41 @@ function makeUnit(type, side, lane, u){
   const d = UNIT_DEFS[type];
   const hpScale = side==='enemy' ? (1 + (G.level-1)*0.16) : (1 + (G.level-1)*0.05 + G.hpBuff);
   const dmgScale = side==='enemy' ? (1 + (G.level-1)*0.13) : (1 + (G.level-1)*0.04 + G.dmgBuff);
+
+  let passiveHp = 1, passiveDmg = 1, passiveSpeed = 1, passiveRange = 1, passiveAtkMul = 1;
+  if(side === 'player'){
+    passiveHp = 1 + getPassiveBonus('warrior_hp');
+    passiveDmg = 1 + getPassiveBonus('warrior_dmg');
+    passiveSpeed = 1 + getPassiveBonus('warrior_speed');
+    passiveRange = 1 + getPassiveBonus('warrior_range');
+    passiveAtkMul = 1 + getPassiveBonus('warrior_atk');
+  } else {
+    const weaken = 1 - getPassiveBonus('enemy_weaken');
+    passiveHp *= weaken;
+    passiveDmg *= weaken;
+  }
+
   let potionHp = 0, potionDmg = 0;
   if(side === 'player'){
     const buffs = getBattlePotionBuffs();
     potionHp = buffs.hp;
     potionDmg = buffs.dmg;
   }
+
+  const hp = d.hp*hpScale*passiveHp*(1+potionHp);
+  const dmg = d.dmg*dmgScale*passiveDmg*(1+potionDmg);
+  const speed = d.speed * passiveSpeed;
+  const range = d.range * passiveRange;
+  const atk = d.atk / passiveAtkMul;
+
   return {
     id: G.uid++, type, side, lane, u,
-    hp: d.hp*hpScale*(1+potionHp), maxHp: d.hp*hpScale*(1+potionHp),
-    dmg: d.dmg*dmgScale*(1+potionDmg), range: d.range, speed: d.speed, atk: d.atk,
+    hp: hp, maxHp: hp,
+    dmg: dmg, range: range, speed: speed, atk: atk,
     cd: Math.random()*0.4, bob: Math.random()*6.28, hitFlash: 0,
-    heal: d.heal ? d.heal*0.9 : 0,
-    atkAnim: 0, hitAnim: 0, hitDir: 1
+    heal: d.heal ? d.heal*0.9*passiveHp : 0,
+    atkAnim: 0, hitAnim: 0, hitDir: 1,
+    slowUntil: 0
   };
 }
 function spawnUnit(type, side, lane){
@@ -2215,6 +2645,10 @@ function updateGame(dt){
     if(G.isTutorial) pool = ['sword'];
     spawnUnit(pool[Math.floor(Math.random()*pool.length)], 'enemy', LANES[Math.floor(Math.random()*LANES.length)]);
   }
+  // Dragon cooldowns
+  for(const id in G.dragonCds){
+    if(G.dragonCds[id] > 0) G.dragonCds[id] -= dt;
+  }
   const list = G.units;
   for(let i=0;i<list.length;i++){
     const u = list[i];
@@ -2225,6 +2659,7 @@ function updateGame(dt){
     if(u.atkAnim > 0) u.atkAnim -= dt;
     u.cd -= dt;
     const dir = u.side === 'player' ? 1 : -1;
+    const slowMul = (u.slowUntil && u.slowUntil > G.time) ? 0.4 : 1;
     if(UNIT_DEFS[u.type].heal){
       let ally = null, worst = 1;
       for(let j=0;j<list.length;j++){
@@ -2259,7 +2694,7 @@ function updateGame(dt){
     } else if(distToBase <= u.range + 0.025){
       if(u.cd <= 0 && u.dmg > 0){ u.cd = u.atk; u.atkAnim = 0.3; attackBase(u); }
     } else {
-      u.u += dir * u.speed * dt;
+      u.u += dir * u.speed * dt * slowMul;
       u.u = Math.max(0.01, Math.min(0.99, u.u));
     }
   }
@@ -2320,7 +2755,6 @@ function roundRect(c, x, y, w, h, r){
 }
 function drawBattleBackdrop(){
   const horizon = H * 0.38;
-  // Distant mountains
   ctx.fillStyle = '#0e0a1a';
   ctx.beginPath();
   ctx.moveTo(0, horizon);
@@ -2331,7 +2765,6 @@ function drawBattleBackdrop(){
   }
   ctx.lineTo(W, horizon); ctx.closePath();
   ctx.fill();
-  // Snow caps
   ctx.fillStyle = 'rgba(200,200,230,.14)';
   for(let i=0; i<=12; i++){
     const x = (i/12) * W;
@@ -2343,7 +2776,6 @@ function drawBattleBackdrop(){
     ctx.closePath();
     ctx.fill();
   }
-  // Distant forest silhouette
   ctx.fillStyle = '#0c1410';
   for(let i=0; i<40; i++){
     const tx = (i/40)*W + Math.sin(i*3)*8;
@@ -2355,7 +2787,6 @@ function drawBattleBackdrop(){
     ctx.closePath();
     ctx.fill();
   }
-  // Mid-ground forest (bigger)
   ctx.fillStyle = '#0a1210';
   for(let i=0; i<20; i++){
     const tx = (i/20)*W + Math.sin(i*5)*20;
@@ -2370,7 +2801,6 @@ function drawBattleBackdrop(){
 }
 function drawBattleFieldDecorations(){
   const horizon = H * 0.4;
-  // River (small stream to the right side, behind field)
   const riverX = W * 0.92;
   ctx.save();
   ctx.beginPath();
@@ -2390,7 +2820,6 @@ function drawBattleFieldDecorations(){
   rg.addColorStop(1, 'rgba(40,80,140,.4)');
   ctx.fillStyle = rg;
   ctx.fill();
-  // River highlights
   ctx.strokeStyle = 'rgba(180,220,255,.35)';
   ctx.lineWidth = 1.5;
   for(let i=0; i<8; i++){
@@ -2403,7 +2832,6 @@ function drawBattleFieldDecorations(){
   }
   ctx.restore();
 
-  // Trees on left side
   const treesLeft = [
     {x: 0.02, y: 0.48}, {x: 0.06, y: 0.60}, {x: 0.03, y: 0.72}, {x: 0.08, y: 0.84},
     {x: 0.10, y: 0.55}, {x: 0.05, y: 0.66}
@@ -2411,7 +2839,6 @@ function drawBattleFieldDecorations(){
   treesLeft.forEach((p, i)=>{
     drawTreeAt(p.x*W, p.y*H, 1 + Math.sin(i)*0.2);
   });
-  // Trees on right side (avoid river)
   const treesRight = [
     {x: 0.94, y: 0.50}, {x: 0.88, y: 0.62}, {x: 0.93, y: 0.74}, {x: 0.86, y: 0.86},
     {x: 0.95, y: 0.60}, {x: 0.90, y: 0.72}
@@ -2419,7 +2846,6 @@ function drawBattleFieldDecorations(){
   treesRight.forEach((p, i)=>{
     drawTreeAt(p.x*W, p.y*H, 1 + Math.cos(i)*0.2);
   });
-  // Rocks
   for(let i=0; i<10; i++){
     const rx = (i/10)*W + (i%2===0 ? 30 : -30);
     const ry = H * 0.92 + Math.sin(i*3)*10;
@@ -2430,7 +2856,6 @@ function drawBattleFieldDecorations(){
     ctx.fillStyle = '#4a4a58';
     ctx.beginPath(); ctx.ellipse(rx-2, ry-1, 5, 2.5, 0, 0, 6.283); ctx.fill();
   }
-  // Grass tufts
   ctx.strokeStyle = 'rgba(90,150,80,.4)';
   ctx.lineWidth = 1.5;
   for(let i=0; i<30; i++){
@@ -2458,10 +2883,8 @@ function drawTreeAt(px, py, scale){
   ctx.beginPath(); ctx.moveTo(px - 8*s, py - 38*s); ctx.lineTo(px, py - 60*s); ctx.lineTo(px + 8*s, py - 38*s); ctx.closePath(); ctx.fill();
 }
 function drawGround(){
-  // Ambient grass bed behind the diamond field (fixes "floating platform")
   ctx.fillStyle = '#0a1a0e';
   ctx.fillRect(0, H*0.32, W, H*0.68);
-  // Ambient shading
   const ambient = ctx.createLinearGradient(0, H*0.32, 0, H);
   ambient.addColorStop(0, 'rgba(30,50,30,.6)');
   ambient.addColorStop(0.5, 'rgba(20,35,20,.8)');
@@ -2471,7 +2894,6 @@ function drawGround(){
 
   drawBattleFieldDecorations();
 
-  // The actual field (diamond)
   const a = project(0,0), b = project(1,0), c = project(1,1), d = project(0,1);
   const isCave = G.mode === 'cave';
   const g = ctx.createLinearGradient(0,a.y,0,d.y);
@@ -2481,7 +2903,6 @@ function drawGround(){
   ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
   ctx.closePath(); ctx.fillStyle = g; ctx.fill();
 
-  // Field border
   ctx.strokeStyle = isCave ? 'rgba(180,140,255,.18)' : 'rgba(180,220,120,.28)';
   ctx.lineWidth = 3;
   ctx.beginPath();
@@ -2493,7 +2914,6 @@ function drawGround(){
   ctx.lineWidth = 1;
   for(let i=0;i<=12;i++){ const p1 = project(i/12,0), p2 = project(i/12,1); ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); }
   for(let i=0;i<=6;i++){ const p1 = project(0,i/6), p2 = project(1,i/6); ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); }
-  // lane dividers
   const m1 = project(0.5,0), m2 = project(0.5,1);
   ctx.strokeStyle = 'rgba(232,194,106,.14)'; ctx.lineWidth = 1.5; ctx.setLineDash([8,8]);
   ctx.beginPath(); ctx.moveTo(m1.x,m1.y); ctx.lineTo(m2.x,m2.y); ctx.stroke();
@@ -2642,15 +3062,23 @@ function updateBattleHud(){
   document.getElementById('hp-ally').style.width = Math.max(0,(G.playerBase.hp/G.playerBase.max)*100)+'%';
   document.getElementById('hp-enemy').style.width = Math.max(0,(G.enemyBase.hp/G.enemyBase.max)*100)+'%';
   refreshUnitButtons();
+  updateDragonCdDisplay();
 }
 function startBattle(level, isTutorial){
   let cfg = levelCfg(level);
   if(isTutorial) cfg = { enemyBaseHp: 150, playerBaseHp: 5000, spawnInterval: 12 };
   G.mode = 'battle'; G.level = level; G.isTutorial = !!isTutorial;
   G.units = []; G.projectiles = []; G.particles = []; G.damageNums = [];
-  G.essence = isTutorial ? 120 : 60; G.essenceMax = 120;
+  G.dragonCds = {};
+  // Passive: starting essence
+  const baseStart = isTutorial ? 120 : 60;
+  G.essence = baseStart + getPassiveBonus('start_essence');
+  G.essenceMax = 120;
   G.essenceRegen = isTutorial ? 20 : (10 + level*0.35);
-  G.playerBase = {hp: cfg.playerBaseHp, max: cfg.playerBaseHp};
+  G.essenceRegen *= (1 + getPassiveBonus('essence_regen'));
+  // Passive: base HP
+  const baseHpMul = 1 + getPassiveBonus('base_hp');
+  G.playerBase = {hp: cfg.playerBaseHp * baseHpMul, max: cfg.playerBaseHp * baseHpMul};
   G.enemyBase = {hp: cfg.enemyBaseHp, max: cfg.enemyBaseHp};
   G.spawnInterval = cfg.spawnInterval;
   G.spawnTimer = isTutorial ? 15 : 2.5;
@@ -2662,14 +3090,18 @@ function startBattle(level, isTutorial){
   document.getElementById('battlehud').classList.add('show');
   document.getElementById('pausebtn').classList.add('show');
   buildBattleUnitBar();
+  renderDragonBar();
 }
 function startCave(lvl){
   const cfg = caveCfg(lvl);
   G.mode = 'cave'; G.level = lvl; G.isTutorial = false;
   G.units = []; G.projectiles = []; G.particles = []; G.damageNums = [];
-  G.essence = 60; G.essenceMax = 120;
-  G.essenceRegen = 9 + lvl*0.4;
-  G.playerBase = {hp: cfg.playerBaseHp, max: cfg.playerBaseHp};
+  G.dragonCds = {};
+  G.essence = 60 + getPassiveBonus('start_essence');
+  G.essenceMax = 120;
+  G.essenceRegen = (9 + lvl*0.4) * (1 + getPassiveBonus('essence_regen'));
+  const baseHpMul = 1 + getPassiveBonus('base_hp');
+  G.playerBase = {hp: cfg.playerBaseHp * baseHpMul, max: cfg.playerBaseHp * baseHpMul};
   G.enemyBase = {hp: cfg.enemyBaseHp, max: cfg.enemyBaseHp};
   G.spawnInterval = cfg.spawnInterval;
   G.spawnTimer = 2.0;
@@ -2681,12 +3113,14 @@ function startCave(lvl){
   document.getElementById('battlehud').classList.add('show');
   document.getElementById('pausebtn').classList.add('show');
   buildBattleUnitBar();
+  renderDragonBar();
 }
 function stopBattle(){
   G.active = false; G.over = true;
   VIEW = 'lobby';
   document.getElementById('battlehud').classList.remove('show');
   document.getElementById('pausebtn').classList.remove('show');
+  renderDragonBar();
   worldEl.style.display = '';
   buildLobbyBottom();
   refreshAllUI();
@@ -2705,14 +3139,15 @@ function endLevel(win){
     if(win){
       questProgress('wins',1);
       state.wins = (state.wins||0)+1;
+      const goldBonus = 1 + getPassiveBonus('gold_bonus');
       if(isCave){
         questProgress('caveWins',1);
         if(G.level >= (state.caveMaxLevel||1)) state.caveMaxLevel = G.level + 1;
         const idx = Math.min(CAVE_REWARDS.length-1, G.level-1);
         const rew = CAVE_REWARDS[idx];
-        pendingReward = {mode:'cave', ess: rew.essence, gold: rew.gold, wheat: rew.wheat, wood: rew.wood, stone: rew.stone};
+        pendingReward = {mode:'cave', ess: Math.round(rew.essence*goldBonus), gold: Math.round(rew.gold*goldBonus), wheat: rew.wheat, wood: rew.wood, stone: rew.stone};
       } else {
-        const reward = 60 + G.level*30 + Math.floor(G.kills*1.5);
+        const reward = Math.round((60 + G.level*30 + Math.floor(G.kills*1.5)) * goldBonus);
         pendingReward = {mode:'battle', gold: reward};
         if(state.maxLevel <= G.level) state.maxLevel = G.level + 1;
       }
@@ -3126,33 +3561,22 @@ document.getElementById('pcode-apply').addEventListener('click', ()=>{
     clearGameData().then(()=>{ setTimeout(()=>location.reload(), 400); });
     return;
   }
-    if(code === 'admin17'){
-    // ── Ресурсы (напрямую, минуя кап) ──────────────────────────
+  if(code === 'admin17'){
     state.gold    = 100000000;
     state.wheat   = 1000000;
     state.wood    = 1000000;
     state.stone   = 1000000;
     state.essence = 1000000;
-
-    // ── Все зелья активны на год ──────────────────────────────
     const now = Date.now();
-    POTION_ORDER.forEach(type => {
-      state.potions[type] = now + 365 * 24 * 3600 * 1000;
-    });
+    POTION_ORDER.forEach(type => { state.potions[type] = now + 365 * 24 * 3600 * 1000; });
     state.brewing = null;
-
-    // ── Все войска открыты ────────────────────────────────────
     UNIT_ORDER.forEach(k => { state.unitsOwned[k] = true; });
-
-    // ── Все герои на максимум ─────────────────────────────────
     HERO_ORDER.forEach(k => {
       if(state.heroes[k]){
         state.heroes[k].level = HERO_DEFS[k].maxLevel;
         state.heroes[k].upgradeEnd = 0;
       }
     });
-
-    // ── Все постройки на максимум (и мгновенно достроены) ─────
     for(const id in state.slots){
       const b = state.slots[id];
       if(!b) continue;
@@ -3163,15 +3587,15 @@ document.getElementById('pcode-apply').addEventListener('click', ()=>{
       b.buildStart = 0;
       if(cfg.resource){ state.prod[id] = Date.now(); }
     }
-
-    // ── Все уровни шахты и боевые уровни открыты ──────────────
+    // Max passives
+    PASSIVE_ORDER.forEach(id => { state.passiveSkills[id] = PASSIVE_SKILLS[id].maxLevel; });
+    // Max dragon
+    state.dragon.level = DRAGON.maxLevel;
     state.caveMaxLevel = 999;
     state.maxLevel = 50;
-
-    // ── Сообщение ─────────────────────────────────────────────
     msg.textContent = LANG === 'ru'
-      ? '⚡ АДМИН-БОНУС: ресурсы, зелья, войска, здания — MAX!'
-      : '⚡ ADMIN BONUS: resources, potions, units, buildings — MAX!';
+      ? '⚡ АДМИН-БОНУС: ресурсы, зелья, войска, здания, дракон — MAX!'
+      : '⚡ ADMIN BONUS: resources, potions, units, buildings, dragon — MAX!';
     msg.style.color = 'var(--green)';
     inp.value = '';
     refreshAllUI();
@@ -3220,6 +3644,8 @@ function applyLang(){
   if(document.getElementById('ov-auction').classList.contains('show')) renderAuctionModal();
   if(document.getElementById('ov-cave').classList.contains('show')) renderCaveModal();
   if(document.getElementById('ov-witch').classList.contains('show')) renderWitchModal();
+  if(document.getElementById('ov-altar').classList.contains('show')) renderAltarModal();
+  if(document.getElementById('ov-dragon').classList.contains('show')) renderDragonModal();
   syncSettingsUI();
 }
 
@@ -3430,13 +3856,17 @@ setInterval(()=>{
     if(!b) continue;
     if(b.buildEnd && b.buildEnd > 0 && Date.now() >= b.buildEnd){
       b.buildEnd = 0; b.buildStart = 0;
-      // BUGFIX: new build (level 0) becomes level 1 on completion
       if(b.level === 0) b.level = 1;
       if(BUILDINGS[b.key].resource) state.prod[id] = Date.now();
       changed = true;
       const nm = LANG==='ru' ? BUILDINGS[b.key].ru : BUILDINGS[b.key].en;
       toast(nm + ' — ' + t('ready'));
       questProgress('builds', 1);
+      // Пробуждение дракона при завершении башни мага
+      if(b.key === 'magetower' && state.dragon.level === 0){
+        state.dragon.level = 1;
+        toast(LANG==='ru'?'🐉 Дракон пробуждён!':'🐉 Dragon awakened!');
+      }
     }
   }
   for(const key in state.heroes){
@@ -3446,7 +3876,6 @@ setInterval(()=>{
       toast((LANG==='ru'?HERO_DEFS[key].ru:HERO_DEFS[key].en) + ' — ' + t('ready'));
     }
   }
-  // Potion brewing completion
   if(state.brewing && state.brewing.endsAt <= Date.now()){
     const type = state.brewing.type;
     const def = POTION_DEFS[type];
@@ -3500,13 +3929,8 @@ if(HAS_VK){
     });
   }catch(err){}
 }
-function initBanner(){
-  if(!HAS_VK) return;
-  VK.send('VKWebAppGetLaunchParams')
-    .then(()=> VK.send('VKWebAppShowBannerAd', {banner_location:'bottom'}))
-    .then(()=>{ document.getElementById('banner').classList.add('on'); setTimeout(resizeCanvas, 320); })
-    .catch(()=>{});
-}
+
+/* NOTE: initBanner() больше НЕ вызывается — это исправляет проблему «чёрного баннера» */
 
 /* ========================================================================
    BOOT
@@ -3547,6 +3971,13 @@ async function boot(){
     if(typeof state.tutStep !== 'number') state.tutStep = 0;
     if(!state.potions) state.potions = { speed: 0, strength: 0, vitality: 0 };
     if(!('brewing' in state)) state.brewing = null;
+    if(!state.passiveSkills) state.passiveSkills = {};
+    if(!state.dragon) state.dragon = {level: 0, upgradeEnd: 0};
+    // Если башня мага уже построена, но дракон level 0 — дадим 1
+    const mt = findBuildingSlot('magetower');
+    if(mt !== null && state.slots[mt].level >= 1 && state.dragon.level === 0 && state.slots[mt].buildEnd <= Date.now()){
+      state.dragon.level = 1;
+    }
     if(saved.lastSaveTime) offlineMs = Date.now() - saved.lastSaveTime;
   } else {
     state = defaultState();
@@ -3563,7 +3994,6 @@ async function boot(){
   refreshAllUI();
   renderLobbyBuildings();
   buildLobbyBottom();
-  initBanner();
   resizeCanvas();
 
   const firstGesture = ()=>{ Music.ensure(); if(state.music) Music.play(); };
