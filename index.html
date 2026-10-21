@@ -63,6 +63,18 @@ body.placing .bld:not(.empty){opacity:.35}
 .bld.ship .bicon img{filter:drop-shadow(0 8px 16px rgba(0,0,0,.8)) drop-shadow(0 0 15px rgba(232,194,106,.45))}
 .bld.ship .ship-glow{position:absolute;inset:-25%;border-radius:50%;background:radial-gradient(circle,rgba(232,194,106,.28),transparent 60%);animation:pulse 2s infinite;pointer-events:none}
 
+/* ============ CANCEL PLACEMENT ============ */
+#cancel-placement{
+  position:fixed;bottom:calc(76px + env(safe-area-inset-bottom,0px));left:50%;
+  transform:translateX(-50%);z-index:9989;
+  padding:11px 26px;background:linear-gradient(180deg,#7a2b3e,#4a1830);
+  border:1px solid rgba(255,95,109,.6);color:#ffd0d6;font-family:inherit;
+  font-size:14px;font-weight:bold;border-radius:12px;cursor:pointer;
+  display:none;box-shadow:0 6px 20px rgba(0,0,0,.7),0 0 15px rgba(255,95,109,.3);
+  white-space:nowrap;
+}
+#cancel-placement.show{display:block;animation:pop .2s}
+
 #bottom{flex:0 0 auto;background:linear-gradient(180deg,#150f22,#0d0916);border-top:1px solid rgba(232,194,106,.18);z-index:20;min-height:60px;display:flex;align-items:stretch;gap:6px;padding:6px 7px}
 #bottom .lbtn{flex:1 1 0;border-radius:11px;border:1px solid rgba(232,194,106,.28);background:linear-gradient(180deg,#2b2142,#191227);color:var(--text);cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:transform .1s;font-family:inherit}
 #bottom .lbtn:active{transform:scale(.96)}
@@ -111,19 +123,23 @@ body.placing .bld:not(.empty){opacity:.35}
 .muted{color:var(--muted);font-size:12px;line-height:1.45}
 
 .costrow{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
-.costitem{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);font-size:11px;font-weight:bold}
+.costitem{display:flex;align-items:center;gap:3px;padding:3px 8px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);font-size:11px;font-weight:bold;white-space:nowrap}
 .costitem svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
 .costitem.miss{color:#ff5f6d}
 .costitem.ok{color:var(--green)}
 
-.bcard{display:flex;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:9px;align-items:center}
+/* FIXED bcard layout - cost on own row */
+.bcard{display:flex;flex-wrap:wrap;gap:10px;padding:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:9px;align-items:flex-start}
 .bcard img{width:52px;height:52px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 3px 5px rgba(0,0,0,.6))}
-.bcard .binfo{flex:1;min-width:0}
+.bcard .binfo{flex:1;min-width:0;overflow-wrap:break-word}
 .bcard .bnm{font-size:14px;color:var(--gold-l);font-weight:bold}
 .bcard .bdesc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}
 .bcard .bmeta{font-size:10px;color:var(--muted);margin-top:3px}
 .bcard .bmeta .ok{color:var(--green)}
 .bcard .bmeta .bad{color:var(--red)}
+.bcard > .btn{flex:0 0 auto;align-self:center}
+.bcard .bcard-cost{flex-basis:100%;padding-top:6px;border-top:1px dashed rgba(255,255,255,.08)}
+.bcard .bcard-cost .costrow{margin:0}
 .bcard.maxed{opacity:.45;filter:grayscale(.6)}
 
 .binfo{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(0,0,0,.28);border-radius:12px;margin-bottom:10px}
@@ -220,18 +236,7 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 #sailing .sail-txt{position:absolute;top:20%;left:50%;transform:translateX(-50%);color:var(--gold-l);font-size:clamp(16px,4vw,22px);letter-spacing:2px;text-align:center;text-shadow:0 0 20px rgba(232,194,106,.6),0 2px 4px #000;animation:fadeIn .8s .3s both;white-space:nowrap}
 #sailing .sail-sub{position:absolute;top:calc(20% + 34px);left:50%;transform:translateX(-50%);color:var(--muted);font-size:12px;letter-spacing:1px;text-align:center;animation:fadeIn .8s .6s both;white-space:nowrap}
 
-/* ============ TUTORIAL ============ */
-#tutbox{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:calc(76px + env(safe-area-inset-bottom,0px));
-  top:auto;
-  width:calc(100% - 24px);max-width:440px;
-  z-index:9998;display:none;
-  background:linear-gradient(180deg,#241b3a,#160f26);
-  border:1px solid var(--gold);
-  border-radius:14px;padding:14px;
-  box-shadow:0 12px 40px rgba(0,0,0,.85),0 0 20px rgba(232,194,106,.25);
-}
+#tutbox{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-width:440px;z-index:9998;display:none;background:linear-gradient(180deg,#241b3a,#160f26);border:1px solid var(--gold);border-radius:14px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.85),0 0 20px rgba(232,194,106,.25)}
 #tutbox.top{top:calc(52px + env(safe-area-inset-top,0px));bottom:auto}
 #tutbox.show{display:block;animation:pop .22s}
 #tutbox .tt{font-size:13px;line-height:1.5;margin-bottom:11px;color:var(--text)}
@@ -240,42 +245,12 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 #tutbox .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2)}
 #tutbox .dots i.on{background:var(--gold)}
 
-/* Пульсирующая подсветка цели */
-.tut-highlight{
-  position:relative;z-index:9997!important;
-  border-radius:12px!important;
-  animation:tut-pulse 1.2s ease-in-out infinite;
-  pointer-events:auto!important;
-}
-@keyframes tut-pulse{
-  0%,100%{box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(232,194,106,.7)}
-  50%{box-shadow:0 0 0 5px #ffe9a8,0 0 34px rgba(255,233,168,.95)}
-}
+.tut-highlight{position:relative;z-index:9997!important;border-radius:12px!important;animation:tut-pulse 1.2s ease-in-out infinite;pointer-events:auto!important}
+@keyframes tut-pulse{0%,100%{box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(232,194,106,.7)}50%{box-shadow:0 0 0 5px #ffe9a8,0 0 34px rgba(255,233,168,.95)}}
 
-/* Плавающая стрелка "Нажмите здесь" */
-.tut-tap-ind{
-  position:fixed;z-index:9999;
-  padding:7px 14px;
-  background:linear-gradient(180deg,#e8c26a,#a8813a);
-  color:#1a1208;font-weight:bold;font-size:13px;
-  border-radius:20px;
-  box-shadow:0 4px 16px rgba(0,0,0,.7),0 0 24px rgba(232,194,106,.6);
-  pointer-events:none;white-space:nowrap;
-  transform:translate(-50%,-100%);
-  animation:tut-bounce 1.1s ease-in-out infinite;
-}
-@keyframes tut-bounce{
-  0%,100%{transform:translate(-50%,-100%) scale(1)}
-  50%{transform:translate(-50%,-118%) scale(1.05)}
-}
-.tut-tap-ind::after{
-  content:'';position:absolute;bottom:-8px;left:50%;
-  transform:translateX(-50%);
-  width:0;height:0;
-  border-left:8px solid transparent;
-  border-right:8px solid transparent;
-  border-top:8px solid #e8c26a;
-}
+.tut-tap-ind{position:fixed;z-index:9999;padding:7px 14px;background:linear-gradient(180deg,#e8c26a,#a8813a);color:#1a1208;font-weight:bold;font-size:13px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.7),0 0 24px rgba(232,194,106,.6);pointer-events:none;white-space:nowrap;transform:translate(-50%,-100%);animation:tut-bounce 1.1s ease-in-out infinite}
+@keyframes tut-bounce{0%,100%{transform:translate(-50%,-100%) scale(1)}50%{transform:translate(-50%,-118%) scale(1.05)}}
+.tut-tap-ind::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid #e8c26a}
 
 .res-big{font-size:26px;text-align:center;margin:4px 0 10px;color:var(--gold-l);letter-spacing:1px}
 .res-line{display:flex;justify-content:space-between;padding:7px 4px;font-size:14px;border-bottom:1px dashed rgba(255,255,255,.08)}
@@ -310,35 +285,17 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h3.8a1.7 1.7 0 010 3.4H9.5h4a1.7 1.7 0 010 3.4H9.5" stroke-width="1.4"/></svg>
       <span id="val-gold">0</span>
     </div>
-    <div class="chip wheat" id="chip-wheat">
-      <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-3 4 3M8 12l4-3 4 3M8 17l4-3 4 3"/></svg>
-      <span id="val-wheat">0</span><span class="cap" id="cap-wheat">/500</span>
-    </div>
-    <div class="chip wood" id="chip-wood">
-      <svg viewBox="0 0 24 24"><path d="M4 20l10-10M6 8l4-4 8 8-4 4zM14 18h6M17 15v6"/></svg>
-      <span id="val-wood">0</span><span class="cap" id="cap-wood">/500</span>
-    </div>
-    <div class="chip stone" id="chip-stone">
-      <svg viewBox="0 0 24 24"><path d="M4 16l3-8 5-2 5 4 3 8zM8 12l4-2 4 3"/></svg>
-      <span id="val-stone">0</span><span class="cap" id="cap-stone">/500</span>
-    </div>
-    <div class="chip essence" id="chip-essence">
-      <svg viewBox="0 0 24 24"><path d="M12 3l3 6-3 12-3-12zM9 9h6"/></svg>
-      <span id="val-essence">0</span>
-    </div>
+    <div class="chip wheat" id="chip-wheat"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-3 4 3M8 12l4-3 4 3M8 17l4-3 4 3"/></svg><span id="val-wheat">0</span><span class="cap" id="cap-wheat">/500</span></div>
+    <div class="chip wood" id="chip-wood"><svg viewBox="0 0 24 24"><path d="M4 20l10-10M6 8l4-4 8 8-4 4zM14 18h6M17 15v6"/></svg><span id="val-wood">0</span><span class="cap" id="cap-wood">/500</span></div>
+    <div class="chip stone" id="chip-stone"><svg viewBox="0 0 24 24"><path d="M4 16l3-8 5-2 5 4 3 8zM8 12l4-2 4 3"/></svg><span id="val-stone">0</span><span class="cap" id="cap-stone">/500</span></div>
+    <div class="chip essence" id="chip-essence"><svg viewBox="0 0 24 24"><path d="M12 3l3 6-3 12-3-12zM9 9h6"/></svg><span id="val-essence">0</span></div>
     <div id="spacer"></div>
-    <button class="tbtn" id="btn-menu" title="menu">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      <span class="dot"></span>
-    </button>
+    <button class="tbtn" id="btn-menu" title="menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="dot"></span></button>
   </header>
 
   <main id="stage">
     <canvas id="cv"></canvas>
-    <div id="world">
-      <div id="lobby-buildings"></div>
-    </div>
-
+    <div id="world"><div id="lobby-buildings"></div></div>
     <div id="battlehud">
       <div class="bhrow"><div class="bhn" id="lbl-ally">Вы</div><div class="bhbar"><i id="hp-ally" style="width:100%;background:linear-gradient(90deg,#3f8cff,#6bb6ff)"></i></div></div>
       <div class="bhrow enemy"><div class="bhn" id="lbl-enemy">Враг</div><div class="bhbar"><i id="hp-enemy" style="width:100%;background:linear-gradient(90deg,#ff4d5e,#ff8b6b)"></i></div></div>
@@ -349,6 +306,8 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
   <div id="bottom"></div>
   <div id="banner"></div>
 </div>
+
+<button id="cancel-placement">✕ <span data-i18n="cancel_place">Отменить размещение</span></button>
 
 <div class="overlay" id="ov-menu">
   <div class="modal">
@@ -384,10 +343,7 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 <div class="overlay" id="ov-shop">
   <div class="modal">
     <div class="mhead"><h2 data-i18n="shop"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody">
-      <div class="muted" style="margin-bottom:10px" data-i18n="shop_desc"></div>
-      <div id="shop-list"></div>
-    </div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="shop_desc"></div><div id="shop-list"></div></div>
   </div>
 </div>
 
@@ -401,20 +357,14 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 <div class="overlay" id="ov-units">
   <div class="modal">
     <div class="mhead"><h2 data-i18n="units"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody">
-      <div class="muted" style="margin-bottom:10px" data-i18n="units_desc"></div>
-      <div class="ugrid" id="units-grid"></div>
-    </div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="units_desc"></div><div class="ugrid" id="units-grid"></div></div>
   </div>
 </div>
 
 <div class="overlay" id="ov-lab">
   <div class="modal">
     <div class="mhead"><h2 data-i18n="lab"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody">
-      <div class="muted" style="margin-bottom:10px" data-i18n="lab_desc"></div>
-      <div id="heroes-list"></div>
-    </div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="lab_desc"></div><div id="heroes-list"></div></div>
   </div>
 </div>
 
@@ -442,23 +392,23 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 <div class="overlay" id="ov-cave">
   <div class="modal">
     <div class="mhead"><h2 data-i18n="cave"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody">
-      <div class="muted" style="margin-bottom:10px" data-i18n="cave_desc"></div>
-      <div id="cave-list"></div>
-    </div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="cave_desc"></div><div id="cave-list"></div></div>
+  </div>
+</div>
+
+<div class="overlay" id="ov-witch">
+  <div class="modal">
+    <div class="mhead"><h2 data-i18n="witch"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody"><div class="muted" style="margin-bottom:10px" data-i18n="witch_desc"></div><div id="witch-list"></div></div>
   </div>
 </div>
 
 <div class="overlay" id="ov-quests">
-  <div class="modal">
-    <div class="mhead"><h2 data-i18n="quests"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody" id="quest-list"></div>
-  </div>
+  <div class="modal"><div class="mhead"><h2 data-i18n="quests"></h2><button class="mclose" data-close>&times;</button></div><div class="mbody" id="quest-list"></div></div>
 </div>
 
 <div class="overlay" id="ov-rest">
-  <div class="modal">
-    <div class="mhead"><h2 data-i18n="rest"></h2><button class="mclose" data-close>&times;</button></div>
+  <div class="modal"><div class="mhead"><h2 data-i18n="rest"></h2><button class="mclose" data-close>&times;</button></div>
     <div class="mbody">
       <div class="center muted" data-i18n="rest_desc" style="margin-bottom:6px"></div>
       <div class="rest-timer" id="rest-timer">60</div>
@@ -469,8 +419,7 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 </div>
 
 <div class="overlay" id="ov-daily">
-  <div class="modal">
-    <div class="mhead"><h2 data-i18n="daily"></h2><button class="mclose" data-close>&times;</button></div>
+  <div class="modal"><div class="mhead"><h2 data-i18n="daily"></h2><button class="mclose" data-close>&times;</button></div>
     <div class="mbody center">
       <div style="font-size:46px;margin:6px 0 10px;color:var(--gold)">✦</div>
       <div class="muted" data-i18n="daily_desc" style="margin-bottom:12px"></div>
@@ -481,15 +430,11 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 </div>
 
 <div class="overlay" id="ov-time">
-  <div class="modal">
-    <div class="mhead"><h2 data-i18n="time"></h2><button class="mclose" data-close>&times;</button></div>
-    <div class="mbody" id="time-list"></div>
-  </div>
+  <div class="modal"><div class="mhead"><h2 data-i18n="time"></h2><button class="mclose" data-close>&times;</button></div><div class="mbody" id="time-list"></div></div>
 </div>
 
 <div class="overlay" id="ov-result">
-  <div class="modal">
-    <div class="mhead"><h2 id="res-title"></h2></div>
+  <div class="modal"><div class="mhead"><h2 id="res-title"></h2></div>
     <div class="mbody">
       <div class="res-big" id="res-big"></div>
       <div id="res-lines"></div>
@@ -500,8 +445,7 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 </div>
 
 <div class="overlay" id="ov-pause">
-  <div class="modal">
-    <div class="mhead"><h2 data-i18n="paused"></h2></div>
+  <div class="modal"><div class="mhead"><h2 data-i18n="paused"></h2></div>
     <div class="mbody">
       <button class="btn green full" id="pause-resume" data-i18n="resume"></button>
       <button class="btn full" id="pause-quit" data-i18n="quit_level"></button>
@@ -509,9 +453,14 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
   </div>
 </div>
 
+<div class="overlay" id="ov-offline">
+  <div class="modal"><div class="mhead"><h2 data-i18n="offline_title"></h2><button class="mclose" data-close>&times;</button></div>
+    <div class="mbody" id="offline-body"></div>
+  </div>
+</div>
+
 <div id="sailing">
-  <div class="sail-stars"></div>
-  <div class="sail-moon"></div>
+  <div class="sail-stars"></div><div class="sail-moon"></div>
   <div class="sail-txt" id="sail-txt">Отплываем…</div>
   <div class="sail-sub" id="sail-sub">Завоевание новых земель</div>
   <div class="sail-waves" id="sail-waves"></div>
@@ -521,10 +470,7 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 
 <div id="adov"><div class="spinner"></div><div class="adtxt" id="adov-text" data-i18n="ad_loading"></div></div>
 
-<div id="tutbox">
-  <div class="tt" id="tut-text"></div>
-  <div class="tfoot"><div class="dots" id="tut-dots"></div><button class="btn" id="tut-next" data-i18n="next"></button></div>
-</div>
+<div id="tutbox"><div class="tt" id="tut-text"></div><div class="tfoot"><div class="dots" id="tut-dots"></div><button class="btn" id="tut-next" data-i18n="next"></button></div></div>
 
 <div id="toast"></div>
 
@@ -536,8 +482,7 @@ const HAS_VK = (typeof vkBridge !== 'undefined');
 const VK = {
   send(method, params){
     if(!HAS_VK) return Promise.reject(new Error('no vk'));
-    try{ return vkBridge.send(method, params); }
-    catch(e){ return Promise.reject(e); }
+    try{ return vkBridge.send(method, params); } catch(e){ return Promise.reject(e); }
   }
 };
 if(HAS_VK) VK.send('VKWebAppInit').catch(()=>{});
@@ -547,71 +492,58 @@ if(HAS_VK) VK.send('VKWebAppInit').catch(()=>{});
    ======================================================================== */
 const STR = {
   ru:{
-    menu:'Меню', settings:'Настройки', quests:'Задания', rest:'Комната отдыха',
-    daily:'Награда дня', time:'Награда за время', invite:'Пригласить',
-    music:'Музыка', music_sub:'Фоновая музыка', language:'Язык',
-    promocode:'Промокод', apply:'Применить',
-    tut_q:'Обучение', tut_yes:'Пройти', tut_no:'Пропустить', next:'Далее', claim:'Получить',
-    daily_desc:'Заходите каждый день — получайте золото. Серия даёт больше.',
-    rest_desc:'Пока отдыхаете — каждая минута приносит золото в казну.',
-    ad_loading:'Загрузка рекламы…\nПожалуйста, подождите.',
-    double_reward:'Удвоить за рекламу', take_reward:'Забрать',
+    menu:'Меню', settings:'Настройки', quests:'Задания', rest:'Комната отдыха', daily:'Награда дня', time:'Награда за время', invite:'Пригласить',
+    music:'Музыка', music_sub:'Фоновая музыка', language:'Язык', promocode:'Промокод', apply:'Применить',
+    next:'Далее', claim:'Получить', finish:'Завершить',
+    daily_desc:'Заходите каждый день — получайте золото.', rest_desc:'Пока отдыхаете — каждая минута приносит золото.',
+    ad_loading:'Загрузка рекламы…\nПожалуйста, подождите.', double_reward:'Удвоить за рекламу', take_reward:'Забрать',
     paused:'Пауза', resume:'Продолжить', quit_level:'Покинуть уровень',
     win:'ПОБЕДА', lose:'ПОРАЖЕНИЕ',
-    units:'Войска', units_desc:'Покупайте и улучшайте воинов. Открываются с ростом Казарм.',
-    lab:'Лаборатория', lab_desc:'Прокачивайте героев за ресурсы и время.',
-    auction:'Аукцион', auction_desc:'Выставляйте ресурсы. Ниже цена — быстрее продажа.',
-    cave:'Пещера', cave_desc:'Сражайтесь с чудовищами за редкую эссенцию.',
-    list:'Выставить', level:'Ур.', upgrade:'Улучшить', build:'Построить',
-    collect:'Собрать', building:'Строится', ready:'Готово', cancel:'Отмена',
+    units:'Войска', units_desc:'Покупайте и улучшайте воинов.', lab:'Лаборатория', lab_desc:'Прокачивайте героев.',
+    auction:'Аукцион', auction_desc:'Выставляйте ресурсы.', cave:'Шахта', cave_desc:'Спускайтесь в шахту за редкими ресурсами.',
+    list:'Выставить', level:'Ур.', upgrade:'Улучшить', build:'Построить', collect:'Собрать', building:'Строится', ready:'Готово', cancel:'Отмена',
     no_gold:'Недостаточно ресурсов', promocode_ok:'Промокод активирован!', promocode_bad:'Неверный промокод',
     time_gone:'Получено', time_ready:'Получить', time_locked:'Через',
     gold:'Золото', wheat:'Пшеница', wood:'Дерево', stone:'Камень', essence:'Эссенция',
     winreward:'Награда', units_spawned:'Призвано', enemies_killed:'Побеждено',
     level_max:'Макс. уровень', req_castle:'Требуется замок ур.',
     buy:'Купить', owned:'Есть', locked:'Закрыто',
-    inv_ok:'Приглашение отправлено', inv_err:'Не удалось пригласить',
-    daily_ok:'Награда получена!', daily_wait:'Уже получено сегодня',
-    quest_done:'Получено', quest_claim:'Забрать',
+    inv_ok:'Приглашение отправлено', inv_err:'Не удалось',
+    daily_wait:'Уже получено сегодня', quest_done:'Получено', quest_claim:'Забрать',
     hp_bonus:'+HP армии', dmg_bonus:'+Урон', essence_bonus:'+Реген эссенции',
     shop:'Магазин', shop_desc:'Выберите здание и разместите его на свободной клетке.',
-    place:'Разместить', maxed:'Максимум', workers:'Рабочие', workers_need:'нужно',
-    workers_free:'свободно', no_worker:'Нет рабочих', producing:'Работает',
+    place:'Разместить', maxed:'Максимум', workers:'Рабочие', workers_need:'нужно', no_worker:'Нет рабочих', producing:'Работает',
     sails:'Отплыть', sail_txt:'Отплываем…', sail_sub:'Завоевание новых земель',
     storage:'Хранилище', cap_bonus:'+к лимиту', workers_give:'Рабочие',
-    give_workers:'даёт рабочих', needs_workers:'требуется рабочих',
-    place_hint:'Нажмите на свободную клетку', cancel_place:'Отменить размещение',
     builders:'Строители', builders_busy:'Все строители заняты',
-    builders_desc:'Позволяет вести строительство. Каждый строитель — одно параллельное улучшение.',
-    tut_1:'Добро пожаловать, правитель! Ваш замок на границе тьмы ждёт развития. Следуйте подсказкам — обучение обязательно.',
-    tut_2:'Тапните кнопку «Магазин» внизу экрана, чтобы открыть каталог зданий.',
-    tut_3:'Выберите Ферму из списка — это первое здание, которое приносит ресурсы.',
-    tut_4:'Отлично! Теперь тапните по пустой клетке на карте (подсвечена зелёным), чтобы поставить ферму.',
-    tut_5:'Ферма производит пшеницу, но ей нужны рабочие. Дома дают рабочих — постройте дом позже. Продолжим.',
-    tut_6:'Теперь тапните по кораблю на карте, чтобы отправиться в первое сражение.',
-    tut_7:'Ваша первая битва! Призывайте воинов кнопками снизу и уничтожьте тёмную башню. Победа ждёт!',
-    tut_8:'Поздравляем! Вы прошли обучение и готовы к великим свершениям. Развивайте крепость, сражайтесь и становитесь легендой!',
-    tutorial:'Обучение', tap_here:'Нажмите здесь', finish:'Завершить',
-    session:'Сессия'
+    cancel_place:'Отменить размещение', cancel_build:'Отменить строительство',
+    witch:'Ведьмин дом', witch_desc:'Варите зелья за ресурсы. Зелья дают временные бонусы.',
+    brew:'Сварить', brewing:'Варится', active:'Активно', potion_ready:'Зелье готово',
+    cauldron_busy:'Котёл занят', potion_active:'Зелье уже действует',
+    offline_title:'С возвращением!', offline_away:'Вы были в отлучке', offline_builds:'Зданий достроено',
+    offline_res:'Ресурсов готово', offline_potion:'Зелье готово', offline_ok:'Отлично!',
+    speed_bonus:'+30% скорость постройки', dmg_potion_bonus:'+25% урона в бою', hp_potion_bonus:'+25% HP в бою',
+    tut_1:'Добро пожаловать, правитель! Следуйте подсказкам — обучение обязательно.',
+    tut_2:'Тапните «Магазин» внизу, чтобы открыть каталог зданий.',
+    tut_3:'Выберите Ферму из списка.',
+    tut_4:'Отлично! Тапните по пустой клетке на карте (подсвечена зелёным).',
+    tut_5:'Ферма производит пшеницу, но ей нужны рабочие. Дома дают рабочих. Продолжим.',
+    tut_6:'Теперь тапните по кораблю на карте, чтобы отправиться в сражение.',
+    tut_7:'Ваша первая битва! Призывайте воинов и уничтожьте тёмную башню.',
+    tut_8:'Поздравляем! Вы готовы к великим свершениям!',
+    tap_here:'Нажмите здесь', session:'Сессия'
   },
   en:{
-    menu:'Menu', settings:'Settings', quests:'Quests', rest:'Rest Room',
-    daily:'Daily Reward', time:'Playtime Reward', invite:'Invite',
-    music:'Music', music_sub:'Background music', language:'Language',
-    promocode:'Promo code', apply:'Apply',
-    tut_q:'Tutorial', tut_yes:'Start', tut_no:'Skip', next:'Next', claim:'Claim',
-    daily_desc:'Log in daily for gold. Longer streak — bigger reward.',
-    rest_desc:'While resting, each minute adds gold.',
-    ad_loading:'Loading ad…\nPlease wait.',
-    double_reward:'Double for ad', take_reward:'Take',
+    menu:'Menu', settings:'Settings', quests:'Quests', rest:'Rest Room', daily:'Daily', time:'Playtime', invite:'Invite',
+    music:'Music', music_sub:'Background music', language:'Language', promocode:'Promo code', apply:'Apply',
+    next:'Next', claim:'Claim', finish:'Finish',
+    daily_desc:'Log in daily for gold.', rest_desc:'Each minute while resting adds gold.',
+    ad_loading:'Loading ad…\nPlease wait.', double_reward:'Double for ad', take_reward:'Take',
     paused:'Paused', resume:'Resume', quit_level:'Leave level',
     win:'VICTORY', lose:'DEFEAT',
-    units:'Army', units_desc:'Buy and upgrade warriors. Unlocked with Barracks level.',
-    lab:'Laboratory', lab_desc:'Upgrade heroes with resources and time.',
-    auction:'Auction', auction_desc:'List resources. Lower price — faster sale.',
-    cave:'Cave', cave_desc:'Battle monsters for rare essence.',
-    list:'List', level:'Lv.', upgrade:'Upgrade', build:'Build',
-    collect:'Collect', building:'Building', ready:'Ready', cancel:'Cancel',
+    units:'Army', units_desc:'Buy and upgrade warriors.', lab:'Laboratory', lab_desc:'Upgrade heroes.',
+    auction:'Auction', auction_desc:'List resources.', cave:'Mine', cave_desc:'Descend into the mine for rare resources.',
+    list:'List', level:'Lv.', upgrade:'Upgrade', build:'Build', collect:'Collect', building:'Building', ready:'Ready', cancel:'Cancel',
     no_gold:'Not enough resources', promocode_ok:'Promo activated!', promocode_bad:'Invalid promo',
     time_gone:'Claimed', time_ready:'Claim', time_locked:'In',
     gold:'Gold', wheat:'Wheat', wood:'Wood', stone:'Stone', essence:'Essence',
@@ -619,35 +551,36 @@ const STR = {
     level_max:'Max level', req_castle:'Requires castle lvl',
     buy:'Buy', owned:'Owned', locked:'Locked',
     inv_ok:'Invitation sent', inv_err:'Invite failed',
-    daily_ok:'Reward claimed!', daily_wait:'Already claimed',
-    quest_done:'Claimed', quest_claim:'Claim',
+    daily_wait:'Already claimed', quest_done:'Claimed', quest_claim:'Claim',
     hp_bonus:'+Army HP', dmg_bonus:'+Damage', essence_bonus:'+Essence regen',
     shop:'Shop', shop_desc:'Pick a building and place it on a free cell.',
-    place:'Place', maxed:'Max', workers:'Workers', workers_need:'need',
-    workers_free:'free', no_worker:'No workers', producing:'Working',
+    place:'Place', maxed:'Max', workers:'Workers', workers_need:'need', no_worker:'No workers', producing:'Working',
     sails:'Sail', sail_txt:'Sailing…', sail_sub:'Conquest of new lands',
     storage:'Storage', cap_bonus:'+to cap', workers_give:'Workers',
-    give_workers:'gives workers', needs_workers:'requires workers',
-    place_hint:'Tap a free cell', cancel_place:'Cancel placement',
     builders:'Builders', builders_busy:'All builders busy',
-    builders_desc:'Enables construction. Each builder — one parallel upgrade.',
-    tut_1:'Welcome, ruler! Your castle on the edge of darkness awaits. Follow the prompts — tutorial is mandatory.',
-    tut_2:'Tap the «Shop» button at the bottom of the screen to open the building catalog.',
-    tut_3:'Pick a Farm from the list — it\'s your first resource-producing building.',
-    tut_4:'Great! Now tap a free cell on the map (highlighted green) to place the farm.',
-    tut_5:'Farm produces wheat but needs workers. Houses provide workers — build one later. Let\'s continue.',
-    tut_6:'Now tap the ship on the map to sail to your first battle.',
-    tut_7:'Your first battle! Summon warriors with the buttons below and destroy the dark tower. Victory awaits!',
-    tut_8:'Congratulations! You completed the tutorial. Build, battle, and become a legend!',
-    tutorial:'Tutorial', tap_here:'Tap here', finish:'Finish',
-    session:'Session'
+    cancel_place:'Cancel placement', cancel_build:'Cancel construction',
+    witch:'Witch House', witch_desc:'Brew potions from resources. Potions give temporary buffs.',
+    brew:'Brew', brewing:'Brewing', active:'Active', potion_ready:'Potion ready',
+    cauldron_busy:'Cauldron busy', potion_active:'Potion already active',
+    offline_title:'Welcome back!', offline_away:'You were away', offline_builds:'Buildings completed',
+    offline_res:'Resources ready', offline_potion:'Potion ready', offline_ok:'Great!',
+    speed_bonus:'+30% build speed', dmg_potion_bonus:'+25% damage in battle', hp_potion_bonus:'+25% HP in battle',
+    tut_1:'Welcome, ruler! Follow the prompts — tutorial is mandatory.',
+    tut_2:'Tap «Shop» at the bottom.',
+    tut_3:'Pick a Farm from the list.',
+    tut_4:'Great! Tap a free cell (highlighted green) to place the farm.',
+    tut_5:'Farm produces wheat but needs workers. Houses provide workers. Let\'s continue.',
+    tut_6:'Now tap the ship on the map to sail to battle.',
+    tut_7:'Your first battle! Summon warriors and destroy the dark tower.',
+    tut_8:'Congratulations! You\'re ready for great things!',
+    tap_here:'Tap here', session:'Session'
   }
 };
 let LANG = 'ru';
 function t(k){ return (STR[LANG] && STR[LANG][k]) || STR.ru[k] || k; }
 
 /* ========================================================================
-   RESOURCES
+   RESOURCES / BUILDINGS
    ======================================================================== */
 const RES = {
   gold:{ru:'Золото', en:'Gold', color:'#e8c26a', icon:'M12 3a9 9 0 100 18 9 9 0 000-18zm0 3v12M9.5 8.5h3.8a1.7 1.7 0 010 3.4H9.5h4a1.7 1.7 0 010 3.4H9.5'},
@@ -659,90 +592,39 @@ const RES = {
 const BASE_STORAGE = 500;
 const WAREHOUSE_BONUS = 400;
 
-/* ========================================================================
-   BUILDINGS
-   ======================================================================== */
 const BUILDINGS = {
-  castle: { ru:'Замок', en:'Castle', icon:'castle', major:true, max:1,
-    desc_ru:'Сердце крепости. Уровень замка ограничивает другие постройки.',
-    desc_en:'Heart of the fortress. Castle level limits other buildings.',
-    maxLevel:20,
-    cost(lv){ return {gold: 200 + 150*(lv-1) + 80*(lv-1)*(lv-1)}; },
-    time(lv){ return 60 * Math.pow(1.7, lv-1); } },
-  cave: { ru:'Пещера', en:'Cave', icon:'cave', major:true, max:1,
-    desc_ru:'Портал в тёмную пещеру для подземных боев.',
-    desc_en:'Portal to a dark cave for dungeon battles.',
-    maxLevel:1, isCavePortal:true },
-  ship: { ru:'Корабль', en:'Ship', icon:'ship', major:true, max:1,
-    desc_ru:'Корабль для дальних плаваний в бой.',
-    desc_en:'Ship for long voyages to battle.',
-    maxLevel:1, isShip:true },
-  builder: { ru:'Строитель', en:'Builder', icon:'builder', max:2,
-    desc_ru:'Позволяет вести строительство. Каждый строитель — одно параллельное улучшение. Второй стоит очень дорого.',
-    desc_en:'Enables construction. Each builder — one parallel upgrade. The second is very expensive.',
-    maxLevel:1,
-    cost(lv){ return {gold: 50000, wheat: 5000, wood: 5000, stone: 5000, essence: 500}; },
-    time(lv){ return 900; } },
-  farm: { ru:'Ферма', en:'Farm', icon:'farm', max:6,
-    desc_ru:'Производит пшеницу. Нужны рабочие.',
-    desc_en:'Produces wheat. Requires workers.',
-    maxLevel:15, resource:'wheat', workersNeeded:1,
-    rate(lv){ return 15 + 10*lv; }, cap(lv){ return 120 + 100*lv; },
-    cost(lv){ return lv===1 ? {gold:80} : {gold:60*lv, wood:25*(lv-1)}; },
-    time(lv){ return 45 * Math.pow(1.5, lv-1); } },
-  lumber: { ru:'Лесопилка', en:'Lumber Mill', icon:'lumber', max:4,
-    desc_ru:'Производит дерево. Нужны рабочие.',
-    desc_en:'Produces wood. Requires workers.',
-    maxLevel:15, resource:'wood', workersNeeded:1,
-    rate(lv){ return 10 + 7*lv; }, cap(lv){ return 100 + 90*lv; },
-    cost(lv){ return lv===1 ? {gold:100} : {gold:80*lv, wheat:30*(lv-1)}; },
-    time(lv){ return 60 * Math.pow(1.5, lv-1); } },
-  quarry: { ru:'Каменоломня', en:'Quarry', icon:'quarry', max:4,
-    desc_ru:'Производит камень. Нужны рабочие.',
-    desc_en:'Produces stone. Requires workers.',
-    maxLevel:15, resource:'stone', workersNeeded:1,
-    rate(lv){ return 6 + 5*lv; }, cap(lv){ return 80 + 80*lv; },
-    cost(lv){ return lv===1 ? {gold:120} : {gold:100*lv, wood:40*(lv-1)}; },
-    time(lv){ return 80 * Math.pow(1.5, lv-1); } },
-  house: { ru:'Жилой дом', en:'House', icon:'house', max:6,
-    desc_ru:'Даёт рабочих. Каждый уровень добавляет жителей.',
-    desc_en:'Provides workers. Each level adds residents.',
-    maxLevel:10, workersBase:1,
-    workersPerLevel(lv){ return lv + 1; },
-    cost(lv){ return lv===1 ? {gold:100} : {gold:80*lv, wood:40*(lv-1)}; },
-    time(lv){ return 50 * Math.pow(1.5, lv-1); } },
-  warehouse: { ru:'Склад', en:'Warehouse', icon:'warehouse', max:3,
-    desc_ru:'Расширяет лимиты хранения всех ресурсов.',
-    desc_en:'Expands resource storage limits.',
-    maxLevel:12,
-    cost(lv){ return lv===1 ? {gold:150} : {gold:120*lv, wood:50*(lv-1), stone:30*(lv-1)}; },
-    time(lv){ return 80 * Math.pow(1.55, lv-1); } },
-  barracks: { ru:'Казармы', en:'Barracks', icon:'barracks', max:1,
-    desc_ru:'Открывает новых воинов. Каждый уровень разблокирует бойца.',
-    desc_en:'Unlocks new warriors. Each level unlocks a fighter.',
-    maxLevel:10, reqCastle:2,
-    cost(lv){ return lv===1 ? {gold:200} : {gold:150*lv + 80*lv*lv, wood:60*lv, stone:40*lv}; },
-    time(lv){ return 120 * Math.pow(1.55, lv-1); } },
-  lab: { ru:'Лаборатория', en:'Laboratory', icon:'lab', max:1,
-    desc_ru:'Прокачка героев, усиливающих армию.',
-    desc_en:'Upgrade heroes that buff your army.',
-    maxLevel:10, reqCastle:3,
-    cost(lv){ return lv===1 ? {gold:300} : {gold:250*lv + 100*lv*lv, wheat:80*lv, wood:60*lv, stone:40*lv}; },
-    time(lv){ return 180 * Math.pow(1.55, lv-1); } },
-  auction: { ru:'Аукцион', en:'Auction House', icon:'auction', max:1,
-    desc_ru:'Продажа ресурсов за золото.',
-    desc_en:'Sell resources for gold.',
-    maxLevel:10, reqCastle:3,
-    cost(lv){ return lv===1 ? {gold:250} : {gold:200*lv, wood:80*lv, stone:40*lv}; },
-    time(lv){ return 150 * Math.pow(1.55, lv-1); } }
+  castle: { ru:'Замок', en:'Castle', icon:'castle', major:true, max:1, desc_ru:'Сердце крепости.', desc_en:'Heart of the fortress.', maxLevel:20,
+    cost(lv){ return {gold: 200 + 150*(lv-1) + 80*(lv-1)*(lv-1)}; }, time(lv){ return 60 * Math.pow(1.7, lv-1); } },
+  cave: { ru:'Шахта', en:'Mine', icon:'cave', major:true, max:1, desc_ru:'Спуск в шахту за редкими ресурсами.', desc_en:'Descent into the mine for rare resources.', maxLevel:1, isCavePortal:true },
+  ship: { ru:'Корабль', en:'Ship', icon:'ship', major:true, max:1, desc_ru:'Корабль для дальних плаваний в бой.', desc_en:'Ship for long voyages to battle.', maxLevel:1, isShip:true },
+  builder: { ru:'Строитель', en:'Builder', icon:'builder', max:2, desc_ru:'Каждый строитель — одно параллельное улучшение. Второй стоит очень дорого.', desc_en:'Each builder — one parallel upgrade.', maxLevel:1,
+    cost(){ return {gold: 50000, wheat: 5000, wood: 5000, stone: 5000, essence: 500}; }, time(){ return 900; } },
+  farm: { ru:'Ферма', en:'Farm', icon:'farm', max:6, desc_ru:'Производит пшеницу. Нужны рабочие.', desc_en:'Produces wheat. Requires workers.', maxLevel:15, resource:'wheat', workersNeeded:1,
+    rate(lv){ return 15 + 10*lv; }, cap(lv){ return 120 + 100*lv; }, cost(lv){ return lv===1 ? {gold:80} : {gold:60*lv, wood:25*(lv-1)}; }, time(lv){ return 45 * Math.pow(1.5, lv-1); } },
+  lumber: { ru:'Лесопилка', en:'Lumber Mill', icon:'lumber', max:4, desc_ru:'Производит дерево. Нужны рабочие.', desc_en:'Produces wood. Requires workers.', maxLevel:15, resource:'wood', workersNeeded:1,
+    rate(lv){ return 10 + 7*lv; }, cap(lv){ return 100 + 90*lv; }, cost(lv){ return lv===1 ? {gold:100} : {gold:80*lv, wheat:30*(lv-1)}; }, time(lv){ return 60 * Math.pow(1.5, lv-1); } },
+  quarry: { ru:'Каменоломня', en:'Quarry', icon:'quarry', max:4, desc_ru:'Производит камень. Нужны рабочие.', desc_en:'Produces stone. Requires workers.', maxLevel:15, resource:'stone', workersNeeded:1,
+    rate(lv){ return 6 + 5*lv; }, cap(lv){ return 80 + 80*lv; }, cost(lv){ return lv===1 ? {gold:120} : {gold:100*lv, wood:40*(lv-1)}; }, time(lv){ return 80 * Math.pow(1.5, lv-1); } },
+  house: { ru:'Жилой дом', en:'House', icon:'house', max:6, desc_ru:'Даёт рабочих.', desc_en:'Provides workers.', maxLevel:10,
+    workersPerLevel(lv){ return lv + 1; }, cost(lv){ return lv===1 ? {gold:100} : {gold:80*lv, wood:40*(lv-1)}; }, time(lv){ return 50 * Math.pow(1.5, lv-1); } },
+  warehouse: { ru:'Склад', en:'Warehouse', icon:'warehouse', max:3, desc_ru:'Расширяет лимиты хранения.', desc_en:'Expands storage limits.', maxLevel:12,
+    cost(lv){ return lv===1 ? {gold:150} : {gold:120*lv, wood:50*(lv-1), stone:30*(lv-1)}; }, time(lv){ return 80 * Math.pow(1.55, lv-1); } },
+  barracks: { ru:'Казармы', en:'Barracks', icon:'barracks', max:1, desc_ru:'Открывает новых воинов.', desc_en:'Unlocks new warriors.', maxLevel:10, reqCastle:2,
+    cost(lv){ return lv===1 ? {gold:200} : {gold:150*lv + 80*lv*lv, wood:60*lv, stone:40*lv}; }, time(lv){ return 120 * Math.pow(1.55, lv-1); } },
+  lab: { ru:'Лаборатория', en:'Laboratory', icon:'lab', max:1, desc_ru:'Прокачка героев.', desc_en:'Upgrade heroes.', maxLevel:10, reqCastle:3,
+    cost(lv){ return lv===1 ? {gold:300} : {gold:250*lv + 100*lv*lv, wheat:80*lv, wood:60*lv, stone:40*lv}; }, time(lv){ return 180 * Math.pow(1.55, lv-1); } },
+  auction: { ru:'Аукцион', en:'Auction', icon:'auction', max:1, desc_ru:'Продажа ресурсов за золото.', desc_en:'Sell resources for gold.', maxLevel:10, reqCastle:3,
+    cost(lv){ return lv===1 ? {gold:250} : {gold:200*lv, wood:80*lv, stone:40*lv}; }, time(lv){ return 150 * Math.pow(1.55, lv-1); } },
+  witch: { ru:'Ведьмин дом', en:'Witch House', icon:'witch', max:1, desc_ru:'Варите зелья за ресурсы для временных бонусов.', desc_en:'Brew potions from resources for temporary buffs.', maxLevel:1, reqCastle:2,
+    cost(){ return {gold: 500, wood: 150, stone: 100, essence: 30}; }, time(){ return 200; } }
 };
-const SHOP_BUILDINGS = ['farm','lumber','quarry','house','warehouse','barracks','lab','auction','builder'];
+const SHOP_BUILDINGS = ['farm','lumber','quarry','house','warehouse','barracks','lab','auction','witch','builder'];
 
 /* ========================================================================
-   UNITS / HEROES
+   UNITS / HEROES / POTIONS
    ======================================================================== */
 const UNIT_DEFS = {
-  sword:  {ru:'Мечник', en:'Swordsman', cost:30,  hp:110, dmg:12, range:0.030, speed:0.085, atk:0.90, img:'sword',  unlockBarracks:1, buyPrice:0,   unlockedByDefault:true},
+  sword:  {ru:'Мечник', en:'Swordsman', cost:30,  hp:110, dmg:12, range:0.030, speed:0.085, atk:0.90, img:'sword',  unlockBarracks:1, buyPrice:0},
   archer: {ru:'Лучник', en:'Archer',    cost:45,  hp:66,  dmg:10, range:0.150, speed:0.075, atk:1.10, img:'archer', unlockBarracks:2, buyPrice:200, ranged:true, proj:'#e8e2d0'},
   mage:   {ru:'Маг',    en:'Mage',      cost:70,  hp:78,  dmg:20, range:0.135, speed:0.060, atk:1.70, img:'mage',   unlockBarracks:3, buyPrice:600, ranged:true, proj:'#b48bff', aoe:0.055},
   knight: {ru:'Рыцарь', en:'Knight',    cost:110, hp:310, dmg:25, range:0.028, speed:0.055, atk:1.30, img:'knight', unlockBarracks:4, buyPrice:1500},
@@ -751,17 +633,36 @@ const UNIT_DEFS = {
 const UNIT_ORDER = ['sword','archer','mage','knight','heal'];
 
 const HERO_DEFS = {
-  paladin: {ru:'Паладин', en:'Paladin', img:'paladin', bonus:'hp', bonusPer:0.06, desc_ru:'Увеличивает HP всех воинов', desc_en:'Increases HP of all warriors', maxLevel:15,
-    cost(lv){ return {gold:250*lv, wheat:80*lv, wood:60*lv, stone:40*lv, essence:10*lv}; },
-    time(lv){ return 180 * Math.pow(1.5, lv); }},
+  paladin: {ru:'Паладин', en:'Paladin', img:'paladin', bonus:'hp', bonusPer:0.06, desc_ru:'Увеличивает HP воинов', desc_en:'Increases warrior HP', maxLevel:15,
+    cost(lv){ return {gold:250*lv, wheat:80*lv, wood:60*lv, stone:40*lv, essence:10*lv}; }, time(lv){ return 180 * Math.pow(1.5, lv); }},
   sorceress:{ru:'Чародейка', en:'Sorceress', img:'sorceress', bonus:'dmg', bonusPer:0.06, desc_ru:'Увеличивает урон воинов', desc_en:'Increases warrior damage', maxLevel:15,
-    cost(lv){ return {gold:300*lv, wheat:60*lv, wood:40*lv, stone:40*lv, essence:15*lv}; },
-    time(lv){ return 240 * Math.pow(1.5, lv); }},
+    cost(lv){ return {gold:300*lv, wheat:60*lv, wood:40*lv, stone:40*lv, essence:15*lv}; }, time(lv){ return 240 * Math.pow(1.5, lv); }},
   warden: {ru:'Хранитель', en:'Warden', img:'warden', bonus:'essence', bonusPer:0.05, desc_ru:'Ускоряет регенерацию эссенции', desc_en:'Speeds up essence regen', maxLevel:15,
-    cost(lv){ return {gold:200*lv, wheat:60*lv, wood:50*lv, stone:50*lv, essence:12*lv}; },
-    time(lv){ return 180 * Math.pow(1.5, lv); }}
+    cost(lv){ return {gold:200*lv, wheat:60*lv, wood:50*lv, stone:50*lv, essence:12*lv}; }, time(lv){ return 180 * Math.pow(1.5, lv); }}
 };
 const HERO_ORDER = ['paladin','sorceress','warden'];
+
+const POTION_DEFS = {
+  speed: {
+    ru:'Зелье скорости', en:'Speed Potion', icon:'potionSpeed',
+    desc_ru:'+30% к скорости постройки на 30 минут', desc_en:'+30% build speed for 30 min',
+    cost: {gold:200, wheat:100, wood:50, essence:20},
+    brewTime: 300, duration: 1800, effect: 'speed', value: 0.3
+  },
+  strength: {
+    ru:'Зелье силы', en:'Strength Potion', icon:'potionStrength',
+    desc_ru:'+25% урона в бою на 30 минут', desc_en:'+25% damage in battle for 30 min',
+    cost: {gold:250, wood:100, stone:50, essence:25},
+    brewTime: 360, duration: 1800, effect: 'dmg', value: 0.25
+  },
+  vitality: {
+    ru:'Зелье жизни', en:'Vitality Potion', icon:'potionVitality',
+    desc_ru:'+25% HP в бою на 30 минут', desc_en:'+25% HP in battle for 30 min',
+    cost: {gold:250, wheat:150, stone:50, essence:25},
+    brewTime: 360, duration: 1800, effect: 'hp', value: 0.25
+  }
+};
+const POTION_ORDER = ['speed','strength','vitality'];
 
 const CAVE_REWARDS = [
   {essence:15, gold:80, wheat:40, wood:20, stone:15},
@@ -780,29 +681,17 @@ const SLOT_LAYOUT = [
   {id:0, x:15, y:8, fixed:'cave'},
   {id:1, x:50, y:8, fixed:'castle'},
   {id:2, x:85, y:8, fixed:'builder'},
-  {id:3, x:15, y:26},
-  {id:4, x:38, y:26},
-  {id:5, x:62, y:26},
-  {id:6, x:85, y:26},
-  {id:7, x:15, y:44},
-  {id:8, x:38, y:44},
-  {id:9, x:62, y:44},
-  {id:10, x:85, y:44},
-  {id:11, x:15, y:62},
-  {id:12, x:38, y:62},
-  {id:13, x:62, y:62},
-  {id:14, x:85, y:62},
-  {id:15, x:15, y:80},
-  {id:16, x:38, y:80},
-  {id:17, x:62, y:80},
-  {id:18, x:85, y:80},
+  {id:3, x:15, y:26}, {id:4, x:38, y:26}, {id:5, x:62, y:26}, {id:6, x:85, y:26},
+  {id:7, x:15, y:44}, {id:8, x:38, y:44}, {id:9, x:62, y:44}, {id:10, x:85, y:44},
+  {id:11, x:15, y:62}, {id:12, x:38, y:62}, {id:13, x:62, y:62}, {id:14, x:85, y:62},
+  {id:15, x:15, y:80}, {id:16, x:38, y:80}, {id:17, x:62, y:80}, {id:18, x:85, y:80},
   {id:19, x:50, y:93, fixed:'ship'}
 ];
 
 /* ========================================================================
    STATE
    ======================================================================== */
-const SAVE_KEY = 'mystic_save_v5';
+const SAVE_KEY = 'mystic_save_v6';
 
 function defaultState(){
   const slots = {};
@@ -810,11 +699,13 @@ function defaultState(){
     slots[s.id] = s.fixed ? {key: s.fixed, level: 1, buildEnd: 0} : null;
   });
   return {
-    v: 5,
+    v: 6,
     gold: 200, wheat: 0, wood: 0, stone: 0, essence: 0,
     slots, prod: {},
     unitsOwned: {sword: true},
     heroes: { paladin:{level:0,upgradeEnd:0}, sorceress:{level:0,upgradeEnd:0}, warden:{level:0,upgradeEnd:0} },
+    potions: { speed: 0, strength: 0, vitality: 0 },
+    brewing: null,
     auction: [], auctionSeq: 1,
     caveMaxLevel: 1,
     questDate:'', questList:[], quests:{}, questClaimed:{},
@@ -823,7 +714,8 @@ function defaultState(){
     restTotal:0,
     maxLevel:1, wins:0, kills:0, spawns:0, goldEarned:0,
     music:true, lang:'ru',
-    tutorial: 0, tutStep: 0
+    tutorial: 0, tutStep: 0,
+    lastSaveTime: Date.now()
   };
 }
 let state = defaultState();
@@ -833,14 +725,16 @@ let state = defaultState();
    ======================================================================== */
 let saveTimer = null;
 function saveGame(now){
+  state.lastSaveTime = Date.now();
   if(!HAS_VK) return;
+  const payload = JSON.stringify(state);
   if(now){
-    VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: JSON.stringify(state)}).catch(()=>{});
+    VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: payload}).catch(()=>{});
     return;
   }
   clearTimeout(saveTimer);
   saveTimer = setTimeout(()=>{
-    VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: JSON.stringify(state)}).catch(()=>{});
+    VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: payload}).catch(()=>{});
   }, 1200);
 }
 async function loadGame(){
@@ -850,7 +744,7 @@ async function loadGame(){
     const v = r && r.keys && r.keys[0] && r.keys[0].value;
     if(!v || v === '{}' || v === '') return null;
     const parsed = JSON.parse(v);
-    if(!parsed || parsed.v !== 5) return null;
+    if(!parsed || parsed.v !== 6) return null;
     return parsed;
   }catch(e){ return null; }
 }
@@ -858,9 +752,7 @@ async function clearGameData(){
   state = defaultState();
   clearTimeout(saveTimer);
   saveTimer = null;
-  if(HAS_VK){
-    try { await VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: ''}); } catch(e){}
-  }
+  if(HAS_VK){ try { await VK.send('VKWebAppStorageSet', {key: SAVE_KEY, value: ''}); } catch(e){} }
   return true;
 }
 
@@ -902,15 +794,15 @@ const Music = {
     const f = c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=620; f.Q.value=1.2;
     g.connect(f); f.connect(this.master);
     const freqs = [110, 164.81, 220, 277.18];
-    const oscs = freqs.map(fr=>{
+    freqs.forEach(fr=>{
       const o = c.createOscillator();
       o.type='sawtooth'; o.frequency.value=fr; o.detune.value=(Math.random()*14-7);
-      o.connect(g); o.start(); return o;
+      o.connect(g); o.start();
     });
     const lfo = c.createOscillator(); lfo.frequency.value=0.055;
     const lg = c.createGain(); lg.gain.value=260;
     lfo.connect(lg); lg.connect(f.frequency); lfo.start();
-    this.pad = {g,f,oscs,lfo};
+    this.pad = {g,f,lfo};
   },
   _tick(){
     if(!this.playing || !this.ctx) return;
@@ -929,11 +821,8 @@ const Music = {
   }
 };
 function refreshMusic(){
-  if(state.music && !isPausedBy('hidden') && !isPausedBy('ad') && !isPausedBy('sailing')){
-    Music.play();
-  } else {
-    Music.stop();
-  }
+  if(state.music && !isPausedBy('hidden') && !isPausedBy('ad') && !isPausedBy('sailing')) Music.play();
+  else Music.stop();
 }
 
 /* ========================================================================
@@ -947,7 +836,7 @@ function anyModalOpen(){ return !!document.querySelector('.overlay.show'); }
 function syncPause(){ setPause('modal', anyModalOpen()); }
 
 /* ========================================================================
-   SPRITES (compact but functional)
+   SPRITES
    ======================================================================== */
 const SVG_SRC = {
   sword: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84"><defs><linearGradient id="sw1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4d74b8"/><stop offset="1" stop-color="#25345a"/></linearGradient></defs><ellipse cx="32" cy="79" rx="15" ry="4" fill="#000" opacity=".35"/><path d="M24 46h16l5 30H19z" fill="url(#sw1)"/><path d="M24 46h16l1 5H23z" fill="#5b83c9"/><rect x="24" y="34" width="16" height="14" rx="4" fill="#5b83c9"/><circle cx="32" cy="25" r="9.5" fill="#e8c39e"/><circle cx="29" cy="24" r="1.1" fill="#2a1f18"/><circle cx="35" cy="24" r="1.1" fill="#2a1f18"/><path d="M22.5 24q0-13 9.5-13t9.5 13q-4-6.5-9.5-6.5T22.5 24z" fill="#9aa7b8"/><g transform="rotate(20 44 36)"><rect x="42.4" y="14" width="3.4" height="28" rx="1.7" fill="#eaf0f6"/><rect x="36.5" y="40" width="15" height="4" rx="2" fill="#c8a35a"/><rect x="43.6" y="44" width="3.6" height="9" rx="1.8" fill="#6b4a2a"/></g></svg>`,
@@ -958,8 +847,11 @@ const SVG_SRC = {
   paladin: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84"><ellipse cx="32" cy="80" rx="15" ry="4" fill="#000" opacity=".4"/><path d="M23 46h18l4 32H19z" fill="#c8a35a"/><circle cx="32" cy="24" r="9.5" fill="#e8c39e"/><path d="M22 22q0-14 10-14t10 14q-4-8-10-8t-10 8z" fill="#c8a35a"/><path d="M32 12l2 4h-4z" fill="#ffe9a8"/><path d="M46 32h10v26H46z" fill="#e8c26a"/></svg>`,
   sorceress: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84"><ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/><path d="M22 44h20l6 32H16z" fill="#6b2d7a"/><circle cx="32" cy="25" r="9" fill="#e8c39e"/><circle cx="29" cy="24" r="1" fill="#2a1f18"/><circle cx="35" cy="24" r="1" fill="#2a1f18"/><path d="M20 24q0-15 12-15t12 15q-5-8-12-8t-12 8z" fill="#3a1b4d"/><rect x="45" y="26" width="3" height="46" rx="1.5" fill="#4a2a5a"/><circle cx="46.5" cy="23" r="9.5" fill="#e0a8ff" opacity=".22"/><circle cx="46.5" cy="23" r="6" fill="#d8a8ff"/></svg>`,
   warden: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 84"><ellipse cx="32" cy="79" rx="14" ry="4" fill="#000" opacity=".35"/><path d="M24 46h16l5 30H19z" fill="#2f5a3d"/><circle cx="32" cy="25" r="9" fill="#e8c39e"/><circle cx="29" cy="24" r="1" fill="#2a1f18"/><circle cx="35" cy="24" r="1" fill="#2a1f18"/><path d="M22 24q0-14 10-14t10 14q-4-7-10-7t-10 7z" fill="#2a4a25"/><rect x="44" y="26" width="3" height="46" rx="1.5" fill="#4a3520"/><circle cx="45.5" cy="23" r="9" fill="#8ef0b0" opacity=".22"/><circle cx="45.5" cy="23" r="6" fill="#8ef0b0"/></svg>`,
+  potionSpeed: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><rect x="14" y="0" width="12" height="10" fill="#3a2a1a"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="#8ef0b0"/><path d="M8 20q0-8 12-8t12 8v10q-12-4-24 0z" fill="#4bc06a"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="none" stroke="#1a1020" stroke-width="2"/><rect x="14" y="10" width="12" height="10" fill="#8ef0b0" opacity=".8"/><ellipse cx="14" cy="34" rx="3" ry="6" fill="#fff" opacity=".4"/></svg>`,
+  potionStrength: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><rect x="14" y="0" width="12" height="10" fill="#3a2a1a"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="#ff5f6d"/><path d="M8 20q0-8 12-8t12 8v10q-12-4-24 0z" fill="#c03848"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="none" stroke="#1a1020" stroke-width="2"/><rect x="14" y="10" width="12" height="10" fill="#ff5f6d" opacity=".8"/><ellipse cx="14" cy="34" rx="3" ry="6" fill="#fff" opacity=".4"/></svg>`,
+  potionVitality: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 60"><rect x="14" y="0" width="12" height="10" fill="#3a2a1a"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="#c88aff"/><path d="M8 20q0-8 12-8t12 8v10q-12-4-24 0z" fill="#8f45a8"/><path d="M8 20q0-8 12-8t12 8v28q0 8-12 8t-12-8z" fill="none" stroke="#1a1020" stroke-width="2"/><rect x="14" y="10" width="12" height="10" fill="#c88aff" opacity=".8"/><ellipse cx="14" cy="34" rx="3" ry="6" fill="#fff" opacity=".4"/></svg>`,
   castle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200"><defs><linearGradient id="cstone" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a8f9c"/><stop offset="0.5" stop-color="#5a5f6e"/><stop offset="1" stop-color="#3a3f4b"/></linearGradient><linearGradient id="croof" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#a85a4a"/><stop offset="1" stop-color="#6a2f22"/></linearGradient><linearGradient id="cwin" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffd97a"/><stop offset="1" stop-color="#d98a2a"/></linearGradient></defs><ellipse cx="80" cy="192" rx="72" ry="10" fill="#000" opacity=".4"/><path d="M20 190V110h20V90h-8V70h12V56h12v14h12V56h12v14h12V56h12v14h12V70h-8v20h20v90z" fill="url(#cstone)"/><path d="M20 190V110h20V90h-8V70h12V56h12v14h12V56h12v14h12V56h12v14h12V70h-8v20h20v90z" fill="none" stroke="#1c1f28" stroke-width="2.5"/><path d="M56 190v-32q24-16 48 0v32z" fill="#1a1420"/><rect x="42" y="120" width="10" height="14" rx="1" fill="url(#cwin)"/><rect x="108" y="120" width="10" height="14" rx="1" fill="url(#cwin)"/><path d="M56 40h48l4 16H52z" fill="url(#croof)"/><path d="M74 40V24h12v16z" fill="#3a3f4b"/><rect x="128" y="40" width="3" height="50" fill="#8a6a2a"/><path d="M131 42l24 8-24 8z" fill="#c8a35a"/></svg>`,
-  cave: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200"><defs><radialGradient id="cavelight" cx="0.5" cy="0.7" r="0.5"><stop offset="0" stop-color="#c88aff" stop-opacity=".8"/><stop offset="1" stop-color="#7b3dff" stop-opacity="0"/></radialGradient></defs><ellipse cx="80" cy="190" rx="72" ry="10" fill="#000" opacity=".5"/><path d="M10 190V70q35-55 70-40 35-15 70 40v120z" fill="#2a1a3a"/><path d="M10 190V70q35-55 70-40 35-15 70 40v120z" fill="none" stroke="#0a0612" stroke-width="3"/><circle cx="80" cy="130" r="45" fill="url(#cavelight)"/><path d="M42 190v-38q38-32 76 0v38z" fill="#08040f"/><path d="M42 190v-38q38-32 76 0v38z" fill="none" stroke="#7b3dff" stroke-width="1.4" opacity=".6"/><circle cx="62" cy="105" r="3" fill="#d8a8ff" opacity=".8"/></svg>`,
+  cave: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200"><defs><linearGradient id="mineRock" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5a5a68"/><stop offset="1" stop-color="#2a2a36"/></linearGradient></defs><ellipse cx="80" cy="192" rx="62" ry="10" fill="#000" opacity=".4"/><path d="M20 190V80q30-40 60-40t60 40v110z" fill="url(#mineRock)"/><path d="M20 190V80q30-40 60-40t60 40v110z" fill="none" stroke="#1a1a24" stroke-width="2"/><path d="M30 100q15-10 30-5M100 90q15 5 25 15M40 140l15-8M110 150l20-10" stroke="#2a2a38" stroke-width="1.5" fill="none"/><rect x="42" y="120" width="8" height="70" fill="#6b4a2a"/><rect x="110" y="120" width="8" height="70" fill="#6b4a2a"/><path d="M38 124l44-24 44 24" stroke="#8a5a2a" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M38 124l44-24 44 24" stroke="#6b4a2a" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="38" y="118" width="84" height="6" fill="#5a3a1a"/><ellipse cx="80" cy="160" rx="30" ry="38" fill="#000"/><ellipse cx="80" cy="160" rx="30" ry="38" fill="none" stroke="#2a1a08" stroke-width="2"/><rect x="46" y="140" width="4" height="10" fill="#3a2a08"/><rect x="43" y="148" width="10" height="8" rx="1" fill="#ffd97a"/><circle cx="48" cy="152" r="5" fill="#ffe9a8" opacity=".6"/><rect x="110" y="140" width="4" height="10" fill="#3a2a08"/><rect x="107" y="148" width="10" height="8" rx="1" fill="#ffd97a"/><circle cx="112" cy="152" r="5" fill="#ffe9a8" opacity=".6"/><path d="M60 190l4-20M100 190l-4-20" stroke="#3a2a08" stroke-width="2"/><path d="M60 190l4-20M100 190l-4-20" stroke="#8a6a4a" stroke-width="1" stroke-dasharray="3,3"/><rect x="70" y="175" width="20" height="12" rx="2" fill="#5a3a1a"/><rect x="70" y="175" width="20" height="4" fill="#8a5a2a"/><circle cx="74" cy="188" r="3" fill="#2a1a08"/><circle cx="86" cy="188" r="3" fill="#2a1a08"/></svg>`,
   ship: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200"><defs><linearGradient id="shull" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a5a2a"/><stop offset="1" stop-color="#4a2a10"/></linearGradient><linearGradient id="ssail" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f0e8d0"/><stop offset="1" stop-color="#c0b090"/></linearGradient></defs><ellipse cx="80" cy="192" rx="55" ry="8" fill="#000" opacity=".35"/><path d="M20 130q10 40 60 40t60-40h-20l-10 15H50l-10-15z" fill="url(#shull)"/><path d="M20 130h120v-8H20z" fill="#5a3a18"/><rect x="77" y="20" width="6" height="110" fill="#5a3a18"/><path d="M83 40q45 25 45 45t-45 30z" fill="url(#ssail)"/><path d="M77 45q-40 25-40 40t40 25z" fill="url(#ssail)" opacity=".95"/><path d="M78 22l24 8-24 8z" fill="#c8a35a"/></svg>`,
   builder: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><linearGradient id="bldg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8a7040"/><stop offset="1" stop-color="#4a3018"/></linearGradient></defs><ellipse cx="70" cy="190" rx="55" ry="10" fill="#000" opacity=".4"/><path d="M30 190V110l15-10 15 10v-30l15-10 15 10v30l15-10 15 10v80z" fill="url(#bldg)"/><path d="M30 190V110l15-10 15 10v-30l15-10 15 10v30l15-10 15 10v80z" fill="none" stroke="#2a1a08" stroke-width="2.4"/><rect x="38" y="60" width="4" height="30" fill="#5a3a1a"/><rect x="98" y="60" width="4" height="30" fill="#5a3a1a"/><rect x="38" y="56" width="64" height="6" fill="#5a3a1a"/><g transform="translate(70 110)"><g transform="rotate(-35)"><rect x="-2" y="-35" width="4" height="45" fill="#6b4a2a"/><rect x="-14" y="-45" width="28" height="12" fill="#8a8f9c"/></g><g transform="rotate(35)"><rect x="-2" y="-35" width="4" height="45" fill="#6b4a2a"/><rect x="-14" y="-45" width="28" height="12" fill="#8a8f9c"/></g></g></svg>`,
   farm: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="190" rx="62" ry="10" fill="#000" opacity=".35"/><rect x="10" y="130" width="120" height="60" fill="#3a4a24"/><g stroke="#e8c460" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".9"><path d="M22 128v-22M22 112l5-5M22 112l-5-5"/><path d="M34 128v-24M34 114l5-5M34 114l-5-5"/><path d="M46 128v-22M46 112l5-5"/><path d="M94 128v-22M94 112l5-5"/><path d="M106 128v-24M106 114l5-5"/><path d="M118 128v-22M118 112l5-5"/></g><g transform="translate(58 60)"><rect x="0" y="0" width="30" height="40" fill="#8a6a3a"/><path d="M-6 -2l21-18 21 18z" fill="#a85a3a"/><rect x="10" y="20" width="10" height="20" fill="#2a1a08"/></g></svg>`,
@@ -970,6 +862,7 @@ const SVG_SRC = {
   barracks: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><linearGradient id="broof" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4a3a5a"/><stop offset="1" stop-color="#2a1a3a"/></linearGradient></defs><ellipse cx="70" cy="188" rx="62" ry="10" fill="#000" opacity=".4"/><rect x="18" y="110" width="104" height="76" fill="#8a6a4a"/><path d="M6 110l64-52 64 52z" fill="url(#broof)"/><rect x="50" y="136" width="40" height="50" fill="#1a1208"/><g transform="translate(38 60) rotate(-20)"><rect x="-2" y="0" width="4" height="38" fill="#eaf0f6"/><rect x="-8" y="32" width="16" height="4" rx="2" fill="#c8a35a"/></g><g transform="translate(102 60) rotate(20)"><rect x="-2" y="0" width="4" height="38" fill="#eaf0f6"/><rect x="-8" y="32" width="16" height="4" rx="2" fill="#c8a35a"/></g></svg>`,
   lab: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><defs><radialGradient id="labglow"><stop offset="0" stop-color="#c88aff" stop-opacity=".9"/><stop offset="1" stop-color="#7b3dff" stop-opacity="0"/></radialGradient></defs><ellipse cx="70" cy="188" rx="58" ry="10" fill="#000" opacity=".4"/><rect x="26" y="120" width="88" height="66" fill="#5a4a7a"/><path d="M26 120l22-30 44 0 22 30z" fill="#3a2a5a"/><path d="M48 90l22-30 22 30" fill="#3a2a5a"/><circle cx="70" cy="60" r="12" fill="url(#labglow)"/><circle cx="70" cy="60" r="5" fill="#e0b8ff"/><rect x="60" y="140" width="20" height="46" fill="#0a0418"/><circle cx="70" cy="158" r="4" fill="url(#labglow)"/></svg>`,
   auction: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="188" rx="60" ry="10" fill="#000" opacity=".4"/><rect x="18" y="118" width="104" height="68" fill="#a8885a"/><path d="M18 118V96h14V78h10v18h14V78h12v18h14V78h10v18h14V78h10v18h14V96h10v22z" fill="#8a7040"/><path d="M10 96l60-44 60 44z" fill="#c8a35a"/><rect x="56" y="136" width="28" height="50" fill="#3a2010"/><rect x="28" y="128" width="18" height="18" fill="#ffd97a" opacity=".6"/><rect x="94" y="128" width="18" height="18" fill="#ffd97a" opacity=".6"/><path d="M110 108v-20" stroke="#8a6a2a" stroke-width="2.4"/><circle cx="110" cy="84" r="8" fill="#c8a35a"/></svg>`,
+  witch: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="188" rx="58" ry="10" fill="#000" opacity=".4"/><path d="M30 190V110q0-15 15-15h50q15 0 15 15v80z" fill="#5a3a5a"/><path d="M30 190V110q0-15 15-15h50q15 0 15 15v80z" fill="none" stroke="#2a1a28" stroke-width="2.4"/><path d="M18 108l52-52 52 52z" fill="#3a1a2a"/><path d="M18 108l52-52 52 52z" fill="none" stroke="#1a0a12" stroke-width="2"/><rect x="95" y="40" width="10" height="30" fill="#3a2020"/><ellipse cx="100" cy="30" rx="8" ry="5" fill="#5a4a5a" opacity=".5"/><ellipse cx="105" cy="20" rx="6" ry="4" fill="#5a4a5a" opacity=".4"/><path d="M60 190v-38q10-14 20 0v38z" fill="#2a1428"/><circle cx="76" cy="172" r="2" fill="#c8a35a"/><rect x="40" y="130" width="14" height="14" rx="2" fill="#8ef0b0" opacity=".7"/><rect x="40" y="130" width="14" height="14" rx="2" fill="none" stroke="#2a1428" stroke-width="1.4"/><rect x="86" y="130" width="14" height="14" rx="2" fill="#c88aff" opacity=".7"/><rect x="86" y="130" width="14" height="14" rx="2" fill="none" stroke="#2a1428" stroke-width="1.4"/><ellipse cx="70" cy="188" rx="20" ry="5" fill="#000" opacity=".3"/><path d="M55 188q0-14 15-14t15 14z" fill="#1a1a1a"/><ellipse cx="70" cy="175" rx="15" ry="4" fill="#8ef0b0" opacity=".5"/><circle cx="65" cy="168" r="2" fill="#c8f0d0" opacity=".8"/><circle cx="75" cy="170" r="1.5" fill="#c8f0d0" opacity=".7"/></svg>`,
   darktower: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/><path d="M40 190V74l30-34 30 34v116z" fill="#2a1a34"/><path d="M70 40l6 20-6 8-6-8z" fill="#6b1f3a"/><path d="M30 74l10-22 8 12 10-18 12 20 12-20 10 18 8-12 10 22z" fill="#2a1c35"/><circle cx="70" cy="120" r="19" fill="#ff2d55" opacity=".16"/><circle cx="70" cy="120" r="9" fill="#ff2d55"/><circle cx="70" cy="120" r="4" fill="#ffd0d8"/><path d="M58 190v-30q12-16 24 0v30z" fill="#0d0812"/></svg>`,
   altardark: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 200"><ellipse cx="70" cy="192" rx="62" ry="12" fill="#000" opacity=".4"/><path d="M40 190V74l30-34 30 34v116z" fill="#2a1a44"/><circle cx="70" cy="120" r="22" fill="#a02060" opacity=".18"/><circle cx="70" cy="120" r="12" fill="#a02060"/><circle cx="70" cy="120" r="5" fill="#ffb8d0"/><path d="M30 74l10-22 8 12 10-18 12 20 12-20 10 18 8-12 10 22z" fill="#3a1f54"/><path d="M58 190v-30q12-16 24 0v30z" fill="#0a0410"/></svg>`
 };
@@ -1002,16 +895,14 @@ let W = 800, H = 500, DPR = 1;
 
 const cam = { x: 0, y: 0, zoom: 1, minZoom: 0.3, maxZoom: 2.2 };
 let camAnimFrame = null;
+let LOBBY_PATHS = [];
 
-function computeMinZoom(){
-  return Math.max(W / WORLD.w, H / WORLD.h);
-}
+function computeMinZoom(){ return Math.max(W / WORLD.w, H / WORLD.h); }
 function clampCam(){
   cam.minZoom = computeMinZoom();
   cam.maxZoom = Math.max(cam.minZoom + 0.4, 2.2);
   cam.zoom = Math.max(cam.minZoom, Math.min(cam.maxZoom, cam.zoom));
-  const vw = W / cam.zoom;
-  const vh = H / cam.zoom;
+  const vw = W / cam.zoom, vh = H / cam.zoom;
   if(vw >= WORLD.w) cam.x = (WORLD.w - vw) / 2;
   else cam.x = Math.max(0, Math.min(WORLD.w - vw, cam.x));
   if(vh >= WORLD.h) cam.y = (WORLD.h - vh) / 2;
@@ -1023,16 +914,12 @@ function applyCam(){
 function centerCamOnCastle(){
   const castle = SLOT_LAYOUT.find(s => s.fixed === 'castle');
   if(!castle) return;
-  const cx = castle.x/100 * WORLD.w;
-  const cy = castle.y/100 * WORLD.h;
+  const cx = castle.x/100 * WORLD.w, cy = castle.y/100 * WORLD.h;
   cam.x = cx - W / cam.zoom / 2;
   cam.y = cy - H / cam.zoom * 0.32;
-  clampCam();
-  applyCam();
+  clampCam(); applyCam();
 }
-function cancelCamAnim(){
-  if(camAnimFrame){ cancelAnimationFrame(camAnimFrame); camAnimFrame = null; }
-}
+function cancelCamAnim(){ if(camAnimFrame){ cancelAnimationFrame(camAnimFrame); camAnimFrame = null; } }
 function smoothPanToWorld(wx, wy, z, duration){
   cancelCamAnim();
   const startX = cam.x, startY = cam.y, startZ = cam.zoom;
@@ -1046,12 +933,38 @@ function smoothPanToWorld(wx, wy, z, duration){
     cam.zoom = startZ + (endZ - startZ) * e;
     cam.x = startX + (endX - startX) * e;
     cam.y = startY + (endY - startY) * e;
-    clampCam();
-    applyCam();
+    clampCam(); applyCam();
     if(k < 1) camAnimFrame = requestAnimationFrame(step);
     else camAnimFrame = null;
   }
   camAnimFrame = requestAnimationFrame(step);
+}
+
+/* Compute chaotic paths between nearby slots (once at boot) */
+function computeLobbyPaths(){
+  LOBBY_PATHS = [];
+  let seed = 12345;
+  const rnd = ()=>{ seed = (seed*16807)%2147483647; return seed/2147483647; };
+  const drawn = new Set();
+  const slots = SLOT_LAYOUT.map(s => ({x: s.x/100*WORLD.w, y: s.y/100*WORLD.h}));
+  for(let i=0; i<slots.length; i++){
+    const a = slots[i];
+    const nearest = slots.map((b, j) => {
+      if(j === i) return null;
+      const dx = b.x - a.x, dy = b.y - a.y;
+      return {j, dist: dx*dx + dy*dy};
+    }).filter(Boolean).sort((x,y) => x.dist - y.dist);
+    for(let k=0; k<2; k++){
+      const ni = nearest[k].j;
+      const pairKey = Math.min(i, ni) + '-' + Math.max(i, ni);
+      if(drawn.has(pairKey)) continue;
+      drawn.add(pairKey);
+      const b = slots[ni];
+      const mx = (a.x + b.x)/2 + (rnd()-0.5)*90;
+      const my = (a.y + b.y)/2 + (rnd()-0.5)*90;
+      LOBBY_PATHS.push({x1: a.x, y1: a.y, mx, my, x2: b.x, y2: b.y});
+    }
+  }
 }
 
 function resizeCanvas(){
@@ -1063,21 +976,16 @@ function resizeCanvas(){
   cv.height = Math.floor(H * DPR);
   cv.style.width = W + 'px';
   cv.style.height = H + 'px';
-  clampCam();
-  applyCam();
+  clampCam(); applyCam();
 }
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', ()=>setTimeout(resizeCanvas, 220));
 
-/* ---------- Camera input ---------- */
+/* Camera input */
 const pointers = new Map();
-let dragStart = null;
-let pinchStart = null;
-
+let dragStart = null, pinchStart = null;
 stage.addEventListener('pointerdown', (e)=>{
-  if(VIEW !== 'lobby') return;
-  if(tutActive) return;
-  if(anyModalOpen()) return;
+  if(VIEW !== 'lobby' || tutActive || anyModalOpen()) return;
   if(e.target.closest('.bld')) return;
   cancelCamAnim();
   pointers.set(e.pointerId, {x: e.clientX, y: e.clientY});
@@ -1087,11 +995,7 @@ stage.addEventListener('pointerdown', (e)=>{
   } else if(pointers.size === 2){
     dragStart = null;
     const ps = Array.from(pointers.values());
-    pinchStart = {
-      dist: Math.hypot(ps[1].x-ps[0].x, ps[1].y-ps[0].y),
-      cx: (ps[0].x+ps[1].x)/2, cy: (ps[0].y+ps[1].y)/2,
-      camX: cam.x, camY: cam.y, zoom: cam.zoom
-    };
+    pinchStart = {dist: Math.hypot(ps[1].x-ps[0].x, ps[1].y-ps[0].y), camX: cam.x, camY: cam.y, zoom: cam.zoom};
   }
   try { stage.setPointerCapture(e.pointerId); } catch(err){}
 });
@@ -1099,12 +1003,10 @@ stage.addEventListener('pointermove', (e)=>{
   if(!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId, {x: e.clientX, y: e.clientY});
   if(pointers.size === 1 && dragStart){
-    const dx = e.clientX - dragStart.x;
-    const dy = e.clientY - dragStart.y;
+    const dx = e.clientX - dragStart.x, dy = e.clientY - dragStart.y;
     cam.x = dragStart.camX - dx / cam.zoom;
     cam.y = dragStart.camY - dy / cam.zoom;
-    clampCam();
-    applyCam();
+    clampCam(); applyCam();
   } else if(pointers.size === 2 && pinchStart){
     const ps = Array.from(pointers.values());
     const dist = Math.hypot(ps[1].x-ps[0].x, ps[1].y-ps[0].y);
@@ -1117,8 +1019,7 @@ stage.addEventListener('pointermove', (e)=>{
     cam.zoom = newZoom;
     cam.x = worldX - sx / cam.zoom;
     cam.y = worldY - sy / cam.zoom;
-    clampCam();
-    applyCam();
+    clampCam(); applyCam();
   }
 });
 function endPointer(e){
@@ -1132,26 +1033,22 @@ function endPointer(e){
 }
 stage.addEventListener('pointerup', endPointer);
 stage.addEventListener('pointercancel', endPointer);
-
 stage.addEventListener('wheel', (e)=>{
   if(VIEW !== 'lobby' || tutActive || anyModalOpen()) return;
-  e.preventDefault();
-  cancelCamAnim();
+  e.preventDefault(); cancelCamAnim();
   const r = stage.getBoundingClientRect();
   const sx = e.clientX - r.left, sy = e.clientY - r.top;
   const mult = e.deltaY > 0 ? 0.9 : 1.1;
   const newZoom = Math.max(cam.minZoom, Math.min(cam.maxZoom, cam.zoom * mult));
-  const worldX = cam.x + sx / cam.zoom;
-  const worldY = cam.y + sy / cam.zoom;
+  const worldX = cam.x + sx / cam.zoom, worldY = cam.y + sy / cam.zoom;
   cam.zoom = newZoom;
   cam.x = worldX - sx / cam.zoom;
   cam.y = worldY - sy / cam.zoom;
-  clampCam();
-  applyCam();
+  clampCam(); applyCam();
 }, {passive: false});
 
 /* ========================================================================
-   SCENE RENDERING
+   SCENE
    ======================================================================== */
 let VIEW = 'lobby';
 
@@ -1184,10 +1081,54 @@ function drawBattleSky(){
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,'#070510'); g.addColorStop(0.45,'#151029');
   g.addColorStop(0.78,'#241739'); g.addColorStop(1,'#33204a');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
   drawStarsScreen();
   drawMoon(W*0.82, H*0.11, Math.min(W,H)*0.048);
+}
+function drawPort(){
+  const shipSlot = SLOT_LAYOUT.find(s => s.fixed === 'ship');
+  if(!shipSlot) return;
+  const sx = shipSlot.x/100 * WORLD.w;
+  const landBottom = WORLD.h * 0.88;
+  // Wooden dock planks going from land into water
+  for(let i=0; i<7; i++){
+    const py = landBottom + i*10;
+    ctx.fillStyle = i % 2 === 0 ? '#6b4a2a' : '#7a5a3a';
+    ctx.fillRect(sx - 60, py, 120, 9);
+    ctx.strokeStyle = 'rgba(0,0,0,.35)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(sx - 60, py, 120, 9);
+  }
+  // Posts on both sides
+  [landBottom + 3, landBottom + 25, landBottom + 47].forEach(py => {
+    ctx.fillStyle = '#3a2818';
+    ctx.fillRect(sx - 66, py, 8, 22);
+    ctx.fillRect(sx + 58, py, 8, 22);
+    // small rope detail
+    ctx.fillStyle = 'rgba(180,150,100,.4)';
+    ctx.fillRect(sx - 64, py + 4, 4, 2);
+    ctx.fillRect(sx + 60, py + 4, 4, 2);
+  });
+  // Rope between bollards
+  ctx.strokeStyle = 'rgba(180,150,100,.5)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(sx - 62, landBottom + 60);
+  ctx.quadraticCurveTo(sx, landBottom + 85, sx + 62, landBottom + 60);
+  ctx.stroke();
+  // Bollards
+  ctx.fillStyle = '#5a3a1a';
+  ctx.fillRect(sx - 72, landBottom + 55, 6, 14);
+  ctx.fillRect(sx + 66, landBottom + 55, 6, 14);
+  // Lantern on post
+  ctx.fillStyle = 'rgba(255,200,100,.7)';
+  ctx.beginPath(); ctx.arc(sx - 68, landBottom + 12, 6, 0, 6.283); ctx.fill();
+  ctx.fillStyle = '#ffe9a8';
+  ctx.beginPath(); ctx.arc(sx - 68, landBottom + 12, 3, 0, 6.283); ctx.fill();
+  ctx.fillStyle = 'rgba(255,200,100,.7)';
+  ctx.beginPath(); ctx.arc(sx + 68, landBottom + 12, 6, 0, 6.283); ctx.fill();
+  ctx.fillStyle = '#ffe9a8';
+  ctx.beginPath(); ctx.arc(sx + 68, landBottom + 12, 3, 0, 6.283); ctx.fill();
 }
 
 function drawLobbyScene(){
@@ -1196,19 +1137,16 @@ function drawLobbyScene(){
   skyGrad.addColorStop(0, '#070510');
   skyGrad.addColorStop(0.55, '#151029');
   skyGrad.addColorStop(1, '#241739');
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, W, H);
   drawStarsScreen();
   drawMoon(W*0.82, H*0.09, Math.min(W,H)*0.045);
 
-  // World coordinates
   ctx.setTransform(DPR * cam.zoom, 0, 0, DPR * cam.zoom, -cam.x * cam.zoom * DPR, -cam.y * cam.zoom * DPR);
 
   const landBottom = WORLD.h * 0.88;
   const g = ctx.createLinearGradient(0, 0, 0, landBottom);
   g.addColorStop(0, '#1e2a18'); g.addColorStop(0.55, '#2a3d22'); g.addColorStop(1, '#3a4d2e');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, WORLD.w, landBottom);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, WORLD.w, landBottom);
 
   let seed = 42;
   const rnd = ()=>{ seed = (seed*16807)%2147483647; return seed/2147483647; };
@@ -1218,14 +1156,20 @@ function drawLobbyScene(){
     ctx.fillRect(gx, gy, 3, 3);
   }
 
-  const castleSlot = SLOT_LAYOUT.find(s => s.fixed === 'castle');
-  const cx = castleSlot.x/100 * WORLD.w;
-  const cy = castleSlot.y/100 * WORLD.h;
-  ctx.strokeStyle = 'rgba(160,140,100,.13)';
-  ctx.lineWidth = 55; ctx.lineCap = 'round';
-  SLOT_LAYOUT.forEach(s => {
-    if(s.fixed === 'castle') return;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(s.x/100*WORLD.w, s.y/100*WORLD.h); ctx.stroke();
+  // Chaotic paths between slots
+  LOBBY_PATHS.forEach(p => {
+    ctx.strokeStyle = 'rgba(120,90,60,.22)';
+    ctx.lineWidth = 20; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(p.x1, p.y1);
+    ctx.quadraticCurveTo(p.mx, p.my, p.x2, p.y2);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(160,130,90,.18)';
+    ctx.lineWidth = 13;
+    ctx.beginPath();
+    ctx.moveTo(p.x1, p.y1);
+    ctx.quadraticCurveTo(p.mx, p.my, p.x2, p.y2);
+    ctx.stroke();
   });
 
   const isNearSlot = (tx, ty) => {
@@ -1242,33 +1186,25 @@ function drawLobbyScene(){
     if(isNearSlot(tx, ty) || ty > landBottom - 40) continue;
     ctx.fillStyle = 'rgba(0,0,0,.35)';
     ctx.beginPath(); ctx.ellipse(tx, ty, 14, 4, 0, 0, 6.283); ctx.fill();
-    ctx.fillStyle = '#3a2818';
-    ctx.fillRect(tx-3, ty-16, 6, 16);
-    ctx.fillStyle = '#1c3318';
-    ctx.beginPath(); ctx.moveTo(tx-13, ty-12); ctx.lineTo(tx, ty-42); ctx.lineTo(tx+13, ty-12); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#2a4a1f';
-    ctx.beginPath(); ctx.moveTo(tx-11, ty-20); ctx.lineTo(tx, ty-48); ctx.lineTo(tx+11, ty-20); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#3a5a2a';
-    ctx.beginPath(); ctx.moveTo(tx-8, ty-28); ctx.lineTo(tx, ty-52); ctx.lineTo(tx+8, ty-28); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#3a2818'; ctx.fillRect(tx-3, ty-16, 6, 16);
+    ctx.fillStyle = '#1c3318'; ctx.beginPath(); ctx.moveTo(tx-13, ty-12); ctx.lineTo(tx, ty-42); ctx.lineTo(tx+13, ty-12); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#2a4a1f'; ctx.beginPath(); ctx.moveTo(tx-11, ty-20); ctx.lineTo(tx, ty-48); ctx.lineTo(tx+11, ty-20); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#3a5a2a'; ctx.beginPath(); ctx.moveTo(tx-8, ty-28); ctx.lineTo(tx, ty-52); ctx.lineTo(tx+8, ty-28); ctx.closePath(); ctx.fill();
   }
   seed = 888;
   for(let i=0;i<40;i++){
     const tx = rnd()*WORLD.w, ty = 200 + rnd()*(landBottom - 250);
     if(isNearSlot(tx, ty)) continue;
     if(rnd() > 0.5){
-      ctx.fillStyle = '#1a3018';
-      ctx.beginPath(); ctx.ellipse(tx, ty, 9, 5, 0, 0, 6.283); ctx.fill();
-      ctx.fillStyle = '#2a4a22';
-      ctx.beginPath(); ctx.ellipse(tx-4, ty-2, 6, 4, 0, 0, 6.283); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(tx+5, ty-1, 6, 4, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = '#1a3018'; ctx.beginPath(); ctx.ellipse(tx, ty, 9, 5, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = '#2a4a22'; ctx.beginPath(); ctx.ellipse(tx-4, ty-2, 6, 4, 0, 0, 6.283); ctx.fill();
     } else {
-      ctx.fillStyle = '#4a4a54';
-      ctx.beginPath(); ctx.ellipse(tx, ty, 8, 5, 0, 0, 6.283); ctx.fill();
-      ctx.fillStyle = '#5a5a68';
-      ctx.beginPath(); ctx.ellipse(tx-2, ty-1, 5, 3, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = '#4a4a54'; ctx.beginPath(); ctx.ellipse(tx, ty, 8, 5, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = '#5a5a68'; ctx.beginPath(); ctx.ellipse(tx-2, ty-1, 5, 3, 0, 0, 6.283); ctx.fill();
     }
   }
 
+  // Water
   const wg = ctx.createLinearGradient(0, landBottom, 0, WORLD.h);
   wg.addColorStop(0, '#1a2a3a'); wg.addColorStop(0.4, '#102030'); wg.addColorStop(1, '#081420');
   ctx.fillStyle = wg;
@@ -1289,6 +1225,9 @@ function drawLobbyScene(){
     ctx.stroke();
   }
 
+  // Port near ship
+  drawPort();
+
   const now = performance.now()/1000;
   for(let i=0;i<20;i++){
     const fx = ((Math.sin(now*0.3 + i*1.7)*0.5+0.5)*0.9 + 0.05) * WORLD.w;
@@ -1301,7 +1240,7 @@ function drawLobbyScene(){
 }
 
 /* ========================================================================
-   BUILDING DOM
+   LOBBY BUILDINGS
    ======================================================================== */
 function renderLobbyBuildings(){
   const cont = document.getElementById('lobby-buildings');
@@ -1313,11 +1252,9 @@ function renderLobbyBuildings(){
     btn.style.left = (slot.x/100 * WORLD.w) + 'px';
     btn.style.top = (slot.y/100 * WORLD.h) + 'px';
     btn.dataset.slot = slot.id;
-
     const cfg = b ? BUILDINGS[b.key] : null;
     if(cfg && cfg.major) btn.classList.add('major');
     if(b && b.key === 'ship') btn.classList.add('ship');
-
     if(!b){
       btn.classList.add('empty');
       btn.innerHTML = `<div class="bicon">+</div>`;
@@ -1336,7 +1273,6 @@ function renderLobbyBuildings(){
         <div class="bname">${LANG === 'ru' ? cfg.ru : cfg.en}</div>
       `;
     }
-
     btn.addEventListener('click', ()=> onSlotClick(slot.id));
     cont.appendChild(btn);
   });
@@ -1355,25 +1291,19 @@ function updateBuildingIndicators(){
     const building = b.buildEnd > Date.now();
     const bicon = btn.querySelector('.bicon');
     if(!bicon) return;
-
-    // Timer
     let timerEl = btn.querySelector('.timer');
     if(building){
       if(!timerEl){ timerEl = document.createElement('div'); timerEl.className = 'timer'; bicon.appendChild(timerEl); }
       timerEl.textContent = fmtTime(Math.max(0, Math.floor((b.buildEnd - Date.now())/1000)));
     } else if(timerEl){ timerEl.remove(); }
-
-    // Badge
     let badgeEl = btn.querySelector('.badge');
     const shouldShow = b.level > 0 && b.key !== 'ship' && b.key !== 'cave';
     if(shouldShow){
       if(!badgeEl){ badgeEl = document.createElement('div'); badgeEl.className = 'badge'; bicon.appendChild(badgeEl); }
       if(badgeEl.textContent !== String(b.level)) badgeEl.textContent = b.level;
     } else if(badgeEl){ badgeEl.remove(); }
-
-    // Ready indicator
     let readyEl = btn.querySelector('.ready');
-    if(!building && cfg.resource){
+    if(!building && cfg.resource && b.level > 0){
       if(!readyEl){ readyEl = document.createElement('div'); readyEl.className = 'ready'; readyEl.style.display = 'none'; bicon.appendChild(readyEl); }
       const prod = getProduction(slot.id);
       readyEl.style.display = (prod.hasWorker && prod.stored >= prod.cap - 0.5) ? 'block' : 'none';
@@ -1382,7 +1312,7 @@ function updateBuildingIndicators(){
 }
 
 /* ========================================================================
-   WORKERS / BUILDERS / STORAGE
+   WORKERS / BUILDERS / STORAGE / BUFFS
    ======================================================================== */
 function getTotalWorkers(){
   let w = 0;
@@ -1412,8 +1342,7 @@ function getProduction(slotId){
   if(!b) return {stored:0, cap:0, rate:0, hasWorker:false};
   const cfg = BUILDINGS[b.key];
   if(!cfg || !cfg.resource || b.level === 0) return {stored:0, cap:0, rate:0, hasWorker:false};
-  const activeSet = getActiveProducerSlotIds();
-  const hasWorker = activeSet.has(parseInt(slotId, 10));
+  const hasWorker = getActiveProducerSlotIds().has(parseInt(slotId, 10));
   if(!hasWorker) return {stored:0, cap:cfg.cap(b.level), rate:0, hasWorker:false};
   const now = Date.now();
   const last = state.prod[slotId] || now;
@@ -1436,7 +1365,6 @@ function collectProduction(slotId){
   toast('+' + amount + ' ' + t(cfg.resource));
   saveGame();
 }
-
 function getBuilders(){
   let c = 0;
   for(const id in state.slots){
@@ -1469,6 +1397,19 @@ function addResource(k, n){
 function addGold(n){
   state.gold = (state.gold||0) + n;
   state.goldEarned = (state.goldEarned||0) + n;
+}
+
+/* Buffs */
+function applySpeedBuff(seconds){
+  if(state.potions.speed > Date.now()) return Math.floor(seconds * 0.7);
+  return seconds;
+}
+function getBattlePotionBuffs(){
+  const now = Date.now();
+  return {
+    hp: state.potions.vitality > now ? POTION_DEFS.vitality.value : 0,
+    dmg: state.potions.strength > now ? POTION_DEFS.strength.value : 0
+  };
 }
 
 /* ========================================================================
@@ -1534,9 +1475,10 @@ function countBuilding(key){
 }
 
 /* ========================================================================
-   PLACEMENT
+   PLACEMENT + CANCEL
    ======================================================================== */
 let placementMode = null;
+const cancelPlacementBtn = document.getElementById('cancel-placement');
 
 function onSlotClick(slotId){
   const b = state.slots[slotId];
@@ -1547,15 +1489,11 @@ function onSlotClick(slotId){
   }
   if(!b){
     if(tutActive) return;
-    toast(LANG==='ru'?'Пустая клетка. Откройте магазин.':'Empty cell. Open shop.');
+    toast(LANG==='ru'?'Пустая клетка. Откройте магазин.':'Empty cell.');
     return;
   }
   if(b.key === 'ship'){
-    if(tutActive && tutIndex === 5){
-      tutTrigger('ship-clicked');
-      startTutorialBattle();
-      return;
-    }
+    if(tutActive && tutIndex === 5){ tutTrigger('ship-clicked'); startTutorialBattle(); return; }
     if(tutActive) return;
     sailToBattle();
     return;
@@ -1573,7 +1511,7 @@ function startPlacement(key){
   placementMode = {key};
   document.body.classList.add('placing');
   renderLobbyBuildings();
-  // re-highlight current tutorial target if applicable
+  if(!tutActive) cancelPlacementBtn.classList.add('show');
   if(tutActive){
     const step = TUT_STEPS[tutIndex];
     if(step && step.target === '.bld.empty'){
@@ -1585,8 +1523,14 @@ function startPlacement(key){
 function endPlacement(){
   placementMode = null;
   document.body.classList.remove('placing');
+  cancelPlacementBtn.classList.remove('show');
   renderLobbyBuildings();
 }
+cancelPlacementBtn.addEventListener('click', ()=>{
+  if(tutActive) return;
+  endPlacement();
+  toast(LANG === 'ru' ? 'Размещение отменено' : 'Placement cancelled');
+});
 function tryPlace(slotId){
   if(!placementMode) return;
   const b = state.slots[slotId];
@@ -1595,7 +1539,6 @@ function tryPlace(slotId){
   const cfg = BUILDINGS[key];
   if(countBuilding(key) >= cfg.max){ toast(LANG==='ru'?'Достигнут лимит':'Max reached'); return; }
   if(cfg.reqCastle && getCastleLevel() < cfg.reqCastle){ toast(t('req_castle') + ' ' + cfg.reqCastle); return; }
-
   const isTutorialFarm = tutActive && tutIndex === 3 && key === 'farm';
   const cost = cfg.cost(1);
   if(!isTutorialFarm){
@@ -1603,25 +1546,17 @@ function tryPlace(slotId){
     if(!canAfford(cost)){ toast(t('no_gold')); return; }
     spendCost(cost);
   }
-
-  state.slots[slotId] = {
-    key, level: 0,
-    buildEnd: Date.now() + (isTutorialFarm ? 1500 : cfg.time(1)*1000),
-    buildStart: Date.now()
-  };
+  const buildTime = applySpeedBuff(isTutorialFarm ? 2 : cfg.time(1));
+  state.slots[slotId] = { key, level: 0, buildEnd: Date.now() + buildTime*1000, buildStart: Date.now() };
   if(cfg.resource) state.prod[slotId] = Date.now();
   endPlacement();
   refreshAllUI();
   saveGame();
-
   if(isTutorialFarm){
     setTimeout(()=>{
       const bb = state.slots[slotId];
-      if(bb && bb.key === 'farm'){
-        bb.level = 1; bb.buildEnd = 0; bb.buildStart = 0;
-        refreshAllUI();
-      }
-    }, 1500);
+      if(bb && bb.key === 'farm'){ bb.level = 1; bb.buildEnd = 0; bb.buildStart = 0; refreshAllUI(); }
+    }, 2000);
     tutTrigger('farm-placed');
   }
 }
@@ -1630,7 +1565,6 @@ function tryPlace(slotId){
    BUILDING MODAL
    ======================================================================== */
 let currentBuildingSlot = null;
-
 function openBuildingModal(slotId){
   if(VIEW !== 'lobby') return;
   currentBuildingSlot = slotId;
@@ -1669,6 +1603,9 @@ function renderBuildingModal(){
     const pct = 100 * (1 - left/total);
     html += `<div class="center muted" style="margin-bottom:6px">${t('building')}… ${fmtTime(left)}</div>`;
     html += `<div class="progress"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></div>`;
+    if(!tutActive){
+      html += `<button class="btn red full" id="bld-cancel-build">${t('cancel_build')}</button>`;
+    }
   } else if(lvl >= cfg.maxLevel){
     html += `<div class="center muted" style="margin:10px 0">${t('level_max')}</div>`;
   } else {
@@ -1678,12 +1615,12 @@ function renderBuildingModal(){
       if(have < cfg.reqCastle){ reqOK = false; reqMsg = t('req_castle') + ' ' + cfg.reqCastle; }
     }
     const cost = cfg.cost(nextLvl);
-    const time = cfg.time(nextLvl);
+    const time = applySpeedBuff(cfg.time(nextLvl));
     const buildersBusy = getActiveBuilds() >= getBuilders();
     const ok = canAfford(cost) && reqOK && !buildersBusy;
     html += `<div style="margin-top:6px;font-size:12px;color:var(--muted)">${LANG==='ru'?'Стоимость:':'Cost:'}</div>`;
     html += showCostHTML(cost);
-    html += `<div class="center muted" style="margin:6px 0">${LANG==='ru'?'Время:':'Time:'} ${fmtTime(time)}</div>`;
+    html += `<div class="center muted" style="margin:6px 0">${LANG==='ru'?'Время:':'Time:'} ${fmtTime(time)}${state.potions.speed > Date.now() ? ' ⚡' : ''}</div>`;
     if(!reqOK) html += `<div class="center" style="color:#ff8b8b;font-size:12px;margin:6px 0">${reqMsg}</div>`;
     if(buildersBusy) html += `<div class="center" style="color:#ff8b8b;font-size:12px;margin:6px 0">${t('builders_busy')} (${getActiveBuilds()}/${getBuilders()})</div>`;
     if(cfg.resource){
@@ -1710,6 +1647,7 @@ function renderBuildingModal(){
   if(b.key === 'barracks' && lvl > 0) html += `<button class="btn full" id="bld-units">${t('units')} →</button>`;
   if(b.key === 'lab' && lvl > 0) html += `<button class="btn full" id="bld-lab">${t('lab')} →</button>`;
   if(b.key === 'auction' && lvl > 0) html += `<button class="btn full" id="bld-auction">${t('auction')} →</button>`;
+  if(b.key === 'witch' && lvl > 0) html += `<button class="btn full" id="bld-witch">${t('witch')} →</button>`;
   if(b.key === 'builder'){
     html += `<div class="row" style="margin-top:10px">
       <div><div class="lab">${t('builders')}</div><div class="sub">${LANG==='ru'?'Заняты':'Busy'}: ${getActiveBuilds()} / ${getBuilders()}</div></div>
@@ -1726,14 +1664,31 @@ function renderBuildingModal(){
       if(getActiveBuilds() >= getBuilders()){ toast(t('builders_busy')); return; }
       spendCost(cfg.cost(nextLvl));
       b.level = nextLvl;
-      b.buildEnd = Date.now() + cfg.time(nextLvl)*1000;
+      b.buildEnd = Date.now() + applySpeedBuff(cfg.time(nextLvl))*1000;
       b.buildStart = Date.now();
       if(cfg.resource) state.prod[slotId] = Date.now();
-      refreshAllUI();
-      renderBuildingModal();
-      saveGame();
+      refreshAllUI(); renderBuildingModal(); saveGame();
     });
   }
+  const cancelBuildBtn = body.querySelector('#bld-cancel-build');
+  if(cancelBuildBtn) cancelBuildBtn.addEventListener('click', ()=>{
+    if(!building) return;
+    const paidLevel = b.level === 0 ? 1 : b.level;
+    const refundCost = cfg.cost(paidLevel);
+    for(const k in refundCost) addResource(k, Math.floor(refundCost[k] * 0.5));
+    if(b.level === 0){
+      state.slots[slotId] = null;
+    } else {
+      b.level -= 1;
+    }
+    if(cancelBuildBtn){
+      const bb = state.slots[slotId];
+      if(bb){ bb.buildEnd = 0; bb.buildStart = 0; }
+    }
+    closeOverlay(document.getElementById('ov-building'));
+    refreshAllUI(); renderLobbyBuildings(); saveGame();
+    toast(LANG === 'ru' ? 'Строительство отменено (50% возврат)' : 'Construction cancelled (50% refund)');
+  });
   const collectBtn = body.querySelector('#bld-collect');
   if(collectBtn) collectBtn.addEventListener('click', ()=>{ collectProduction(slotId); renderBuildingModal(); });
   const btnUnits = body.querySelector('#bld-units');
@@ -1742,10 +1697,12 @@ function renderBuildingModal(){
   if(btnLab) btnLab.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openLabModal(); });
   const btnAuc = body.querySelector('#bld-auction');
   if(btnAuc) btnAuc.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openAuctionModal(); });
+  const btnWitch = body.querySelector('#bld-witch');
+  if(btnWitch) btnWitch.addEventListener('click', ()=>{ closeOverlay(document.getElementById('ov-building')); openWitchModal(); });
 }
 
 /* ========================================================================
-   SHOP
+   SHOP (FIXED LAYOUT)
    ======================================================================== */
 function openShop(){
   renderShop();
@@ -1771,9 +1728,9 @@ function renderShop(){
         <div class="bnm">${name}</div>
         <div class="bdesc">${desc}</div>
         <div class="bmeta">${count}/${cfg.max}${!reqOK ? ` · <span class="bad">${t('req_castle')} ${cfg.reqCastle}</span>` : ''}</div>
-        ${showCostHTML(cost)}
       </div>
       <button class="btn sm ${canBuy?'green':''}" data-place="${key}" ${canBuy?'':'disabled'}>${atMax?t('maxed'):t('place')}</button>
+      <div class="bcard-cost">${showCostHTML(cost)}</div>
     </div>`;
   });
   list.innerHTML = html;
@@ -1782,21 +1739,18 @@ function renderShop(){
       const key = b.getAttribute('data-place');
       closeOverlay(document.getElementById('ov-shop'));
       startPlacement(key);
-      if(tutActive && tutIndex === 2 && key === 'farm'){
-        tutTrigger('shop-place');
-      }
+      if(tutActive && tutIndex === 2 && key === 'farm') tutTrigger('shop-place');
     });
   });
 }
 
 /* ========================================================================
-   UNITS MODAL
+   UNITS / LAB / AUCTION / CAVE / WITCH MODALS
    ======================================================================== */
 function openUnitsModal(){
   const s = findBuildingSlot('barracks');
   if(s === null || state.slots[s].level < 1){ toast(LANG==='ru'?'Постройте казармы':'Build barracks first'); return; }
-  renderUnitsModal();
-  openOverlay('ov-units');
+  renderUnitsModal(); openOverlay('ov-units');
 }
 function renderUnitsModal(){
   const grid = document.getElementById('units-grid');
@@ -1836,9 +1790,6 @@ function renderUnitsModal(){
   });
 }
 
-/* ========================================================================
-   LAB / AUCTION / CAVE
-   ======================================================================== */
 function openLabModal(){
   const s = findBuildingSlot('lab');
   if(s === null || state.slots[s].level < 1){ toast(LANG==='ru'?'Постройте лабораторию':'Build lab first'); return; }
@@ -1918,7 +1869,7 @@ function renderAuctionModal(){
   const slots = auctionSlotLimit();
   let html = `<div class="muted" style="margin-bottom:6px">${LANG==='ru'?'Слоты':'Slots'}: ${state.auction.length}/${slots}</div>`;
   if(state.auction.length === 0){
-    html += `<div class="muted center" style="padding:14px">${LANG==='ru'?'Нет активных лотов':'No active listings'}</div>`;
+    html += `<div class="muted center" style="padding:14px">${LANG==='ru'?'Нет лотов':'No listings'}</div>`;
   } else {
     state.auction.forEach(a => {
       const chance = Math.min(0.8, Math.max(0.02, 0.4 / (a.price/(BASE_PRICES[a.resource]||1))));
@@ -1950,9 +1901,9 @@ document.getElementById('auc-add').addEventListener('click', ()=>{
   const price = parseInt(document.getElementById('auc-price').value,10);
   const hint = document.getElementById('auc-hint');
   if(!res || !amt || !price || amt <= 0 || price <= 0){ hint.textContent = LANG==='ru'?'Заполните поля':'Fill fields'; return; }
-  if((state[res]||0) < amt){ hint.textContent = LANG==='ru'?'Недостаточно ресурса':'Not enough resource'; return; }
+  if((state[res]||0) < amt){ hint.textContent = LANG==='ru'?'Недостаточно ресурса':'Not enough'; return; }
   if(state.auction.length >= auctionSlotLimit()){ hint.textContent = LANG==='ru'?'Все слоты заняты':'All slots busy'; return; }
-  if(price / (BASE_PRICES[res]||1) > 5){ hint.textContent = LANG==='ru'?'Слишком высокая цена':'Price too high'; return; }
+  if(price / (BASE_PRICES[res]||1) > 5){ hint.textContent = LANG==='ru'?'Слишком высокая цена':'Too high'; return; }
   state[res] -= amt;
   state.auction.push({id: state.auctionSeq++, resource: res, amount: amt, price, createdAt: Date.now()});
   document.getElementById('auc-amt').value = ''; document.getElementById('auc-price').value = ''; hint.textContent = '';
@@ -2000,7 +1951,7 @@ function renderCaveModal(){
     html += `<div class="ccard ${unlocked?'':'locked'}">
       <img src="${img.src}" alt="">
       <div class="cinfo">
-        <div class="cn">${LANG==='ru'?'Пещера':'Cave'} ${i}</div>
+        <div class="cn">${LANG==='ru'?'Шахта':'Mine'} ${i} ${LANG==='ru'?'(глубина)':'(depth)'}</div>
         <div class="cr">${t('essence')}+${rew.essence} · ${t('gold')}+${rew.gold}</div>
       </div>
       <button class="btn ${unlocked?'green':''}" ${unlocked?'':'disabled'} data-cave="${i}">${unlocked?(LANG==='ru'?'Войти':'Enter'):(LANG==='ru'?'Закрыто':'Locked')}</button>
@@ -2012,6 +1963,94 @@ function renderCaveModal(){
       const lvl = parseInt(b.getAttribute('data-cave'),10);
       closeOverlay(document.getElementById('ov-cave'));
       await startCaveBattle(lvl);
+    });
+  });
+}
+
+/* ========================================================================
+   WITCH HOUSE
+   ======================================================================== */
+function openWitchModal(){
+  const s = findBuildingSlot('witch');
+  if(s === null || state.slots[s].level < 1){ toast(LANG==='ru'?'Постройте ведьмин дом':'Build witch house first'); return; }
+  renderWitchModal(); openOverlay('ov-witch');
+}
+function renderWitchModal(){
+  const cont = document.getElementById('witch-list');
+  if(!cont) return;
+  const now = Date.now();
+  let html = '';
+
+  // Active potions
+  const active = [];
+  POTION_ORDER.forEach(type => {
+    if(state.potions[type] > now){
+      const left = Math.floor((state.potions[type] - now) / 1000);
+      active.push({type, left});
+    }
+  });
+  if(active.length > 0){
+    html += `<div style="margin-bottom:10px">
+      <div class="muted" style="margin-bottom:6px">${LANG==='ru'?'Активные зелья':'Active potions'}:</div>`;
+    active.forEach(p => {
+      const def = POTION_DEFS[p.type];
+      html += `<div style="padding:8px 12px;background:rgba(92,214,138,.1);border:1px solid rgba(92,214,138,.4);border-radius:8px;margin-bottom:4px;font-size:12px;display:flex;align-items:center;gap:8px">
+        <img src="${getSprite(def.icon).src}" style="width:20px;height:20px">
+        <b style="color:var(--green);flex:1">${def[LANG]}</b>
+        <span class="muted">${fmtTime(p.left)}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Brewing
+  if(state.brewing){
+    const left = Math.max(0, Math.floor((state.brewing.endsAt - now) / 1000));
+    const def = POTION_DEFS[state.brewing.type];
+    const total = def.brewTime;
+    const pct = 100 * (1 - left / total);
+    html += `<div class="row" style="border-color:var(--gold);display:block">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <img src="${getSprite(def.icon).src}" style="width:24px;height:24px">
+        <div style="flex:1"><div class="lab">${def[LANG]}</div><div class="sub">${t('brewing')}… ${fmtTime(left)}</div></div>
+      </div>
+      <div class="progress"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></div>
+    </div>`;
+  }
+
+  // Available potions
+  POTION_ORDER.forEach(type => {
+    const def = POTION_DEFS[type];
+    const isActive = state.potions[type] > now;
+    const isBrewing = state.brewing && state.brewing.type === type;
+    const canBrew = !isActive && !state.brewing && canAfford(def.cost);
+    html += `<div class="bcard ${isActive?'maxed':''}">
+      <img src="${getSprite(def.icon).src}" alt="">
+      <div class="binfo">
+        <div class="bnm">${def[LANG]}</div>
+        <div class="bdesc">${def['desc_'+LANG] || def['desc_ru']}</div>
+        <div class="bmeta">${LANG==='ru'?'Варка:':'Brew:'} ${fmtTime(def.brewTime)}</div>
+      </div>
+      ${isActive
+        ? `<span class="muted" style="color:var(--green);font-weight:bold">${t('active')}</span>`
+        : isBrewing
+          ? `<span class="muted">${t('brewing')}</span>`
+          : `<button class="btn sm ${canBrew?'green':''}" data-brew="${type}" ${canBrew?'':'disabled'}>${t('brew')}</button>`}
+      <div class="bcard-cost">${showCostHTML(def.cost)}</div>
+    </div>`;
+  });
+
+  cont.innerHTML = html;
+  cont.querySelectorAll('[data-brew]').forEach(b => {
+    b.addEventListener('click', ()=>{
+      const type = b.getAttribute('data-brew');
+      const def = POTION_DEFS[type];
+      if(!canAfford(def.cost)){ toast(t('no_gold')); return; }
+      if(state.brewing){ toast(t('cauldron_busy')); return; }
+      if(state.potions[type] > Date.now()){ toast(t('potion_active')); return; }
+      spendCost(def.cost);
+      state.brewing = { type, endsAt: Date.now() + def.brewTime * 1000 };
+      refreshAllUI(); renderWitchModal(); saveGame();
     });
   });
 }
@@ -2036,7 +2075,6 @@ function buildSailingOverlay(){
   document.getElementById('sail-ship').innerHTML = SVG_SRC.ship;
 }
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
 async function sailToBattle(){
   if(anyPause()) return;
   const s = document.getElementById('sailing');
@@ -2054,8 +2092,8 @@ async function startCaveBattle(lvl){
   if(anyPause()) return;
   const s = document.getElementById('sailing');
   s.classList.add('show'); setPause('sailing', true); Music.stop();
-  document.getElementById('sail-txt').textContent = LANG==='ru'?'Спускаемся в пещеру…':'Descending…';
-  document.getElementById('sail-sub').textContent = LANG==='ru'?'Тьма и чудовища ждут':'Darkness awaits';
+  document.getElementById('sail-txt').textContent = LANG==='ru'?'Спускаемся в шахту…':'Descending into the mine…';
+  document.getElementById('sail-sub').textContent = LANG==='ru'?'Глубины полны чудовищ':'Depths full of monsters';
   const ship = document.getElementById('sail-ship');
   ship.style.animation = 'none'; void ship.offsetWidth; ship.style.animation = '';
   await sleep(3200);
@@ -2111,10 +2149,16 @@ function makeUnit(type, side, lane, u){
   const d = UNIT_DEFS[type];
   const hpScale = side==='enemy' ? (1 + (G.level-1)*0.16) : (1 + (G.level-1)*0.05 + G.hpBuff);
   const dmgScale = side==='enemy' ? (1 + (G.level-1)*0.13) : (1 + (G.level-1)*0.04 + G.dmgBuff);
+  let potionHp = 0, potionDmg = 0;
+  if(side === 'player'){
+    const buffs = getBattlePotionBuffs();
+    potionHp = buffs.hp;
+    potionDmg = buffs.dmg;
+  }
   return {
     id: G.uid++, type, side, lane, u,
-    hp: d.hp*hpScale, maxHp: d.hp*hpScale,
-    dmg: d.dmg*dmgScale, range: d.range, speed: d.speed, atk: d.atk,
+    hp: d.hp*hpScale*(1+potionHp), maxHp: d.hp*hpScale*(1+potionHp),
+    dmg: d.dmg*dmgScale*(1+potionDmg), range: d.range, speed: d.speed, atk: d.atk,
     cd: Math.random()*0.4, bob: Math.random()*6.28, hitFlash: 0,
     heal: d.heal ? d.heal*0.9 : 0,
     atkAnim: 0, hitAnim: 0, hitDir: 1
@@ -2165,8 +2209,7 @@ function updateGame(dt){
     if(G.level >= 3) pool.push('knight','heal');
     if(G.level >= 5) pool.push('knight','mage','heal');
     if(G.isTutorial) pool = ['sword'];
-    const type = pool[Math.floor(Math.random()*pool.length)];
-    spawnUnit(type, 'enemy', LANES[Math.floor(Math.random()*LANES.length)]);
+    spawnUnit(pool[Math.floor(Math.random()*pool.length)], 'enemy', LANES[Math.floor(Math.random()*LANES.length)]);
   }
   const list = G.units;
   for(let i=0;i<list.length;i++){
@@ -2258,6 +2301,9 @@ function attackBase(u){
   }
 }
 
+/* ========================================================================
+   BATTLE RENDERING
+   ======================================================================== */
 function roundRect(c, x, y, w, h, r){
   r = Math.min(r, w/2, h/2);
   c.beginPath();
@@ -2268,20 +2314,182 @@ function roundRect(c, x, y, w, h, r){
   c.arcTo(x, y, x+w, y, r);
   c.closePath();
 }
+function drawBattleBackdrop(){
+  const horizon = H * 0.38;
+  // Distant mountains
+  ctx.fillStyle = '#0e0a1a';
+  ctx.beginPath();
+  ctx.moveTo(0, horizon);
+  for(let i=0; i<=12; i++){
+    const x = (i/12) * W;
+    const y = horizon - 45 - Math.sin(i*1.8)*50 - Math.sin(i*0.7)*30;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W, horizon); ctx.closePath();
+  ctx.fill();
+  // Snow caps
+  ctx.fillStyle = 'rgba(200,200,230,.14)';
+  for(let i=0; i<=12; i++){
+    const x = (i/12) * W;
+    const y = horizon - 45 - Math.sin(i*1.8)*50 - Math.sin(i*0.7)*30;
+    ctx.beginPath();
+    ctx.moveTo(x-8, y+8);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x+8, y+8);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Distant forest silhouette
+  ctx.fillStyle = '#0c1410';
+  for(let i=0; i<40; i++){
+    const tx = (i/40)*W + Math.sin(i*3)*8;
+    const th = 15 + Math.abs(Math.sin(i*2.3))*25;
+    ctx.beginPath();
+    ctx.moveTo(tx-8, horizon+8);
+    ctx.lineTo(tx, horizon-th);
+    ctx.lineTo(tx+8, horizon+8);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Mid-ground forest (bigger)
+  ctx.fillStyle = '#0a1210';
+  for(let i=0; i<20; i++){
+    const tx = (i/20)*W + Math.sin(i*5)*20;
+    const th = 30 + Math.abs(Math.cos(i*1.9))*40;
+    ctx.beginPath();
+    ctx.moveTo(tx-12, horizon+16);
+    ctx.lineTo(tx, horizon-th);
+    ctx.lineTo(tx+12, horizon+16);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+function drawBattleFieldDecorations(){
+  const horizon = H * 0.4;
+  // River (small stream to the right side, behind field)
+  const riverX = W * 0.92;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(riverX - 20, horizon);
+  for(let y=horizon; y<=H*0.9; y+=20){
+    const wave = Math.sin(y*0.03 + performance.now()*0.0008) * 6;
+    ctx.lineTo(riverX - 20 + wave, y);
+  }
+  for(let y=H*0.9; y>=horizon; y-=20){
+    const wave = Math.sin(y*0.03 + performance.now()*0.0008 + 1) * 6;
+    ctx.lineTo(riverX + 20 + wave, y);
+  }
+  ctx.closePath();
+  const rg = ctx.createLinearGradient(riverX-20, 0, riverX+20, 0);
+  rg.addColorStop(0, 'rgba(40,80,140,.4)');
+  rg.addColorStop(0.5, 'rgba(70,130,200,.7)');
+  rg.addColorStop(1, 'rgba(40,80,140,.4)');
+  ctx.fillStyle = rg;
+  ctx.fill();
+  // River highlights
+  ctx.strokeStyle = 'rgba(180,220,255,.35)';
+  ctx.lineWidth = 1.5;
+  for(let i=0; i<8; i++){
+    const y = horizon + 40 + i*45;
+    const wave = Math.sin(y*0.03 + performance.now()*0.001) * 5;
+    ctx.beginPath();
+    ctx.moveTo(riverX - 12 + wave, y);
+    ctx.lineTo(riverX + 12 + wave, y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Trees on left side
+  const treesLeft = [
+    {x: 0.02, y: 0.48}, {x: 0.06, y: 0.60}, {x: 0.03, y: 0.72}, {x: 0.08, y: 0.84},
+    {x: 0.10, y: 0.55}, {x: 0.05, y: 0.66}
+  ];
+  treesLeft.forEach((p, i)=>{
+    drawTreeAt(p.x*W, p.y*H, 1 + Math.sin(i)*0.2);
+  });
+  // Trees on right side (avoid river)
+  const treesRight = [
+    {x: 0.94, y: 0.50}, {x: 0.88, y: 0.62}, {x: 0.93, y: 0.74}, {x: 0.86, y: 0.86},
+    {x: 0.95, y: 0.60}, {x: 0.90, y: 0.72}
+  ];
+  treesRight.forEach((p, i)=>{
+    drawTreeAt(p.x*W, p.y*H, 1 + Math.cos(i)*0.2);
+  });
+  // Rocks
+  for(let i=0; i<10; i++){
+    const rx = (i/10)*W + (i%2===0 ? 30 : -30);
+    const ry = H * 0.92 + Math.sin(i*3)*10;
+    ctx.fillStyle = 'rgba(0,0,0,.4)';
+    ctx.beginPath(); ctx.ellipse(rx, ry+3, 10, 3, 0, 0, 6.283); ctx.fill();
+    ctx.fillStyle = '#3a3a48';
+    ctx.beginPath(); ctx.ellipse(rx, ry, 8, 4, 0, 0, 6.283); ctx.fill();
+    ctx.fillStyle = '#4a4a58';
+    ctx.beginPath(); ctx.ellipse(rx-2, ry-1, 5, 2.5, 0, 0, 6.283); ctx.fill();
+  }
+  // Grass tufts
+  ctx.strokeStyle = 'rgba(90,150,80,.4)';
+  ctx.lineWidth = 1.5;
+  for(let i=0; i<30; i++){
+    const gx = (Math.sin(i*5.5)*0.5+0.5) * W;
+    const gy = H * 0.88 + Math.cos(i*3.3)*20;
+    ctx.beginPath();
+    ctx.moveTo(gx, gy);
+    ctx.lineTo(gx - 2, gy - 6);
+    ctx.moveTo(gx + 2, gy);
+    ctx.lineTo(gx + 2, gy - 5);
+    ctx.stroke();
+  }
+}
+function drawTreeAt(px, py, scale){
+  const s = scale || 1;
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
+  ctx.beginPath(); ctx.ellipse(px, py, 14*s, 4*s, 0, 0, 6.283); ctx.fill();
+  ctx.fillStyle = '#2a1a08';
+  ctx.fillRect(px - 3*s, py - 20*s, 6*s, 20*s);
+  ctx.fillStyle = '#0f2010';
+  ctx.beginPath(); ctx.moveTo(px - 14*s, py - 18*s); ctx.lineTo(px, py - 50*s); ctx.lineTo(px + 14*s, py - 18*s); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#1a3018';
+  ctx.beginPath(); ctx.moveTo(px - 11*s, py - 28*s); ctx.lineTo(px, py - 56*s); ctx.lineTo(px + 11*s, py - 28*s); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#2a4a20';
+  ctx.beginPath(); ctx.moveTo(px - 8*s, py - 38*s); ctx.lineTo(px, py - 60*s); ctx.lineTo(px + 8*s, py - 38*s); ctx.closePath(); ctx.fill();
+}
 function drawGround(){
+  // Ambient grass bed behind the diamond field (fixes "floating platform")
+  ctx.fillStyle = '#0a1a0e';
+  ctx.fillRect(0, H*0.32, W, H*0.68);
+  // Ambient shading
+  const ambient = ctx.createLinearGradient(0, H*0.32, 0, H);
+  ambient.addColorStop(0, 'rgba(30,50,30,.6)');
+  ambient.addColorStop(0.5, 'rgba(20,35,20,.8)');
+  ambient.addColorStop(1, 'rgba(15,25,15,.95)');
+  ctx.fillStyle = ambient;
+  ctx.fillRect(0, H*0.32, W, H*0.68);
+
+  drawBattleFieldDecorations();
+
+  // The actual field (diamond)
   const a = project(0,0), b = project(1,0), c = project(1,1), d = project(0,1);
   const isCave = G.mode === 'cave';
   const g = ctx.createLinearGradient(0,a.y,0,d.y);
   if(isCave){ g.addColorStop(0,'#181022'); g.addColorStop(0.55,'#211830'); g.addColorStop(1,'#2a1f3d'); }
-  else { g.addColorStop(0,'#1a2419'); g.addColorStop(0.55,'#22301f'); g.addColorStop(1,'#2c3f28'); }
+  else { g.addColorStop(0,'#2a3a22'); g.addColorStop(0.55,'#344826'); g.addColorStop(1,'#3a5228'); }
   ctx.beginPath();
   ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
   ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+
+  // Field border
+  ctx.strokeStyle = isCave ? 'rgba(180,140,255,.18)' : 'rgba(180,220,120,.28)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y);
+  ctx.closePath(); ctx.stroke();
+
   ctx.save(); ctx.clip();
-  ctx.strokeStyle = isCave ? 'rgba(180,140,255,.10)' : 'rgba(150,210,160,.10)';
+  ctx.strokeStyle = isCave ? 'rgba(180,140,255,.12)' : 'rgba(200,240,140,.14)';
   ctx.lineWidth = 1;
   for(let i=0;i<=12;i++){ const p1 = project(i/12,0), p2 = project(i/12,1); ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); }
   for(let i=0;i<=6;i++){ const p1 = project(0,i/6), p2 = project(1,i/6); ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.stroke(); }
+  // lane dividers
   const m1 = project(0.5,0), m2 = project(0.5,1);
   ctx.strokeStyle = 'rgba(232,194,106,.14)'; ctx.lineWidth = 1.5; ctx.setLineDash([8,8]);
   ctx.beginPath(); ctx.moveTo(m1.x,m1.y); ctx.lineTo(m2.x,m2.y); ctx.stroke();
@@ -2320,7 +2528,7 @@ function drawUnit(u){
     lungeX = sign * Math.sin((1-k)*Math.PI) * 8;
     rot = sign * Math.sin((1-k)*Math.PI) * 0.14;
   }
-  if(u.hitAnim > 0){ lungeX -= u.hitDir * Math.sin((u.hitAnim/0.2)*Math.PI) * 6; }
+  if(u.hitAnim > 0) lungeX -= u.hitDir * Math.sin((u.hitAnim/0.2)*Math.PI) * 6;
   ctx.save(); ctx.globalAlpha = 0.4;
   ctx.fillStyle = u.side === 'player' ? '#4fa8ff' : (G.mode==='cave' ? '#b46bff' : '#ff5a5a');
   ctx.beginPath(); ctx.ellipse(p.x, p.y, ww*0.40, ww*0.15, 0, 0, 6.283); ctx.fill();
@@ -2407,6 +2615,7 @@ function renderBattle(){
     ctx.globalAlpha = 1;
   } else {
     drawBattleSky();
+    drawBattleBackdrop();
   }
   drawGround();
   drawBase('player');
@@ -2512,13 +2721,12 @@ function endLevel(win){
     saveGame();
   }, 700);
 }
-
 const ovResult = document.getElementById('ov-result');
 function showResult(win){
   const r = pendingReward || {};
   document.getElementById('res-title').textContent = win ? t('win') : t('lose');
   document.getElementById('res-title').style.color = win ? 'var(--gold-l)' : '#ff8b8b';
-  document.getElementById('res-big').textContent = (win ? '✦ ' : '✧ ') + (G.mode==='cave'? (LANG==='ru'?'Пещера ':'Cave ') : t('level') + ' ') + G.level;
+  document.getElementById('res-big').textContent = (win ? '✦ ' : '✧ ') + (G.mode==='cave'? (LANG==='ru'?'Шахта ':'Mine ') : t('level') + ' ') + G.level;
   let lines = `<div class="res-line"><span>${t('units_spawned')}</span><b>${G.spawned}</b></div>
     <div class="res-line"><span>${t('enemies_killed')}</span><b>${G.kills}</b></div>`;
   let rewardText = '';
@@ -2608,8 +2816,7 @@ function buildBattleUnitBar(){
 function refreshUnitButtons(){
   if(VIEW !== 'battle' && VIEW !== 'cave') return;
   document.querySelectorAll('.ubtn').forEach(b=>{
-    const key = b.dataset.unit;
-    b.classList.toggle('disabled', G.essence < UNIT_DEFS[key].cost);
+    b.classList.toggle('disabled', G.essence < UNIT_DEFS[b.dataset.unit].cost);
   });
 }
 function trySpawn(key){
@@ -2637,11 +2844,7 @@ const QUEST_POOL = [
 ];
 const QUEST_BY_ID = {};
 QUEST_POOL.forEach(q=>QUEST_BY_ID[q.id]=q);
-
-function todayStr(){
-  const d = new Date();
-  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-}
+function todayStr(){ const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
 function seededShuffle(arr, seed){
   let s = Math.abs(seed) % 2147483647 || 1;
   const a = arr.slice();
@@ -2688,7 +2891,7 @@ function questName(def){
     kills:{ru:'Победить врагов',en:'Defeat enemies'},gold:{ru:'Заработать золота',en:'Earn gold'},
     mages:{ru:'Призвать магов',en:'Summon mages'},minutes:{ru:'Провести в игре минут',en:'Spend minutes'},
     knights:{ru:'Призвать рыцарей',en:'Summon knights'},archers:{ru:'Призвать лучников',en:'Summon archers'},
-    builds:{ru:'Построить зданий',en:'Construct buildings'},caveWins:{ru:'Победить в пещере',en:'Win in cave'},
+    builds:{ru:'Построить зданий',en:'Construct buildings'},caveWins:{ru:'Победить в шахте',en:'Win in mine'},
     auctionSales:{ru:'Продать на аукционе',en:'Sell on auction'}
   };
   const n = names[def.type];
@@ -2840,20 +3043,14 @@ function refreshAllUI(){
     document.getElementById(chipId).classList.toggle('full', v >= cap);
   });
   document.getElementById('val-essence').textContent = fmtNum(state.essence||0);
-
-  // Preserve tutorial highlight across re-render
   const tutEl = document.querySelector('.tut-highlight');
   const tutSlot = tutEl ? tutEl.dataset.slot : null;
-
   updateBuildingIndicators();
   updateAlertDots();
-
-  // If highlight was on a building that got re-rendered, reapply
   if(tutActive && tutSlot != null){
     const el = document.querySelector(`[data-slot="${tutSlot}"]`);
     if(el && !el.classList.contains('tut-highlight')) el.classList.add('tut-highlight');
   }
-
   if(document.getElementById('ov-building').classList.contains('show') && currentBuildingSlot !== null){
     renderBuildingModal();
   }
@@ -2865,12 +3062,10 @@ function refreshAllUI(){
 function openOverlay(id){
   const el = document.getElementById(id);
   if(!el) return;
-  el.classList.add('show');
-  syncPause();
+  el.classList.add('show'); syncPause();
 }
 function closeOverlay(el){
-  el.classList.remove('show');
-  syncPause();
+  el.classList.remove('show'); syncPause();
   if(el.id === 'ov-rest') restOpen = false;
 }
 document.querySelectorAll('.overlay').forEach(ov=>{
@@ -2881,8 +3076,7 @@ document.querySelectorAll('.overlay').forEach(ov=>{
 });
 
 document.getElementById('btn-menu').addEventListener('click', ()=>{
-  updateAlertDots();
-  openOverlay('ov-menu');
+  updateAlertDots(); openOverlay('ov-menu');
 });
 document.querySelectorAll('.mbtn[data-open]').forEach(b=>{
   b.addEventListener('click', ()=>{
@@ -2976,6 +3170,7 @@ function applyLang(){
   if(document.getElementById('ov-lab').classList.contains('show')) renderLabModal();
   if(document.getElementById('ov-auction').classList.contains('show')) renderAuctionModal();
   if(document.getElementById('ov-cave').classList.contains('show')) renderCaveModal();
+  if(document.getElementById('ov-witch').classList.contains('show')) renderWitchModal();
   syncSettingsUI();
 }
 
@@ -2983,18 +3178,16 @@ function applyLang(){
    TUTORIAL
    ======================================================================== */
 const TUT_STEPS = [
-  { textKey:'tut_1', target:null,                 advance:'continue' },
-  { textKey:'tut_2', target:'#btn-shop',           advance:'shop-open' },
+  { textKey:'tut_1', target:null, advance:'continue' },
+  { textKey:'tut_2', target:'#btn-shop', advance:'shop-open' },
   { textKey:'tut_3', target:'.bcard[data-key="farm"]', advance:'shop-place' },
-  { textKey:'tut_4', target:'.bld.empty',          advance:'farm-placed' },
-  { textKey:'tut_5', target:null,                  advance:'continue' },
-  { textKey:'tut_6', target:'[data-slot="19"]',    advance:'ship-clicked' },
-  { textKey:'tut_7', target:null,                  advance:'battle-won' },
-  { textKey:'tut_8', target:null,                  advance:'continue' }
+  { textKey:'tut_4', target:'.bld.empty', advance:'farm-placed' },
+  { textKey:'tut_5', target:null, advance:'continue' },
+  { textKey:'tut_6', target:'[data-slot="19"]', advance:'ship-clicked' },
+  { textKey:'tut_7', target:null, advance:'battle-won' },
+  { textKey:'tut_8', target:null, advance:'continue' }
 ];
-let tutIndex = 0;
-let tutActive = false;
-let tapIndEl = null;
+let tutIndex = 0, tutActive = false, tapIndEl = null;
 
 function clearTapIndicator(){
   if(tapIndEl){ tapIndEl.remove(); tapIndEl = null; }
@@ -3006,7 +3199,7 @@ function placeTapIndicator(el){
   const rect = el.getBoundingClientRect();
   const ind = document.createElement('div');
   ind.className = 'tut-tap-ind';
-  ind.textContent = LANG === 'ru' ? 'Нажмите здесь' : 'Tap here';
+  ind.textContent = t('tap_here');
   let left = rect.left + rect.width / 2;
   let top = rect.top - 6;
   left = Math.max(70, Math.min(window.innerWidth - 70, left));
@@ -3016,7 +3209,6 @@ function placeTapIndicator(el){
   document.body.appendChild(ind);
   tapIndEl = ind;
 }
-
 function startTutorial(){
   tutActive = true;
   tutIndex = state.tutStep || 0;
@@ -3029,25 +3221,18 @@ function showTutStep(){
   const step = TUT_STEPS[tutIndex];
   document.getElementById('tut-text').textContent = t(step.textKey);
   document.getElementById('tut-dots').innerHTML = TUT_STEPS.map((_,i)=>`<i class="${i<=tutIndex?'on':''}"></i>`).join('');
-
   document.querySelectorAll('.tut-highlight').forEach(e=>e.classList.remove('tut-highlight'));
   clearTapIndicator();
-
   const tutbox = document.getElementById('tutbox');
-  // Move box to top only for ship step so the ship at bottom is visible
   const isShipStep = step.target === '[data-slot="19"]';
   tutbox.classList.toggle('top', isShipStep);
-
   if(step.target){
     const el = document.querySelector(step.target);
     if(el){
       el.classList.add('tut-highlight');
       const isWorldEl = !!el.closest('#lobby-buildings');
       const rect = el.getBoundingClientRect();
-      const offScreen =
-        rect.bottom < 90 || rect.top > window.innerHeight - 90 ||
-        rect.right < 40 || rect.left > window.innerWidth - 40;
-
+      const offScreen = rect.bottom < 90 || rect.top > window.innerHeight - 90 || rect.right < 40 || rect.left > window.innerWidth - 40;
       if(isWorldEl && VIEW === 'lobby' && offScreen){
         const wx = parseFloat(el.style.left) || 0;
         const wy = parseFloat(el.style.top) || 0;
@@ -3070,14 +3255,11 @@ function showTutStep(){
       }
     }
   }
-
   const btn = document.getElementById('tut-next');
   if(step.advance === 'continue'){
     btn.style.display = 'block';
     btn.textContent = (tutIndex === TUT_STEPS.length-1) ? t('finish') : t('next');
-  } else {
-    btn.style.display = 'none';
-  }
+  } else btn.style.display = 'none';
   state.tutStep = tutIndex;
   saveGame();
 }
@@ -3099,8 +3281,7 @@ function endTutorial(){
   document.getElementById('tutbox').classList.remove('top');
   document.querySelectorAll('.tut-highlight').forEach(e=>e.classList.remove('tut-highlight'));
   clearTapIndicator();
-  state.tutorial = 2;
-  state.tutStep = 0;
+  state.tutorial = 2; state.tutStep = 0;
   setPause('tutorial', false);
   syncPause();
   saveGame();
@@ -3110,14 +3291,11 @@ document.getElementById('tut-next').addEventListener('click', ()=>{
   const step = TUT_STEPS[tutIndex];
   if(step && step.advance === 'continue') advanceTutorial();
 });
-
-/* Block clicks during tutorial except allowed targets */
 function tutAllowEvent(e){
   if(!tutActive) return true;
   if(e.target.closest('#tutbox')) return true;
   const step = TUT_STEPS[tutIndex];
   if(!step) return true;
-  // During battle tutorial, allow all battle interaction
   if(step.advance === 'battle-won'){
     if(VIEW === 'battle' || VIEW === 'cave') return true;
     if(e.target.closest('#ov-result')) return true;
@@ -3160,16 +3338,51 @@ function showNativeAd(format){
 }
 
 /* ========================================================================
+   OFFLINE PROCESSING
+   ======================================================================== */
+function showOfflineSummary(ms){
+  const hours = Math.floor(ms / 3600000);
+  const mins = Math.floor((ms % 3600000) / 60000);
+  let totalReady = 0;
+  let buildsDone = 0;
+  for(const id in state.slots){
+    const b = state.slots[id];
+    if(!b) continue;
+    if(b.buildEnd > 0 && b.buildEnd <= Date.now()) buildsDone++;
+    const prod = getProduction(id);
+    totalReady += Math.floor(prod.stored);
+  }
+  let potionDone = false;
+  if(state.brewing && state.brewing.endsAt <= Date.now()) potionDone = true;
+
+  const timeStr = (hours > 0 ? hours + (LANG==='ru'?'ч ':'h ') : '') + mins + (LANG==='ru'?'м':'m');
+  const body = document.getElementById('offline-body');
+  let html = `<div class="center" style="font-size:32px;color:var(--gold-l);margin:8px 0">${timeStr}</div>
+    <div class="muted center" style="margin-bottom:14px">${t('offline_away')}</div>`;
+  if(buildsDone > 0) html += `<div class="res-line"><span>${t('offline_builds')}</span><b>${buildsDone}</b></div>`;
+  if(totalReady > 0) html += `<div class="res-line"><span>${t('offline_res')}</span><b>${totalReady}</b></div>`;
+  if(potionDone) html += `<div class="res-line"><span>${t('offline_potion')}</span><b>✓</b></div>`;
+  html += `<button class="btn green full" id="offline-ok">${t('offline_ok')}</button>`;
+  body.innerHTML = html;
+  openOverlay('ov-offline');
+  const okBtn = document.getElementById('offline-ok');
+  if(okBtn) okBtn.addEventListener('click', ()=>{
+    closeOverlay(document.getElementById('ov-offline'));
+  });
+}
+
+/* ========================================================================
    TICK
    ======================================================================== */
 setInterval(()=>{
-  if(VIEW !== 'lobby') return;
   let changed = false;
   for(const id in state.slots){
     const b = state.slots[id];
     if(!b) continue;
     if(b.buildEnd && b.buildEnd > 0 && Date.now() >= b.buildEnd){
       b.buildEnd = 0; b.buildStart = 0;
+      // BUGFIX: new build (level 0) becomes level 1 on completion
+      if(b.level === 0) b.level = 1;
       if(BUILDINGS[b.key].resource) state.prod[id] = Date.now();
       changed = true;
       const nm = LANG==='ru' ? BUILDINGS[b.key].ru : BUILDINGS[b.key].en;
@@ -3184,8 +3397,22 @@ setInterval(()=>{
       toast((LANG==='ru'?HERO_DEFS[key].ru:HERO_DEFS[key].en) + ' — ' + t('ready'));
     }
   }
-  if(changed){ refreshAllUI(); saveGame(); }
-  else updateBuildingIndicators();
+  // Potion brewing completion
+  if(state.brewing && state.brewing.endsAt <= Date.now()){
+    const type = state.brewing.type;
+    const def = POTION_DEFS[type];
+    state.potions[type] = Date.now() + def.duration * 1000;
+    state.brewing = null;
+    changed = true;
+    toast(def[LANG] + ' — ' + t('potion_ready'));
+    if(document.getElementById('ov-witch').classList.contains('show')) renderWitchModal();
+  }
+  if(VIEW === 'lobby'){
+    if(changed){ refreshAllUI(); saveGame(); }
+    else updateBuildingIndicators();
+  } else if(changed){
+    saveGame();
+  }
 }, 1000);
 
 /* ========================================================================
@@ -3224,7 +3451,6 @@ if(HAS_VK){
     });
   }catch(err){}
 }
-
 function initBanner(){
   if(!HAS_VK) return;
   VK.send('VKWebAppGetLaunchParams')
@@ -3240,8 +3466,10 @@ async function boot(){
   resizeCanvas();
   await loadSprites();
   buildSailingOverlay();
+  computeLobbyPaths();
 
   const saved = await loadGame();
+  let offlineMs = 0;
   if(saved){
     state = Object.assign(defaultState(), saved);
     if(!state.slots){
@@ -3268,6 +3496,9 @@ async function boot(){
     if(!state.questClaimed) state.questClaimed = {};
     if(!state.playClaimed) state.playClaimed = [];
     if(typeof state.tutStep !== 'number') state.tutStep = 0;
+    if(!state.potions) state.potions = { speed: 0, strength: 0, vitality: 0 };
+    if(!('brewing' in state)) state.brewing = null;
+    if(saved.lastSaveTime) offlineMs = Date.now() - saved.lastSaveTime;
   } else {
     state = defaultState();
   }
@@ -3292,6 +3523,8 @@ async function boot(){
 
   if(state.tutorial !== 2){
     setTimeout(()=>{ startTutorial(); }, 600);
+  } else if(offlineMs > 60000){
+    setTimeout(()=>{ showOfflineSummary(offlineMs); }, 800);
   }
 
   requestAnimationFrame(loop);
