@@ -1388,11 +1388,15 @@ function getStorageCap(resource){
     const b = state.slots[id];
     if(b && b.key === 'warehouse' && b.buildEnd <= Date.now()) cap += b.level * WAREHOUSE_BONUS;
   }
-  return cap;
+  // Не показывать лимит ниже текущего значения (админ-ресурсы не «обрезаем» визуально)
+  return Math.max(cap, Math.floor(state[resource] || 0));
 }
+
 function addResource(k, n){
   const cap = getStorageCap(k);
-  state[k] = Math.min(cap, (state[k]||0) + n);
+  const cur = state[k] || 0;
+  // Если уже выше лимита — только добавляем, никогда не режем вниз
+  state[k] = cur >= cap ? cur + n : Math.min(cap, cur + n);
 }
 function addGold(n){
   state.gold = (state.gold||0) + n;
@@ -3122,12 +3126,57 @@ document.getElementById('pcode-apply').addEventListener('click', ()=>{
     clearGameData().then(()=>{ setTimeout(()=>location.reload(), 400); });
     return;
   }
-  if(code === 'admin17'){
-    addGold(100000);
-    msg.textContent = t('promocode_ok') + ' +100000 ' + t('gold');
+    if(code === 'admin17'){
+    // ── Ресурсы (напрямую, минуя кап) ──────────────────────────
+    state.gold    = 100000000;
+    state.wheat   = 1000000;
+    state.wood    = 1000000;
+    state.stone   = 1000000;
+    state.essence = 1000000;
+
+    // ── Все зелья активны на год ──────────────────────────────
+    const now = Date.now();
+    POTION_ORDER.forEach(type => {
+      state.potions[type] = now + 365 * 24 * 3600 * 1000;
+    });
+    state.brewing = null;
+
+    // ── Все войска открыты ────────────────────────────────────
+    UNIT_ORDER.forEach(k => { state.unitsOwned[k] = true; });
+
+    // ── Все герои на максимум ─────────────────────────────────
+    HERO_ORDER.forEach(k => {
+      if(state.heroes[k]){
+        state.heroes[k].level = HERO_DEFS[k].maxLevel;
+        state.heroes[k].upgradeEnd = 0;
+      }
+    });
+
+    // ── Все постройки на максимум (и мгновенно достроены) ─────
+    for(const id in state.slots){
+      const b = state.slots[id];
+      if(!b) continue;
+      const cfg = BUILDINGS[b.key];
+      if(!cfg) continue;
+      if(cfg.maxLevel){ b.level = cfg.maxLevel; }
+      b.buildEnd = 0;
+      b.buildStart = 0;
+      if(cfg.resource){ state.prod[id] = Date.now(); }
+    }
+
+    // ── Все уровни шахты и боевые уровни открыты ──────────────
+    state.caveMaxLevel = 999;
+    state.maxLevel = 50;
+
+    // ── Сообщение ─────────────────────────────────────────────
+    msg.textContent = LANG === 'ru'
+      ? '⚡ АДМИН-БОНУС: ресурсы, зелья, войска, здания — MAX!'
+      : '⚡ ADMIN BONUS: resources, potions, units, buildings — MAX!';
     msg.style.color = 'var(--green)';
     inp.value = '';
-    refreshAllUI(); saveGame();
+    refreshAllUI();
+    renderLobbyBuildings();
+    saveGame();
     return;
   }
   msg.textContent = t('promocode_bad'); msg.style.color = '#ff8b8b';
