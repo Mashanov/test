@@ -228,7 +228,41 @@ input.fld:focus,select.fld:focus{border-color:var(--accent);box-shadow:0 0 0 2px
 #tutbox .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2)}
 #tutbox .dots i.on{background:var(--gold)}
 .tut-highlight{position:relative;z-index:9997!important;box-shadow:0 0 0 3px var(--gold),0 0 24px rgba(232,194,106,.7)!important;border-radius:12px!important}
-body.tut-active::before{content:'';position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9990;pointer-events:auto}
+/* Подсветка целевого элемента — яркая пульсация */
+.tut-highlight{
+  position:relative;z-index:9997!important;
+  border-radius:12px!important;
+  animation:tut-pulse 1.2s ease-in-out infinite;
+  pointer-events:auto!important;
+}
+@keyframes tut-pulse{
+  0%,100%{box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(232,194,106,.7)}
+  50%{box-shadow:0 0 0 5px #ffe9a8,0 0 34px rgba(255,233,168,.95)}
+}
+/* Плавающая стрелка "Нажмите здесь" */
+.tut-tap-ind{
+  position:fixed;z-index:9999;
+  padding:7px 14px;
+  background:linear-gradient(180deg,#e8c26a,#a8813a);
+  color:#1a1208;font-weight:bold;font-size:13px;
+  border-radius:20px;
+  box-shadow:0 4px 16px rgba(0,0,0,.7),0 0 24px rgba(232,194,106,.6);
+  pointer-events:none;white-space:nowrap;
+  transform:translate(-50%,-100%);
+  animation:tut-bounce 1.1s ease-in-out infinite;
+}
+@keyframes tut-bounce{
+  0%,100%{transform:translate(-50%,-100%) scale(1)}
+  50%{transform:translate(-50%,-118%) scale(1.05)}
+}
+.tut-tap-ind::after{
+  content:'';position:absolute;bottom:-8px;left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:8px solid #e8c26a;
+}
 
 .res-big{font-size:26px;text-align:center;margin:4px 0 10px;color:var(--gold-l);letter-spacing:1px}
 .res-line{display:flex;justify-content:space-between;padding:7px 4px;font-size:14px;border-bottom:1px dashed rgba(255,255,255,.08)}
@@ -2117,6 +2151,7 @@ async function startCaveBattle(lvl){
 }
 
 function startTutorialBattle(){
+  setPause('tutorial', false);   // <-- добавлено
   Music.ensure(); if(state.music) Music.play();
   startBattle(1, true);
 }
@@ -3094,11 +3129,30 @@ function showTutStep(){
   const step = TUT_STEPS[tutIndex];
   document.getElementById('tut-text').textContent = t(step.textKey);
   document.getElementById('tut-dots').innerHTML = TUT_STEPS.map((_,i)=>`<i class="${i<=tutIndex?'on':''}"></i>`).join('');
+
+  // Очищаем предыдущую подсветку и стрелку
   document.querySelectorAll('.tut-highlight').forEach(e=>e.classList.remove('tut-highlight'));
+  document.querySelectorAll('.tut-tap-ind').forEach(e=>e.remove());
+
   if(step.target){
     const el = document.querySelector(step.target);
-    if(el) el.classList.add('tut-highlight');
+    if(el){
+      el.classList.add('tut-highlight');
+      // Плавающая стрелка "Нажмите здесь" над целью
+      const rect = el.getBoundingClientRect();
+      const ind = document.createElement('div');
+      ind.className = 'tut-tap-ind';
+      ind.textContent = LANG === 'ru' ? 'Нажмите здесь' : 'Tap here';
+      let left = rect.left + rect.width / 2;
+      let top = rect.top - 6;
+      left = Math.max(70, Math.min(window.innerWidth - 70, left));
+      top  = Math.max(70, top);
+      ind.style.left = left + 'px';
+      ind.style.top  = top + 'px';
+      document.body.appendChild(ind);
+    }
   }
+
   const btn = document.getElementById('tut-next');
   if(step.advance === 'continue'){
     btn.style.display = 'block';
@@ -3116,6 +3170,7 @@ function tutTrigger(event){
   advanceTutorial();
 }
 function advanceTutorial(){
+  document.querySelectorAll('.tut-tap-ind').forEach(e=>e.remove());
   tutIndex++;
   if(tutIndex >= TUT_STEPS.length){ endTutorial(); return; }
   showTutStep();
@@ -3125,6 +3180,7 @@ function endTutorial(){
   document.body.classList.remove('tut-active');
   document.getElementById('tutbox').classList.remove('show');
   document.querySelectorAll('.tut-highlight').forEach(e=>e.classList.remove('tut-highlight'));
+  document.querySelectorAll('.tut-tap-ind').forEach(e=>e.remove());
   state.tutorial = 2;
   state.tutStep = 0;
   setPause('tutorial', false);
