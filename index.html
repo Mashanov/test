@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ff6b35">
-<title>Бургерная Turbo</title>
+<title>Бургерная</title>
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}
@@ -13,8 +13,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:
 .screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .screen.active{display:flex}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#ff6b35;border-radius:3px}
-
-/* ==== SVG icons ==== */
 .svg{display:inline-block;width:1em;height:1em;vertical-align:middle;flex-shrink:0;fill:currentColor}
 
 /* ==== Buttons ==== */
@@ -23,262 +21,187 @@ html,body{width:100%;height:100%;overflow:hidden;background:#100823;font-family:
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   transition:transform .1s,box-shadow .2s,background .2s;
 }
-.btn-primary{
-  padding:16px 28px;font-size:18px;letter-spacing:.5px;
-  background:linear-gradient(135deg,#ff6b35,#ff8c42);
-  color:#fff;box-shadow:0 6px 24px rgba(255,107,53,.5),inset 0 1px 0 rgba(255,255,255,.3);
-}
+.btn-primary{padding:14px 24px;font-size:16px;letter-spacing:.5px;background:linear-gradient(135deg,#ff6b35,#ff8c42);color:#fff;box-shadow:0 6px 24px rgba(255,107,53,.5),inset 0 1px 0 rgba(255,255,255,.3)}
 .btn-primary:active{transform:scale(.96)}
 .btn-primary:disabled{opacity:.4;box-shadow:none}
-.btn-secondary{
-  padding:12px 20px;font-size:14px;background:rgba(255,255,255,.1);
-  color:#fff;border:1px solid rgba(255,255,255,.25);
-}
+.btn-secondary{padding:11px 18px;font-size:13px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25)}
 .btn-secondary:active{background:rgba(255,255,255,.2)}
-.btn-tertiary{
-  padding:10px 16px;font-size:12px;background:rgba(255,255,255,.06);
-  color:#fff;border:1px solid rgba(255,255,255,.15);
-}
+.btn-tertiary{padding:9px 14px;font-size:12px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.15)}
 .btn-tertiary:active{background:rgba(255,255,255,.15)}
-.btn-danger{background:rgba(230,57,70,.6);border-color:rgba(230,57,70,.8)}
 
 /* ==== LOBBY ==== */
-#lobby{justify-content:center;gap:6px}
-.lobby-hero{font-size:80px;filter:drop-shadow(0 10px 30px rgba(255,107,53,.6));animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
-#lobby h1{
-  font-size:34px;font-weight:900;letter-spacing:2px;
-  background:linear-gradient(135deg,#ffd166,#ff6b35,#ffd166);background-size:200% 100%;
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:shine 3s linear infinite;
-}
+#lobby{justify-content:flex-start;padding-top:24px;gap:4px}
+.lobby-hero{font-size:60px;filter:drop-shadow(0 10px 30px rgba(255,107,53,.6));animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+#lobby h1{font-size:28px;font-weight:900;letter-spacing:1.5px;background:linear-gradient(135deg,#ffd166,#ff6b35,#ffd166);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 3s linear infinite;text-align:center}
 @keyframes shine{to{background-position:200% 50%}}
-.subtitle{color:#888;font-size:12px;letter-spacing:4px;margin-bottom:28px}
-.menu{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
-.menu-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.stats{margin-top:24px;color:#888;font-size:14px}
-.stats span{color:#ffd166;font-weight:800}
+.subtitle{color:#888;font-size:10px;letter-spacing:4px;margin-bottom:16px}
+.lobby-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:400px;margin-top:8px}
+.menu-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 6px;border:1px solid rgba(255,255,255,.15);border-radius:14px;background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));color:#fff;cursor:pointer;font-family:inherit;min-height:78px}
+.menu-card:active{transform:scale(.95);background:rgba(255,255,255,.18)}
+.menu-card .svg{width:26px;height:26px;color:#ffd166}
+.menu-card .label{font-size:10px;font-weight:700;text-align:center}
+.menu-card.play{grid-column:1 / -1;flex-direction:row;gap:10px;min-height:60px;background:linear-gradient(135deg,#ff6b35,#ff8c42,#ffb84d);border-color:rgba(255,209,102,.6);box-shadow:0 8px 28px rgba(255,107,53,.55)}
+.menu-card.play .svg{width:28px;height:28px;color:#fff}
+.menu-card.play .label{font-size:18px;font-weight:900;letter-spacing:1.5px}
+.badge{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 10px #ff3b30;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+.hud-coins{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;background:linear-gradient(135deg,rgba(255,107,53,.25),rgba(255,209,102,.15));border:1px solid rgba(255,200,100,.35);font-weight:800;color:#ffd166;font-size:14px;z-index:5}
+.hud-coins .svg{width:16px;height:16px}
 
-/* ==== HUD ==== */
-.hud{
-  position:absolute;top:0;left:0;right:0;height:56px;z-index:10;
-  display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
-  background:linear-gradient(180deg,rgba(20,10,40,.98),rgba(20,10,40,.85));
-  border-bottom:1px solid rgba(255,200,100,.25);
-}
-.hud-left{display:flex;gap:8px;align-items:center}
-.coins-hud,.hearts-hud,.level-badge{
-  display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-  font-weight:800;font-size:14px;
-}
-.coins-hud{color:#ffd166}
-.coins-hud .svg{font-size:16px}
-.hearts-hud{letter-spacing:2px;font-size:16px}
-.heart{transition:transform .2s,opacity .3s}
-.heart.lost{opacity:.25;filter:grayscale(1);transform:scale(.8)}
-.level-badge{color:#4ecdc4;font-size:12px}
-.hud-quit{
-  width:36px;height:36px;border-radius:50%;font-size:22px;font-weight:400;
-  background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
+/* ==== LEVEL LAYOUT ==== */
+#level{padding:0;justify-content:flex-start}
+.hud{position:absolute;top:0;left:0;right:0;height:52px;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:linear-gradient(180deg,rgba(20,10,40,.98),rgba(20,10,40,.85));border-bottom:1px solid rgba(255,200,100,.25)}
+.hud-left{display:flex;gap:6px;align-items:center}
+.coins-hud,.hearts-hud,.level-badge{display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-weight:800;font-size:13px}
+.coins-hud{color:#ffd166}.coins-hud .svg{width:14px;height:14px}
+.hearts-hud{letter-spacing:1px;font-size:14px}
+.heart{transition:opacity .3s}.heart.lost{opacity:.25;filter:grayscale(1)}
+.level-badge{color:#4ecdc4;font-size:11px}
+.hud-quit{width:32px;height:32px;border-radius:50%;font-size:20px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer}
 
-/* ==== SCENE ==== */
-.scene{
-  position:absolute;top:56px;left:0;right:0;height:38vh;min-height:200px;max-height:280px;
-  background:linear-gradient(180deg,#3d2f5e 0%,#2a1f3a 70%,#5a3a24 70%,#3d2419 100%);
-  overflow:hidden;
-}
-.scene::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:30%;
-  background:repeating-linear-gradient(90deg,#5a3a24 0 40px,#3d2419 40px 42px);
-  opacity:.6;
-}
-.customer{
-  position:absolute;bottom:22%;width:70px;height:110px;cursor:pointer;
-  transition:transform .2s,filter .2s;
-  z-index:2;
-}
-.customer.selected{transform:translateY(-8px) scale(1.08);filter:drop-shadow(0 0 14px #ffd166)}
-.customer.leaving{animation:leaveOut .5s forwards}
-@keyframes leaveOut{to{transform:translateY(40px) scale(.6);opacity:0}}
+/* ==== SCENE (SVG background + HTML customers overlay) ==== */
+.scene{position:absolute;top:52px;left:0;right:0;height:38vh;min-height:200px;max-height:280px;background:#0a0518;overflow:hidden;border-bottom:2px solid rgba(255,200,100,.3)}
+.scene-svg{width:100%;height:100%;display:block;position:absolute;inset:0}
+.customers-layer{position:absolute;inset:0;pointer-events:none}
+.customer{position:absolute;bottom:14%;width:64px;height:110px;cursor:pointer;pointer-events:auto;transition:transform .2s,filter .2s}
+.customer.selected{transform:translateY(-6px) scale(1.06);filter:drop-shadow(0 0 14px #ffd166)}
 .customer .body-svg{width:100%;height:100%;display:block}
-.order-bubble{
-  position:absolute;top:-52px;left:50%;transform:translateX(-50%);
-  background:#fff;border-radius:10px;padding:4px 6px;
-  display:flex;gap:2px;align-items:center;white-space:nowrap;
-  border:2px solid #ffd166;box-shadow:0 4px 12px rgba(0,0,0,.4);
-}
-.order-bubble::after{
-  content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
-  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;
-  border-top:6px solid #ffd166;
-}
-.order-bubble .ing{width:18px;height:18px;display:inline-flex}
+.customer .face-happy,.customer .face-worried,.customer .face-angry{display:none}
+.customer[data-mood="happy"] .face-happy,
+.customer[data-mood="worried"] .face-worried,
+.customer[data-mood="angry"] .face-angry{display:inline}
+.order-bubble{position:absolute;top:-44px;left:50%;transform:translateX(-50%);background:#fff;border-radius:10px;padding:3px 5px;display:flex;gap:1px;white-space:nowrap;border:2px solid #ffd166;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.order-bubble::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #ffd166}
+.order-bubble .ing{width:16px;height:16px;display:inline-flex}
 .order-bubble .ing svg{width:100%;height:100%}
-.order-mod{
-  position:absolute;top:-78px;left:50%;transform:translateX(-50%);
-  background:#e63946;color:#fff;font-size:10px;font-weight:900;
-  padding:2px 8px;border-radius:8px;white-space:nowrap;
-  box-shadow:0 2px 8px rgba(230,57,70,.6);animation:modPulse 1.5s infinite;
-}
-@keyframes modPulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
-.patience-bar{
-  position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
-  width:60px;height:6px;background:rgba(0,0,0,.6);border-radius:3px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.2);
-}
+.mod-badge{position:absolute;top:-68px;left:50%;transform:translateX(-50%);background:#e63946;color:#fff;font-size:9px;font-weight:900;padding:2px 7px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 8px rgba(230,57,70,.6);animation:modPulse 1.5s infinite}
+@keyframes modPulse{50%{transform:translateX(-50%) scale(1.06)}}
+.patience-bar{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:56px;height:5px;background:rgba(0,0,0,.6);border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,.2)}
 .patience-fill{height:100%;width:100%;background:#4ecdc4;border-radius:3px;transition:background .3s}
 .patience-fill.warn{background:#ffa500}
 .patience-fill.danger{background:#e63946;animation:dangerPulse .5s infinite}
-@keyframes dangerPulse{50%{opacity:.6}}
+@keyframes dangerPulse{50%{opacity:.5}}
 
 /* ==== GAME PANEL ==== */
-.game-panel{
-  position:absolute;top:calc(56px + 38vh);left:0;right:0;bottom:0;
-  display:flex;flex-direction:column;padding:8px;gap:6px;overflow-y:auto;
-  background:linear-gradient(180deg,rgba(15,8,30,.5),rgba(10,5,25,.98));
-}
-.order-panel{
-  background:linear-gradient(135deg,rgba(255,107,53,.22),rgba(255,140,66,.06));
-  border:1px solid rgba(255,140,66,.5);border-radius:12px;padding:8px 10px;
-  min-height:52px;display:flex;flex-direction:column;gap:6px;
-}
-.order-title{font-size:12px;color:#ffd166;font-weight:800;display:flex;justify-content:space-between}
-.order-items{display:flex;flex-wrap:wrap;gap:4px}
-.order-items .ing{width:28px;height:28px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px;display:flex}
+.game-panel{position:absolute;top:calc(52px + 38vh);left:0;right:0;bottom:0;display:flex;flex-direction:column;padding:6px;gap:4px;overflow-y:auto;background:linear-gradient(180deg,rgba(15,8,30,.5),rgba(10,5,25,.98))}
+.order-panel{background:linear-gradient(135deg,rgba(255,107,53,.22),rgba(255,140,66,.06));border:1px solid rgba(255,140,66,.5);border-radius:10px;padding:6px 10px;min-height:46px;display:flex;flex-direction:column;gap:4px}
+.order-title{font-size:11px;color:#ffd166;font-weight:800;display:flex;justify-content:space-between}
+.order-items{display:flex;flex-wrap:wrap;gap:3px}
+.order-items .ing{width:24px;height:24px;background:rgba(255,255,255,.1);border-radius:5px;padding:2px;display:flex}
 .order-items .ing svg{width:100%;height:100%}
-.burger-stack{
-  min-height:60px;max-height:110px;overflow-y:auto;padding:4px;
-  display:flex;flex-direction:column-reverse;align-items:center;gap:1px;
-  background:rgba(0,0,0,.4);border:2px dashed rgba(255,209,102,.3);border-radius:10px;
-}
-.burger-layer{
-  width:88%;height:18px;border-radius:5px;display:flex;align-items:center;gap:4px;
-  padding:0 6px;font-size:10px;font-weight:900;color:#1a0f2e;
-  box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
-  animation:layerPop .2s ease-out;
-}
-.burger-layer .ing{width:14px;height:14px;display:flex}
+.burger-stack{min-height:52px;max-height:100px;overflow-y:auto;padding:4px;display:flex;flex-direction:column-reverse;align-items:center;gap:1px;background:rgba(0,0,0,.4);border:2px dashed rgba(255,209,102,.3);border-radius:10px}
+.burger-layer{width:88%;height:16px;border-radius:5px;display:flex;align-items:center;gap:4px;padding:0 6px;font-size:9px;font-weight:900;color:#1a0f2e;box-shadow:0 1px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);animation:layerPop .2s}
+.burger-layer .ing{width:12px;height:12px;display:flex}
 .burger-layer .ing svg{width:100%;height:100%}
 @keyframes layerPop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
-.ingredients{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:4px;
-}
-.ing-btn{
-  display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;
-  border:1px solid rgba(255,255,255,.2);border-radius:10px;
-  background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
-  color:#fff;font-size:9px;font-weight:700;font-family:inherit;cursor:pointer;
-  transition:transform .1s,background .15s;
-}
+.ingredients{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px}
+.ing-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border:1px solid rgba(255,255,255,.2);border-radius:9px;background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.02));color:#fff;font-size:8px;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .1s,background .15s}
 .ing-btn:active{transform:scale(.9);background:rgba(255,180,60,.3)}
-.ing-btn .ing{width:24px;height:24px}
+.ing-btn .ing{width:22px;height:22px}
 .ing-btn .ing svg{width:100%;height:100%}
-.actions{display:flex;gap:6px;margin-top:auto;padding-top:4px}
+.actions{display:flex;gap:5px;margin-top:auto;padding-top:3px}
 .actions button{flex:1}
 
 /* ==== RESULT ==== */
-#result{gap:16px;text-align:center}
-.result-stars{font-size:64px;letter-spacing:8px;line-height:1}
+#result{gap:12px;text-align:center}
+.result-stars{font-size:54px;letter-spacing:6px;line-height:1}
 .result-stars .star{opacity:.2;transition:all .4s;display:inline-block}
 .result-stars .star.on{opacity:1;animation:starPop .5s backwards}
 .result-stars .star.on:nth-child(2){animation-delay:.15s}
 .result-stars .star.on:nth-child(3){animation-delay:.3s}
 @keyframes starPop{from{transform:scale(0) rotate(-180deg)}to{transform:scale(1) rotate(0)}}
-#result h2{font-size:26px;font-weight:900}
-#result-coins{font-size:22px;color:#ffd166;font-weight:900}
-.result-buttons{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px;margin-top:20px}
+#result h2{font-size:24px;font-weight:900}
+#result-coins{font-size:20px;color:#ffd166;font-weight:900}
+.result-buttons{display:flex;flex-direction:column;gap:6px;width:100%;max-width:280px;margin-top:14px}
 
-/* ==== LEVELS GRID ==== */
-#levels-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;
-  width:100%;max-width:480px;max-height:60vh;overflow-y:auto;padding:4px;
-}
-.lvl-btn{
-  aspect-ratio:1;border-radius:10px;font-family:inherit;font-size:12px;font-weight:900;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;
-  cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
-}
+/* ==== GRIDS / LISTS ==== */
+#levels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:5px;width:100%;max-width:520px;max-height:60vh;overflow-y:auto;padding:4px}
+.lvl-btn{aspect-ratio:1;border-radius:10px;font-family:inherit;font-size:12px;font-weight:900;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .lvl-btn.locked{opacity:.3;cursor:not-allowed}
 .lvl-btn.done{border-color:#4ecdc4;background:rgba(78,205,196,.2)}
 .lvl-btn.current{border-color:#ffd166;box-shadow:0 0 12px rgba(255,209,102,.7)}
 .lvl-btn .stars{font-size:7px;color:#ffd166;letter-spacing:-1px}
 
-/* ==== LEADERBOARD ==== */
-#leaderboard-list{width:100%;max-width:400px;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto}
-.lb-row{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-}
-.lb-row.top{background:linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,140,66,.06));border-color:rgba(255,209,102,.5)}
-.lb-rank{font-size:18px;font-weight:900;color:#ffd166;width:28px}
-.lb-info{flex:1;font-size:12px}
-.lb-stars{color:#ffd166;font-weight:800}
+.task-item,.ach-item,.shop-item{display:flex;gap:10px;align-items:center;padding:10px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.12);border-radius:10px}
+.task-item.done,.ach-item.unlocked{border-color:#4ecdc4;background:rgba(78,205,196,.14)}
+#tasks-list,#achievements-list{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;max-height:60vh;overflow-y:auto;padding:4px}
+.ach-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);flex-shrink:0;color:#ffd166}
+.ach-icon .svg{width:22px;height:22px}
 
-/* ==== TOAST ==== */
-#toast-area{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
-.toast{
-  padding:10px 20px;border-radius:12px;font-weight:800;font-size:13px;
-  background:linear-gradient(135deg,rgba(255,107,53,.98),rgba(255,140,66,.98));
-  box-shadow:0 6px 20px rgba(0,0,0,.5);animation:toastIn 2s forwards;
-  max-width:80vw;text-align:center;
-}
+#shop-categories{display:flex;gap:5px;overflow-x:auto;padding:4px 4px 10px;width:100%;max-width:520px}
+.shop-cat{flex-shrink:0;padding:7px 12px;border-radius:16px;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap}
+.shop-cat.active{background:linear-gradient(135deg,#ff6b35,#ff8c42);border-color:transparent}
+#shop-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:55vh;overflow-y:auto;width:100%;max-width:520px;padding:4px}
+.shop-item{flex-direction:column;align-items:center;gap:5px;padding:10px;text-align:center}
+.shop-item .preview{width:54px;height:54px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);overflow:hidden}
+.shop-item .preview .svg{width:36px;height:36px}
+.shop-item .name{font-size:11px;font-weight:700}
+.shop-item .price{color:#ffd166;font-weight:800;font-size:11px;display:flex;align-items:center;gap:3px}
+.shop-item .price .svg{width:12px;height:12px}
+.shop-item button{width:100%;padding:7px;font-size:11px}
+
+/* ==== MISC ==== */
+.screen h2{font-size:22px;font-weight:900;margin-bottom:14px;color:#ffd166;text-align:center}
+#toast-area{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;flex-direction:column;gap:5px;align-items:center;pointer-events:none}
+.toast{padding:9px 18px;border-radius:12px;font-weight:800;font-size:12px;background:linear-gradient(135deg,rgba(255,107,53,.98),rgba(255,140,66,.98));box-shadow:0 6px 20px rgba(0,0,0,.5);animation:toastIn 2s forwards;max-width:80vw;text-align:center}
 .toast.good{background:linear-gradient(135deg,#4ecdc4,#2a9d8f)}
 .toast.bad{background:linear-gradient(135deg,#e63946,#8a1020)}
 @keyframes toastIn{0%{opacity:0;transform:translateY(-10px)}15%,85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
-
-/* ==== FX ==== */
 body.shake #level{animation:shake .3s}
-@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px) rotate(-1deg)}40%{transform:translateX(8px) rotate(1deg)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
-.fly-coin{
-  position:fixed;pointer-events:none;z-index:1000;font-weight:900;font-size:22px;
-  color:#ffd166;text-shadow:0 0 12px rgba(255,209,102,.9);animation:flyUp 1s ease-out forwards;
-}
-@keyframes flyUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-90px) scale(1.5)}}
-.particle{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:999;animation:burst .7s ease-out forwards}
-@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
-.combo-flash{
-  position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1000;
-  font-size:42px;font-weight:900;color:#ffd166;
-  text-shadow:0 0 24px rgba(255,209,102,.9),0 4px 12px rgba(0,0,0,.6);
-  animation:comboAnim .8s ease-out forwards;
-}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.fly-coin{position:fixed;pointer-events:none;z-index:1000;font-weight:900;font-size:20px;color:#ffd166;text-shadow:0 0 12px rgba(255,209,102,.9);animation:flyUp 1s ease-out forwards}
+@keyframes flyUp{to{opacity:0;transform:translateY(-90px) scale(1.5)}}
+.particle{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:999;animation:burst .7s ease-out forwards}
+@keyframes burst{to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+.combo-flash{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1000;font-size:38px;font-weight:900;color:#ffd166;text-shadow:0 0 24px rgba(255,209,102,.9),0 4px 12px rgba(0,0,0,.6);animation:comboAnim .8s ease-out forwards}
 @keyframes comboAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
-
-/* ==== SPLASH ==== */
-#splash{position:fixed;inset:0;background:#100823;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+#splash{position:fixed;inset:0;background:#100823;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #splash.hidden{opacity:0;pointer-events:none;transition:opacity .4s}
-.spinner{width:50px;height:50px;border:4px solid rgba(255,209,102,.2);border-top-color:#ff6b35;border-radius:50%;animation:spin 1s linear infinite}
+.spinner{width:48px;height:48px;border:4px solid rgba(255,209,102,.2);border-top-color:#ff6b35;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.screen h2{font-size:22px;font-weight:900;margin-bottom:16px;color:#ffd166;text-align:center}
-.screen label{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:15px;cursor:pointer}
-.screen input[type=checkbox]{width:20px;height:20px;accent-color:#ff6b35}
+.stat-row{display:flex;justify-content:space-between;width:100%;max-width:320px;padding:10px 14px;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.12);margin-bottom:6px;font-size:13px;align-items:center}
+.stat-row .val{font-weight:900;color:#ffd166;display:flex;align-items:center;gap:3px}
+.streak-days{display:flex;gap:5px;margin:12px 0;flex-wrap:wrap;justify-content:center}
+.streak-day{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:800;color:#888}
+.streak-day.done{background:linear-gradient(135deg,#ff6b35,#ffd166);border-color:#ffd166;color:#fff}
+.streak-day.today{border-color:#4ecdc4}
 </style>
 </head>
 <body>
 
-<!-- SVG SPRITE -->
 <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
 <defs>
 <linearGradient id="g-coin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe89a"/><stop offset="1" stop-color="#d99a00"/></linearGradient>
 <linearGradient id="g-bun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c78a"/><stop offset="1" stop-color="#c89566"/></linearGradient>
 </defs>
-<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/><circle cx="12" cy="12" r="7.2" fill="none" stroke="#8a5a00" stroke-width=".8" opacity=".4"/><path d="M12 6.8l1.5 3.6 3.9.3-3 2.6 1 3.8-3.4-2.1-3.4 2.1 1-3.8-3-2.6 3.9-.3z" fill="#8a5a00" opacity=".9"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/><path d="M12 6.8l1.5 3.6 3.9.3-3 2.6 1 3.8-3.4-2.1-3.4 2.1 1-3.8-3-2.6 3.9-.3z" fill="#8a5a00" opacity=".9"/></symbol>
 <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3 7 7.5.6-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4L1.5 9.6 9 9z" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1"/></symbol>
-<symbol id="i-burger" viewBox="0 0 24 24"><path d="M3 9q9-6 18 0v1.4H3z" fill="url(#g-bun)"/><rect x="3" y="10.4" width="18" height="1.6" fill="#8fd860"/><rect x="3" y="12" width="18" height="1.6" fill="#e63946"/><rect x="3" y="13.6" width="18" height="1.6" fill="#8b3d15"/><rect x="3" y="15.2" width="18" height="1.6" fill="#ffd93d"/><path d="M3 16.8h18v1.4q-9 3-18 0z" fill="url(#g-bun)"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="currentColor"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2z" fill="currentColor"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24"><path d="M2 3h3l2 12h12l2-8H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="20" r="1.8" fill="currentColor"/><circle cx="18" cy="20" r="1.8" fill="currentColor"/></symbol>
+<symbol id="i-tasks" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2" fill="currentColor"/><path d="M8 11l2 2 4-4M8 16l2 2 4-4" stroke="#100823" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1.5" fill="currentColor"/><rect x="10.5" y="9" width="3" height="12" fill="#100823"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 3h12v5a6 6 0 11-12 0z" fill="currentColor"/><rect x="10" y="14" width="4" height="4" fill="currentColor"/><rect x="7" y="18" width="10" height="3" rx="1" fill="currentColor"/></symbol>
+<symbol id="i-zzz" viewBox="0 0 24 24"><path d="M14 6h5l-5 4h5M17 2h3l-3 2.4h3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><path d="M12 2l1.8 3.2 3.6-.6.6 3.6L21 10l-1.8 3 1.8 3-3 1.8-.6 3.6-3.6-.6L12 22l-1.8-3.2-3.6.6-.6-3.6L3 14l1.8-3L3 8l3-1.8.6-3.6 3.6.6z" fill="currentColor"/><circle cx="12" cy="12" r="3" fill="#100823"/></symbol>
+<symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 2c0 4-5 5-5 10a5 5 0 0010 0c0-2-1-3-1-3 3 1 3 4 3 6a7 7 0 11-14 0c0-6 7-6 7-13z" fill="currentColor"/></symbol>
 
-<symbol id="ing-bun_bottom" viewBox="0 0 32 32"><path d="M3 18q13-5 26 0v6q-13 3-26 0z" fill="url(#g-bun)" stroke="#8b5a3c" stroke-width="1.2"/><ellipse cx="16" cy="18" rx="13" ry="3" fill="#f0c78a" opacity=".6"/></symbol>
+<symbol id="ing-bun_bottom" viewBox="0 0 32 32"><path d="M3 18q13-5 26 0v6q-13 3-26 0z" fill="url(#g-bun)" stroke="#8b5a3c" stroke-width="1.2"/></symbol>
 <symbol id="ing-bun_top" viewBox="0 0 32 32"><path d="M3 18q13-16 26 0z" fill="url(#g-bun)" stroke="#8b5a3c" stroke-width="1.2"/><circle cx="11" cy="11" r="1.2" fill="#fff" opacity=".8"/><circle cx="16" cy="8.5" r="1.2" fill="#fff" opacity=".8"/><circle cx="21" cy="11" r="1.2" fill="#fff" opacity=".8"/></symbol>
-<symbol id="ing-patty" viewBox="0 0 32 32"><rect x="3" y="11" width="26" height="10" rx="5" fill="#7a3b10" stroke="#4a2008" stroke-width="1.2"/><ellipse cx="16" cy="14" rx="11" ry="2" fill="#a0522d" opacity=".5"/></symbol>
+<symbol id="ing-patty" viewBox="0 0 32 32"><rect x="3" y="11" width="26" height="10" rx="5" fill="#7a3b10" stroke="#4a2008" stroke-width="1.2"/></symbol>
 <symbol id="ing-cheese" viewBox="0 0 32 32"><path d="M4 12l24 0 0 6-4 2-4-2-4 2-4-2-4 2-4-2z" fill="#ffd93d" stroke="#c9970d" stroke-width="1.2"/></symbol>
 <symbol id="ing-lettuce" viewBox="0 0 32 32"><path d="M3 16q4-6 8-2 4-6 8 0 5-4 10 2-5 6-13 6T3 16z" fill="#7bc043" stroke="#4a8a20" stroke-width="1.2"/></symbol>
 <symbol id="ing-tomato" viewBox="0 0 32 32"><circle cx="16" cy="17" r="9" fill="#e63946" stroke="#8a1020" stroke-width="1.2"/><path d="M13 9l3-2 3 2" stroke="#4a8a20" stroke-width="1.6" fill="none" stroke-linecap="round"/></symbol>
 <symbol id="ing-onion" viewBox="0 0 32 32"><ellipse cx="16" cy="18" rx="10" ry="8" fill="#e6d0ee" stroke="#a070b8" stroke-width="1.2"/><path d="M8 14q8 2 16 0M8 18q8 2 16 0" stroke="#b890c8" stroke-width="1" fill="none"/></symbol>
 <symbol id="ing-pickle" viewBox="0 0 32 32"><ellipse cx="16" cy="17" rx="6" ry="11" fill="#6b8e23" stroke="#3a5010" stroke-width="1.2" transform="rotate(-20 16 17)"/></symbol>
-<symbol id="ing-bacon" viewBox="0 0 32 32"><path d="M4 12q6-4 12 0 6 4 12 0v4q-6 4-12 0-6-4-12 0z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.2"/><path d="M6 14q5-2 10 0M16 16q5-2 10 0" stroke="#ffe0b0" stroke-width="1.2" fill="none" opacity=".6"/></symbol>
+<symbol id="ing-bacon" viewBox="0 0 32 32"><path d="M4 12q6-4 12 0 6 4 12 0v4q-6 4-12 0-6-4-12 0z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.2"/></symbol>
+<symbol id="ing-double_patty" viewBox="0 0 32 32"><rect x="3" y="8" width="26" height="6" rx="3" fill="#7a3b10" stroke="#4a2008" stroke-width="1"/><rect x="3" y="16" width="26" height="6" rx="3" fill="#7a3b10" stroke="#4a2008" stroke-width="1"/></symbol>
+<symbol id="ing-cheddar" viewBox="0 0 32 32"><path d="M4 14l24 0 0 5-4 2-4-2-4 2-4-2-4 2-4-2z" fill="#ffa500" stroke="#a06000" stroke-width="1.2"/><circle cx="12" cy="17" r="1" fill="#a06000"/><circle cx="20" cy="17" r="1" fill="#a06000"/></symbol>
+<symbol id="ing-avocado" viewBox="0 0 32 32"><ellipse cx="16" cy="18" rx="8" ry="10" fill="#4a6030" stroke="#22300f" stroke-width="1.2"/><ellipse cx="16" cy="18" rx="5.5" ry="7.5" fill="#a8c060"/><circle cx="16" cy="18" r="3" fill="#7a5a2a"/></symbol>
+<symbol id="ing-truffle" viewBox="0 0 32 32"><path d="M8 20q0-9 8-10 8 1 8 10-3 4-8 4t-8-4z" fill="#3a2a1a" stroke="#1a0f05" stroke-width="1.2"/></symbol>
+<symbol id="ing-gold_leaf" viewBox="0 0 32 32"><path d="M6 22q0-12 10-14 10 2 10 14-5 5-10 5t-10-5z" fill="url(#g-coin)" stroke="#8a5a00" stroke-width="1.2"/></symbol>
 </svg>
 
 <div id="app">
@@ -288,19 +211,21 @@ body.shake #level{animation:shake .3s}
 
 <!-- LOBBY -->
 <div id="lobby" class="screen active">
+  <div class="hud-coins"><svg class="svg"><use href="#i-coin"/></svg><span id="lobby-coins">0</span></div>
   <div class="lobby-hero">🍔</div>
   <h1>БУРГЕРНАЯ</h1>
   <p class="subtitle">TURBO EDITION</p>
-  <div class="menu">
-    <button class="btn-primary" id="play-btn">▶ ИГРАТЬ</button>
-    <button class="btn-secondary" id="daily-btn">🎁 Ежедневный вызов</button>
-    <div class="menu-row">
-      <button class="btn-tertiary" id="levels-btn">📋 Уровни</button>
-      <button class="btn-tertiary" id="leaderboard-btn">🏆 Рейтинг</button>
-      <button class="btn-tertiary" id="settings-btn">⚙ Ещё</button>
-    </div>
+  <div class="lobby-grid">
+    <button class="menu-card play" id="play-btn"><svg class="svg"><use href="#i-play"/></svg><span class="label">ИГРАТЬ</span></button>
+    <button class="menu-card" id="levels-btn"><svg class="svg"><use href="#i-map"/></svg><span class="label">Уровни</span></button>
+    <button class="menu-card" id="shop-btn"><svg class="svg"><use href="#i-cart"/></svg><span class="label">Магазин</span></button>
+    <button class="menu-card" id="tasks-btn"><svg class="svg"><use href="#i-tasks"/></svg><span class="label">Задания</span></button>
+    <button class="menu-card" id="daily-btn"><svg class="svg"><use href="#i-gift"/></svg><span class="label">Награда</span><span class="badge" id="daily-badge" style="display:none"></span></button>
+    <button class="menu-card" id="afk-btn"><svg class="svg"><use href="#i-zzz"/></svg><span class="label">Отдых</span></button>
+    <button class="menu-card" id="ach-btn"><svg class="svg"><use href="#i-trophy"/></svg><span class="label">Награды</span></button>
+    <button class="menu-card" id="settings-btn"><svg class="svg"><use href="#i-gear"/></svg><span class="label">Ещё</span></button>
   </div>
-  <div class="stats">⭐ <span id="total-stars">0</span> · 🏆 макс. ур. <span id="best-level">1</span></div>
+  <div style="margin-top:14px;color:#888;font-size:12px">⭐ <span id="total-stars" style="color:#ffd166;font-weight:800">0</span> · 🏆 ур. <span id="best-level" style="color:#ffd166;font-weight:800">1</span></div>
 </div>
 
 <!-- LEVEL -->
@@ -313,9 +238,12 @@ body.shake #level{animation:shake .3s}
     <div class="level-badge">Ур. <span id="hud-level">1</span> · <span id="hud-progress">0/0</span></div>
     <button class="hud-quit" id="quit-btn">×</button>
   </div>
-  <div class="scene" id="scene"></div>
+  <div class="scene" id="scene">
+    <svg class="scene-svg" id="scene-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice"></svg>
+    <div class="customers-layer" id="customers-layer"></div>
+  </div>
   <div class="game-panel">
-    <div class="order-panel" id="order-panel">
+    <div class="order-panel">
       <div class="order-title"><span id="order-name">Выберите клиента</span><span id="order-mod-label"></span></div>
       <div class="order-items" id="order-items"></div>
     </div>
@@ -344,353 +272,529 @@ body.shake #level{animation:shake .3s}
 <div id="levels-screen" class="screen">
   <h2>Уровни</h2>
   <div id="levels-grid"></div>
-  <button class="btn-secondary" id="levels-back" style="margin-top:16px">Назад</button>
+  <button class="btn-secondary" id="levels-back" style="margin-top:14px">Назад</button>
 </div>
 
-<!-- LEADERBOARD -->
-<div id="leaderboard-screen" class="screen">
-  <h2>Рейтинг</h2>
-  <div id="leaderboard-list"></div>
-  <button class="btn-secondary" id="leaderboard-back" style="margin-top:16px">Назад</button>
+<!-- SHOP -->
+<div id="shop-screen" class="screen">
+  <h2>Магазин</h2>
+  <div id="shop-categories"></div>
+  <div id="shop-items"></div>
+  <button class="btn-secondary" id="shop-back" style="margin-top:14px">Назад</button>
+</div>
+
+<!-- TASKS -->
+<div id="tasks-screen" class="screen">
+  <h2>Задания</h2>
+  <div id="tasks-list"></div>
+  <button class="btn-secondary" id="tasks-back" style="margin-top:14px">Назад</button>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div id="ach-screen" class="screen">
+  <h2>Достижения</h2>
+  <div id="achievements-list"></div>
+  <button class="btn-secondary" id="ach-back" style="margin-top:14px">Назад</button>
 </div>
 
 <!-- DAILY -->
 <div id="daily-screen" class="screen">
-  <h2>Ежедневный вызов</h2>
-  <div id="daily-content" style="text-align:center;max-width:360px;line-height:1.6"></div>
-  <button class="btn-primary" id="daily-start" style="margin-top:20px;min-width:220px">Начать</button>
+  <h2>Ежедневная награда</h2>
+  <p style="color:#aaa;margin:6px 0" id="streak-info">Серия: 0 🔥</p>
+  <div class="streak-days" id="streak-days"></div>
+  <p id="daily-status" style="margin:10px 0;text-align:center;color:#ffd166;font-weight:800"></p>
+  <button class="btn-primary" id="daily-claim" style="min-width:200px">Получить</button>
   <button class="btn-secondary" id="daily-back" style="margin-top:10px">Назад</button>
+</div>
+
+<!-- AFK -->
+<div id="afk-screen" class="screen">
+  <h2>Комната отдыха</h2>
+  <div class="stat-row"><span>Доход:</span><span class="val"><svg class="svg" style="width:14px;height:14px"><use href="#i-coin"/></svg><span id="afk-rate">1</span>/мин</span></div>
+  <div class="stat-row"><span>Заработано:</span><span class="val" id="afk-earned">0</span></div>
+  <div class="stat-row"><span>Всего минут:</span><span class="val" id="afk-total">0</span></div>
+  <button class="btn-secondary" id="afk-back" style="margin-top:14px">Назад</button>
 </div>
 
 <!-- SETTINGS -->
 <div id="settings-screen" class="screen">
   <h2>Настройки</h2>
-  <label><input type="checkbox" id="music-toggle"> Музыка и звуки</label>
-  <p style="color:#888;font-size:12px;margin-top:20px;text-align:center;max-width:300px">Рекорд лучшего комбо: <span id="best-combo-stat" style="color:#ffd166;font-weight:800">0</span></p>
-  <p style="color:#888;font-size:12px;text-align:center;max-width:300px">Всего обслужено: <span id="total-served-stat" style="color:#ffd166;font-weight:800">0</span></p>
-  <button class="btn-danger" id="reset-progress" style="margin-top:24px">Сбросить прогресс</button>
-  <button class="btn-secondary" id="settings-back" style="margin-top:12px">Назад</button>
+  <label style="display:flex;align-items:center;gap:10px;margin:10px 0;font-size:15px;cursor:pointer"><input type="checkbox" id="music-toggle" style="width:20px;height:20px;accent-color:#ff6b35"> Музыка</label>
+  <p style="color:#888;font-size:12px;margin-top:14px;text-align:center">Лучшее комбо: <span id="best-combo-stat" style="color:#ffd166;font-weight:800">0</span></p>
+  <p style="color:#888;font-size:12px;text-align:center">Обслужено: <span id="total-served-stat" style="color:#ffd166;font-weight:800">0</span></p>
+  <button class="btn-secondary" id="reset-progress" style="margin-top:20px;border-color:rgba(230,57,70,.6);color:#ff8c8c">Сбросить прогресс</button>
+  <button class="btn-secondary" id="settings-back" style="margin-top:10px">Назад</button>
 </div>
 
 <div id="toast-area"></div>
-
 </div>
 
 <script>
-/* ====================== INGREDIENTS ====================== */
+/* ============================================================
+   INGREDIENTS
+============================================================ */
 const ING = {
-  bun_bottom: { name:'Нижняя булка', color:'#d4a574' },
-  bun_top:    { name:'Верхняя булка', color:'#c89566' },
-  patty:      { name:'Котлета',       color:'#8b4513' },
-  cheese:     { name:'Сыр',           color:'#ffd93d' },
-  lettuce:    { name:'Салат',         color:'#7bc043' },
-  tomato:     { name:'Помидор',       color:'#e63946' },
-  onion:      { name:'Лук',           color:'#c9a5e0' },
-  pickle:     { name:'Огурец',        color:'#6b8e23' },
-  bacon:      { name:'Бекон',         color:'#b22222' },
+  bun_bottom:{name:'Нижняя булка',color:'#d4a574',base:true},
+  bun_top:{name:'Верхняя булка',color:'#c89566',base:true},
+  patty:{name:'Котлета',color:'#8b4513',base:true},
+  cheese:{name:'Сыр',color:'#ffd93d',base:true},
+  lettuce:{name:'Салат',color:'#7bc043',base:true},
+  tomato:{name:'Помидор',color:'#e63946',base:true},
+  onion:{name:'Лук',color:'#c9a5e0',base:true},
+  pickle:{name:'Огурец',color:'#6b8e23',base:true},
+  bacon:{name:'Бекон',color:'#b22222',base:true},
+  double_patty:{name:'Двойная котлета',color:'#7a3b10',price:500,bonus:1.3},
+  cheddar:{name:'Чеддер',color:'#ffa500',price:400,bonus:1.2},
+  avocado:{name:'Авокадо',color:'#4a6030',price:800,bonus:1.5},
+  truffle:{name:'Трюфель',color:'#3a2a1a',price:1500,bonus:2},
+  gold_leaf:{name:'Золотой лист',color:'#ffd166',price:3000,bonus:3}
 };
-const UNLOCKS = [
-  { level:1,  ids:['bun_bottom','bun_top','patty','cheese'] },
-  { level:3,  ids:['lettuce','tomato'] },
-  { level:6,  ids:['onion','pickle'] },
-  { level:10, ids:['bacon'] },
+const LEVEL_UNLOCKS = [
+  {level:1,ids:['bun_bottom','bun_top','patty','cheese']},
+  {level:3,ids:['lettuce','tomato']},
+  {level:5,ids:['onion']},
+  {level:7,ids:['pickle']},
+  {level:10,ids:['bacon']}
 ];
-function unlockedIngredients(n){
-  return UNLOCKS.filter(u => u.level <= n).flatMap(u => u.ids);
-}
-function ingSvg(id){
-  return `<svg class="svg" viewBox="0 0 32 32"><use href="#ing-${id}"/></svg>`;
-}
 
-/* ====================== SAVE ====================== */
+/* ============================================================
+   THEMES
+============================================================ */
+const THEMES = {
+  classic:{name:'Классика',price:0,wall1:'#3d2f4e',wall2:'#2a1f3a',floor:'#5a3a24',floorLine:'#3d2419',counter:'#d4a574',counterTop:'#8b5a3c',menuBg:'#1a0f0a',menuText:'#ffd166',accent:'#ff6b35'},
+  retro:{name:'Ретро',price:2000,wall1:'#ffb6c1',wall2:'#ff8fab',floor:'#000',floorLine:'#333',counter:'#fff',counterTop:'#ff1493',menuBg:'#000',menuText:'#ff1493',accent:'#ff1493'},
+  modern:{name:'Модерн',price:5000,wall1:'#e0e0e0',wall2:'#b0b0b0',floor:'#2c2c2c',floorLine:'#444',counter:'#4a4a4a',counterTop:'#1a1a1a',menuBg:'#1a1a1a',menuText:'#00d9ff',accent:'#00d9ff'},
+  neon:{name:'Неон',price:10000,wall1:'#1a0033',wall2:'#0d001a',floor:'#000',floorLine:'#330066',counter:'#ff00ff',counterTop:'#00ffff',menuBg:'#000',menuText:'#00ffff',accent:'#ff00ff'},
+  luxury:{name:'Люкс',price:20000,wall1:'#2c1810',wall2:'#1a0f0a',floor:'#1a0f0a',floorLine:'#000',counter:'#d4af37',counterTop:'#8b6914',menuBg:'#1a0f0a',menuText:'#ffd700',accent:'#ffd700'}
+};
+
+/* ============================================================
+   FURNITURE
+============================================================ */
+const FURN = {
+  table:{label:'Столы',items:[
+    {id:'t_basic',name:'Базовый',price:0,color:'#8b5a3c'},
+    {id:'t_wood',name:'Дуб',price:1500,color:'#5a3a24'},
+    {id:'t_glass',name:'Стекло',price:4000,color:'#8899aa'},
+    {id:'t_neon',name:'Неон',price:9000,color:'#ff33cc'}
+  ]},
+  chair:{label:'Стулья',items:[
+    {id:'c_basic',name:'Базовый',price:0,color:'#8b5a3c'},
+    {id:'c_red',name:'Красный',price:1000,color:'#e63946'},
+    {id:'c_teal',name:'Бирюза',price:2500,color:'#4ecdc4'},
+    {id:'c_gold',name:'Золото',price:6000,color:'#ffd700'}
+  ]},
+  window:{label:'Окна',items:[
+    {id:'w_none',name:'Нет',price:0},
+    {id:'w_small',name:'Маленькое',price:900,color:'#88aacc'},
+    {id:'w_wide',name:'Панорама',price:3500,color:'#88ccff'},
+    {id:'w_stained',name:'Витраж',price:8000,color:'#ff66cc'}
+  ]},
+  floor:{label:'Плитка',items:[
+    {id:'f_wood',name:'Дерево',price:0,a:'#5a3a24',b:'#3d2419'},
+    {id:'f_checker',name:'Шахматы',price:1800,a:'#1a1a2e',b:'#e8e8f0'},
+    {id:'f_marble',name:'Мрамор',price:4500,a:'#dddddd',b:'#aaaaaa'},
+    {id:'f_neon',name:'Неон',price:9500,a:'#1a0033',b:'#ff00ff'}
+  ]},
+  decor:{label:'Декор',items:[
+    {id:'d_none',name:'Пусто',price:0},
+    {id:'d_plant',name:'Растение',price:700},
+    {id:'d_painting',name:'Картина',price:1800},
+    {id:'d_lamp',name:'Лампа',price:2500},
+    {id:'d_clock',name:'Часы',price:1500},
+    {id:'d_flower',name:'Цветок',price:1200},
+    {id:'d_sofa',name:'Диван',price:5500},
+    {id:'d_jukebox',name:'Автомат',price:7000}
+  ]}
+};
+const FURN_KEY = {table:'table',chair:'chair',window:'window',floor:'floor',decor:'decor'};
+
+/* ============================================================
+   SAVE
+============================================================ */
+const DEFAULT_SAVE = {
+  coins:0, maxLevel:1, stars:{}, highScores:[],
+  purchasedIngredients:[], purchasedThemes:['classic'], activeTheme:'classic',
+  purchasedFurniture:['t_basic','c_basic','w_none','f_wood','d_none'],
+  selectedFurniture:{table:'t_basic',chair:'c_basic',window:'w_none',floor:'f_wood',decor:'d_none'},
+  lastDaily:null, streak:0, musicOn:true, tutorialDone:false,
+  totalServed:0, totalPerfect:0, bestCombo:0, totalEarned:0,
+  taskProgress:{}, taskDay:'', achievements:[],
+  afkRate:1, afkTotal:0, afkEarned:0
+};
 const Save = {
-  data: {
-    coins:0, maxLevel:1, stars:{}, highScores:[],
-    musicOn:true, totalServed:0, bestCombo:0,
-    lastDaily:null, dailyBest:0
-  },
+  data: JSON.parse(JSON.stringify(DEFAULT_SAVE)),
   async load(){
     let raw = null;
-    try{
-      if(typeof vkBridge !== 'undefined'){
-        const r = await vkBridge.send('VKWebAppStorageGet', { keys:['burger_v2'] });
-        raw = r?.keys?.[0]?.value || null;
-      }
-    }catch(e){}
-    if(!raw){ try{ raw = localStorage.getItem('burger_v2'); }catch(e){} }
+    try{ if(typeof vkBridge!=='undefined'){ const r = await vkBridge.send('VKWebAppStorageGet',{keys:['burger_v3']}); raw = r?.keys?.[0]?.value || null; } }catch(e){}
+    if(!raw){ try{ raw = localStorage.getItem('burger_v3'); }catch(e){} }
     if(raw){ try{ Object.assign(this.data, JSON.parse(raw)); }catch(e){} }
   },
   async save(){
     const s = JSON.stringify(this.data);
-    try{ localStorage.setItem('burger_v2', s); }catch(e){}
-    try{
-      if(typeof vkBridge !== 'undefined'){
-        await vkBridge.send('VKWebAppStorageSet', { key:'burger_v2', value:s });
-      }
-    }catch(e){}
+    try{ localStorage.setItem('burger_v3', s); }catch(e){}
+    try{ if(typeof vkBridge!=='undefined') await vkBridge.send('VKWebAppStorageSet',{key:'burger_v3',value:s}); }catch(e){}
   }
 };
 
-/* ====================== AUDIO ====================== */
+/* ============================================================
+   AUDIO
+============================================================ */
 const Audio = {
-  ctx:null, on:true, musicTimer:null,
+  ctx:null, on:true,
   init(){
     const un = () => {
-      if(!this.ctx){
-        try{ this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
-      }
-      if(this.ctx?.state === 'suspended') this.ctx.resume();
+      if(!this.ctx){ try{ this.ctx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+      if(this.ctx?.state==='suspended') this.ctx.resume();
       document.removeEventListener('touchstart', un);
       document.removeEventListener('click', un);
     };
-    document.addEventListener('touchstart', un, { once:true });
-    document.addEventListener('click', un, { once:true });
+    document.addEventListener('touchstart', un, {once:true});
+    document.addEventListener('click', un, {once:true});
   },
-  beep(freq, dur=0.1, type='sine', vol=0.08){
-    if(!this.on || !this.ctx) return;
-    const o = this.ctx.createOscillator();
-    const g = this.ctx.createGain();
-    o.type = type; o.frequency.value = freq;
-    const now = this.ctx.currentTime;
-    g.gain.setValueAtTime(vol, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+  beep(f,d,t='sine',v=0.08){
+    if(!this.on||!this.ctx) return;
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type=t; o.frequency.value=f;
+    const n=this.ctx.currentTime;
+    g.gain.setValueAtTime(v,n); g.gain.exponentialRampToValueAtTime(0.001,n+d);
     o.connect(g); g.connect(this.ctx.destination);
-    o.start(now); o.stop(now + dur);
+    o.start(n); o.stop(n+d);
   },
-  click(){ this.beep(600, 0.06, 'square', 0.05); },
-  add(){ this.beep(500, 0.05, 'sine', 0.06); },
+  click(){ this.beep(600,0.05,'square',0.05); },
+  add(){ this.beep(500,0.04,'sine',0.05); },
   success(){
-    if(!this.on || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    [523, 659, 784, 1047].forEach((f, i) => {
-      const o = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      o.type = 'triangle'; o.frequency.value = f;
-      g.gain.setValueAtTime(0, now + i*0.06);
-      g.gain.linearRampToValueAtTime(0.09, now + i*0.06 + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.001, now + i*0.06 + 0.25);
+    if(!this.on||!this.ctx) return;
+    const n=this.ctx.currentTime;
+    [523,659,784].forEach((f,i)=>{
+      const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+      o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,n+i*0.06); g.gain.linearRampToValueAtTime(0.08,n+i*0.06+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,n+i*0.06+0.22);
       o.connect(g); g.connect(this.ctx.destination);
-      o.start(now + i*0.06); o.stop(now + i*0.06 + 0.25);
+      o.start(n+i*0.06); o.stop(n+i*0.06+0.22);
     });
   },
   error(){
-    if(!this.on || !this.ctx) return;
-    const o = this.ctx.createOscillator();
-    const g = this.ctx.createGain();
-    o.type = 'sawtooth';
-    o.frequency.setValueAtTime(240, this.ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.3);
-    g.gain.setValueAtTime(0.09, this.ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+    if(!this.on||!this.ctx) return;
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(240,this.ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(80,this.ctx.currentTime+0.3);
+    g.gain.setValueAtTime(0.08,this.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,this.ctx.currentTime+0.32);
     o.connect(g); g.connect(this.ctx.destination);
-    o.start(); o.stop(this.ctx.currentTime + 0.35);
+    o.start(); o.stop(this.ctx.currentTime+0.32);
   },
   coin(){
-    if(!this.on || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    const o = this.ctx.createOscillator();
-    const g = this.ctx.createGain();
-    o.type = 'square';
-    o.frequency.setValueAtTime(1200, now);
-    o.frequency.linearRampToValueAtTime(1800, now + 0.08);
-    g.gain.setValueAtTime(0.06, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    o.connect(g); g.connect(this.ctx.destination);
-    o.start(now); o.stop(now + 0.15);
+    if(!this.on||!this.ctx) return;
+    const n=this.ctx.currentTime;
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type='square'; o.frequency.setValueAtTime(1200,n); o.frequency.linearRampToValueAtTime(1800,n+0.08);
+    g.gain.setValueAtTime(0.05,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.14);
+    o.connect(g); g.connect(this.ctx.destination); o.start(n); o.stop(n+0.14);
   },
   levelUp(){
-    if(!this.on || !this.ctx) return;
-    const now = this.ctx.currentTime;
-    [262, 330, 392, 523, 659, 784].forEach((f, i) => {
-      const o = this.ctx.createOscillator();
-      const g = this.ctx.createGain();
-      o.type = 'triangle'; o.frequency.value = f;
-      g.gain.setValueAtTime(0, now + i*0.08);
-      g.gain.linearRampToValueAtTime(0.1, now + i*0.08 + 0.01);
-      g.gain.exponentialRampToValueAtTime(0.001, now + i*0.08 + 0.35);
+    if(!this.on||!this.ctx) return;
+    const n=this.ctx.currentTime;
+    [262,330,392,523,659,784].forEach((f,i)=>{
+      const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+      o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,n+i*0.08); g.gain.linearRampToValueAtTime(0.09,n+i*0.08+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,n+i*0.08+0.32);
       o.connect(g); g.connect(this.ctx.destination);
-      o.start(now + i*0.08); o.stop(now + i*0.08 + 0.35);
+      o.start(n+i*0.08); o.stop(n+i*0.08+0.32);
     });
   }
 };
 
-/* ====================== FX ====================== */
-function shake(){ document.body.classList.add('shake'); setTimeout(()=>document.body.classList.remove('shake'), 320); }
-function flyCoin(x, y, amount){
-  const el = document.createElement('div');
-  el.className = 'fly-coin';
-  el.textContent = '+' + amount;
-  el.style.left = x + 'px'; el.style.top = y + 'px';
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 1000);
+/* ============================================================
+   FX
+============================================================ */
+function shake(){ document.body.classList.add('shake'); setTimeout(()=>document.body.classList.remove('shake'),320); }
+function flyCoin(x,y,amt){
+  const el=document.createElement('div'); el.className='fly-coin'; el.textContent='+'+amt;
+  el.style.left=x+'px'; el.style.top=y+'px'; document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
 }
-function burst(x, y, color, count=15){
-  for(let i=0; i<count; i++){
-    const el = document.createElement('div');
-    el.className = 'particle';
-    el.style.left = x + 'px'; el.style.top = y + 'px';
-    el.style.background = color;
-    const a = Math.random()*Math.PI*2;
-    const d = 30 + Math.random()*70;
-    el.style.setProperty('--dx', Math.cos(a)*d + 'px');
-    el.style.setProperty('--dy', Math.sin(a)*d + 'px');
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), 700);
+function burst(x,y,color,cnt=15){
+  for(let i=0;i<cnt;i++){
+    const el=document.createElement('div'); el.className='particle';
+    el.style.left=x+'px'; el.style.top=y+'px'; el.style.background=color;
+    const a=Math.random()*Math.PI*2, d=30+Math.random()*70;
+    el.style.setProperty('--dx',Math.cos(a)*d+'px');
+    el.style.setProperty('--dy',Math.sin(a)*d+'px');
+    document.body.appendChild(el); setTimeout(()=>el.remove(),700);
   }
 }
-function comboFlash(text){
-  const el = document.createElement('div');
-  el.className = 'combo-flash';
-  el.textContent = text;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 800);
+function comboFlash(txt){
+  const el=document.createElement('div'); el.className='combo-flash'; el.textContent=txt;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),800);
 }
-function toast(text, kind=''){
-  const area = document.getElementById('toast-area');
-  const el = document.createElement('div');
-  el.className = 'toast ' + kind;
-  el.textContent = text;
-  area.appendChild(el);
-  setTimeout(()=>el.remove(), 2100);
+function toast(txt,kind=''){
+  const el=document.createElement('div'); el.className='toast '+kind; el.textContent=txt;
+  document.getElementById('toast-area').appendChild(el);
+  setTimeout(()=>el.remove(),2100);
 }
 
-/* ====================== LEVEL CONFIG ====================== */
-function getConfig(n){
-  const unlocked = unlockedIngredients(n);
-  const fillings = unlocked.filter(id => id !== 'bun_bottom' && id !== 'bun_top');
-  const totalCustomers = 4 + Math.floor(n * 0.5);
-  const concurrent = n >= 4 ? 3 : 2;
-  const basePatience = Math.max(18, 48 - n * 1.5);
-  const specialChance = n >= 5 ? 0.25 : 0;
-  const rushChance = n >= 8 ? 0.2 : 0;
-  const vipChance = n >= 12 ? 0.15 : 0;
-  return { n, unlocked, fillings, totalCustomers, concurrent, basePatience, specialChance, rushChance, vipChance };
-}
-
-/* ====================== CUSTOMER GEN ====================== */
-function rand(a, b){ return a + Math.floor(Math.random()*(b-a+1)); }
+/* ============================================================
+   HELPERS
+============================================================ */
+const $ = id => document.getElementById(id);
+const ingSvg = id => `<svg viewBox="0 0 32 32"><use href="#ing-${id}"/></svg>`;
+const svgIcon = name => `<svg class="svg"><use href="#i-${name}"/></svg>`;
+function rand(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
 function shuffle(a){ return [...a].sort(()=>Math.random()-0.5); }
 
+function unlockedBaseIngredients(level){
+  const ids=[];
+  LEVEL_UNLOCKS.forEach(u=>{ if(level>=u.level) ids.push(...u.ids); });
+  return ids;
+}
+function availableIngredientsForLevel(level){
+  const base = unlockedBaseIngredients(level);
+  const premium = Save.data.purchasedIngredients;
+  return [...new Set([...base, ...premium])];
+}
+function findFurn(cat,id){
+  const c = FURN[cat]; return c ? c.items.find(i=>i.id===id) : null;
+}
+
+/* ============================================================
+   LEVEL CONFIG
+============================================================ */
+function getLevelConfig(n){
+  const avail = availableIngredientsForLevel(n);
+  const fillings = avail.filter(id=>id!=='bun_bottom' && id!=='bun_top');
+  
+  let concurrent, total, patience, specials, rush, vip;
+  if(n<=3){ concurrent=1; total=3+n; patience=60; specials=0; rush=0; vip=0; }
+  else if(n<=8){ concurrent=2; total=6+Math.floor((n-3)*1.5); patience=45-n; specials=0.15; rush=0; vip=0; }
+  else if(n<=20){ concurrent=2; total=10+Math.floor((n-8)*1.2); patience=38-Math.floor((n-8)*0.5); specials=0.22; rush=0.15; vip=0; }
+  else if(n<=50){ concurrent=3; total=14+Math.floor((n-20)*0.8); patience=33-Math.floor((n-20)*0.2); specials=0.28; rush=0.2; vip=0.1; }
+  else if(n<=100){ concurrent=3; total=18+Math.floor((n-50)*0.5); patience=28-Math.floor((n-50)*0.1); specials=0.35; rush=0.25; vip=0.15; }
+  else { concurrent=3; total=Math.min(30,22+Math.floor((n-100)*0.15)); patience=Math.max(18,22-Math.floor((n-100)*0.05)); specials=0.4; rush=0.3; vip=0.2; }
+  
+  return { level:n, fillings, concurrent:Math.max(1,concurrent), total,
+    basePatience:Math.max(15,patience), specialChance:specials, rushChance:rush, vipChance:vip,
+    rewardBase: Math.round(12 + n*1.5) };
+}
+
+/* ============================================================
+   CUSTOMER GENERATION
+============================================================ */
 function makeCustomer(cfg){
-  let type = 'regular';
-  const r = Math.random();
-  if(r < cfg.vipChance) type = 'vip';
-  else if(r < cfg.vipChance + cfg.rushChance) type = 'rush';
+  let type='regular';
+  const r=Math.random();
+  if(r<cfg.vipChance) type='vip';
+  else if(r<cfg.vipChance+cfg.rushChance) type='rush';
   
-  let itemCount, patienceMult, rewardMult;
-  if(type === 'vip'){ itemCount = rand(4,5); patienceMult = 1.6; rewardMult = 2.2; }
-  else if(type === 'rush'){ itemCount = rand(1,2); patienceMult = 0.55; rewardMult = 1.6; }
-  else { itemCount = rand(1,3); patienceMult = 1; rewardMult = 1; }
+  let itemCount, patMult, rewMult;
+  if(type==='vip'){ itemCount=rand(3,4); patMult=1.5; rewMult=2.2; }
+  else if(type==='rush'){ itemCount=rand(1,2); patMult=0.55; rewMult=1.5; }
+  else { itemCount=rand(1,3); patMult=1; rewMult=1; }
   
-  const fillings = shuffle(cfg.fillings).slice(0, itemCount);
-  let order = ['bun_bottom', 'patty', ...fillings, 'bun_top'];
+  itemCount = Math.min(itemCount, cfg.fillings.length);
+  const chosen = shuffle(cfg.fillings).slice(0,itemCount);
+  let order = ['bun_bottom','patty', ...chosen, 'bun_top'];
   
   let modifier = null;
-  if(Math.random() < cfg.specialChance){
-    const candidates = [];
-    if(order.includes('onion')) candidates.push('no_onion');
-    if(order.includes('pickle')) candidates.push('no_pickle');
-    if(order.includes('tomato')) candidates.push('no_tomato');
-    candidates.push('double_cheese');
-    candidates.push('double_patty');
-    modifier = candidates[rand(0, candidates.length-1)];
+  if(cfg.specialChance > 0 && Math.random() < cfg.specialChance){
+    const cands=[];
+    if(order.includes('onion')) cands.push('no_onion');
+    if(order.includes('pickle')) cands.push('no_pickle');
+    if(order.includes('tomato')) cands.push('no_tomato');
+    cands.push('double_cheese','double_patty');
+    modifier = cands[rand(0,cands.length-1)];
+    if(modifier==='no_onion') order=order.filter(x=>x!=='onion');
+    else if(modifier==='no_pickle') order=order.filter(x=>x!=='pickle');
+    else if(modifier==='no_tomato') order=order.filter(x=>x!=='tomato');
+    else if(modifier==='double_cheese'){
+      const i=order.indexOf('cheese');
+      if(i>=0) order.splice(i+1,0,'cheese'); else order.splice(2,0,'cheese','cheese');
+    } else if(modifier==='double_patty'){
+      const i=order.indexOf('patty'); order.splice(i+1,0,'patty');
+    }
   }
   
-  if(modifier === 'no_onion') order = order.filter(x => x !== 'onion');
-  else if(modifier === 'no_pickle') order = order.filter(x => x !== 'pickle');
-  else if(modifier === 'no_tomato') order = order.filter(x => x !== 'tomato');
-  else if(modifier === 'double_cheese'){
-    const i = order.indexOf('cheese');
-    if(i >= 0) order.splice(i+1, 0, 'cheese');
-    else order.splice(2, 0, 'cheese', 'cheese');
-  } else if(modifier === 'double_patty'){
-    const i = order.indexOf('patty');
-    order.splice(i+1, 0, 'patty');
-  }
+  // Compute base reward with premium ingredient bonuses
+  let ingBonus = 1;
+  chosen.forEach(id=>{ const i=ING[id]; if(i?.bonus) ingBonus *= i.bonus; });
+  let reward = Math.round(cfg.rewardBase * rewMult * ingBonus);
   
-  const names = ['Аня','Ваня','Маша','Петя','Оля','Серёжа','Катя','Дима','Лена','Миша','Даша','Коля','Света','Гоша'];
-  const colors = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#e84393'];
-  const skins = ['#f5c6a0','#e0ac69','#c68642','#8d5524','#ffdbac'];
-  const hairs = ['#2c1810','#000000','#ffd700','#8b4513','#a0522d','#c45a2d'];
-  
-  const patience = Math.round(cfg.basePatience * patienceMult * 1000);
-  const reward = Math.round(15 * rewardMult * (1 + cfg.n * 0.12));
+  const names=['Аня','Ваня','Маша','Петя','Оля','Серёжа','Катя','Дима','Лена','Миша','Даша','Коля','Света','Гоша','Костя'];
+  const colors=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#e84393'];
+  const skins=['#f5c6a0','#e0ac69','#c68642','#8d5524','#ffdbac'];
+  const hairs=['#2c1810','#000000','#ffd700','#8b4513','#a0522d','#c45a2d'];
   
   return {
     type, order, modifier, reward,
-    patience, maxPatience: patience,
-    name: names[rand(0, names.length-1)],
-    color: colors[rand(0, colors.length-1)],
-    skin: skins[rand(0, skins.length-1)],
-    hair: hairs[rand(0, hairs.length-1)],
-    served: false
+    patience: Math.round(cfg.basePatience*patMod? cfg.basePatience : cfg.basePatience*patMult*1000),
+    maxPatience: Math.round(cfg.basePatience*patMult*1000),
+    name: names[rand(0,names.length-1)],
+    color: colors[rand(0,colors.length-1)],
+    skin: skins[rand(0,skins.length-1)],
+    hair: hairs[rand(0,hairs.length-1)],
+    served:false
   };
 }
-
 const MOD_LABEL = {
-  no_onion: '🚫 Без лука',
-  no_pickle: '🚫 Без огурца',
-  no_tomato: '🚫 Без помидора',
-  double_cheese: '×2 Сыр',
-  double_patty: '×2 Котлета'
+  no_onion:'🚫 Без лука', no_pickle:'🚫 Без огурца', no_tomato:'🚫 Без помидора',
+  double_cheese:'×2 Сыр', double_patty:'×2 Котлета'
 };
 
-/* ====================== GAME STATE ====================== */
+/* ============================================================
+   GAME STATE
+============================================================ */
 const G = {
-  mode: null,        // 'level' | 'daily'
-  cfg: null,
-  levelNum: 1,
-  coins: 0,          // earned this session
-  hearts: 3,
-  totalNeeded: 0,
-  totalServed: 0,
-  customers: [],     // active customers
-  selected: -1,
-  burger: [],        // current stack for selected
-  combo: 0,
-  maxCombo: 0,
-  lastFrame: 0,
-  raf: null,
-  active: false,
-  paused: false,
-  dailyModifier: null
+  active:false, paused:false, levelNum:1,
+  coins:0, hearts:3, totalNeeded:0, totalServed:0,
+  customers:[], selected:-1, burger:[],
+  combo:0, maxCombo:0,
+  cfg:null,
+  lastFrame:0, raf:null
 };
 
-/* ====================== UI REFS ====================== */
-const $ = id => document.getElementById(id);
-const sceneEl = $('scene');
-const ingredientsEl = $('ingredients');
-const burgerStackEl = $('burger-stack');
-const orderItemsEl = $('order-items');
-const orderNameEl = $('order-name');
-const orderModEl = $('order-mod-label');
-const heartsEl = $('hud-hearts');
-const hudCoinsEl = $('hud-coins');
-const hudProgressEl = $('hud-progress');
+/* ============================================================
+   SCENE RENDERING (SVG — called once per level)
+============================================================ */
+function escapeXml(s){ return s.replace(/[<>&"']/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
 
-/* ====================== SCREENS ====================== */
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = $(id);
-  if(el) el.classList.add('active');
+function renderSceneSVG(){
+  const theme = THEMES[Save.data.activeTheme] || THEMES.classic;
+  const sel = Save.data.selectedFurniture;
+  const floorItem = findFurn('floor', sel.floor) || {a:theme.floor, b:theme.floorLine};
+  const tableItem = findFurn('table', sel.table) || {color:'#8b5a3c'};
+  const chairItem = findFurn('chair', sel.chair) || {color:'#8b5a3c'};
+  const windowItem = findFurn('window', sel.window) || {id:'w_none'};
+  const decorItem = findFurn('decor', sel.decor) || {id:'d_none'};
+  
+  const svg = document.getElementById('scene-svg');
+  let html = `
+    <defs>
+      <pattern id="floorTiles" x="0" y="0" width="60" height="40" patternUnits="userSpaceOnUse">
+        <rect width="60" height="40" fill="${floorItem.a}"/>
+        <rect width="60" height="40" fill="none" stroke="${floorItem.b}" stroke-width="1.6"/>
+      </pattern>
+      <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${theme.wall1}"/>
+        <stop offset="1" stop-color="${theme.wall2}"/>
+      </linearGradient>
+      <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="${theme.accent}" stop-opacity=".5"/>
+        <stop offset="1" stop-color="${theme.accent}" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="800" height="205" fill="url(#wallGrad)"/>
+  `;
+  
+  // Windows
+  if(windowItem.id==='w_small'){
+    html += `
+      <rect x="60" y="60" width="80" height="70" rx="4" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="100" y1="60" x2="100" y2="130" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="60" y1="95" x2="140" y2="95" stroke="#1a0f2e" stroke-width="2"/>
+      <rect x="660" y="60" width="80" height="70" rx="4" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="700" y1="60" x2="700" y2="130" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="660" y1="95" x2="740" y2="95" stroke="#1a0f2e" stroke-width="2"/>
+    `;
+  } else if(windowItem.id==='w_wide'){
+    html += `
+      <rect x="40" y="50" width="140" height="95" rx="6" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="110" y1="50" x2="110" y2="145" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="40" y1="97" x2="180" y2="97" stroke="#1a0f2e" stroke-width="2"/>
+      <rect x="620" y="50" width="140" height="95" rx="6" fill="${windowItem.color}" opacity=".85" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="690" y1="50" x2="690" y2="145" stroke="#1a0f2e" stroke-width="2"/>
+      <line x1="620" y1="97" x2="760" y2="97" stroke="#1a0f2e" stroke-width="2"/>
+    `;
+  } else if(windowItem.id==='w_stained'){
+    html += `
+      <rect x="55" y="55" width="90" height="80" rx="6" fill="${windowItem.color}" opacity=".9" stroke="#1a0f2e" stroke-width="2"/>
+      <circle cx="100" cy="95" r="22" fill="#ffd166" opacity=".7"/>
+      <circle cx="100" cy="95" r="12" fill="#e63946" opacity=".8"/>
+      <rect x="655" y="55" width="90" height="80" rx="6" fill="${windowItem.color}" opacity=".9" stroke="#1a0f2e" stroke-width="2"/>
+      <circle cx="700" cy="95" r="22" fill="#4ecdc4" opacity=".7"/>
+      <circle cx="700" cy="95" r="12" fill="#e63946" opacity=".8"/>
+    `;
+  }
+  
+  // Decor
+  if(decorItem.id==='d_plant'){
+    html += `
+      <g transform="translate(180,130)"><path d="M-15 30 h30 l-4 -22 h-22 z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.5"/><path d="M0 8 V-6 M0 -6 q-12 -12 -18 -4 q4 12 18 4 M0 -6 q12 -12 18 -4 q-4 12 -18 4" fill="#4a8a20" stroke="#2a5a10" stroke-width=".8"/></g>
+      <g transform="translate(620,130)"><path d="M-15 30 h30 l-4 -22 h-22 z" fill="#c0392b" stroke="#7a1a10" stroke-width="1.5"/><path d="M0 8 V-6 M0 -6 q-12 -12 -18 -4 q4 12 18 4 M0 -6 q12 -12 18 -4 q-4 12 -18 4" fill="#4a8a20" stroke="#2a5a10" stroke-width=".8"/></g>
+    `;
+  } else if(decorItem.id==='d_painting'){
+    html += `
+      <g transform="translate(155,60)"><rect width="70" height="50" rx="3" fill="#8b6914" stroke="#5a3a24" stroke-width="3"/><rect x="4" y="4" width="62" height="42" fill="#2a1f3a"/><path d="M8 42 L22 26 L34 34 L50 18 L62 30 L62 42 Z" fill="#4ecdc4" opacity=".7"/><circle cx="56" cy="12" r="4" fill="#ffd166"/></g>
+      <g transform="translate(575,60)"><rect width="70" height="50" rx="3" fill="#8b6914" stroke="#5a3a24" stroke-width="3"/><rect x="4" y="4" width="62" height="42" fill="#2a1f3a"/><path d="M8 42 L22 26 L34 34 L50 18 L62 30 L62 42 Z" fill="#ff6b35" opacity=".7"/><circle cx="56" cy="12" r="4" fill="#4ecdc4"/></g>
+    `;
+  } else if(decorItem.id==='d_lamp'){
+    html += `<g transform="translate(130,50)"><path d="M-18 -14 h36 l-6 18 h-24 z" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/><line x1="0" y1="4" x2="0" y2="60" stroke="#666" stroke-width="2"/></g><g transform="translate(670,50)"><path d="M-18 -14 h36 l-6 18 h-24 z" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/><line x1="0" y1="4" x2="0" y2="60" stroke="#666" stroke-width="2"/></g>`;
+  } else if(decorItem.id==='d_clock'){
+    html += `<g transform="translate(140,80)"><circle cx="0" cy="0" r="20" fill="#f5e6c8" stroke="#8a5a00" stroke-width="3"/><line x1="0" y1="0" x2="0" y2="-12" stroke="#1a0f2e" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="0" x2="8" y2="4" stroke="#1a0f2e" stroke-width="2" stroke-linecap="round"/></g>`;
+  } else if(decorItem.id==='d_flower'){
+    html += `<g transform="translate(155,130)"><path d="M0 30 V10" stroke="#4a8a20" stroke-width="2"/><circle cx="0" cy="6" r="6" fill="#ff5c8a"/><circle cx="-6" cy="10" r="4.5" fill="#ff8cae"/><circle cx="6" cy="10" r="4.5" fill="#ff8cae"/><circle cx="0" cy="12" r="3.5" fill="#ffd166"/></g>`;
+  } else if(decorItem.id==='d_sofa'){
+    html += `<g transform="translate(190,160)"><rect x="-40" y="-14" width="80" height="24" rx="5" fill="#8b3d5c"/><rect x="-44" y="-22" width="10" height="32" rx="4" fill="#a04868"/><rect x="34" y="-22" width="10" height="32" rx="4" fill="#a04868"/></g>`;
+  } else if(decorItem.id==='d_jukebox'){
+    html += `<g transform="translate(180,120)"><path d="M-18 -34 q18 -12 36 0 v60 h-36 z" fill="#e63946" stroke="#7a1a10" stroke-width="2"/><circle cx="0" cy="-14" r="9" fill="#ffd166" stroke="#8a5a00" stroke-width="1.5"/><circle cx="0" cy="-14" r="3" fill="#8a5a00"/><rect x="-14" y="10" width="28" height="4" fill="#1a0f2e"/></g>`;
+  }
+  
+  // Menu board
+  html += `
+    <rect x="250" y="14" width="300" height="88" rx="10" fill="${theme.menuBg}" stroke="${theme.accent}" stroke-width="3"/>
+    <text x="400" y="44" text-anchor="middle" font-size="20" font-weight="900" fill="${theme.menuText}" font-family="sans-serif">🍔 БУРГЕРНАЯ</text>
+    <text x="400" y="68" text-anchor="middle" font-size="11" fill="${theme.menuText}" font-family="sans-serif" opacity="0.85">★ СВЕЖИЕ БУРГЕРЫ ★</text>
+    <text x="400" y="86" text-anchor="middle" font-size="10" fill="${theme.menuText}" font-family="sans-serif" opacity="0.7">— ОТКРЫТО —</text>
+  `;
+  
+  // Lamps
+  html += `
+    <circle cx="100" cy="30" r="26" fill="url(#lampGlow)"/>
+    <circle cx="100" cy="30" r="7" fill="${theme.accent}" opacity="0.85"/>
+    <circle cx="700" cy="30" r="26" fill="url(#lampGlow)"/>
+    <circle cx="700" cy="30" r="7" fill="${theme.accent}" opacity="0.85"/>
+  `;
+  
+  // Counter + floor
+  html += `<rect x="0" y="198" width="800" height="8" fill="${theme.counterTop}"/>`;
+  html += `<rect x="0" y="206" width="800" height="94" fill="url(#floorTiles)"/>`;
+  html += `<rect x="0" y="206" width="800" height="8" fill="rgba(0,0,0,0.35)"/>`;
+  
+  // Tables + chairs
+  [150,400,650].forEach(tx=>{
+    html += `
+      <g transform="translate(${tx},245)">
+        <ellipse cx="0" cy="18" rx="42" ry="6" fill="rgba(0,0,0,0.4)"/>
+        <rect x="-42" y="-2" width="84" height="10" rx="4" fill="${tableItem.color}" stroke="rgba(0,0,0,.35)" stroke-width="1"/>
+        <rect x="-6" y="8" width="12" height="12" fill="${tableItem.color}"/>
+      </g>
+      <g transform="translate(${tx-60},252)">
+        <rect x="-8" y="0" width="16" height="6" fill="${chairItem.color}"/>
+        <rect x="-8" y="-16" width="16" height="14" rx="2" fill="${chairItem.color}"/>
+      </g>
+      <g transform="translate(${tx+60},252)">
+        <rect x="-8" y="0" width="16" height="6" fill="${chairItem.color}"/>
+        <rect x="-8" y="-16" width="16" height="14" rx="2" fill="${chairItem.color}"/>
+      </g>
+    `;
+  });
+  
+  // Counter
+  html += `
+    <rect x="0" y="272" width="800" height="28" fill="${theme.counter}"/>
+    <rect x="0" y="272" width="800" height="5" fill="${theme.counterTop}"/>
+  `;
+  
+  svg.innerHTML = html;
 }
 
-/* ====================== CUSTOMER RENDER ====================== */
-function customerSvg(c, mood){
-  const eyes = mood === 'angry' ? `
-    <path d="M-8 -77 l4 -2 M8 -77 l-4 -2" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>
-    <circle cx="-5" cy="-76" r="1.5" fill="#222"/>
-    <circle cx="5" cy="-76" r="1.5" fill="#222"/>
-    <path d="M-5 -68 q5 4 10 0" stroke="#222" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  ` : mood === 'worried' ? `
-    <circle cx="-5" cy="-77" r="2" fill="#222"/>
-    <circle cx="5" cy="-77" r="2" fill="#222"/>
-    <path d="M-4 -69 q4 2 8 0" stroke="#222" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-  ` : `
-    <circle cx="-5" cy="-77" r="1.8" fill="#222"/>
-    <circle cx="5" cy="-77" r="1.8" fill="#222"/>
-    <path d="M-5 -70 q5 4 10 0" stroke="#222" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-  `;
+/* ============================================================
+   CUSTOMER RENDERING (cheap — DOM built only when list changes)
+============================================================ */
+function customerSvgBody(c){
+  // All three faces inline, CSS shows one based on data-mood
   return `
     <svg class="body-svg" viewBox="-40 -110 80 120">
       <ellipse cx="0" cy="6" rx="24" ry="5" fill="rgba(0,0,0,.4)"/>
@@ -700,103 +804,152 @@ function customerSvg(c, mood){
       <rect x="-5" y="-60" width="10" height="6" fill="${c.skin}"/>
       <circle cx="0" cy="-76" r="15" fill="${c.skin}" stroke="rgba(0,0,0,.2)" stroke-width="1"/>
       <path d="M-15 -78 Q-15 -94 0 -94 Q15 -94 15 -78 Q10 -85 0 -85 Q-10 -85 -15 -78 Z" fill="${c.hair}"/>
-      ${eyes}
-      <circle cx="-9" cy="-71" r="2.5" fill="rgba(255,120,120,${mood === 'angry' ? 0.7 : 0.35})"/>
-      <circle cx="9" cy="-71" r="2.5" fill="rgba(255,120,120,${mood === 'angry' ? 0.7 : 0.35})"/>
+      <g class="face-happy">
+        <circle cx="-5" cy="-77" r="1.8" fill="#222"/>
+        <circle cx="5" cy="-77" r="1.8" fill="#222"/>
+        <path d="M-5 -70 q5 4 10 0" stroke="#222" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+        <circle cx="-9" cy="-71" r="2.5" fill="rgba(255,120,120,0.35)"/>
+        <circle cx="9" cy="-71" r="2.5" fill="rgba(255,120,120,0.35)"/>
+      </g>
+      <g class="face-worried">
+        <circle cx="-5" cy="-77" r="2" fill="#222"/>
+        <circle cx="5" cy="-77" r="2" fill="#222"/>
+        <path d="M-4 -69 q4 2 8 0" stroke="#222" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      </g>
+      <g class="face-angry">
+        <path d="M-8 -79 l4 -1 M8 -79 l-4 -1" stroke="#222" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="-5" cy="-77" r="1.5" fill="#222"/>
+        <circle cx="5" cy="-77" r="1.5" fill="#222"/>
+        <path d="M-5 -68 q5 4 10 0" stroke="#222" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <circle cx="-9" cy="-71" r="2.5" fill="rgba(255,120,120,0.7)"/>
+        <circle cx="9" cy="-71" r="2.5" fill="rgba(255,120,120,0.7)"/>
+      </g>
     </svg>
   `;
 }
 
-function customerMood(c){
-  const pct = c.patience / c.maxPatience;
-  if(pct < 0.15) return 'angry';
-  if(pct < 0.4) return 'worried';
-  return 'happy';
-}
-
-function renderScene(){
-  sceneEl.innerHTML = '';
+// Called ONLY when list changes: initial, spawn, remove, selection change
+function rebuildCustomers(){
+  const layer = document.getElementById('customers-layer');
+  layer.innerHTML = '';
   const total = G.customers.length;
-  const spacing = 100 / (total + 1);
-  G.customers.forEach((c, i) => {
+  const spacing = 100/(total+1);
+  G.customers.forEach((c,i)=>{
     const wrap = document.createElement('div');
-    wrap.className = 'customer' + (i === G.selected ? ' selected' : '');
-    wrap.style.left = `calc(${spacing * (i+1)}% - 35px)`;
+    wrap.className = 'customer' + (i===G.selected ? ' selected' : '');
+    wrap.style.left = `calc(${spacing*(i+1)}% - 32px)`;
     wrap.dataset.idx = i;
+    const pct = c.patience/c.maxPatience;
+    const mood = pct<0.15?'angry':pct<0.4?'worried':'happy';
+    wrap.dataset.mood = mood;
     
-    const mood = customerMood(c);
-    let html = customerSvg(c, mood);
-    
-    // Order bubble
-    html += `<div class="order-bubble">${c.order.map(id => `<span class="ing">${ingSvg(id)}</span>`).join('')}</div>`;
-    // Modifier badge
-    if(c.modifier) html += `<div class="order-mod">${MOD_LABEL[c.modifier]}</div>`;
-    // Patience bar
-    const pct = Math.max(0, c.patience / c.maxPatience);
-    let barClass = '';
-    if(pct < 0.25) barClass = 'danger';
-    else if(pct < 0.5) barClass = 'warn';
-    html += `<div class="patience-bar"><div class="patience-fill ${barClass}" style="width:${pct*100}%"></div></div>`;
+    let html = customerSvgBody(c);
+    html += `<div class="order-bubble">${c.order.map(id=>`<span class="ing">${ingSvg(id)}</span>`).join('')}</div>`;
+    if(c.modifier) html += `<div class="mod-badge">${MOD_LABEL[c.modifier]}</div>`;
+    let barCls = pct<0.25?'danger':pct<0.5?'warn':'';
+    html += `<div class="patience-bar"><div class="patience-fill ${barCls}" style="width:${pct*100}%"></div></div>`;
     
     wrap.innerHTML = html;
-    wrap.addEventListener('click', () => selectCustomer(i));
-    sceneEl.appendChild(wrap);
+    // IMPORTANT: attach click ONCE
+    wrap.addEventListener('click', ()=>selectCustomer(i));
+    layer.appendChild(wrap);
   });
 }
 
-/* ====================== INGREDIENTS UI ====================== */
+// Called every frame: updates only style.width and data-mood
+function updateCustomerVisuals(){
+  const layer = document.getElementById('customers-layer');
+  if(!layer) return;
+  const wraps = layer.children;
+  for(let i=0; i<wraps.length; i++){
+    const wrap = wraps[i];
+    const c = G.customers[i];
+    if(!c){ continue; }
+    const pct = Math.max(0, c.patience / c.maxPatience);
+    const bar = wrap.querySelector('.patience-fill');
+    if(bar){
+      bar.style.width = (pct*100)+'%';
+      bar.classList.toggle('danger', pct<0.25);
+      bar.classList.toggle('warn', pct>=0.25 && pct<0.5);
+    }
+    const mood = pct<0.15?'angry':pct<0.4?'worried':'happy';
+    if(wrap.dataset.mood !== mood) wrap.dataset.mood = mood;
+  }
+}
+
+/* ============================================================
+   UI RENDERERS
+============================================================ */
 function renderIngredients(){
-  ingredientsEl.innerHTML = '';
-  const cfg = G.cfg;
-  cfg.unlocked.forEach(id => {
+  const el = document.getElementById('ingredients');
+  el.innerHTML = '';
+  const avail = availableIngredientsForLevel(G.levelNum);
+  avail.forEach(id=>{
     const btn = document.createElement('button');
     btn.className = 'ing-btn';
     btn.innerHTML = `<span class="ing">${ingSvg(id)}</span><span>${ING[id].name.split(' ')[0]}</span>`;
-    btn.addEventListener('click', () => addIngredient(id));
-    ingredientsEl.appendChild(btn);
+    btn.addEventListener('click', ()=>addIngredient(id));
+    el.appendChild(btn);
   });
 }
 
-/* ====================== ORDER PANEL ====================== */
-function renderOrderPanel(){
-  if(G.selected < 0 || !G.customers[G.selected]){
-    orderNameEl.textContent = 'Выберите клиента';
-    orderModEl.textContent = '';
-    orderItemsEl.innerHTML = '';
-    return;
-  }
-  const c = G.customers[G.selected];
-  orderNameEl.textContent = `👤 ${c.name}`;
-  orderModEl.innerHTML = c.modifier ? `<span style="color:#e63946">${MOD_LABEL[c.modifier]}</span>` : '';
-  orderItemsEl.innerHTML = c.order.map(id => `<span class="ing">${ingSvg(id)}</span>`).join('');
-}
-
 function renderBurgerStack(){
-  burgerStackEl.innerHTML = '';
-  G.burger.forEach(id => {
+  const el = document.getElementById('burger-stack');
+  el.innerHTML = '';
+  G.burger.forEach(id=>{
     const layer = document.createElement('div');
     layer.className = 'burger-layer';
     layer.style.background = ING[id].color;
     layer.innerHTML = `<span class="ing">${ingSvg(id)}</span><span>${ING[id].name}</span>`;
-    burgerStackEl.appendChild(layer);
+    el.appendChild(layer);
   });
 }
 
-/* ====================== GAME LOGIC ====================== */
+function renderOrderPanel(){
+  const nameEl = document.getElementById('order-name');
+  const modEl = document.getElementById('order-mod-label');
+  const itemsEl = document.getElementById('order-items');
+  if(G.selected<0 || !G.customers[G.selected]){
+    nameEl.textContent = 'Выберите клиента';
+    modEl.textContent = '';
+    itemsEl.innerHTML = '';
+    return;
+  }
+  const c = G.customers[G.selected];
+  nameEl.textContent = `👤 ${c.name}`;
+  modEl.innerHTML = c.modifier ? `<span style="color:#e63946">${MOD_LABEL[c.modifier]}</span>` : '';
+  itemsEl.innerHTML = c.order.map(id=>`<span class="ing">${ingSvg(id)}</span>`).join('');
+}
+
+function updateHearts(){
+  const el = document.getElementById('hud-hearts');
+  el.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const s = document.createElement('span');
+    s.className = 'heart'+(i>=G.hearts?' lost':'');
+    s.textContent = '❤';
+    el.appendChild(s);
+  }
+}
+
+/* ============================================================
+   GAME LOGIC
+============================================================ */
 function selectCustomer(i){
   if(!G.active) return;
-  if(i === G.selected) return;
+  if(i===G.selected) return;
+  if(!G.customers[i]) return;
   Audio.click();
   G.selected = i;
   G.burger = [];
-  renderScene();
+  rebuildCustomers();
   renderOrderPanel();
   renderBurgerStack();
 }
 
 function addIngredient(id){
   if(!G.active) return;
-  if(G.selected < 0){ toast('Сначала выберите клиента', 'bad'); return; }
+  if(G.selected<0){ toast('Сначала выберите клиента','bad'); return; }
   G.burger.push(id);
   Audio.add();
   renderBurgerStack();
@@ -809,165 +962,142 @@ function clearBurger(){
 
 function serve(){
   if(!G.active) return;
-  if(G.selected < 0 || !G.customers[G.selected]){ toast('Выберите клиента', 'bad'); return; }
+  if(G.selected<0 || !G.customers[G.selected]){ toast('Выберите клиента','bad'); return; }
   const c = G.customers[G.selected];
-  
   const a = [...G.burger].sort().join('|');
   const b = [...c.order].sort().join('|');
   
-  if(a === b){
-    // SUCCESS
+  if(a===b){
     Audio.success();
     c.served = true;
-    
     G.combo++;
-    if(G.combo > G.maxCombo) G.maxCombo = G.combo;
-    const comboMult = 1 + Math.min(1, (G.combo - 1) * 0.15);
+    if(G.combo>G.maxCombo) G.maxCombo = G.combo;
+    const comboMult = 1+Math.min(1,(G.combo-1)*0.15);
     const reward = Math.round(c.reward * comboMult);
     G.coins += reward;
     Save.data.coins += reward;
+    Save.data.totalEarned += reward;
     Save.data.totalServed++;
+    Save.data.totalPerfect++;
+    if(G.combo > Save.data.bestCombo) Save.data.bestCombo = G.combo;
     
-    // FX
-    const wrap = sceneEl.querySelector(`.customer[data-idx="${G.selected}"]`);
+    const wrap = document.querySelector(`.customer[data-idx="${G.selected}"]`);
     if(wrap){
       const r = wrap.getBoundingClientRect();
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      flyCoin(cx, cy, reward);
-      burst(cx, cy, '#ffd166', 18);
+      flyCoin(r.left+r.width/2, r.top+r.height/2, reward);
+      burst(r.left+r.width/2, r.top+r.height/2, '#ffd166', 18);
     }
-    if(G.combo >= 3) comboFlash('COMBO ×' + G.combo);
+    if(G.combo>=3) comboFlash('COMBO ×'+G.combo);
     Audio.coin();
-    
-    toast('✓ +' + reward, 'good');
+    toast('✓ +'+reward,'good');
     
     G.totalServed++;
-    hudCoinsEl.textContent = Save.data.coins;
-    hudProgressEl.textContent = G.totalServed + '/' + G.totalNeeded;
+    document.getElementById('hud-coins').textContent = Save.data.coins;
+    document.getElementById('lobby-coins').textContent = Save.data.coins;
+    document.getElementById('hud-progress').textContent = G.totalServed+'/'+G.totalNeeded;
     
-    // Remove customer
-    G.customers.splice(G.selected, 1);
+    trackTask('serve',1);
+    trackTask('earn',reward);
+    trackTask('perfect',1);
+    checkAchievements();
+    
+    G.customers.splice(G.selected,1);
     G.selected = -1;
     G.burger = [];
-    renderScene();
+    
+    if(G.totalServed>=G.totalNeeded){ Save.save(); endLevel(true); return; }
+    
+    setTimeout(()=>{
+      if(G.active && G.customers.length<G.cfg.concurrent){
+        G.customers.push(makeCustomer(G.cfg));
+      }
+      rebuildCustomers();
+    }, 400);
+    rebuildCustomers();
     renderOrderPanel();
     renderBurgerStack();
-    
-    // Win check
-    if(G.totalServed >= G.totalNeeded){
-      endLevel(true);
-      return;
-    }
-    
-    // Spawn
-    setTimeout(() => {
-      if(G.active && G.customers.length < G.cfg.concurrent){
-        G.customers.push(makeCustomer(G.cfg));
-        renderScene();
-      }
-    }, 400);
   } else {
-    // FAIL
     Audio.error();
     shake();
-    toast('✗ Не тот заказ', 'bad');
+    toast('✗ Не тот заказ','bad');
     G.combo = 0;
     loseHeart();
-    // Remove customer
-    const wrap = sceneEl.querySelector(`.customer[data-idx="${G.selected}"]`);
-    if(wrap) wrap.classList.add('leaving');
-    G.customers.splice(G.selected, 1);
-    G.selected = -1;
-    G.burger = [];
-    setTimeout(() => {
-      renderScene();
+    if(G.hearts > 0){
+      // Remove failed customer and spawn new
+      G.customers.splice(G.selected,1);
+      G.selected = -1;
+      G.burger = [];
+      setTimeout(()=>{
+        if(G.active && G.customers.length<G.cfg.concurrent){
+          G.customers.push(makeCustomer(G.cfg));
+        }
+        rebuildCustomers();
+      }, 400);
+      rebuildCustomers();
       renderOrderPanel();
       renderBurgerStack();
-      if(G.active && G.hearts > 0 && G.totalServed < G.totalNeeded && G.customers.length < G.cfg.concurrent){
-        G.customers.push(makeCustomer(G.cfg));
-        renderScene();
-      }
-    }, 500);
+    }
   }
 }
 
 function loseHeart(){
   G.hearts--;
   updateHearts();
-  if(G.hearts <= 0){
-    endLevel(false);
-  }
+  if(G.hearts<=0){ Save.save(); endLevel(false); }
 }
 
-function updateHearts(){
-  heartsEl.innerHTML = '';
-  for(let i = 0; i < 3; i++){
-    const s = document.createElement('span');
-    s.className = 'heart' + (i >= G.hearts ? ' lost' : '');
-    s.textContent = '❤';
-    heartsEl.appendChild(s);
-  }
-}
-
-function tick(dt){
+function tickPatience(dt){
   if(!G.active || G.paused) return;
-  let expired = [];
-  G.customers.forEach((c, i) => {
-    c.patience -= dt * 1000;
-    if(c.patience <= 0){
-      c.patience = 0;
-      expired.push(i);
-    }
+  const expired = [];
+  G.customers.forEach((c,i)=>{
+    c.patience -= dt*1000;
+    if(c.patience<=0){ c.patience=0; expired.push(i); }
   });
-  // Render scene if any patience changed significantly — do it every frame is fine
-  renderScene();
-  
-  // Handle expired (in reverse to splice safely)
-  expired.sort((a,b) => b-a).forEach(i => {
-    const wasSelected = (i === G.selected);
-    G.customers.splice(i, 1);
-    if(wasSelected){ G.selected = -1; G.burger = []; }
-    loseHeart();
-    Audio.error();
-    toast('😡 Клиент ушёл', 'bad');
-    G.combo = 0;
-  });
+  updateCustomerVisuals();
   if(expired.length){
-    renderOrderPanel();
-    renderBurgerStack();
-    if(G.active && G.hearts > 0 && G.totalServed < G.totalNeeded && G.customers.length < G.cfg.concurrent){
-      setTimeout(() => {
+    // Remove expired in reverse
+    expired.sort((a,b)=>b-a).forEach(i=>{
+      if(i===G.selected){ G.selected=-1; G.burger=[]; renderOrderPanel(); renderBurgerStack(); }
+      G.customers.splice(i,1);
+      G.combo = 0;
+      loseHeart();
+    });
+    Audio.error();
+    toast('😡 Клиент ушёл','bad');
+    rebuildCustomers();
+    // Refill
+    if(G.active && G.hearts>0 && G.totalServed<G.totalNeeded){
+      setTimeout(()=>{
         if(G.active){
-          G.customers.push(makeCustomer(G.cfg));
-          renderScene();
+          while(G.customers.length<G.cfg.concurrent && G.customers.length+G.totalServed<G.totalNeeded){
+            G.customers.push(makeCustomer(G.cfg));
+            break; // one at a time
+          }
+          rebuildCustomers();
         }
       }, 500);
     }
   }
 }
 
-/* ====================== LEVEL FLOW ====================== */
-function startLevel(n, mode='level', dailyMod=null){
+function gameLoop(ts){
+  const dt = Math.min((ts-G.lastFrame)/1000, 0.1);
+  G.lastFrame = ts;
+  tickPatience(dt);
+  if(G.active) G.raf = requestAnimationFrame(gameLoop);
+}
+
+/* ============================================================
+   LEVEL FLOW
+============================================================ */
+function startLevel(n){
   Audio.init();
   Save.data.maxLevel = Math.max(Save.data.maxLevel, n);
-  G.mode = mode;
   G.levelNum = n;
-  G.dailyModifier = dailyMod;
-  
-  if(mode === 'daily'){
-    // Harder config with modifiers
-    G.cfg = getConfig(Math.max(5, Save.data.maxLevel));
-    G.cfg.concurrent = 3;
-    G.cfg.basePatience = 20;
-    G.cfg.specialChance = 0.5;
-    G.cfg.totalCustomers = 8;
-  } else {
-    G.cfg = getConfig(n);
-  }
-  
+  G.cfg = getLevelConfig(n);
   G.coins = 0;
   G.hearts = 3;
-  G.totalNeeded = G.cfg.totalCustomers;
+  G.totalNeeded = G.cfg.total;
   G.totalServed = 0;
   G.customers = [];
   G.selected = -1;
@@ -977,211 +1107,460 @@ function startLevel(n, mode='level', dailyMod=null){
   G.paused = false;
   G.active = true;
   
-  // Initial customers
   const initial = Math.min(G.cfg.concurrent, G.totalNeeded);
-  for(let i=0; i<initial; i++){
-    G.customers.push(makeCustomer(G.cfg));
-  }
+  for(let i=0;i<initial;i++) G.customers.push(makeCustomer(G.cfg));
   
-  $('hud-level').textContent = G.levelNum;
-  hudCoinsEl.textContent = Save.data.coins;
-  hudProgressEl.textContent = '0/' + G.totalNeeded;
-  updateHearts();
+  document.getElementById('hud-level').textContent = G.levelNum;
+  document.getElementById('hud-coins').textContent = Save.data.coins;
+  document.getElementById('hud-progress').textContent = '0/'+G.totalNeeded;
+  
+  renderSceneSVG();
   renderIngredients();
-  renderScene();
   renderOrderPanel();
   renderBurgerStack();
+  updateHearts();
+  rebuildCustomers();
   showScreen('level');
   
   G.lastFrame = performance.now();
-  if(!G.raf) G.raf = requestAnimationFrame(loop);
+  if(G.raf) cancelAnimationFrame(G.raf);
+  G.raf = requestAnimationFrame(gameLoop);
 }
 
 function endLevel(win){
   G.active = false;
-  if(G.raf){ cancelAnimationFrame(G.raf); G.raf = null; }
+  if(G.raf){ cancelAnimationFrame(G.raf); G.raf=null; }
   
   const stars = win ? G.hearts : 0;
-  const starsStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-  
   if(win){
     Audio.levelUp();
-    // Save stars
     const prev = Save.data.stars[G.levelNum] || 0;
     if(stars > prev) Save.data.stars[G.levelNum] = stars;
-    
-    if(G.mode === 'level'){
-      Save.data.maxLevel = Math.max(Save.data.maxLevel, G.levelNum + 1);
-    } else if(G.mode === 'daily'){
-      Save.data.lastDaily = new Date().toDateString();
-      Save.data.dailyBest = Math.max(Save.data.dailyBest, G.totalServed);
-      // Bonus
-      Save.data.coins += 500;
-    }
-    Save.data.bestCombo = Math.max(Save.data.bestCombo, G.maxCombo);
-    
-    // Highscore entry
-    const totalStars = Object.values(Save.data.stars).reduce((a,b) => a+b, 0);
-    Save.data.highScores.push({
-      name: 'Игрок',
-      stars: totalStars,
-      level: Save.data.maxLevel,
-      date: Date.now()
-    });
-    Save.data.highScores.sort((a,b) => b.stars - a.stars || b.level - a.level);
-    Save.data.highScores = Save.data.highScores.slice(0, 20);
+    Save.data.maxLevel = Math.max(Save.data.maxLevel, G.levelNum + 1);
+    trackTask('complete',1);
+    Save.data.taskProgress = Save.data.taskProgress || {};
   }
-  
   Save.save();
+  checkAchievements();
   
-  // Show result
-  $('result-stars').innerHTML = [1,2,3].map(i =>
-    `<span class="star ${i <= stars ? 'on' : ''}">★</span>`
-  ).join('');
-  $('result-title').textContent = win
-    ? (G.mode === 'daily' ? 'Ежедневный вызов пройден!' : 'Уровень пройден!')
-    : 'Провал...';
-  $('result-coins').innerHTML = win
-    ? `+${G.coins} ${ingSvg('bun_top').replace('bun_top','')}💰` // simple text
-    : 'Попробуйте снова';
-  $('result-coins').textContent = win ? `Заработано: ${G.coins} монет` : 'Все сердца потеряны';
-  
-  $('next-btn').style.display = (win && G.mode === 'level') ? 'flex' : 'none';
-  $('retry-btn').style.display = 'flex';
+  document.getElementById('result-stars').innerHTML =
+    [1,2,3].map(i=>`<span class="star ${i<=stars?'on':''}">★</span>`).join('');
+  document.getElementById('result-title').textContent = win ? 'Уровень пройден!' : 'Провал...';
+  document.getElementById('result-coins').textContent = win ? `Заработано: ${G.coins} монет` : 'Все сердца потеряны';
+  document.getElementById('next-btn').style.display = win ? 'flex' : 'none';
   
   showScreen('result');
+  refreshLobby();
 }
 
-function loop(ts){
-  const dt = Math.min((ts - G.lastFrame) / 1000, 0.1);
-  G.lastFrame = ts;
-  tick(dt);
-  if(G.active) G.raf = requestAnimationFrame(loop);
+/* ============================================================
+   TASKS
+============================================================ */
+const TASK_POOL = [
+  {id:'serve_5',type:'serve',target:5,reward:100,text:'Обслужите 5 клиентов'},
+  {id:'serve_15',type:'serve',target:15,reward:300,text:'Обслужите 15 клиентов'},
+  {id:'serve_30',type:'serve',target:30,reward:600,text:'Обслужите 30 клиентов'},
+  {id:'perfect_5',type:'perfect',target:5,reward:200,text:'5 идеальных бургеров'},
+  {id:'perfect_15',type:'perfect',target:15,reward:500,text:'15 идеальных бургеров'},
+  {id:'earn_500',type:'earn',target:500,reward:150,text:'Заработайте 500 монет'},
+  {id:'earn_2000',type:'earn',target:2000,reward:500,text:'Заработайте 2000 монет'},
+  {id:'complete_3',type:'complete',target:3,reward:250,text:'Пройдите 3 уровня'},
+  {id:'complete_7',type:'complete',target:7,reward:600,text:'Пройдите 7 уровней'}
+];
+function ensureTasks(){
+  const today = new Date().toDateString();
+  if(Save.data.taskDay !== today){
+    Save.data.taskDay = today;
+    Save.data.taskProgress = {};
+    // Pick 3 random daily tasks
+    Save.data.dailyTasks = shuffle(TASK_POOL).slice(0,3).map(t=>({...t,claimed:false}));
+    Save.save();
+  }
+}
+function trackTask(type, amount){
+  ensureTasks();
+  const tasks = Save.data.dailyTasks || [];
+  let changed = false;
+  tasks.forEach(t=>{
+    if(t.claimed) return;
+    if(t.type !== type) return;
+    const cur = Save.data.taskProgress[t.id] || 0;
+    Save.data.taskProgress[t.id] = Math.min(t.target, cur + amount);
+    changed = true;
+  });
+  if(changed) Save.save();
 }
 
-/* ====================== LEVELS GRID ====================== */
+/* ============================================================
+   ACHIEVEMENTS
+============================================================ */
+const ACH_LIST = [
+  {id:'first',name:'Первая монета',desc:'Заработайте 1 монету',icon:'i-coin',check:s=>s.totalEarned>=1,reward:50},
+  {id:'ten',name:'Новичок',desc:'Обслужите 10 клиентов',icon:'i-burger',check:s=>s.totalServed>=10,reward:200},
+  {id:'fifty',name:'Опытный',desc:'Обслужите 50 клиентов',icon:'i-burger',check:s=>s.totalServed>=50,reward:1000},
+  {id:'hund',name:'Мастер',desc:'Обслужите 100 клиентов',icon:'i-burger',check:s=>s.totalServed>=100,reward:3000},
+  {id:'lvl10',name:'Уровень 10',desc:'Пройдите 10 уровень',icon:'i-map',check:s=>s.maxLevel>=11,reward:500},
+  {id:'lvl25',name:'Уровень 25',desc:'Пройдите 25 уровень',icon:'i-map',check:s=>s.maxLevel>=26,reward:2000},
+  {id:'lvl50',name:'Уровень 50',desc:'Пройдите 50 уровень',icon:'i-map',check:s=>s.maxLevel>=51,reward:8000},
+  {id:'combo5',name:'Комбо x5',desc:'5 идеальных подряд',icon:'i-fire',check:s=>s.bestCombo>=5,reward:800},
+  {id:'combo10',name:'Комбо x10',desc:'10 идеальных подряд',icon:'i-fire',check:s=>s.bestCombo>=10,reward:3000},
+  {id:'streak3',name:'Постоянный',desc:'Заходите 3 дня подряд',icon:'i-gift',check:s=>s.streak>=3,reward:600},
+  {id:'rich',name:'Богач',desc:'Накопите 100 000 монет',icon:'i-coin',check:s=>s.coins>=100000,reward:20000},
+  {id:'designer',name:'Дизайнер',desc:'Купите 8 предметов',icon:'i-cart',check:s=>s.purchasedFurniture.length>=13,reward:1500}
+];
+function checkAchievements(){
+  const unlocked = new Set(Save.data.achievements || []);
+  let newOnes = [];
+  ACH_LIST.forEach(a=>{
+    if(unlocked.has(a.id)) return;
+    try{
+      if(a.check(Save.data)){
+        unlocked.add(a.id);
+        Save.data.coins += a.reward;
+        newOnes.push(a);
+      }
+    }catch(e){}
+  });
+  if(newOnes.length){
+    Save.data.achievements = [...unlocked];
+    Save.save();
+    newOnes.forEach(a=>toast(`🏆 ${a.name} +${a.reward}`,'good'));
+    document.getElementById('lobby-coins').textContent = Save.data.coins;
+  }
+}
+
+/* ============================================================
+   SHOP
+============================================================ */
+let currentShopCat = 'ingredient';
+function renderShop(){
+  const catsEl = document.getElementById('shop-categories');
+  const itemsEl = document.getElementById('shop-items');
+  const cats = [
+    {id:'ingredient',label:'Ингредиенты'},
+    {id:'theme',label:'Интерьер'},
+    ...Object.keys(FURN).map(k=>({id:k,label:FURN[k].label})),
+    {id:'upgrade',label:'Улучшения'}
+  ];
+  catsEl.innerHTML = '';
+  cats.forEach(c=>{
+    const btn = document.createElement('button');
+    btn.className = 'shop-cat' + (c.id===currentShopCat?' active':'');
+    btn.textContent = c.label;
+    btn.addEventListener('click', ()=>{ Audio.click(); currentShopCat=c.id; renderShop(); });
+    catsEl.appendChild(btn);
+  });
+  
+  itemsEl.innerHTML = '';
+  
+  if(currentShopCat==='ingredient'){
+    Object.keys(ING).filter(id=>ING[id].price).forEach(id=>{
+      const ing = ING[id];
+      const owned = Save.data.purchasedIngredients.includes(id);
+      const el = document.createElement('div');
+      el.className = 'shop-item';
+      el.innerHTML = `
+        <div class="preview"><span style="width:36px;height:36px">${ingSvg(id)}</span></div>
+        <div class="name">${ing.name}</div>
+        <div class="price">${ing.price} ${svgIcon('coin')}</div>
+        <button class="btn-primary" ${owned?'disabled':''}>${owned?'Куплено':'Купить'}</button>
+      `;
+      if(!owned) el.querySelector('button').addEventListener('click', ()=>{
+        if(Save.data.coins>=ing.price){
+          Save.data.coins -= ing.price;
+          Save.data.purchasedIngredients.push(id);
+          Save.save();
+          document.getElementById('lobby-coins').textContent = Save.data.coins;
+          Audio.coin();
+          renderShop();
+        } else toast('Недостаточно монет','bad');
+      });
+      itemsEl.appendChild(el);
+    });
+    return;
+  }
+  
+  if(currentShopCat==='theme'){
+    Object.keys(THEMES).forEach(id=>{
+      const t = THEMES[id];
+      const owned = Save.data.purchasedThemes.includes(id);
+      const active = Save.data.activeTheme===id;
+      const el = document.createElement('div');
+      el.className = 'shop-item';
+      el.innerHTML = `
+        <div class="preview" style="background:linear-gradient(135deg,${t.wall1},${t.accent})">
+          <div style="position:absolute;bottom:0;left:0;right:0;height:14px;background:${t.floor}"></div>
+        </div>
+        <div class="name">${t.name}</div>
+        <div class="price">${owned?(active?'✓':''):t.price+' '+svgIcon('coin')}</div>
+        <button class="btn-primary" ${active?'disabled':''}>${owned?(active?'✓':'Применить'):'Купить'}</button>
+      `;
+      if(!active) el.querySelector('button').addEventListener('click', ()=>{
+        if(owned){
+          Save.data.activeTheme = id; Save.save(); renderShop();
+        } else if(Save.data.coins>=t.price){
+          Save.data.coins -= t.price;
+          Save.data.purchasedThemes.push(id);
+          Save.data.activeTheme = id;
+          Save.save();
+          document.getElementById('lobby-coins').textContent = Save.data.coins;
+          Audio.coin();
+          renderShop();
+        } else toast('Недостаточно монет','bad');
+      });
+      itemsEl.appendChild(el);
+    });
+    return;
+  }
+  
+  if(currentShopCat==='upgrade'){
+    const cost = Save.data.afkRate * 1000;
+    const el = document.createElement('div');
+    el.className = 'shop-item';
+    el.innerHTML = `
+      <div class="preview">${svgIcon('zzz')}</div>
+      <div class="name">+1 AFK/мин</div>
+      <div class="price">${cost} ${svgIcon('coin')}</div>
+      <button class="btn-primary">Купить</button>
+    `;
+    el.querySelector('button').addEventListener('click', ()=>{
+      if(Save.data.coins>=cost){
+        Save.data.coins -= cost;
+        Save.data.afkRate++;
+        Save.save();
+        document.getElementById('lobby-coins').textContent = Save.data.coins;
+        Audio.coin();
+        renderShop();
+      } else toast('Недостаточно монет','bad');
+    });
+    itemsEl.appendChild(el);
+    return;
+  }
+  
+  const cat = FURN[currentShopCat];
+  if(!cat) return;
+  cat.items.forEach(item=>{
+    const owned = Save.data.purchasedFurniture.includes(item.id);
+    const active = Save.data.selectedFurniture[currentShopCat]===item.id;
+    const el = document.createElement('div');
+    el.className = 'shop-item';
+    let bg = item.color || (item.a && item.b ? `linear-gradient(135deg,${item.a} 50%,${item.b} 50%)` : 'rgba(255,255,255,.1)');
+    el.innerHTML = `
+      <div class="preview" style="background:${bg}"></div>
+      <div class="name">${item.name}</div>
+      <div class="price">${owned?(active?'✓':''):item.price+' '+svgIcon('coin')}</div>
+      <button class="btn-primary" ${active?'disabled':''}>${owned?(active?'✓':'Применить'):'Купить'}</button>
+    `;
+    if(!active) el.querySelector('button').addEventListener('click', ()=>{
+      if(owned){
+        Save.data.selectedFurniture[currentShopCat] = item.id;
+        Save.save(); renderShop();
+      } else if(Save.data.coins>=item.price){
+        Save.data.coins -= item.price;
+        Save.data.purchasedFurniture.push(item.id);
+        Save.data.selectedFurniture[currentShopCat] = item.id;
+        Save.save();
+        document.getElementById('lobby-coins').textContent = Save.data.coins;
+        checkAchievements();
+        Audio.coin();
+        renderShop();
+      } else toast('Недостаточно монет','bad');
+    });
+    itemsEl.appendChild(el);
+  });
+}
+
+/* ============================================================
+   UI REFRESH
+============================================================ */
+function refreshLobby(){
+  document.getElementById('lobby-coins').textContent = Save.data.coins;
+  const totalStars = Object.values(Save.data.stars).reduce((a,b)=>a+b,0);
+  document.getElementById('total-stars').textContent = totalStars;
+  document.getElementById('best-level').textContent = Save.data.maxLevel;
+  const today = new Date().toDateString();
+  document.getElementById('daily-badge').style.display = (Save.data.lastDaily!==today) ? 'block' : 'none';
+}
+
 function renderLevelsGrid(){
-  const grid = $('levels-grid');
+  const grid = document.getElementById('levels-grid');
   grid.innerHTML = '';
-  const maxShow = Math.max(20, Save.data.maxLevel + 10);
-  const limit = Math.min(maxShow, 100);
-  for(let i = 1; i <= limit; i++){
+  const max = Save.data.maxLevel;
+  const show = Math.min(500, Math.max(20, max+10));
+  for(let i=1;i<=show;i++){
     const btn = document.createElement('button');
     btn.className = 'lvl-btn';
-    const unlocked = i <= Save.data.maxLevel;
-    const stars = Save.data.stars[i] || 0;
-    if(i === Save.data.maxLevel) btn.classList.add('current');
+    const unlocked = i<=max;
+    const stars = Save.data.stars[i]||0;
     if(!unlocked) btn.classList.add('locked');
-    if(stars > 0) btn.classList.add('done');
+    if(stars>0) btn.classList.add('done');
+    if(i===max) btn.classList.add('current');
     btn.innerHTML = `<span>${i}</span><span class="stars">${'★'.repeat(stars)}</span>`;
-    if(unlocked) btn.addEventListener('click', () => startLevel(i, 'level'));
+    if(unlocked) btn.addEventListener('click', ()=>{ Audio.click(); startLevel(i); });
     grid.appendChild(btn);
   }
 }
 
-/* ====================== LEADERBOARD ====================== */
-function renderLeaderboard(){
-  const list = $('leaderboard-list');
+function renderTasks(){
+  ensureTasks();
+  const list = document.getElementById('tasks-list');
   list.innerHTML = '';
-  const scores = Save.data.highScores || [];
-  if(scores.length === 0){
-    list.innerHTML = '<div style="text-align:center;color:#888;padding:20px">Пока нет результатов.<br>Пройдите уровень, чтобы попасть в рейтинг.</div>';
-    return;
-  }
-  scores.slice(0, 20).forEach((s, i) => {
-    const row = document.createElement('div');
-    row.className = 'lb-row' + (i < 3 ? ' top' : '');
-    row.innerHTML = `
-      <div class="lb-rank">${i+1}</div>
-      <div class="lb-info">
-        <div style="font-weight:800">Уровень ${s.level}</div>
-        <div style="color:#888;font-size:10px">${new Date(s.date).toLocaleDateString()}</div>
+  (Save.data.dailyTasks || []).forEach(t=>{
+    const cur = Save.data.taskProgress[t.id] || 0;
+    const done = cur>=t.target;
+    const el = document.createElement('div');
+    el.className = 'task-item' + (t.claimed?' done':'');
+    el.innerHTML = `
+      <div style="flex:1">
+        <div style="font-size:12px">${t.text}</div>
+        <div style="font-size:10px;color:#888">${cur}/${t.target}</div>
       </div>
-      <div class="lb-stars">⭐ ${s.stars}</div>
+      <div style="text-align:right">
+        <div style="color:#ffd166;font-weight:800;font-size:12px">${t.reward} ${svgIcon('coin')}</div>
+        ${done && !t.claimed ? `<button class="btn-primary" style="margin-top:3px;padding:5px 10px;font-size:10px">Забрать</button>` : ''}
+        ${t.claimed ? '<div style="margin-top:3px">✅</div>' : ''}
+      </div>
     `;
-    list.appendChild(row);
+    if(done && !t.claimed){
+      el.querySelector('button').addEventListener('click', ()=>{
+        t.claimed = true;
+        Save.data.coins += t.reward;
+        Save.save();
+        document.getElementById('lobby-coins').textContent = Save.data.coins;
+        Audio.coin();
+        renderTasks();
+      });
+    }
+    list.appendChild(el);
   });
 }
 
-/* ====================== DAILY ====================== */
+function renderAchievements(){
+  const list = document.getElementById('achievements-list');
+  list.innerHTML = '';
+  const unlocked = new Set(Save.data.achievements || []);
+  ACH_LIST.forEach(a=>{
+    const on = unlocked.has(a.id);
+    const el = document.createElement('div');
+    el.className = 'ach-item' + (on?' unlocked':'');
+    el.innerHTML = `
+      <div class="ach-icon">${svgIcon(a.icon.replace('i-',''))}</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:12px">${a.name}</div>
+        <div style="font-size:10px;color:#888">${a.desc}</div>
+      </div>
+      <div style="text-align:right;color:#ffd166;font-weight:800;font-size:11px">${a.reward} ${svgIcon('coin')}</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
 function renderDaily(){
-  const content = $('daily-content');
   const today = new Date().toDateString();
-  const done = Save.data.lastDaily === today;
-  content.innerHTML = `
-    <p style="margin-bottom:12px">Особый режим: <b>8 клиентов</b>, короткое терпение, много спецзаказов.</p>
-    <p style="color:#4ecdc4;font-weight:800">Награда: +500 монет</p>
-    <p style="color:#888;margin-top:12px;font-size:12px">Лучший результат: ${Save.data.dailyBest} обслужено</p>
-    ${done ? '<p style="color:#ffd166;margin-top:16px;font-weight:800">✓ Уже пройдено сегодня</p>' : ''}
-  `;
-  $('daily-start').disabled = done;
-  $('daily-start').textContent = done ? 'Пройдено' : 'Начать';
+  const done = Save.data.lastDaily===today;
+  const streakInfo = document.getElementById('streak-info');
+  streakInfo.textContent = 'Серия: ' + Save.data.streak + ' 🔥';
+  const daysEl = document.getElementById('streak-days');
+  daysEl.innerHTML = '';
+  for(let i=1;i<=7;i++){
+    const d = document.createElement('div');
+    d.className = 'streak-day' + (i<=Save.data.streak?' done':'');
+    if(i===Save.data.streak+1) d.classList.add('today');
+    d.textContent = i;
+    daysEl.appendChild(d);
+  }
+  const status = document.getElementById('daily-status');
+  const btn = document.getElementById('daily-claim');
+  if(done){
+    status.textContent = 'Уже получено сегодня';
+    btn.disabled = true;
+  } else {
+    const rewards = [100,200,400,800,1600,3200,6400];
+    const r = rewards[Math.min(Save.data.streak,6)];
+    status.innerHTML = `День ${Math.min(Save.data.streak+1,7)}: +${r} ${svgIcon('coin')}`;
+    btn.disabled = false;
+  }
 }
 
-/* ====================== LOBBY REFRESH ====================== */
-function refreshLobby(){
-  const totalStars = Object.values(Save.data.stars).reduce((a,b) => a+b, 0);
-  $('total-stars').textContent = totalStars;
-  $('best-level').textContent = Save.data.maxLevel;
+/* ============================================================
+   SCREEN SWITCH
+============================================================ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
 }
 
-/* ====================== SETTINGS ====================== */
-function refreshSettings(){
-  $('music-toggle').checked = Save.data.musicOn;
-  $('best-combo-stat').textContent = Save.data.bestCombo;
-  $('total-served-stat').textContent = Save.data.totalServed;
-}
-
-/* ====================== EVENT BINDING ====================== */
-function bind(){
-  $('play-btn').addEventListener('click', () => { Audio.click(); startLevel(Save.data.maxLevel, 'level'); });
-  $('levels-btn').addEventListener('click', () => { Audio.click(); renderLevelsGrid(); showScreen('levels-screen'); });
-  $('leaderboard-btn').addEventListener('click', () => { Audio.click(); renderLeaderboard(); showScreen('leaderboard-screen'); });
-  $('settings-btn').addEventListener('click', () => { Audio.click(); refreshSettings(); showScreen('settings-screen'); });
-  $('daily-btn').addEventListener('click', () => { Audio.click(); renderDaily(); showScreen('daily-screen'); });
+/* ============================================================
+   EVENTS
+============================================================ */
+function bindEvents(){
+  const on = (id,fn)=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('click', ()=>{ Audio.click(); fn(); });
+  };
   
-  $('levels-back').addEventListener('click', () => showScreen('lobby'));
-  $('leaderboard-back').addEventListener('click', () => showScreen('lobby'));
-  $('daily-back').addEventListener('click', () => showScreen('lobby'));
-  $('settings-back').addEventListener('click', () => { refreshLobby(); showScreen('lobby'); });
-  $('to-lobby-btn').addEventListener('click', () => { refreshLobby(); showScreen('lobby'); });
+  on('play-btn', ()=>startLevel(Save.data.maxLevel));
+  on('levels-btn', ()=>{ renderLevelsGrid(); showScreen('levels-screen'); });
+  on('shop-btn', ()=>{ renderShop(); showScreen('shop-screen'); });
+  on('tasks-btn', ()=>{ renderTasks(); showScreen('tasks-screen'); });
+  on('ach-btn', ()=>{ renderAchievements(); showScreen('ach-screen'); });
+  on('daily-btn', ()=>{ renderDaily(); showScreen('daily-screen'); });
+  on('afk-btn', ()=>{ refreshAFK(); showScreen('afk-screen'); });
+  on('settings-btn', ()=>{ refreshSettings(); showScreen('settings-screen'); });
   
-  $('next-btn').addEventListener('click', () => {
-    Audio.click();
-    startLevel(Math.min(G.levelNum + 1, 100), 'level');
-  });
-  $('retry-btn').addEventListener('click', () => {
-    Audio.click();
-    if(G.mode === 'daily') startLevel(Save.data.maxLevel, 'daily');
-    else startLevel(G.levelNum, 'level');
-  });
+  on('levels-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('shop-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('tasks-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('ach-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('daily-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('afk-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('settings-back', ()=>{ refreshLobby(); showScreen('lobby'); });
+  on('to-lobby-btn', ()=>{ refreshLobby(); showScreen('lobby'); });
   
-  $('daily-start').addEventListener('click', () => {
-    if(Save.data.lastDaily === new Date().toDateString()) return;
-    Audio.click();
-    startLevel(Save.data.maxLevel, 'daily');
-  });
-  
-  $('serve-btn').addEventListener('click', serve);
-  $('clear-btn').addEventListener('click', () => { Audio.click(); clearBurger(); });
-  $('quit-btn').addEventListener('click', () => {
-    if(confirm('Выйти из уровня? Прогресс не сохранится.')){
+  on('serve-btn', serve);
+  on('clear-btn', clearBurger);
+  on('quit-btn', ()=>{
+    if(confirm('Выйти из уровня? Прогресс уровня не сохранится.')){
       G.active = false;
-      if(G.raf){ cancelAnimationFrame(G.raf); G.raf = null; }
-      refreshLobby();
-      showScreen('lobby');
+      if(G.raf){ cancelAnimationFrame(G.raf); G.raf=null; }
+      refreshLobby(); showScreen('lobby');
     }
   });
   
-  $('music-toggle').addEventListener('change', e => {
+  on('next-btn', ()=>startLevel(Math.min(G.levelNum+1, 500)));
+  on('retry-btn', ()=>startLevel(G.levelNum));
+  
+  on('daily-claim', ()=>{
+    const today = new Date().toDateString();
+    if(Save.data.lastDaily===today) return;
+    // Check streak continuity
+    const last = Save.data.lastDaily ? new Date(Save.data.lastDaily) : null;
+    const now = new Date(today);
+    const diff = last ? Math.round((now-last)/(1000*60*60*24)) : 999;
+    if(diff>1) Save.data.streak = 0;
+    Save.data.streak++;
+    Save.data.lastDaily = today;
+    const rewards = [100,200,400,800,1600,3200,6400];
+    const r = rewards[Math.min(Save.data.streak-1,6)];
+    Save.data.coins += r;
+    Save.save();
+    checkAchievements();
+    Audio.coin();
+    toast('+'+r+' монет','good');
+    renderDaily();
+    refreshLobby();
+  });
+  
+  document.getElementById('music-toggle').addEventListener('change', e=>{
     Save.data.musicOn = e.target.checked;
     Audio.on = e.target.checked;
     Save.save();
   });
   
-  $('reset-progress').addEventListener('click', () => {
+  on('reset-progress', ()=>{
     if(confirm('Точно сбросить весь прогресс?')){
-      Save.data = { coins:0, maxLevel:1, stars:{}, highScores:[], musicOn:true, totalServed:0, bestCombo:0, lastDaily:null, dailyBest:0 };
+      Save.data = JSON.parse(JSON.stringify(DEFAULT_SAVE));
       Save.save();
       refreshLobby();
       refreshSettings();
@@ -1190,33 +1569,61 @@ function bind(){
     }
   });
   
-  // Keyboard shortcut (desktop)
-  document.addEventListener('keydown', e => {
+  // Keyboard
+  document.addEventListener('keydown', e=>{
     if(!G.active) return;
-    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); serve(); }
-    if(e.key === 'Escape'){ e.preventDefault(); clearBurger(); }
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); serve(); }
+    if(e.key==='Escape'){ e.preventDefault(); clearBurger(); }
   });
 }
 
-/* ====================== INIT ====================== */
+function refreshAFK(){
+  document.getElementById('afk-rate').textContent = Save.data.afkRate;
+  document.getElementById('afk-earned').textContent = Save.data.afkEarned;
+  document.getElementById('afk-total').textContent = Save.data.afkTotal;
+}
+
+function refreshSettings(){
+  document.getElementById('music-toggle').checked = Save.data.musicOn;
+  document.getElementById('best-combo-stat').textContent = Save.data.bestCombo;
+  document.getElementById('total-served-stat').textContent = Save.data.totalServed;
+}
+
+/* ============================================================
+   AFK tick (passive income)
+============================================================ */
+let afkTimer = null;
+function startAFKTicker(){
+  if(afkTimer) return;
+  afkTimer = setInterval(()=>{
+    if(Save.data.afkRate > 0){
+      Save.data.coins += Save.data.afkRate;
+      Save.data.afkEarned += Save.data.afkRate;
+      Save.data.afkTotal += 1;
+      Save.data.totalEarned += Save.data.afkRate;
+      document.getElementById('lobby-coins').textContent = Save.data.coins;
+      if(document.getElementById('afk-earned')) refreshAFK();
+    }
+  }, 60000);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
 async function init(){
   Audio.init();
-  Audio.on = true;
-  
   try{
-    if(typeof vkBridge !== 'undefined'){
-      await vkBridge.send('VKWebAppInit');
-    }
+    if(typeof vkBridge!=='undefined') await vkBridge.send('VKWebAppInit');
   }catch(e){}
-  
   await Save.load();
   Audio.on = Save.data.musicOn;
-  
-  bind();
+  ensureTasks();
+  bindEvents();
   refreshLobby();
+  startAFKTicker();
   
-  $('splash').classList.add('hidden');
-  setTimeout(() => $('splash').remove(), 500);
+  document.getElementById('splash').classList.add('hidden');
+  setTimeout(()=>{ const s = document.getElementById('splash'); if(s) s.remove(); }, 500);
 }
 
 document.addEventListener('DOMContentLoaded', init);
